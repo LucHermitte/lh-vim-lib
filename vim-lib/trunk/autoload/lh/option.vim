@@ -1,5 +1,5 @@
 "=============================================================================
-" $Id: option.vim 5 2006-12-02 03:58:52Z Luc Hermitte $
+" $Id$
 " File:		autoload/lh/option.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>

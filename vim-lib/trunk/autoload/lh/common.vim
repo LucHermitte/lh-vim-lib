@@ -1,5 +1,5 @@
 "=============================================================================
-" $Id: common.vim 5 2006-12-02 03:58:52Z Luc Hermitte $
+" $Id$
 " File:		common.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
