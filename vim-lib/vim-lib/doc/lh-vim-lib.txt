@@ -1,0 +1,572 @@
+*lh-vim-lib.txt*        Vim common libraries (v2.0.4)
+                        For Vim version 7+	Last change: $Date$ (08th Feb 2008)
+
+                        By Luc Hermitte
+                        hermitte {at} free {dot} fr
+
+
+==============================================================================
+CONTENTS                                      *lhvl-contents*      {{{1
+|lhvl-presentation|     Presentation
+|lhvl-functions|        Functions
+    
+|add-local-help|        Instructions on installing this help file
+
+
+------------------------------------------------------------------------------
+PRESENTATION                                  *lhvl-presentation*  {{{1
+
+|lh-vim-lib| is a library that defines some common VimL functions I use in my
+various plugins and ftplugins.
+This library has been conceived as a suite of |autoload| plugins, and a few
+|macros| plugins. As such, it requires Vim 7+.
+
+
+==============================================================================
+FUNCTIONS                                     *lhvl-functions*     {{{1
+{{{3Functions list~
+Miscellanous functions:                                 |lhvl#misc|
+- |lh#common#ErrorMsg()|
+- |lh#common#WarningMsg()|
+- |lh#common#CheckDeps()|
+- |lh#option#Get()|
+- |lh#list#Match()|
+- |lh#askvim#Exe()|
+- |lh#position#IsBefore()|
+- |lh#position#CharAtMark()|
+- |lh#position#CharAtPos()|
+Paths related functions:                                |lhvl#path|
+- |lh#path#Simplify()|
+- |lh#path#StripCommon()|
+- |lh#path#StripStart()|
+- |lh#path#isAbsolutePath()|
+- |lh#path#isURL()|
+- |lh#path#SelectOne()|
+- |lh#path#ToRelative()|
+- |lh#path#GlobAsList()|
+Commands related functions:                             |lhvl#command|
+- |lh#command#New()| (alpha version)
+- |lh#command#Fargs2String()| (alpha version)
+Menus related functions:                                |lhvl#menu|
+- |lh#menu#DefToggleItem()|
+- |lh#menu#Text()|
+- |lh#menu#Make()|
+- |lh#menu#IVN_Make()|
+- |lh#menu#CMD_andclear_v()| (to document)
+- |lh#menu#Map_all()| (to document)
+- |lh#askvim#Menu()| (beta version)
+Buffers related functions:                              |lhvl#buffer|
+- |lh#buffer#Find()|
+- |lh#buffer#Jump()|
+- |lh#buffer#Scratch()|
+- |lh#buffer#dialog#toggle_help()| (beta version ; to document)
+- |lh#buffer#dialog#add_help()| (beta version ; to document)
+- |lh#buffer#dialog#new()| (beta version ; to document)
+Syntax related functions:				|lhvl#syntax|
+- |lh#syntax#NameAt()|
+- |lh#syntax#NameAtMark()|
+- |lh#syntax#Skip()|
+- |lh#syntax#SkipAt()|
+- |lh#syntax#SkipAtMark()|
+- |lh#syntax#SynListRaw()|
+- |lh#syntax#SynList()| (to document)
+
+}}}2
+------------------------------------------------------------------------------
+MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
+
+
+                                                *lh#common#ErrorMsg()*  {{{3
+lh#common#ErrorMsg({text})~
+@param  {text}    Error message to display
+@return nothing
+
+This function displays an error message in a |confirm()| box if gvim is being
+used, or as a standard vim error message through |:echoerr| otherwise. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#common#WarningMsg()* {{{3
+lh#common#WarningMsg({text})~
+@param  {text}    Error message to display
+@return nothing
+
+This function displays a warning message highlighted with |WarningMsg| syntax.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#common#CheckDeps()* {{{3
+lh#common#CheckDeps({symbol},{file},{path},{requester})~
+@param  {symbol}    Symbol required, see |exists()| for symbol format.
+@param  {file}      File in which the symbol is expected to be defined
+@param  {path}      Path where the file can be found
+@param  {requester} Name of the script in need of this symbol
+@return 0/1 whether the {symbol} exists
+
+Checks if {symbol} exists in vim. If not, this function first tries
+to |:source| the {file} in which the {symbol} is expected to be defined. If the
+{symbol} is still not defined, an error message is issued (with
+|lh#common#ErrorMsg()|, and 0 is returned.
+
+Example: >
+    if   
+          \    !lh#common#CheckDeps('*Cpp_CurrentScope', 
+          \                     'cpp_FindContextClass.vim', 'ftplugin/cpp/',
+          \                     'cpp#GotoFunctionImpl.vim')
+          \ || !lh#common#CheckDeps(':CheckOptions',
+          \                     'cpp_options-commands.vim', 'ftplugin/cpp/',
+          \                     'cpp#GotoFunctionImpl.vim')
+      let &cpo=s:cpo_save
+      finish
+    endif
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#option#Get()*       {{{3
+lh#option#Get({name},{default}[,{scopes}])~
+@param {name}       Name of the option to fetch
+@param {default}    Default value in case the option is not defined
+@param {scopes}     Vim scopes in which the options must be searched,
+                    default="bg".
+@return b:{name} if it exists, of g:{name} if it exists, or {default}
+otherwise.
+
+This function fetches the value of an user defined option (not Vim |options|).
+The option can be either a |global-variable|, a |buffer-variable|, or even
+a|window-variable|.
+
+The order of the variables checked can be specified through the optional
+argument {scopes}. By default, buffer-local options have the priority over
+global options.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#list#Match()*       {{{3
+lh#list#Match({list},{pattern})~
+@param {list}    |List| 
+@param {pattern} |expr-string|
+@return the lowest index in |List| {list} where the item matches {pattern}.
+@returns -1 if no item matches {pattern}.
+@see |index()|, |match()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#askvim#Exe()*       {{{3
+lh#askvim#Exe({command})~
+@param {command}  Command to execute from vim.
+@return what the command echos while executed.
+@note This function encapsultates |redir| without altering any register.
+
+Some informations aren't directly accessible through vim API (|functions|).
+However, they can be obtained by executing some commands, and redirecting the
+result of these commands.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#askvim#Menu()*      {{{3
+lh#askvim#Menu({menuid},{modes})~
+@param {menuid}  Menu identifier.
+@param {modes}   List of modes
+@return Information related to the {menuid}
+@todo still bugged
+
+This function provides a way to obtain information related to a menu entry in
+Vim.
+
+The format of the result being «to be stabilized»
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#position#IsBefore()* {{{3
+lh#position#IsBefore({lhs_pos},{rhs_pos})~
+@param[in] positions as those returned from |getpos()|
+@return whether {lhs_pos} is before {rhs_pos}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                             *lh#position#CharAtMark()* {{{3
+lh#position#CharAtMark({mark})~
+@return the character at a given |mark|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                              *lh#position#CharAtPos()* {{{3
+lh#position#CharAtPos({pos})~
+@return the character at a position (see |getpos()|).
+
+
+------------------------------------------------------------------------------
+PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#Simplify()*    {{{3
+lh#path#Simplify({pathname})~
+@param {pathname}  Pathname to simplify
+@return the simplified pathname
+
+This function works like |simplify()|, except that it also strips the leading
+"./".
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#StripCommon()* {{{3
+lh#path#StripCommon({pathnames})~
+@param[in,out] {pathnames} |List| of pathnames to simplify
+@return the simplified pathnames
+
+This function strips all pathnames from their common leading part.
+e.g.: >
+ :echo lh#path#StripCommon(['foo/bar/file','foo/file', 'foo/foo/file'])
+echoes >
+ ['bar/file','file', 'foo/file']
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                 *lh#path#StripStart()* {{{3
+lh#path#StripStart({pathname}, {pathslist})~
+@param[in] {pathname} name to simplify
+@param[in] {pathslist} list of pathname (can be a |string| of pathnames
+separated by ",", of a |List|).
+Strip, {pathname}, the occurrence of any path from {pathslist}.
+
+This function strips all pathnames from their common leading part.
+e.g.: >
+ :echo lh#path#StripStart($HOME.'/.vim/template/template.bar',
+   \ ['/home/foo/.vim', '/usr/local/share/vim/'])
+ :echo lh#path#StripStart($HOME.'/.vim/template/template.bar',&rtp)
+echoe >
+ template/template.bar
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#isAbsolutePath()* {{{3
+lh#path#isAbsolutePath({path})~
+@return {path} Path to test
+@return whether the path is an absolute path
+@note Supports Unix absolute paths, Windows absolute paths, and UNC paths
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#isURL()*       {{{3
+lh#path#isURL({path})~
+@return {path} Path to test
+@return whether the path is an URL
+@note Supports http(s)://, (s)ftp://, dav://, fetch://, file://, rcp://,
+rsynch://, scp://
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#SelectOne()*   {{{3
+lh#path#SelectOne({pathnames},{prompt})~
+@param[in] {pathnames} |List| of pathname
+@param     {prompt}     Prompt for the dialog box
+
+@return "" if len({pathnames}) == 0
+@return {pathnames}[0] if len({pathnames}) == 1
+@return the selected pathname otherwise
+
+Asks the end-user to choose a pathname among a list of pathnames.
+The pathnames displayed will be simplified thanks to |StripCommon()| -- the
+pathname returned is the "full" original pathname matching the simplified
+pathname selected.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#ToRelative()*  {{{3
+lh#path#ToRelative({pathname})~
+@param {pathname} Pathname to convert
+@return the pathname in it relative form as it would be seen from the current
+directory.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#GlobAsList()*  {{{3
+lh#path#GlobAsList({pathslist}, {expr})~
+@return |globpath()|'s result, but formatted as a list of matching pathnames.
+In case {expr} is a |List|, |globpath()| is applied on each expression in
+{expr}.
+
+
+------------------------------------------------------------------------------
+MENUS RELATED FUNCTIONS                               *lhvl#menu*       {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                             *lh#menu#DefToggleItem()*  {{{3
+lh#menu#DefToggleItem({Data})~
+@param[in,out] {Data} Definition of a |menu| item.
+
+This function defines a |menu| entry that will be associated to a
+|global-variable| whose values can be cycled and explored from the menu. This
+global variable can be seen as an enumerate whose value can be cyclically
+updated through a menu.
+
+{Data} is a |Dictionary| whose keys are:
+- "variable": name of the |global-variable| to bind to the menu entry
+  Mandatory.
+- "values": associated values of string or integers (|List|)
+  Mandatory.
+- "menu": describes where the menu entry must be placed (|Dictionary|)
+    - "priority": complete priority of the entry (see |sub-menu-priority|)
+    - "name": complete name of the entry -- ampersand (&) can be used to define
+      shortcut keys
+  Mandatory.
+- "idx_crt_value": index of the current value for the option (|expr-number|)
+  This is also an internal variable that will be automatically updated to
+  keep the index of the current value of the "variable" in "values".
+  Optional ; default value is 1, or the associated index of the initial value
+  of the variable (in "values") before the function call.
+- "texts": texts to display according to the variable value (|List|)
+  Optional, "values" will be used by default. This option is to be used to
+  distinguish the short encoded value, from the long self explanatory name.
+
+Warning:
+    If the variable is changed by hand without using the menu, then the menu
+    and the variable will be out of synch. Unless the automatically generated
+    command *lhvl-:Toggle{Varname}* is used to change the value of the options
+    (and keep the menu synchronized)
+
+Examples:
+   See tests/lh/test-toggle-menu.vim
+
+Todo:
+    Propose a *lhvl-:Set{vaName}* command.
+    Is it really a good function name, won't ToggleMenu() be better ?
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                      *lh#menu#Text()*  {{{3
+Function: lh#menu#Text({text})~
+@param[in] {text} Text to send to |:menu| commands
+@return a text to be used in menus where "\" and spaces have been escaped.
+
+This helper function transforms a regular text into a text that can be
+directly used with |:menu| commands.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                      *lh#menu#Make()*  {{{3
+option: *[gb]:want_buffermenu_or_global_disable*
+
+lh#menu#Make({modes}, {menu-priority}, {menu-text}, {key-binding}, [<buffer>,]  {action})~
+@param[in] {modes} Vim modes the menus and maps will be provided for
+@param[in] {menu-priority} |sub-menu-priority| for the new menu entry
+@param[in] {menu-text}      Name of the new menu entry
+@param[in] {key-binding}    Sequence of keys to execute to associated action
+@param[in] "<buffer>"       If the string "<buffer>" is provided, then the 
+                            associated mapping will be a |map-<buffer>|, and
+                            the menu will be available to the current buffer
+                            only. See |[gb]:want_buffermenu_or_global_disable|
+                            When "<buffer>" is set, the call to lh#menu#Make()
+                            must be done in the buffer-zone of a |ftplugin|.
+@param[in] {action}         Action to execute when {key-binding} is typed, or
+                            when the menu entry is selected.
+
+First example: the following call will add the menu "LaTeX.Run LaTeX once
+<C-L><C-O>", with the priority (placement) 50.305, for the NORMAL, INSERT and
+COMMAND modes. The action associated first saves all the changed buffers and
+then invokes LaTeX. The same action is also binded to <C-L><C-O> for the same
+modes, with the nuance that the maps will be local to the buffer ; I haven't
+tried yet to integrate Michael Geddes's Buffer-menus plugin.
+>
+  call lh#menu#Make("nic", '50.305', '&LaTeX.Run LaTeX &once', "<C-L><C-O>",
+          \ '<buffer>', ":wa<CR>:call TKMakeDVIfile(1)<CR>")
+
+The second example demonstrates an hidden, but useful, behavior: if the mode
+is the visual one, then the register v is filled with the text of the visual
+area. This text can then be used in the function called. Here, it will be
+proposed as a default name for the section to insert:
+>
+  function! TKinsertSec()
+    " ...
+    if (strlen(@v) != 0) && (visualmode() == 'v')
+      let SecName = input("name of ".SecType.": ", @v)
+    else
+      let SecName = input("name of ".SecType.": ")
+    endif
+    " ...
+  endfunction
+  
+  call lh#menuMake("nic", '50.360.100', '&LaTeX.&Insert.&Section',
+          \ "<C-L><C-S>", '<buffer>', ":call TKinsertSec()<CR>")
+
+We have to be cautious to one little thing: there is a side effect: the visual
+mode vanishes when we enter the function. If you don't want this to happen,
+use the non-existant command: |:VCall| ...
+
+Third: if it is known that a function will be called only under |VISUAL-mode|,
+and that we don't want of the previous behavior, we can explicitly invoke the
+function with |:VCall| -- command that doesn't have to exist. Check
+|s:MapMenu4Env| for such an example.
+
+Fourth thing: actually, lh#menu#Make() is not restricted to commands. The
+action can be anything that could come at the right hand side of any |:map| or
+|:menu| action. But this time, you have to be cautious with the modes you
+dedicate your map to. I won't give any related example ; this is the
+underlying approach in |IVN_MenuMake()|. 
+
+Examples:
+   See tests/lh/test-menu-map.vim
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                  *lh#menu#IVN_Make()*  {{{3
+Mappings & menus inserting text~
+lh#menu#IVN_Make(<priority>, {text}, {key}, {IM-action}, {VM-action}, {NM-action} [, {nore-IM}, {nore-VM}, {nore-NM}])~
+
+lh#menu#IVN_MenuMake() accepts three different actions for the three modes:
+INSERT, VISUAL and NORMAL. The mappings defined will be relative to the
+current buffer -- this function is addressed to ftplugins writers. The last
+arguments specify the inner mappings and abbreviations embedded within the
+actions should be expanded or not ; i.e. are we defining «noremaps/noremenus» ?
+
+You could find very simple examples of what could be done at the end of
+menu-map.vim. Instead, I'll show here an extract of my TeX ftplugin: it
+defines complex functions that will help to define very simply the different
+mappings I use. You could find another variation on this theme in
+html_set.vim.
+
+>
+  :MapMenu 50.370.300 &LaTeX.&Fonts.&Emphasize ]em emph
+  call <SID>MapMenu4Env("50.370.200", '&LaTeX.&Environments.&itemize',
+        \ ']ei', 'itemize', '\item ')
+  
+
+The first command binds ]em to \emph{} for the three different modes. In
+INSERT mode, the cursor is positioned between the curly brackets, and a marker
+is added after the closing bracket -- cf. my bracketing system. In VISUAL
+mode, the curly brackets are added around the visual area. In NORMAL mode, the
+area is considered to be the current word.
+
+The second call binds for the three modes: ]ei to:
+>
+      \begin{itemize}
+          \item
+      \end{itemize}
+    
+The definition of the different functions and commands involved just follows.
+>
+  command -nargs=1 -buffer MapMenu :call <SID>MapMenu(<f-args>)
+  
+  function! s:MapMenu(code,text,binding, tex_cmd, ...)
+    let _2visual = (a:0 > 0) ? a:1 : "viw"
+    " If the tex_cmd starts with an alphabetic character, then suppose the
+    " command must begin with a '\'.
+    let texc = ((a:tex_cmd[0] =~ '\a') ? '\' : "") . a:tex_cmd
+    call lh#menu#IVN_Make(a:code, a:text.'     --  ' . texc .'{}', a:binding,
+          \ texc.'{',
+          \ '<ESC>`>a}<ESC>`<i' . texc . '{<ESC>%l',
+          \ ( (_2visual=='0') ? "" : _2visual.a:binding),
+          \ 0, 1, 0)
+  endfunction
+
+  " a function and its map to close a "}", and that works whatever the
+  " activation states of the brackets and marking features are.
+  function! s:Close()
+    if strlen(maparg('{')) == 0                    | exe "normal a} \<esc>"
+    elseif exists("b:usemarks") && (b:usemarks==1) | exe "normal ¡jump! "
+    else                                           | exe "normal a "
+    endif
+  endfunction
+
+  imap <buffer> ¡close! <c-o>:call <SID>Close()<cr>
+
+  function! s:MapMenu4Env(code,text,binding, tex_env, middle, ...)
+    let _2visual = (a:0 > 0) ? a:1 : "vip"
+    let b = "'" . '\begin{' . a:tex_env . '}' . "'"
+    let e = "'" . '\end{' . a:tex_env . '}' . "'"
+    call IVN_MenuMake(a:code, a:text, a:binding,
+          \ '\begin{'.a:tex_env.'¡close!<CR>'.a:middle.' <CR>\end{'.a:tex_env.'}<C-F><esc>ks',
+          \ ':VCall MapAroundVisualLines('.b. ',' .e.',1,1)',
+          \ _2visual.a:binding,
+          \ 0, 1, 0)
+  endfunction
+
+Examples:
+   See tests/lh/test-menu-map.vim
+
+
+------------------------------------------------------------------------------
+                                            *lh#menu#CMD_andclear_v()*  {{{3
+                                                   *lh#menu#Map_all()*  {{{3
+
+------------------------------------------------------------------------------
+???? RELATED FUNCTIONS                                *lh#????*         {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                     *lh#analysis#IsKindOfEmptyLine()*  {{{3
+
+
+------------------------------------------------------------------------------
+COMMANDS RELATED FUNCTIONS                            *lhvl#command*    {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#command#New()*      {{{3
+Highly Experimental.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                       *lh#command#Fargs2String()*      {{{3
+lh#command#Fargs2String({aList})~
+@param[in,out] aList list of params from <f-args>
+@see tests/lh/test-Fargs2String.vim
+
+
+------------------------------------------------------------------------------
+BUFFERS RELATED FUNCTIONS                             *lhvl#buffer*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#buffer#Find()*      {{{3
+lh#buffer#Find({filename})~
+@param {filename}
+@return The number of the first window found, in which {filename} is opened.
+
+If {filename} is opened in a window, jump to this window. Otherwise, return
+-1.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#buffer#Jump()*      {{{3
+lh#buffer#Jump({filename}, {cmd})~
+@param {filename}
+@param {cmd}
+@return Nothing.
+
+If {filename} is opened in a window, jump to this window. 
+Otherwise, execute {cmd} with {filename} as a parameter. Typical values for
+the command will be "sp" or "vsp". (see |:split|, |:vsplit|)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#buffer#Scratch()*   {{{3
+lh#buffer#Scratch({bname},{where})~
+@param {bname} Name for the new scratch buffer
+@param {where} Where the new scratch buffer will be opened ('', or 'v')
+
+This function opens a new scratch buffer.
+
+
+------------------------------------------------------------------------------
+SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#syntax#NameAt()*    {{{3
+lh#syntax#NameAt({lnum},{col}[,{trans}])~
+@param {lnum}  line of the character
+@param {col}   column of the character
+@param {trans} see |synID()|, default=0
+@return the syntax kind of the given character at {lnum}, {col}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#syntax#NameAtMark()* {{{3
+lh#syntax#NameAtMark({mark}[,{trans}])~
+@param {mark}  position of the character
+@param {trans} see |synID()|, default=0
+@return the syntax kind of the character at the givenn |mark|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+       *lh#syntax#Skip()* *lh#syntax#SkipAt()* *lh#syntax#SkipAtMark()* {{{3
+lh#syntax#Skip()~
+lh#syntax#SkipAt({lnum},{col})~
+lh#syntax#SkipAtMark({mark})~
+
+Functions to be used with |searchpair()| functions in order to search for a
+pair of elements, without taking comments, strings, characters and doxygen
+(syntax) contexts into account while searching.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#syntax#SynListRaw()* {{{3
+lh#syntax#SynListRaw({name})~
+@param {group-name} 
+@return the result of "syn list {group-name}" as a string
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#syntax#SynList()*   {{{3
+lh#syntax#SynList()~
+
+
+------------------------------------------------------------------------------
+                                                                     }}}1
+==============================================================================
+ © Luc Hermitte, 2001-2008, <http://hermitte.free.fr/vim/>           {{{1
+ $Id: lh-vim-lib.txt 8 2007-04-17 00:08:44Z Luc Hermitte $
+ VIM: let b:VS_language = 'american' 
+ vim:ts=8:sw=4:tw=80:fo=tcq2:isk=!-~,^*,^\|,^\":ft=help:
+ vim600:fdm=marker:
