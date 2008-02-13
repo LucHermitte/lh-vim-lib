@@ -1,5 +1,5 @@
 "=============================================================================
-" $Id: buffer.vim 11 2007-04-17 23:41:50Z Luc Hermitte $
+" $Id$
 " File:		buffer.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>

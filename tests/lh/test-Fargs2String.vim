@@ -1,5 +1,5 @@
 "=============================================================================
-" $Id: test-Fargs2String.vim 8 2007-04-17 00:08:44Z Luc Hermitte $
+" $Id$
 " File:		test-Fargs2String.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>

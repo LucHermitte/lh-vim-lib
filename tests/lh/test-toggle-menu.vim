@@ -1,4 +1,4 @@
-" $Id: test-toggle-menu.vim 8 2007-04-17 00:08:44Z Luc Hermitte $
+" $Id$
 " Tests for lh-vim-lib . lh#menu#DefToggleItem()
 
 let Data = {

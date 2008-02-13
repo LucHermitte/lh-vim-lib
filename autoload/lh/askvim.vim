@@ -1,5 +1,5 @@
 "=============================================================================
-" $Id: askvim.vim 10 2007-04-17 00:17:11Z Luc Hermitte $
+" $Id$
 " File:		autoload/lh/askvim.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
