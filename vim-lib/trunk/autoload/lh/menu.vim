@@ -3,7 +3,7 @@
 " File:		autoload/lh/menu.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.1
+" Version:	2.0.5
 " Created:	13th Oct 2006
 " Last Update:	$Date$ (28th Aug 2007)
 "------------------------------------------------------------------------
