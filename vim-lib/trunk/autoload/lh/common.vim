@@ -3,7 +3,7 @@
 " File:		common.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.3
+" Version:	2.0.5
 " Created:	07th Oct 2006
 " Last Update:	$Date$ (08th Feb 2008)
 "------------------------------------------------------------------------
@@ -43,7 +43,7 @@ endfunction
 " Function: lh#common#WarningMsg {{{2
 function! lh#common#WarningMsg(text)
   echohl WarningMsg
-  echo a:text
+  echomsg a:text
   echohl None
 endfunction 
 
