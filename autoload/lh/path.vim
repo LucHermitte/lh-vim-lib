@@ -3,7 +3,7 @@
 " File:		path.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.4
+" Version:	2.0.5
 " Created:	23rd Jan 2007
 " Last Update:	11th Feb 2008
 "------------------------------------------------------------------------
@@ -23,6 +23,8 @@
 " 	(*) lh#path#GlobAsList() 
 " 	v 2.0.4
 " 	(*) lh#path#StripStart()
+" 	v 2.0.5
+" 	(*) lh#path#StripStart() interprets '.' as getcwd()
 " TODO:		«missing features»
 " }}}1
 "=============================================================================
@@ -131,15 +133,33 @@ endfunction
 " separated by ",", of a |List|).
 function! lh#path#StripStart(pathname, pathslist)
   if type(a:pathslist) == type('string')
-    let strip_re = escape(a:pathslist, '\\.')
-    let strip_re = '^' . substitute(strip_re, ',', '\\|^', 'g')
+    " let strip_re = escape(a:pathslist, '\\.')
+    " let strip_re = '^' . substitute(strip_re, ',', '\\|^', 'g')
+    let pathslist = split(a:pathslist, ',')
   elseif type(a:pathslist) == type([])
     let pathslist = deepcopy(a:pathslist)
-    call map(pathslist, '"^".escape(v:val, "\\\\.")')
-    let strip_re = join(pathslist, '\|')
   else
     throw "Unexpected type for a:pathname"
   endif
+
+  " apply a realpath like operation
+  let nb_paths = len(pathslist) " set before the loop
+  let i = 0
+  while i != nb_paths
+    if pathslist[i] =~ '^\.\%(/\|$\)'
+      let path2 = getcwd().pathslist[i][1:]
+      call add(pathslist, path2)
+    endif
+    let i = i + 1
+  endwhile
+  " replace path separators by a regex that can match them
+  call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")')
+  " echomsg string(pathslist)
+  " escape .
+  call map(pathslist, '"^".escape(v:val, ".")')
+  " build the strip regex
+  let strip_re = join(pathslist, '\|')
+  " echomsg strip_re
   let res = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
   return res
 endfunction
