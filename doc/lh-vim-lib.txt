@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.0.4)
-                        For Vim version 7+	Last change: $Date$ (08th Feb 2008)
+*lh-vim-lib.txt*        Vim common libraries (v2.0.5)
+                        For Vim version 7+	Last change: $Date$ (14th Feb 2008)
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -30,6 +30,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#common#WarningMsg()|
 - |lh#common#CheckDeps()|
 - |lh#option#Get()|
+- |lh#option#GetNonEmpty()|
 - |lh#list#Match()|
 - |lh#askvim#Exe()|
 - |lh#position#IsBefore()|
@@ -135,6 +136,22 @@ a|window-variable|.
 The order of the variables checked can be specified through the optional
 argument {scopes}. By default, buffer-local options have the priority over
 global options.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                              *lh#option#GetNonEmpty()* {{{3
+lh#option#GetNonEmpty({name},{default}[,{scopes}])~
+@param {name}       Name of the option to fetch
+@param {default}    Default value in case the option is not defined, nor empty
+@param {scopes}     Vim scopes in which the options must be searched,
+                    default="bg".
+@return b:{name} if it exists, of g:{name} if it exists, or {default}
+otherwise.
+
+This function works exactly like |lh#option#Get()| except that a defined
+variable with an empty value will be ignored as well.
+An |expr-string| will be considered empty if its |strlen()| is 0, an
+|expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
+is 0.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#list#Match()*       {{{3
