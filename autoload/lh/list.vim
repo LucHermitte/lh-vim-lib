@@ -3,7 +3,7 @@
 " File:		autoload/lh/list.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.0
+" Version:	2.0.5
 " Created:	17th Apr 2007
 " Last Update:	$Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
