@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.0.5)
+*lh-vim-lib.txt*        Vim common libraries (v2.0.6)
                         For Vim version 7+	Last change: $Date$ (14th Feb 2008)
 
                         By Luc Hermitte
@@ -36,6 +36,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#IsBefore()|
 - |lh#position#CharAtMark()|
 - |lh#position#CharAtPos()|
+- |lh#event#RegisterForOneExecutionAt()| (to document)
 Paths related functions:                                |lhvl#path|
 - |lh#path#Simplify()|
 - |lh#path#StripCommon()|
