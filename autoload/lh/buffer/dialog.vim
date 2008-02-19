@@ -3,7 +3,7 @@
 " File:		autoload/lh/buffer/dialog.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	1.0.0
+" Version:	2.0.6
 " Created:	21st Sep 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -179,15 +179,19 @@ function! lh#buffer#dialog#add_help(abuffer, text, help_type)
 endfunction
 
 "=============================================================================
+function! lh#buffer#dialog#Quit()
+  echohl WarningMsg
+  echo "Abort"
+  echohl None
+  quit
+endfunction
 
 function! s:Select(line, bufferId)
   if a:line == -1
-    echohl WarningMsg
-    echo "Abort"
-    echohl None
-    quit
+    call lh#buffer#dialog#Quit()
     return
-  elseif a:line <= s:Help_NbL() + 1
+  " elseif a:line <= s:Help_NbL() + 1
+  elseif a:line <= s:Help_NbL() 
     echoerr "Unselectable item"
     return 
   else
