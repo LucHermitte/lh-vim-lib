@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v2.0.6)
-                        For Vim version 7+	Last change: $Date$ (14th Feb 2008)
+                        For Vim version 7+Last change: $Date$
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -32,11 +32,12 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#option#Get()|
 - |lh#option#GetNonEmpty()|
 - |lh#list#Match()|
+- |lh#list#Find_if()|
 - |lh#askvim#Exe()|
 - |lh#position#IsBefore()|
 - |lh#position#CharAtMark()|
 - |lh#position#CharAtPos()|
-- |lh#event#RegisterForOneExecutionAt()| (to document)
+- |lh#event#RegisterForOneExecutionAt()|
 Paths related functions:                                |lhvl#path|
 - |lh#path#Simplify()|
 - |lh#path#StripCommon()|
@@ -156,12 +157,43 @@ is 0.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#list#Match()*       {{{3
-lh#list#Match({list},{pattern})~
-@param {list}    |List| 
-@param {pattern} |expr-string|
-@return the lowest index in |List| {list} where the item matches {pattern}.
+lh#list#Match({list},{pattern}[, {start-pos}])~
+@param {list}     |List| 
+@param {pattern}  |expr-string|
+@param {start-pos} First index to check
+@return the lowest index, >= {start-pos}, in |List| {list} where the item
+matches {pattern}.
 @returns -1 if no item matches {pattern}.
 @see |index()|, |match()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#list#Find_if()*     {{{3
+lh#list#Find_if({list},{predicate} [, {pred-parameters}][, {start-pos}])~
+@param {list}             |List| 
+@param {predicate}         Predicate to evaluate
+@param {pred-parameters}] |List| of Parameters to bind to special arguments in
+                           the {predicate}.
+@param {start-pos}         First index to check
+@return the lowest index, >= {start-pos}, in |List| {list} where the
+{predicate} evals to true.
+@returns -1 if no item matches {pattern}.
+@see |index()|, |eval()|
+
+The predicate recognizes some special arguments:
+- |v:val| is subtituted with the current element being evaluated in the list
+- *v:1_* *v:2_* , ..., are substituted with the i-th elements from
+  {pred-parameters}.
+  NB: the "v:\d\+_" are 1-indexed while {pred-parameters} is indeed seen as
+  0-indexed by Vim. 
+  This particular feature permits to pass any type of variable to the
+  predicate: a |expr-string|, a |List|, a |Dictionary|, ...
+
+e.g.: >
+    :let b = { 'min': 12, 'max': 42 }
+    :let l = [ 1, 5, 48, 25, 5, 28, 6]
+    :let i = lh#list#Find_if(l, 'v:val>v:1_.min  && v:val<v:1_.max && v:val%v:2_==0', [b, 2] )
+    :echo l[i]
+    28
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#askvim#Exe()*       {{{3
@@ -203,6 +235,18 @@ lh#position#CharAtMark({mark})~
 lh#position#CharAtPos({pos})~
 @return the character at a position (see |getpos()|).
 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                 *lh#event#RegisterForOneExecutionAt()* {{{3
+lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})~
+Registers a command to be executed once (and only once) when {event} is
+triggered on the current file.
+
+@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
+@param {cmd}   |expression-command| to execute
+@param {group} |autocmd-groups| under which the internal autocommand will be
+                registered.
+@todo possibility to specify the file pattern
 
 ------------------------------------------------------------------------------
 PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
