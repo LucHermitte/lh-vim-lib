@@ -3,7 +3,7 @@
 " File:		mk-lh-lib.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.6
+" Version:	2.0.7
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -16,6 +16,7 @@ autoload/lh/buffer/dialog.vim
 autoload/lh/command.vim
 autoload/lh/common.vim
 autoload/lh/event.vim
+autoload/lh/encoding.vim
 autoload/lh/list.vim
 autoload/lh/menu.vim
 autoload/lh/option.vim
