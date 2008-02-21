@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.0.6)
+*lh-vim-lib.txt*        Vim common libraries (v2.0.7)
                         For Vim version 7+Last change: $Date$
 
                         By Luc Hermitte
@@ -38,6 +38,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#CharAtMark()|
 - |lh#position#CharAtPos()|
 - |lh#event#RegisterForOneExecutionAt()|
+- |lh#enconding#Iconv()|
 Paths related functions:                                |lhvl#path|
 - |lh#path#Simplify()|
 - |lh#path#StripCommon()|
@@ -247,6 +248,13 @@ triggered on the current file.
 @param {group} |autocmd-groups| under which the internal autocommand will be
                 registered.
 @todo possibility to specify the file pattern
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+lh#enconding#Iconv({expr}, {from}, {to})~
+This function just calls |inconv()| with the same arguments. The only
+difference is that it return {expr} when we know that |iconv()| will return an
+empty string.
+
 
 ------------------------------------------------------------------------------
 PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
