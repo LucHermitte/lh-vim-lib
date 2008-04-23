@@ -1,12 +1,12 @@
 			   ------------------
-			    lh-vim-lib 2.0.7
+			    lh-vim-lib 2.1.0
 			   ------------------
 
 lh-vim-lib is a library plugin for vim v7+. It is just a collection a
 functions that are meant to be used by script writers.
 
 For Who       : Vim script writers
-Requirements  : Vim 7
+Requirements  : Vim 7.1
 Required by   : Just a few other plugins for the moment
 Author        : Luc Hermitte
 License       : GPL2

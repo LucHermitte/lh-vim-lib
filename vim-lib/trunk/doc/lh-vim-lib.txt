@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.0.7)
+*lh-vim-lib.txt*        Vim common libraries (v2.1.0)
                         For Vim version 7+Last change: $Date$
 
                         By Luc Hermitte
@@ -74,6 +74,9 @@ Syntax related functions:				|lhvl#syntax|
 - |lh#syntax#SkipAtMark()|
 - |lh#syntax#SynListRaw()|
 - |lh#syntax#SynList()| (to document)
+Graphs related functions:				|lhvl#graph|
+- |lh#graph#tsort#depth()|
+- |lh#graph#tsort#breadth|
 
 }}}2
 ------------------------------------------------------------------------------
@@ -631,6 +634,32 @@ lh#syntax#SynListRaw({name})~
                                                 *lh#syntax#SynList()*   {{{3
 lh#syntax#SynList()~
 
+
+------------------------------------------------------------------------------
+GRAPH RELATED FUNCTIONS                               *lhvl#syntax*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                             *lh#graph#tsort#depth()*   {{{3
+                                             *lh#graph#tsort#breadth()* {{{3
+lh#graph#tsort#depth({dag}, {start-nodes})~
+lh#graph#tsort#breadth({dag}, {start-nodes})~
+@param {dag} is either 
+	     - a |Dictionnary| that associates to each node, the |List| of all
+	       its successors
+	     - or a /fetch/ |function()| that returns the |List| of the
+	       successors of a given node -- works only with depth() which
+	       takes care of not calling this function more than once for each
+	       given node.
+@param {start-nodes} is a |List| of start nodes with no incoming edge
+@throw "Tsort: cyclic graph detected:" if {dag} is not a DAG.
+@see http://en.wikipedia.org/wiki/Topological_sort
+@since Version 2.1.0
+@test tests/lh/topological-sort.vim
+
+These two functions implement a topological sort on the Direct Acyclic Graph
+{dag}. 
+- depth() is a recursive implementation of a depth-first search. 
+- breadth() is a non recursive implementation of a breadth-first search.
 
 ------------------------------------------------------------------------------
                                                                      }}}1
