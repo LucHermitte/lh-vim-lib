@@ -3,7 +3,7 @@
 " File:		autoload/lh/list.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.7
+" Version:	2.1.1
 " Created:	17th Apr 2007
 " Last Update:	$Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -15,6 +15,8 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
+" 	v2.1.1: 
+" 	(*) uniq_sort
 " 	v2.0.7:
 " 	(*) Bug fix: lh#list#Match()
 " 	v2.0.6:
@@ -74,6 +76,48 @@ function! lh#list#Find_if(list, predicate, ...)
     let idx += 1
   endwhile
   return -1
+endfunction
+
+" Function: lh#list#unique_sort(list [, func]) {{{2
+" See also http://vim.wikia.com/wiki/Unique_sorting
+"
+" Works like sort(), optionally taking in a comparator (just like the
+" original), except that duplicate entries will be removed.
+" todo: support another argument that act as an equality predicate
+function! lh#list#unique_sort(list, ...)
+  let dictionary = {}
+  for i in a:list
+    let dictionary[string(i)] = i
+  endfor
+  let result = []
+  echo values(dictionary)
+  if ( exists( 'a:1' ) )
+    let result = sort( values( dictionary ), a:1 )
+  else
+    let result = sort( values( dictionary ) )
+  endif
+  return result
+endfunction
+
+function! lh#list#unique_sort2(list, ...)
+  let list = copy(a:list)
+  if ( exists( 'a:1' ) )
+    call sort(list, a:1 )
+  else
+    call sort(list)
+  endif
+  if len(list) <= 1 | return list | endif
+  let result = [ list[0] ]
+  let last = list[0]
+  let i = 1
+  while i < len(list)
+    if last != list[i]
+      let last = list[i]
+      call add(result, last)
+    endif
+    let i += 1
+  endwhile
+  return result
 endfunction
 
 " Functions }}}1
