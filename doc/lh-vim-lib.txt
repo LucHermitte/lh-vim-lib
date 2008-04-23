@@ -31,14 +31,19 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#common#CheckDeps()|
 - |lh#option#Get()|
 - |lh#option#GetNonEmpty()|
-- |lh#list#Match()|
-- |lh#list#Find_if()|
 - |lh#askvim#Exe()|
 - |lh#position#IsBefore()|
 - |lh#position#CharAtMark()|
 - |lh#position#CharAtPos()|
 - |lh#event#RegisterForOneExecutionAt()|
 - |lh#enconding#Iconv()|
+Lists related functions:				|lhvl#list|
+- |lh#list#Match()|
+- |lh#list#Find_if()|
+- |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+Graphs related functions:				|lhvl#graph|
+- |lh#graph#tsort#depth()|
+- |lh#graph#tsort#breadth|
 Paths related functions:                                |lhvl#path|
 - |lh#path#Simplify()|
 - |lh#path#StripCommon()|
@@ -74,15 +79,12 @@ Syntax related functions:				|lhvl#syntax|
 - |lh#syntax#SkipAtMark()|
 - |lh#syntax#SynListRaw()|
 - |lh#syntax#SynList()| (to document)
-Graphs related functions:				|lhvl#graph|
-- |lh#graph#tsort#depth()|
-- |lh#graph#tsort#breadth|
 
 }}}2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
 
-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#common#ErrorMsg()*  {{{3
 lh#common#ErrorMsg({text})~
 @param  {text}    Error message to display
@@ -160,6 +162,68 @@ An |expr-string| will be considered empty if its |strlen()| is 0, an
 is 0.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#askvim#Exe()*       {{{3
+lh#askvim#Exe({command})~
+@param {command}  Command to execute from vim.
+@return what the command echos while executed.
+@note This function encapsultates |redir| without altering any register.
+
+Some informations aren't directly accessible through vim API (|functions|).
+However, they can be obtained by executing some commands, and redirecting the
+result of these commands.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#askvim#Menu()*      {{{3
+lh#askvim#Menu({menuid},{modes})~
+@param {menuid}  Menu identifier.
+@param {modes}   List of modes
+@return Information related to the {menuid}
+@todo still bugged
+
+This function provides a way to obtain information related to a menu entry in
+Vim.
+
+The format of the result being «to be stabilized»
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#position#IsBefore()* {{{3
+lh#position#IsBefore({lhs_pos},{rhs_pos})~
+@param[in] positions as those returned from |getpos()|
+@return whether {lhs_pos} is before {rhs_pos}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                             *lh#position#CharAtMark()* {{{3
+lh#position#CharAtMark({mark})~
+@return the character at a given |mark|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                              *lh#position#CharAtPos()* {{{3
+lh#position#CharAtPos({pos})~
+@return the character at a position (see |getpos()|).
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                 *lh#event#RegisterForOneExecutionAt()* {{{3
+lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})~
+Registers a command to be executed once (and only once) when {event} is
+triggered on the current file.
+
+@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
+@param {cmd}   |expression-command| to execute
+@param {group} |autocmd-groups| under which the internal autocommand will be
+                registered.
+@todo possibility to specify the file pattern
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+lh#enconding#Iconv({expr}, {from}, {to})~
+This function just calls |inconv()| with the same arguments. The only
+difference is that it return {expr} when we know that |iconv()| will return an
+empty string.
+
+
+------------------------------------------------------------------------------
+LISTS RELATED FUNCTIONS                               *lhvl#list*       {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#list#Match()*       {{{3
 lh#list#Match({list},{pattern}[, {start-pos}])~
 @param {list}     |List| 
@@ -200,63 +264,40 @@ e.g.: >
     28
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                                *lh#askvim#Exe()*       {{{3
-lh#askvim#Exe({command})~
-@param {command}  Command to execute from vim.
-@return what the command echos while executed.
-@note This function encapsultates |redir| without altering any register.
+                   *lh#list#unique_sort()* *lh#list#unique_sort2()*     {{{3
+lh#list#unique_sort({list} [, {cmp}])~
+@param[in] {list} |List| to sort
+@param     {cmp}  |Funcref| or function name that acts as a compare predicate.
+@return a new |List| sorted with no element repeated
+@todo support an optional {equal} predicate to use in the /unique/ making
+process.
 
-Some informations aren't directly accessible through vim API (|functions|).
-However, they can be obtained by executing some commands, and redirecting the
-result of these commands.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                                *lh#askvim#Menu()*      {{{3
-lh#askvim#Menu({menuid},{modes})~
-@param {menuid}  Menu identifier.
-@param {modes}   List of modes
-@return Information related to the {menuid}
-@todo still bugged
-
-This function provides a way to obtain information related to a menu entry in
-Vim.
-
-The format of the result being «to be stabilized»
+------------------------------------------------------------------------------
+GRAPHS RELATED FUNCTIONS                              *lhvl#graph*      {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#position#IsBefore()* {{{3
-lh#position#IsBefore({lhs_pos},{rhs_pos})~
-@param[in] positions as those returned from |getpos()|
-@return whether {lhs_pos} is before {rhs_pos}
+                                             *lh#graph#tsort#depth()*   {{{3
+                                             *lh#graph#tsort#breadth()* {{{3
+lh#graph#tsort#depth({dag}, {start-nodes})~
+lh#graph#tsort#breadth({dag}, {start-nodes})~
+@param {dag} is either 
+	     - a |Dictionnary| that associates to each node, the |List| of all
+	       its successors
+	     - or a /fetch/ |function()| that returns the |List| of the
+	       successors of a given node -- works only with depth() which
+	       takes care of not calling this function more than once for each
+	       given node.
+@param {start-nodes} is a |List| of start nodes with no incoming edge
+@throw "Tsort: cyclic graph detected:" if {dag} is not a DAG.
+@see http://en.wikipedia.org/wiki/Topological_sort
+@since Version 2.1.0
+@test tests/lh/topological-sort.vim
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                             *lh#position#CharAtMark()* {{{3
-lh#position#CharAtMark({mark})~
-@return the character at a given |mark|.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                              *lh#position#CharAtPos()* {{{3
-lh#position#CharAtPos({pos})~
-@return the character at a position (see |getpos()|).
-
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                 *lh#event#RegisterForOneExecutionAt()* {{{3
-lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})~
-Registers a command to be executed once (and only once) when {event} is
-triggered on the current file.
-
-@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
-@param {cmd}   |expression-command| to execute
-@param {group} |autocmd-groups| under which the internal autocommand will be
-                registered.
-@todo possibility to specify the file pattern
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-lh#enconding#Iconv({expr}, {from}, {to})~
-This function just calls |inconv()| with the same arguments. The only
-difference is that it return {expr} when we know that |iconv()| will return an
-empty string.
+These two functions implement a topological sort on the Direct Acyclic Graph
+{dag}. 
+- depth() is a recursive implementation of a depth-first search. 
+- breadth() is a non recursive implementation of a breadth-first search.
 
 
 ------------------------------------------------------------------------------
@@ -634,32 +675,6 @@ lh#syntax#SynListRaw({name})~
                                                 *lh#syntax#SynList()*   {{{3
 lh#syntax#SynList()~
 
-
-------------------------------------------------------------------------------
-GRAPH RELATED FUNCTIONS                               *lhvl#syntax*     {{{2
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                             *lh#graph#tsort#depth()*   {{{3
-                                             *lh#graph#tsort#breadth()* {{{3
-lh#graph#tsort#depth({dag}, {start-nodes})~
-lh#graph#tsort#breadth({dag}, {start-nodes})~
-@param {dag} is either 
-	     - a |Dictionnary| that associates to each node, the |List| of all
-	       its successors
-	     - or a /fetch/ |function()| that returns the |List| of the
-	       successors of a given node -- works only with depth() which
-	       takes care of not calling this function more than once for each
-	       given node.
-@param {start-nodes} is a |List| of start nodes with no incoming edge
-@throw "Tsort: cyclic graph detected:" if {dag} is not a DAG.
-@see http://en.wikipedia.org/wiki/Topological_sort
-@since Version 2.1.0
-@test tests/lh/topological-sort.vim
-
-These two functions implement a topological sort on the Direct Acyclic Graph
-{dag}. 
-- depth() is a recursive implementation of a depth-first search. 
-- breadth() is a non recursive implementation of a breadth-first search.
 
 ------------------------------------------------------------------------------
                                                                      }}}1
