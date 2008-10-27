@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
 " Version:	2.1.0
-let s:version = '2.1.0'
+let s:version = '2.2.0'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -32,6 +32,7 @@ autoload/lh/option.vim
 autoload/lh/path.vim
 autoload/lh/position.vim
 autoload/lh/syntax.vim
+autoload/lh/visual.vim
 autoload/lh/graph/tsort.vim
 doc/lh-vim-lib.txt
 macros/menu-map.vim
