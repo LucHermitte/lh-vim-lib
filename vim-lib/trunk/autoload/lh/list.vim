@@ -3,7 +3,7 @@
 " File:		autoload/lh/list.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.1.1
+" Version:	2.2.0
 " Created:	17th Apr 2007
 " Last Update:	$Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -15,8 +15,10 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
+" 	v2.1.2: ?
+" 	(*) lh#list#Transform
 " 	v2.1.1: 
-" 	(*) uniq_sort
+" 	(*) unique_sort
 " 	v2.0.7:
 " 	(*) Bug fix: lh#list#Match()
 " 	v2.0.6:
@@ -34,6 +36,16 @@ set cpo&vim
 
 "------------------------------------------------------------------------
 " Functions {{{1
+
+" Function: lh#list#Transform(input, output, action) {{{2
+function! lh#list#Transform(input, output, action)
+  for element in a:input
+    let action = substitute(a:action, 'v:val','element', 'g')
+    let res = eval(action)
+    call add(a:output, res)
+  endfor
+  return a:output
+endfunction
 
 " Function: lh#list#Match(list, to_be_matched [, idx]) {{{2
 function! lh#list#Match(list, to_be_matched, ...)
