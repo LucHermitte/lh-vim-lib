@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		common.vim                                           {{{1
+" File:		autoload/lh/common.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+" Version:	2.2.0
 " Created:	07th Oct 2006
 " Last Update:	$Date$ (08th Feb 2008)
 "------------------------------------------------------------------------
@@ -17,8 +17,12 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
+" 	v2.1.1
+" 		- New function: lh#common#echomsgMultilines()
+" 		- lh#common#WarningMsg() supports multilines messages
+"
 " 	v2.0.0:
-" 		Code move from other plugins
+" 		- Code moved from other plugins
 " }}}1
 "=============================================================================
 
@@ -28,6 +32,14 @@ let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
 " Functions {{{1
+
+" Function: lh#common#echomsgMultilines {{{2
+function! lh#common#echomsgMultilines(text)
+  let lines = split(a:text, "[\n\r]")
+  for line in lines
+    echomsg line
+  endfor
+endfunction
 
 " Function: lh#common#ErrorMsg {{{2
 function! lh#common#ErrorMsg(text)
@@ -43,7 +55,8 @@ endfunction
 " Function: lh#common#WarningMsg {{{2
 function! lh#common#WarningMsg(text)
   echohl WarningMsg
-  echomsg a:text
+  " echomsg a:text
+  call lh#common#echomsgMultilines(a:text)
   echohl None
 endfunction 
 
