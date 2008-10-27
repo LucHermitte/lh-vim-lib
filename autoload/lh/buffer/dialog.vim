@@ -3,7 +3,7 @@
 " File:		autoload/lh/buffer/dialog.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.6
+" Version:	2.2.0
 " Created:	21st Sep 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -37,8 +37,8 @@ let s:LHdialog = {}
 function! s:Mappings(abuffer)
   " map <enter> to edit a file, also dbl-click
   exe "nnoremap <silent> <buffer> <esc>         :silent call ".a:abuffer.action."(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> q             :call <sid>Select(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> <cr>          :call <sid>Select(line('.'), ".a:abuffer.id.")<cr>"
+  exe "nnoremap <silent> <buffer> q             :call lh#buffer#dialog#Select(-1, ".a:abuffer.id.")<cr>"
+  exe "nnoremap <silent> <buffer> <cr>          :call lh#buffer#dialog#Select(line('.'), ".a:abuffer.id.")<cr>"
   " nnoremap <silent> <buffer> <2-LeftMouse> :silent call <sid>GrepEditFileLine(line("."))<cr>
   " nnoremap <silent> <buffer> Q	  :call <sid>Reformat()<cr>
   " nnoremap <silent> <buffer> <Left>	  :set tabstop-=1<cr>
@@ -130,6 +130,9 @@ endfunction
 function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, choices)
   " The ID will be the buffer id
   let res = {}
+  let where_it_started = getpos('.')
+  let where_it_started[0] = bufnr('%')
+  let res.where_it_started = where_it_started
 
   try
     call lh#buffer#Scratch(a:bname, a:where)
@@ -180,13 +183,16 @@ endfunction
 
 "=============================================================================
 function! lh#buffer#dialog#Quit()
+  let bufferId = b:dialog.where_it_started[0]
   echohl WarningMsg
   echo "Abort"
   echohl None
   quit
+  call lh#buffer#Find(bufferId)
 endfunction
 
-function! s:Select(line, bufferId)
+" Function: lh#buffer#dialog#Select(line, bufferId [,overriden-action])
+function! lh#buffer#dialog#Select(line, bufferId, ...)
   if a:line == -1
     call lh#buffer#dialog#Quit()
     return
@@ -207,7 +213,11 @@ function! s:Select(line, bufferId)
     endif
   endif
 
-  exe 'call '.dialog.action.'(results)'
+  if a:0 > 0 " action overriden
+    exe 'call '.dialog.action.'(results, a:000)'
+  else
+    exe 'call '.dialog.action.'(results)'
+  endif
 endfunction
 
 function! Action(results)
