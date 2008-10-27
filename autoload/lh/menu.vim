@@ -3,7 +3,7 @@
 " File:		autoload/lh/menu.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+" Version:	2.2.0
 " Created:	13th Oct 2006
 " Last Update:	$Date$ (28th Aug 2007)
 "------------------------------------------------------------------------
@@ -225,7 +225,7 @@ function! s:Build_CMD(prefix, cmd)
       " gV exit select-mode if we where in it!
     else
       return
-	    \ " \"vy\<C-C>:call CMD_and_clear_v('" . 
+	    \ " \"vy\<C-C>:call lh#menu#CMD_and_clear_v('" . 
 	    \ substitute(a:cmd, "<CR>$", '', '') ."')\<cr>"
     endif
   elseif a:prefix[0] == "c"  | return " \<C-C>" . a:cmd
