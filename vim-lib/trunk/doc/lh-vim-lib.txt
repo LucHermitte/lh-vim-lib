@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.1.0)
+*lh-vim-lib.txt*        Vim common libraries (v2.2.0)
                         For Vim version 7+Last change: $Date$
 
                         By Luc Hermitte
@@ -26,6 +26,7 @@ This library has been conceived as a suite of |autoload| plugins, and a few
 FUNCTIONS                                     *lhvl-functions*     {{{1
 {{{3Functions list~
 Miscellanous functions:                                 |lhvl#misc|
+- |lh#common#echomsgMultilines()|
 - |lh#common#ErrorMsg()|
 - |lh#common#WarningMsg()|
 - |lh#common#CheckDeps()|
@@ -35,12 +36,14 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#IsBefore()|
 - |lh#position#CharAtMark()|
 - |lh#position#CharAtPos()|
+- |lh#visual#selection()|
 - |lh#event#RegisterForOneExecutionAt()|
 - |lh#enconding#Iconv()|
 Lists related functions:				|lhvl#list|
 - |lh#list#Match()|
 - |lh#list#Find_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+- |lh#list#Transform()|
 Graphs related functions:				|lhvl#graph|
 - |lh#graph#tsort#depth()|
 - |lh#graph#tsort#breadth|
@@ -71,6 +74,7 @@ Buffers related functions:                              |lhvl#buffer|
 - |lh#buffer#dialog#toggle_help()| (beta version ; to document)
 - |lh#buffer#dialog#add_help()| (beta version ; to document)
 - |lh#buffer#dialog#new()| (beta version ; to document)
+- |lh#buffer#dialog#Select()| (beta version ; to document)
 Syntax related functions:				|lhvl#syntax|
 - |lh#syntax#NameAt()|
 - |lh#syntax#NameAtMark()|
@@ -83,6 +87,15 @@ Syntax related functions:				|lhvl#syntax|
 }}}2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                       *lh#common#echomsgMultilines()*  {{{3
+lh#common#echomsgMultilines()({text})~
+@param  {text}    Message to display on several lines
+@return nothing
+
+This function executes |:echomsg| as many times as required as there are lines
+in the original {text}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#common#ErrorMsg()*  {{{3
@@ -202,6 +215,12 @@ lh#position#CharAtPos({pos})~
 @return the character at a position (see |getpos()|).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#visual#selection()* {{{3
+lh#visual#selection()~
+@return the current visual selction
+@post no register will be changed
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                  *lh#event#RegisterForOneExecutionAt()* {{{3
 lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})~
 Registers a command to be executed once (and only once) when {event} is
@@ -271,6 +290,16 @@ lh#list#unique_sort({list} [, {cmp}])~
 @return a new |List| sorted with no element repeated
 @todo support an optional {equal} predicate to use in the /unique/ making
 process.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#list#Transform()*   {{{3
+lh#list#Transform({input},{output},{action})~
+@param[in]  {input}  Input |List| to transform
+@param[out] {output} Output |List| to transform
+@param     {action}  Stringified action to apply on each element from {input}.
+                     The string "v:val" will always be replaced a the element
+		     currently tranformed.
+@return {output}
 
 
 ------------------------------------------------------------------------------
