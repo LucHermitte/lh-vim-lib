@@ -73,10 +73,10 @@ function! lh#list#Find_if(list, predicate, ...)
     elseif type(a:1) == type(42)
       let idx = a:1
     else
-      throw "lh#list#Match_if: unexpected argument type"
+      throw "lh#list#Find_if: unexpected argument type"
     endif
   elseif a:0 != 0
-      throw "lh#list#Match_if: unexpected number of arguments: lh#list#Match_if(list, predicate [, predicate-arguments] [, start-pos])"
+      throw "lh#list#Find_if: unexpected number of arguments: lh#list#Find_if(list, predicate [, predicate-arguments] [, start-pos])"
   endif
 
   " The search loop
