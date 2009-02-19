@@ -109,6 +109,12 @@ endfunction
 function! s:GlobAsList(pathslist, expr)
   let sResult = globpath(a:pathslist, a:expr)
   let lResult = split(sResult, '\n')
+  " workaround a non feature of wildignore: it does not ignore directories
+  for ignored_pattern in split(&wildignore,',')
+    if stridx(ignored_pattern,'/') != -1
+      call filter(lResult, 'v:val !~ '.string(ignored_pattern))
+    endif
+  endfor
   return lResult
 endfunction
 
