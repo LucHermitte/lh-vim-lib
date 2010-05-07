@@ -2,8 +2,8 @@
 " $Id$
 " File:		test-buffer-menu.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.0
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	18th Apr 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -15,8 +15,7 @@
 " 	(*) Vim 7.0+
 " 	(*) vim_units.vim v0.2/1.0?
 " 	    Vimscript # «???»
-" 	(*) lh-vim-lib (lh#ask#Menu)
-" 	    <http://hermitte.free.fr/vim/ressources/lh-vim-lib.tar.gz>
+" 	(*) lh-vim-lib (lh#ask#menu)
 "
 " User Manual:
 " 	Source this file.
@@ -50,7 +49,7 @@ function! TestAskMenu()
 endfunction
 
 function! s:CheckInMode(mode, name)
-  let g:menu = lh#askvim#Menu('LH-Tests.Menu.ask.'.a:name, a:mode)
+  let g:menu = lh#askvim#menu('LH-Tests.Menu.ask.'.a:name, a:mode)
   let g:name = a:name
   " VUAssert 55 Equals g:menu.name     g:name     "Name mismatch"
   " VUAssert 56 Equals g:menu.priority '42.40.10' "Priority mismatch"
