@@ -61,9 +61,9 @@ let TBTWcommand = {
       \     ]
       \ }
 
-call lh#command#New(TBTWcommand)
+call lh#command#new(TBTWcommand)
 
-nnoremap µ :call lh#command#New(TBTWcommand)<cr>
+nnoremap µ :call lh#command#new(TBTWcommand)<cr>
 
 "=============================================================================
 " vim600: set fdm=marker:

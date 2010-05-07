@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		test-Fargs2String.vim                                           {{{1
+" File:		tests/lh/test-Fargs2String.vim                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	«version»
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	16th Apr 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
