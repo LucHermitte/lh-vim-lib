@@ -2,11 +2,11 @@
 " $Id$
 " File:		macros/menu-map.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-" 		<URL:http://hermitte.free.fr/vim/>
+" 		<URL:http://code.google.com/p/lh-vim/>
 "
 " Purpose:	Define functions to build mappings and menus at the same time
 "
-" Version:	2.0.0
+" Version:	2.2.0
 " Last Update:  $Date$ (02nd Dec 2006)
 "
 " Last Changes: {{{
@@ -64,7 +64,7 @@ command! -nargs=+           NMAP     nmap       <args>
 command! -nargs=+           CMAP     cmap       <args>
 command! -nargs=+           VMAP     vmap       <args>
 command! -nargs=+           AMAP
-      \       call lh#menu#Map_all('amap', <f-args>)
+      \       call lh#menu#map_all('amap', <f-args>)
 
 command! -nargs=+ -bang  NOREMAP  noremap<bang> <args>
 command! -nargs=+       INOREMAP inoremap       <args>
@@ -72,7 +72,7 @@ command! -nargs=+       NNOREMAP nnoremap       <args>
 command! -nargs=+       CNOREMAP cnoremap       <args>
 command! -nargs=+       VNOREMAP vnoremap       <args>
 command! -nargs=+       ANOREMAP
-      \       call lh#menu#Map_all('anoremap', <f-args>)
+      \       call lh#menu#map_all('anoremap', <f-args>)
 " }}}
 
 " End !

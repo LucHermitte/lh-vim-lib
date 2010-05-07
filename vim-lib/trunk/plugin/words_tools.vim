@@ -1,6 +1,6 @@
-" File:		words_tools.vim
+" File:		plugin/words_tools.vim
 " Author:	Luc Hermitte <hermitte {at} free {dot} fr>
-" 		<URL:http://hermitte.free.fr/vim>
+" 		<URL:http://code.google.com/p/lh-vim/>
 " URL: http://hermitte.free.fr/vim/ressources/vim_dollar/plugin/words_tools.vim
 "
 " Last Update:	14th nov 2002

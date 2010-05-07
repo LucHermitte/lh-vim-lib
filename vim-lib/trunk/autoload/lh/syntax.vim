@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		syntax.vim                                           {{{1
+" File:		autoload/lh/syntax.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -24,45 +24,75 @@
 
 
 "=============================================================================
-" Avoid global reinclusion {{{1
 let s:cpo_save=&cpo
 set cpo&vim
-" Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
-" Functions {{{1
+" ## Functions {{{1
+" # Debug {{{2
+function! lh#syntax#verbose(level)
+  let s:verbose = a:level
+endfunction
 
-" Functions: Show name of the syntax kind of a character {{{2
-function! lh#syntax#NameAt(l,c, ...)
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#syntax#debug(expr)
+  return eval(a:expr)
+endfunction
+
+" # Public {{{2
+" Functions: Show name of the syntax kind of a character {{{3
+function! lh#syntax#name_at(l,c, ...)
   let what = a:0 > 0 ? a:1 : 0
   return synIDattr(synID(a:l, a:c, what),'name')
 endfunction
-
-function! lh#syntax#NameAtMark(mark, ...)
+function! lh#syntax#NameAt(l,c, ...)
   let what = a:0 > 0 ? a:1 : 0
-  return lh#syntax#NameAt(line(a:mark), col(a:mark), what)
+  return lh#syntax#name_at(a:l, a:c, what)
 endfunction
 
-" Functions: skip string, comment, character, doxygen {{{2
+function! lh#syntax#name_at_mark(mark, ...)
+  let what = a:0 > 0 ? a:1 : 0
+  return lh#syntax#name_at(line(a:mark), col(a:mark), what)
+endfunction
+function! lh#syntax#NameAtMark(mark, ...)
+  let what = a:0 > 0 ? a:1 : 0
+  return lh#syntax#name_at_mark(a:mark, what)
+endfunction
+
+" Functions: skip string, comment, character, doxygen {{{3
+func! lh#syntax#skip_at(l,c)
+  return lh#syntax#name_at(a:l,a:c) =~? 'string\|comment\|character\|doxygen'
+endfun
 func! lh#syntax#SkipAt(l,c)
-  return lh#syntax#NameAt(a:l,a:c) =~? 'string\|comment\|character\|doxygen'
+  return lh#syntax#skip_at(a:l,a:c)
 endfun
 
+func! lh#syntax#skip()
+  return lh#syntax#skip_at(line('.'), col('.'))
+endfun
 func! lh#syntax#Skip()
-  return lh#syntax#SkipAt(line('.'), col('.'))
+  return lh#syntax#skip()
 endfun
 
+func! lh#syntax#skip_at_mark(mark)
+  return lh#syntax#skip_at(line(a:mark), col(a:mark))
+endfun
 func! lh#syntax#SkipAtMark(mark)
-  return lh#syntax#SkipAt(line(a:mark), col(a:mark))
+  return lh#syntax#skip_at_mark(a:mark)
 endfun
 
-" Function: Show current syntax kind {{{2
-command! SynShow echo 'hi<'.lh#syntax#NameAtMark('.',1).'> trans<'
-      \ lh#syntax#NameAtMark('.',0).'> lo<'.
+" Function: Show current syntax kind {{{3
+command! SynShow echo 'hi<'.lh#syntax#name_at_mark('.',1).'> trans<'
+      \ lh#syntax#name_at_mark('.',0).'> lo<'.
       \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'
 
 
-" Function: lh#syntax#SynListRaw(name) : string                     {{{2
-function! lh#syntax#SynListRaw(name)
+" Function: lh#syntax#list_raw(name) : string                     {{{3
+function! lh#syntax#list_raw(name)
   let a_save = @a
   try
     redir @a
@@ -75,8 +105,9 @@ function! lh#syntax#SynListRaw(name)
   return res
 endfunction
 
-function! lh#syntax#SynList(name)
-  let raw = lh#syntax#SynListRaw(a:name)
+" Function: lh#syntax#list(name) : List                     {{{3
+function! lh#syntax#list(name)
+  let raw = lh#syntax#list_raw(a:name)
   let res = [] 
   let lines = split(raw, '\n')
   let started = 0

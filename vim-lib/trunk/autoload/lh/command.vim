@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		command.vim                                           {{{1
+" File:		autoload/lh/command.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	08th Jan 2007
 " Last Update:	$Date$ (08th Jan 2007)
 "------------------------------------------------------------------------
@@ -27,8 +27,24 @@
 "=============================================================================
 let s:cpo_save=&cpo
 set cpo&vim
+
+" ## Debug {{{1
+function! lh#command#verbose(level)
+  let s:verbose = a:level
+endfunction
+
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#command#debug(expr)
+  return eval(a:expr)
+endfunction
+
 "------------------------------------------------------------------------
-" Functions {{{1
+" ## Functions {{{1
 
 " Tool functions {{{2
 " Function: lh#command#Fargs2String(aList) {{{3
@@ -53,7 +69,7 @@ function! lh#command#Fargs2String(aList)
 endfunction
 
 "------------------------------------------------------------------------
-" Experimental Functions {{{1
+" ## Experimental Functions {{{1
 
 " Internal functions        {{{2
 " Function: s:SaveData({Data})                             {{{3
@@ -76,7 +92,7 @@ function! s:SaveData(Data)
 endfunction
 
 " BTWComplete(ArgLead, CmdLine, CursorPos):      Auto-complete {{{3
-function! lh#command#Complete(ArgLead, CmdLine, CursorPos)
+function! lh#command#complete(ArgLead, CmdLine, CursorPos)
   let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
   let pos = strlen(tmp)
   if 0
@@ -194,7 +210,7 @@ function! s:execute(definition, ...)
   endtry
 endfunction
 
-function! lh#command#New(definition)
+function! lh#command#new(definition)
   let cmd_name = a:definition.name
   " Save the definition as an internal script variable
   let id = s:SaveData(a:definition)

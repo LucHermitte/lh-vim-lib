@@ -2,7 +2,7 @@
 " $Id$
 " File:		autoload/lh/buffer/dialog.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
+"		<URL:http://code.google.com/p/lh-vim/>
 " Version:	2.2.0
 " Created:	21st Sep 2007
 " Last Update:	$Date$
@@ -32,13 +32,38 @@
 let s:cpo_save=&cpo
 set cpo&vim
 
+
+
+"=============================================================================
+" ## Globals {{{1
 let s:LHdialog = {}
+
+"=============================================================================
+" ## Functions {{{1
+" # Debug {{{2
+function! lh#buffer#dialog#verbose(level)
+  let s:verbose = a:level
+endfunction
+
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#buffer#dialog#debug(expr)
+  return eval(a:expr)
+endfunction
+
+
+"=============================================================================
+" # Dialog functions {{{2
 "------------------------------------------------------------------------
 function! s:Mappings(abuffer)
   " map <enter> to edit a file, also dbl-click
   exe "nnoremap <silent> <buffer> <esc>         :silent call ".a:abuffer.action."(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> q             :call lh#buffer#dialog#Select(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> <cr>          :call lh#buffer#dialog#Select(line('.'), ".a:abuffer.id.")<cr>"
+  exe "nnoremap <silent> <buffer> q             :call lh#buffer#dialog#select(-1, ".a:abuffer.id.")<cr>"
+  exe "nnoremap <silent> <buffer> <cr>          :call lh#buffer#dialog#select(line('.'), ".a:abuffer.id.")<cr>"
   " nnoremap <silent> <buffer> <2-LeftMouse> :silent call <sid>GrepEditFileLine(line("."))<cr>
   " nnoremap <silent> <buffer> Q	  :call <sid>Reformat()<cr>
   " nnoremap <silent> <buffer> <Left>	  :set tabstop-=1<cr>
@@ -94,7 +119,7 @@ function! s:RedisplayHelp(dialog)
   endfor
 endfunction
 
-function! lh#buffer#dialog#Update(dialog)
+function! lh#buffer#dialog#update(dialog)
   set noro
   exe (s:Help_NbL()+1).',$d_'
   for choice in a:dialog.choices
@@ -115,7 +140,7 @@ function! s:Display(dialog, atitle)
 endfunction
 
 function! s:ToggleHelp(bufferId)
-  call lh#buffer#Find(a:bufferId)
+  call lh#buffer#find(a:bufferId)
   call b:dialog.toggle_help()
 endfunction
 
@@ -135,7 +160,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let res.where_it_started = where_it_started
 
   try
-    call lh#buffer#Scratch(a:bname, a:where)
+    call lh#buffer#scratch(a:bname, a:where)
   catch /.*/
     echoerr v:exception
     return res
@@ -182,19 +207,19 @@ function! lh#buffer#dialog#add_help(abuffer, text, help_type)
 endfunction
 
 "=============================================================================
-function! lh#buffer#dialog#Quit()
+function! lh#buffer#dialog#quit()
   let bufferId = b:dialog.where_it_started[0]
   echohl WarningMsg
   echo "Abort"
   echohl None
   quit
-  call lh#buffer#Find(bufferId)
+  call lh#buffer#find(bufferId)
 endfunction
 
-" Function: lh#buffer#dialog#Select(line, bufferId [,overriden-action])
-function! lh#buffer#dialog#Select(line, bufferId, ...)
+" Function: lh#buffer#dialog#select(line, bufferId [,overriden-action])
+function! lh#buffer#dialog#select(line, bufferId, ...)
   if a:line == -1
-    call lh#buffer#dialog#Quit()
+    call lh#buffer#dialog#quit()
     return
   " elseif a:line <= s:Help_NbL() + 1
   elseif a:line <= s:Help_NbL() 
@@ -217,6 +242,14 @@ function! lh#buffer#dialog#Select(line, bufferId, ...)
     exe 'call '.dialog.action.'(results, a:000)'
   else
     exe 'call '.dialog.action.'(results)'
+  endif
+endfunction
+function! lh#buffer#dialog#Select(line, bufferId, ...)
+  echomsg "lh#buffer#dialog#Select() is deprecated, use lh#buffer#dialog#select() instead"
+  if a:0 > 0 " action overriden
+    exe 'call lh#buffer#dialog#select(a:line,  a:bufferId, a:1)'
+  else
+    exe 'call lh#buffer#dialog#select(a:line,  a:bufferId)'
   endif
 endfunction
 
