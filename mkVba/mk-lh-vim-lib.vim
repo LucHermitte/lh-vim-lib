@@ -2,8 +2,8 @@
 " $Id$
 " File:		mk-lh-lib.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.1.0
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 let s:version = '2.2.0'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
@@ -24,8 +24,9 @@ autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
 autoload/lh/command.vim
 autoload/lh/common.vim
-autoload/lh/event.vim
 autoload/lh/encoding.vim
+autoload/lh/event.vim
+autoload/lh/graph/tsort.vim
 autoload/lh/list.vim
 autoload/lh/menu.vim
 autoload/lh/option.vim
@@ -33,11 +34,14 @@ autoload/lh/path.vim
 autoload/lh/position.vim
 autoload/lh/syntax.vim
 autoload/lh/visual.vim
-autoload/lh/graph/tsort.vim
 doc/lh-vim-lib.txt
 macros/menu-map.vim
+mkVba/mk-lh-vim-lib.vim
 plugin/ui-functions.vim
 plugin/words_tools.vim
+tests/lh/function.vim
+tests/lh/list.vim
+tests/lh/path.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim
