@@ -1,52 +1,54 @@
 "=============================================================================
-" File:		ui-functions.vim					{{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
+" File:         plugin/ui-functions.vim                                  {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://code.google.com/p/lh-vim/>
 " URL: http://hermitte.free.fr/vim/ressources/vimfiles/plugin/ui-functions.vim
 " 
-" Version:	0.06
-" Created:	18th nov 2002
-" Last Update:	28th Nov 2007
+" Version:      2.2.0
+" Created:      18th nov 2002
+" Last Update:  28th Nov 2007
 "------------------------------------------------------------------------
-" Description:	Functions for the interaction with a User Interface.
-" 		The UI can be graphical or textual.
-" 		At first, this was designed to ease the syntax of
-" 		mu-template's templates.
+" Description:  Functions for the interaction with a User Interface.
+"               The UI can be graphical or textual.
+"               At first, this was designed to ease the syntax of
+"               mu-template's templates.
 "
-" Option:	{{{2
-"	{[bg]:ui_type} 
-" 		= "g\%[ui]", 
-" 		= "t\%[ext]" ; the call must not be |:silent|
-" 		= "f\%[te]"
+" Option:       {{{2
+"       {[bg]:ui_type} 
+"               = "g\%[ui]", 
+"               = "t\%[ext]" ; the call must not be |:silent|
+"               = "f\%[te]"
 " }}}2
 "------------------------------------------------------------------------
-" Installation:	Drop this into one of your {rtp}/plugin/ directories.
-" History:	{{{2
+" Installation: Drop this into one of your {rtp}/plugin/ directories.
+" History:      {{{2
 "    v0.01 Initial Version
 "    v0.02
-"	(*) Code "factorisations" 
-"	(*) Help on <F1> enhanced.
-"	(*) Small changes regarding the parameter accepted
-"	(*) Function SWITCH
+"       (*) Code "factorisations" 
+"       (*) Help on <F1> enhanced.
+"       (*) Small changes regarding the parameter accepted
+"       (*) Function SWITCH
 "    v0.03
-"	(*) Small bug fix with INPUT()
+"       (*) Small bug fix with INPUT()
 "    v0.04
-"	(*) New function: WHICH()
+"       (*) New function: WHICH()
 "    v0.05
 "       (*) In vim7e, inputdialog() returns a trailing '\n'. INPUT() strips the
 "           NL character.
 "    v0.06
 "       (*) :s/echoerr/throw/ => vim7 only
+"    v2.2.0
+"       (*) menu to switch the ui_type
 " 
-" TODO:		{{{2
-" 	(*) Save the hl-User1..9 before using them
-" 	(*) Possibility other than &statusline:
-" 	    echohl User1 |echon "bla"|echohl User2|echon "bli"|echohl None
-" 	(*) Wraps too long choices-line (length > term-width)
-" 	(*) Add to the documentation: "don't use CTRL-C to abort !!"
-" 	(*) Look if I need to support 'wildmode'
-" 	(*) 3rd mode: return string for FTE
-" 	(*) 4th mode: interaction in a scratch buffer
+" TODO:         {{{2
+"       (*) Save the hl-User1..9 before using them
+"       (*) Possibility other than &statusline:
+"           echohl User1 |echon "bla"|echohl User2|echon "bli"|echohl None
+"       (*) Wraps too long choices-line (length > term-width)
+"       (*) Add to the documentation: "don't use CTRL-C to abort !!"
+"       (*) Look if I need to support 'wildmode'
+"       (*) 3rd mode: return string for FTE
+"       (*) 4th mode: interaction in a scratch buffer
 "
 " }}}1
 "=============================================================================
@@ -83,7 +85,7 @@ function! SWITCH(var, ...)
     let i = a:0 - 1 - explicit_def
     while i > 0
       if a:var == a:{i}
-	return a:{i+1}
+        return a:{i+1}
       endif
       let i = i - 2
     endwhile
@@ -205,8 +207,8 @@ function! WHICH(fn, prompt, ...)
     return substitute(matchstr(a:{1}, '^.\{-}\ze\%(\n\|$\)'), '&', '', 'g')
   else
     return substitute(
-	  \ matchstr(a:{1}, '^\%(.\{-}\n\)\{'.(which-1).'}\zs.\{-}\ze\%(\n\|$\)')
-	  \ , '&', '', 'g')
+          \ matchstr(a:{1}, '^\%(.\{-}\n\)\{'.(which-1).'}\zs.\{-}\ze\%(\n\|$\)')
+          \ , '&', '', 'g')
   endif
   " }}}3
 endfunction
@@ -242,6 +244,18 @@ endfunction
 
 " }}}1
 "------------------------------------------------------------------------
+" Options setting {{{1
+let s:OptionData = {
+      \ "variable": "ui_type",
+      \ "idx_crt_value": 1,
+      \ "values": ['gui', 'text', 'fte'],
+      \ "menu": { "priority": '500.2700', "name": '&Plugin.&LH.&UI type'}
+      \}
+
+call lh#menu#def_toggle_item(s:OptionData)
+
+" }}}1
+"------------------------------------------------------------------------
 " Internal functions {{{1
 function! s:Option(name, default) " {{{2
   if     exists('b:ui_'.a:name) | return b:ui_{a:name}
@@ -274,10 +288,10 @@ function! s:status_line(current, hl, ...)
   while i <= a:0
     if i == a:current
       let sl_choices = sl_choices . ' '. hl . 
-	    \ substitute(a:{i}, '&\(.\)', '%6*\1'.hl, '') . '%* '
+            \ substitute(a:{i}, '&\(.\)', '%6*\1'.hl, '') . '%* '
     else
       let sl_choices = sl_choices . ' ' . 
-	    \ substitute(a:{i}, '&\(.\)', '%6*\1%*', '') . ' '
+            \ substitute(a:{i}, '&\(.\)', '%6*\1%*', '') . ' '
     endif
     let i = i + 1
   endwhile
@@ -305,8 +319,8 @@ function! s:confirm_text(box, text, ...)
   " Prepare the hot keys
   let i = 0
   while i != 26
-    let hotkey_{nr2char(i+64)} = 0
-    let i = i + 1
+    let hotkey_{nr2char(i+65)} = 0
+    let i += 1
   endwhile
   let hotkeys = '' | let help_k = '/'
   " Parse the choices
@@ -348,17 +362,17 @@ function! s:confirm_text(box, text, ...)
   let sl = &l:statusline
   " Color schemes for selected item {{{5
   :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow 
-	\ guifg=Black guibg=Yellow
+        \ guifg=Black guibg=Yellow
   :hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
-	\ guifg=Black guibg=LightRed
+        \ guifg=Black guibg=LightRed
   :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red 
-	\ guifg=Black guibg=Red
+        \ guifg=Black guibg=Red
   :hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
-	\ guifg=Black guibg=Cyan
+        \ guifg=Black guibg=Cyan
   :hi User5 term=inverse,bold cterm=inverse,bold ctermfg=LightYellow
-	\ guifg=Black guibg=LightYellow
+        \ guifg=Black guibg=LightYellow
   :hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
-	\ guifg=DarkRed guibg=LightGray
+        \ guifg=DarkRed guibg=LightGray
   " }}}5
 
   " 3.2- Interactive loop                {{{4
@@ -387,37 +401,37 @@ function! s:confirm_text(box, text, ...)
     let complType=nr2char(key)
     " If the key hit matched awaited keys ...
     if -1 != stridx(" \<tab>\<esc>\<enter>".hotkeys,complType) ||
-	  \ (key =~ "\<F1>\\|\<right>\\|\<left>\\|\<s-tab>")
+          \ (key =~ "\<F1>\\|\<right>\\|\<left>\\|\<s-tab>")
       if key           == "\<F1>"                       " Help      {{{5
-	redraw!
-	echohl StatusLineNC
-	echo help
-	echohl None
-	let key=getchar()
-	let complType=nr2char(key)
+        redraw!
+        echohl StatusLineNC
+        echo help
+        echohl None
+        let key=getchar()
+        let complType=nr2char(key)
       endif
       " TODO: support CTRL-D
       if     complType == "\<enter>"                    " Validate  {{{5
-	break
+        break
       elseif complType == " "                           " check box {{{5
-	let toggle = 1
+        let toggle = 1
       elseif complType == "\<esc>"                      " Abort     {{{5
-	let i = -1 | break
+        let i = -1 | break
       elseif complType == "\<tab>" || key == "\<right>" " Next      {{{5
-	let direction = 1
+        let direction = 1
       elseif key =~ "\<left>\\|\<s-tab>"                " Previous  {{{5
-	let direction = -1
+        let direction = -1
       elseif -1 != stridx(hotkeys, complType )          " Hotkeys     {{{5
-	if '' == complType  | continue | endif
-	let direction = hotkey_{toupper(complType)} - i
-	let toggle = 1
+        if '' == complType  | continue | endif
+        let direction = hotkey_{toupper(complType)} - i
+        let toggle = 1
       " else
       endif
       " }}}5
     endif
     if direction != 0 " {{{5
       if 'combo' == a:box
-	let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
+        let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
       endif
       let i = i + direction
       if     i > nb_choices | let i = 1 
@@ -427,8 +441,8 @@ function! s:confirm_text(box, text, ...)
     endif
     if toggle == 1    " {{{5
       if 'check' == a:box
-	let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]') 
-	      \ . strpart(choice_{i}, 3)
+        let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]') 
+              \ . strpart(choice_{i}, 3)
       endif
       let toggle = 0
     endif
