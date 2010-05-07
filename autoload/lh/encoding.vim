@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		encoding.vim                                           {{{1
+" File:		autoload/lh/encoding.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.7
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	21st Feb 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -25,10 +25,10 @@ let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
 
-" Function: lh#encoding#Iconv(expr, from, to)  " {{{3
+" Function: lh#encoding#iconv(expr, from, to)  " {{{3
 " Unlike |iconv()|, this wrapper returns {expr} when we know no convertion can
 " be acheived.
-function! lh#encoding#Iconv(expr, from, to)
+function! lh#encoding#iconv(expr, from, to)
   " call Dfunc("s:ICONV(".a:expr.','.a:from.','.a:to.')')
   if has('multi_byte') && 
 	\ ( has('iconv') || has('iconv/dyn') ||

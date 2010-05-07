@@ -29,10 +29,11 @@
 " 	v 2.0.5
 " 	(*) lh#path#StripStart() interprets '.' as getcwd()
 " 	v 2.2.0
-" 	(*) new functions: #common(), #to_dirname(), #depth(), #relative_to(),
-" 	    #to_regex(), #find()
-" 	(*) #simplify() fixed
-" 	(*) #to_relative() use simplify()
+" 	(*) new functions: lh#path#common(), lh#path#to_dirname(),
+" 	    lh#path#depth(), lh#path#relative_to(), lh#path#to_regex(),
+" 	    lh#path#find()
+" 	(*) lh#path#simplify() fixed
+" 	(*) lh#path#to_relative() use simplify()
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')

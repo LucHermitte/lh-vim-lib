@@ -1,9 +1,9 @@
 "=============================================================================
 " $Id$
-" File:		tsort.vim                                           {{{1
+" File:		autoload/lh/tsort.vim                        {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.1.0
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	21st Apr 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -18,6 +18,23 @@
 
 let s:cpo_save=&cpo
 set cpo&vim
+
+"------------------------------------------------------------------------
+" ## Debug {{{1
+function! lh#graph#tsort#verbose(level)
+  let s:verbose = a:level
+endfunction
+
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#graph#tsort#debug(expr)
+  return eval(a:expr)
+endfunction
+
 "------------------------------------------------------------------------
 "## Helper functions                         {{{1
 "# s:Successors_fully_defined(node)          {{{2

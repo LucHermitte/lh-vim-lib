@@ -2,13 +2,13 @@
 " $Id$
 " File:		autoload/lh/askvim.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	17th Apr 2007
 " Last Update:	$Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
 " Description:	
-" 	Defines functions that asks vim what its is relinquish to tell us
+" 	Defines functions that asks vim what it is relinquish to tell us
 " 	- menu
 " 
 "------------------------------------------------------------------------
@@ -25,11 +25,33 @@
 "=============================================================================
 let s:cpo_save=&cpo
 set cpo&vim
-"------------------------------------------------------------------------
-" Functions {{{1
 
-" Function: lh#askvim#exe(command) {{{2
+"------------------------------------------------------------------------
+" ## Functions {{{1
+" # Debug {{{2
+function! lh#askvim#verbose(level)
+  let s:verbose = a:level
+endfunction
+
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#askvim#debug(expr)
+  return eval(a:expr)
+endfunction
+
+"------------------------------------------------------------------------
+" # Public {{{2
+" Function: lh#askvim#exe(command) {{{3
 function! lh#askvim#Exe(command)
+  echomsg 'lh#askvim#Exe() is deprecated, use lh#askvim#exe()'
+  return lh#askvim#exe(a:command)
+endfunction
+
+function! lh#askvim#exe(command)
   let save_a = @a
   try 
     silent! redir @a
@@ -44,9 +66,9 @@ function! lh#askvim#Exe(command)
 endfunction
 
 
-" Function: lh#askvim#menu(menuid) {{{2
+" Function: lh#askvim#menu(menuid) {{{3
 function! s:AskOneMenu(menuact, res)
-  let sKnown_menus = lh#askvim#Exe(a:menuact)
+  let sKnown_menus = lh#askvim#exe(a:menuact)
   let lKnown_menus = split(sKnown_menus, '\n')
   " echo string(lKnown_menus)
 
@@ -57,7 +79,7 @@ function! s:AskOneMenu(menuact, res)
 
   let simplifiedKnown_menus = deepcopy(lKnown_menus)
   call map(simplifiedKnown_menus, 'substitute(v:val, "&", "", "g")')
-  " let idx = lh#list#Match(simplifiedKnown_menus, '^\d\+\s\+'.menuid_parts[-1])
+  " let idx = lh#list#match(simplifiedKnown_menus, '^\d\+\s\+'.menuid_parts[-1])
   let idx = match(simplifiedKnown_menus, '^\d\+\s\+'.menuid_parts[-1])
   if idx == -1
     " echo "not found"
@@ -97,7 +119,7 @@ function! s:AskOneMenu(menuact, res)
       let act.action      = menu_def[4]
     else
       echomsg string(menu_def)
-      echoerr "lh#askvim#Menu(): Cannot decode ``".lKnown_menus[idx]."''"
+      echoerr "lh#askvim#menu(): Cannot decode ``".lKnown_menus[idx]."''"
     endif
     
     let a:res.actions["mode_" . act.mode] = act
@@ -109,12 +131,12 @@ function! s:AskOneMenu(menuact, res)
   return a:res
 endfunction
 
-function! lh#askvim#Menu(menuid, modes)
+function! lh#askvim#menu(menuid, modes)
   let res = {}
   let i = 0
   while i != strlen(a:modes)
     call s:AskOneMenu(a:modes[i].'menu '.a:menuid, res)
-    let i = i + 1
+    let i += 1
   endwhile
   return res
 endfunction

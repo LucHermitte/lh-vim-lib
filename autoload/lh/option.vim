@@ -2,8 +2,8 @@
 " $Id$
 " File:		autoload/lh/option.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	2.0.5
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	2.2.0
 " Created:	24th Jul 2004
 " Last Update:	$Date$ (07th Oct 2006)
 "------------------------------------------------------------------------
@@ -17,8 +17,8 @@
 " 	Requires Vim 7+
 " History:	
 " 	v2.0.5
-" 	(*) lh#option#GetNonEmpty() manages Lists and Dictionaries
-" 	(*) lh#option#Get() doesn't test emptyness anymore
+" 	(*) lh#option#get_non_empty() manages Lists and Dictionaries
+" 	(*) lh#option#get() doesn't test emptyness anymore
 " 	v2.0.0
 " 		Code moved from {rtp}/macros/ 
 " }}}1
@@ -28,15 +28,31 @@
 "=============================================================================
 let s:cpo_save=&cpo
 set cpo&vim
-"------------------------------------------------------------------------
-" Functions {{{1
 
-" Function: lh#option#Get(name, default [, scope])            {{{2
+"------------------------------------------------------------------------
+" ## Functions {{{1
+" # Debug {{{2
+function! lh#option#verbose(level)
+  let s:verbose = a:level
+endfunction
+
+function! s:Verbose(expr)
+  if exists('s:verbose') && s:verbose
+    echomsg a:expr
+  endif
+endfunction
+
+function! lh#option#debug(expr)
+  return eval(a:expr)
+endfunction
+
+" # Public {{{2
+" Function: lh#option#get(name, default [, scope])            {{{3
 " @return b:{name} if it exists, or g:{name} if it exists, or {default}
 " otherwise
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#Get(name,default,...)
+function! lh#option#get(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   let name = a:name
   let i = 0
@@ -45,9 +61,13 @@ function! lh#option#Get(name,default,...)
       " \ && (0 != strlen({scope[i]}:{name}))
       return {scope[i]}:{name}
     endif
-    let i = i + 1
+    let i += 1
   endwhile 
   return a:default
+endfunction
+function! lh#option#Get(name,default,...)
+  let scope = (a:0 == 1) ? a:1 : 'bg'
+  return lh#option#get(a:name, a:default, scope)
 endfunction
 
 function! s:IsEmpty(variable)
@@ -59,11 +79,11 @@ function! s:IsEmpty(variable)
   endif
 endfunction
 
-" Function: lh#option#GetNonEmpty(name, default [, scope])            {{{2
+" Function: lh#option#get_non_empty(name, default [, scope])            {{{3
 " @return of b:{name}, g:{name}, or {default} the first which exists and is not empty 
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#GetNonEmpty(name,default,...)
+function! lh#option#get_non_empty(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   let name = a:name
   let i = 0
@@ -71,9 +91,13 @@ function! lh#option#GetNonEmpty(name,default,...)
     if exists(scope[i].':'.name) && !s:IsEmpty({scope[i]}:{name})
       return {scope[i]}:{name}
     endif
-    let i = i + 1
+    let i += 1
   endwhile 
   return a:default
+endfunction
+function! lh#option#GetNonEmpty(name,default,...)
+  let scope = (a:0 == 1) ? a:1 : 'bg'
+  return lh#option#get_non_empty(a:name, a:default, scope)
 endfunction
 
 " Functions }}}1
