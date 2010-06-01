@@ -3,7 +3,7 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.0
+" Version:	2.2.1
 " Created:	23rd Jan 2007
 " Last Update:	11th Feb 2008
 "------------------------------------------------------------------------
@@ -49,12 +49,14 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Debug {{{2
-function! lh#path#verbose(level)
-  let s:verbose = a:level
+let s:verbose = 0
+function! lh#path#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
 endfunction
 
 function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
+  if s:verbose
     echomsg a:expr
   endif
 endfunction
