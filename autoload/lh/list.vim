@@ -3,7 +3,7 @@
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.0
+" Version:      2.2.1
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -15,6 +15,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:      
+"       v2.2.1:
+"       (*) use :unlet in :for loop to support heterogeneous lists
+"       (*) binary search algorithms (upper_bound, lower_bound, equal_range)
 "       v2.2.0:
 "       (*) new functions: lh#list#accumulate, lh#list#transform,
 "           lh#list#transform_if, lh#list#find_if, lh#list#copy_if,
@@ -67,6 +70,7 @@ function! lh#list#Transform(input, output, action)
     let action = substitute(a:action, 'v:val','element', 'g')
     let res = eval(action)
     call add(a:output, res)
+    unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction
@@ -75,6 +79,7 @@ function! lh#list#transform(input, output, action)
   for element in a:input
     let res = lh#function#execute(a:action, element)
     call add(a:output, res)
+    unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction
@@ -85,6 +90,7 @@ function! lh#list#transform_if(input, output, action, predicate)
       let res = lh#function#execute(a:action, element)
       call add(a:output, res)
     endif
+    unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction
@@ -94,6 +100,7 @@ function! lh#list#copy_if(input, output, predicate)
     if lh#function#execute(a:predicate, element)
       call add(a:output, element)
     endif
+    unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction
@@ -159,7 +166,7 @@ function! lh#list#find_if(list, predicate, ...)
   if a:0 == 1
     let idx = a:1
   elseif a:0 != 0
-      throw "lh#list#find_if: unexpected number of arguments: lh#list#Find_if(list, predicate [, start-pos])"
+      throw "lh#list#find_if: unexpected number of arguments: lh#list#find_if(list, predicate [, start-pos])"
   endif
 
   " The search loop
@@ -170,6 +177,94 @@ function! lh#list#find_if(list, predicate, ...)
     let idx += 1
   endwhile
   return -1
+endfunction
+
+" Function: lh#list#lower_bound(sorted_list, value  [, first[, last]]) {{{3
+function! lh#list#lower_bound(list, val, ...)
+  let first = 0
+  let last = len(a:list)
+  if a:0 >= 1     | let first = a:1
+  elseif a:0 >= 2 | let last = a:2
+  elseif a:0 > 2
+      throw "lh#list#equal_range: unexpected number of arguments: lh#list#equal_range(sorted_list, value  [, first[, last]])"
+  endif
+
+  let len = last - first
+
+  while len > 0
+    let half = len / 2
+    let middle = first + half
+    if a:list[middle] < a:val
+      let first = middle + 1
+      let len -= half + 1
+    else
+      let len = half
+    endif
+  endwhile
+  return first
+endfunction
+
+" Function: lh#list#upper_bound(sorted_list, value  [, first[, last]]) {{{3
+function! lh#list#upper_bound(list, val, ...)
+  let first = 0
+  let last = len(a:list)
+  if a:0 >= 1     | let first = a:1
+  elseif a:0 >= 2 | let last = a:2
+  elseif a:0 > 2
+      throw "lh#list#equal_range: unexpected number of arguments: lh#list#equal_range(sorted_list, value  [, first[, last]])"
+  endif
+
+  let len = last - first
+
+  while len > 0
+    let half = len / 2
+    let middle = first + half
+    if a:val < a:list[middle]
+      let len = half
+    else
+      let first = middle + 1
+      let len -= half + 1
+    endif
+  endwhile
+  return first
+endfunction
+
+" Function: lh#list#equal_range(sorted_list, value  [, first[, last]]) {{{3
+" @return [f, l], where
+"   f : First position where {value} could be inserted
+"   l : Last position where {value} could be inserted
+function! lh#list#equal_range(list, val, ...)
+  let first = 0
+  let last = len(a:list)
+
+  " Parameters
+  if a:0 >= 1     | let first = a:1
+  elseif a:0 >= 2 | let last  = a:2
+  elseif a:0 > 2
+      throw "lh#list#equal_range: unexpected number of arguments: lh#list#equal_range(sorted_list, value  [, first[, last]])"
+  endif
+
+  " The search loop ( == STLPort's equal_range)
+
+  let len = last - first
+  while len > 0
+    let half = len / 2
+    let middle = first + half
+    if a:list[middle] < a:val
+      let first = middle + 1
+      let len -= half + 1
+    elseif a:val < a:list[middle]
+      let len = half
+    else
+      let left = lh#list#lower_bound(a:list, a:val, first, middle)
+      let right = lh#list#upper_bound(a:list, a:val, middle+1, first+len)
+      return [left, right]
+    endif
+
+    " let predicate = substitute(a:predicate, 'v:val', 'a:list['.idx.']', 'g')
+    " let res = lh#function#execute(a:predicate, a:list[idx])
+  endwhile
+  return [first, first]
 endfunction
 
 " Function: lh#list#unique_sort(list [, func]) {{{3
