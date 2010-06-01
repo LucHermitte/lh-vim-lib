@@ -3,7 +3,7 @@
 " File:		tests/lh/list.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.0
+" Version:	2.2.1
 " Created:	19th Nov 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -78,6 +78,36 @@ function! s:Test_sort2()
     :let s = lh#list#unique_sort2(l, "CmpNumbers") 
     " Comment string(s)
     Assert s == expected
+endfunction
+
+"------------------------------------------------------------------------
+" Searchs
+function! s:TestBinarySearches()
+  let v1 = [ -3, -2, -1, -1, 0, 0, 1, 2, 3, 4, 6 ]
+  let i = lh#list#lower_bound(v1, 3)
+  Assert v1[i] == 3
+  let i = lh#list#upper_bound(v1, 3)
+  Assert v1[i] == 4
+  let r = lh#list#equal_range(v1, 3)
+  Assert v1[r[0]:r[1]-1] == [3]
+
+  let i = lh#list#lower_bound(v1, -1)
+  Assert v1[i] == -1
+  let i = lh#list#upper_bound(v1, -1)
+  Assert v1[i] == 0
+  let r = lh#list#equal_range(v1, -1)
+  Assert v1[r[0]:r[1]-1] == [-1, -1]
+
+  let i = lh#list#lower_bound(v1, 5)
+  Assert v1[i] == 6
+  let i = lh#list#upper_bound(v1, 5)
+  Assert v1[i] == 6
+  let r = lh#list#equal_range(v1, 5)
+  Assert v1[r[0]:r[1]-1] == []
+
+  Assert len(v1) == lh#list#lower_bound(v1, 10)
+  Assert len(v1) == lh#list#upper_bound(v1, 10)
+  Assert [len(v1), len(v1)] == lh#list#equal_range(v1, 10)
 endfunction
 
 "------------------------------------------------------------------------
