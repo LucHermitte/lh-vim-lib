@@ -6,7 +6,7 @@
 "
 " Purpose:	Define functions to build mappings and menus at the same time
 "
-" Version:	2.2.0
+" Version:	2.2.1
 " Last Update:  $Date$ (02nd Dec 2006)
 "
 " Last Changes: {{{
