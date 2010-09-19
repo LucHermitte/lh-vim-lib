@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.2.0)
-                        For Vim version 7+Last change: $Date$
+*lh-vim-lib.txt*        Vim common libraries (v2.2.1)
+                        For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -53,6 +53,8 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+o |lh#list#equal_range()|, 
+  |lh#list#lower_bound()| and |lh#list#upper_bound()| 
 Graphs related functions:                               |lhvl#graph|
 - |lh#graph#tsort#depth()|
 - |lh#graph#tsort#breadth()|
@@ -409,7 +411,7 @@ lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])
 @see |index()|, |eval()|
 
 The {string-predicate} recognizes some special arguments:
-- |v:val| is subtituted with the current element being evaluated in the list
+- |v:val| is substituted with the current element being evaluated in the list
 - *v:1_* *v:2_* , ..., are substituted with the i-th elements from
   {pred-parameters}.
   NB: the "v:\d\+_" are 1-indexed while {pred-parameters} is indeed seen as

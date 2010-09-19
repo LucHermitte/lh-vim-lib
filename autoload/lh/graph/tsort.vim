@@ -3,7 +3,7 @@
 " File:		autoload/lh/tsort.vim                        {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.0
+" Version:	2.2.1
 " Created:	21st Apr 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------

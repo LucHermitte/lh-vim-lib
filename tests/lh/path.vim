@@ -3,7 +3,7 @@
 " File:		tests/lh/path.vim                                      {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.0
+" Version:	2.2.1
 " Created:	28th May 2009
 " Last Update:	$Date$
 "------------------------------------------------------------------------

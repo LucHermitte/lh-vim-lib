@@ -4,7 +4,7 @@
 "               <URL:http://code.google.com/p/lh-vim/>
 " URL: http://hermitte.free.fr/vim/ressources/vimfiles/plugin/ui-functions.vim
 " 
-" Version:      2.2.0
+" Version:      2.2.1
 " Created:      18th nov 2002
 " Last Update:  28th Nov 2007
 "------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 " File:		tests/lh/function.vim                                   {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.0
+" Version:	2.2.1
 " Created:	03rd Nov 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -194,6 +194,7 @@ function! s:Test_double_bind_func_name()
   let i = 0
   while i != len(r)
     Assert! should#be#number (r[i])
+    " echo "?? ".(r[i])."==".(i+1)
     Assert r[i] == i+1
     let i += 1
   endwhile
@@ -232,13 +233,15 @@ function! s:Test_double_bind_func_cplx()
   " Comment "f2=f1(v:1_, 5)=".string(f2)
 
   let r = lh#function#execute(f2, 42, "foo")
-  Comment r
+  Assert! 0 && "not ready"
+  Comment "2bcpl# ".string(r)
 endfunction
 
 function! s:Test_double_bind_expr()
   let f1 = lh#function#bind('Id(1, 2, v:1_, v:3_, v:2_)')
-  Comment "f1=".string(f1)
+  Comment "2be# f1=".string(f1)
   let r = lh#function#execute(f1, 3, 5, 4)
+  Comment "2be# ".string(r)
   Assert! len(r) == 5
   let i = 0
   while i != len(r)
@@ -249,9 +252,9 @@ function! s:Test_double_bind_expr()
 
   " f2
   let f2 = lh#function#bind(f1, 'v:1_', '"foo"', [])
-  Comment "f2=f1(v:1_, 5)=".string(f2)
+  Comment "2be# f2=f1(v:1_, 5)=".string(f2)
   let r = lh#function#execute(f2, 3)
-  Comment string(r)
+  Comment "2be# ".string(r)
   Assert! len(r) == 5
   let i = 0
   while i != len(r)-2
