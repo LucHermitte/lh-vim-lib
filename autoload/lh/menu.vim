@@ -3,9 +3,9 @@
 " File:		autoload/lh/menu.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.2
 " Created:	13th Oct 2006
-" Last Update:	$Date$ (28th Aug 2007)
+" Last Update:	$Date$ (01st Dec 2010)
 "------------------------------------------------------------------------
 " Description:	
 " 	Defines the global function lh#menu#def_menu
@@ -20,6 +20,7 @@
 " 	v2.0.1:	:ToggleXxx echoes the new value
 " 	v2.2.0: Support environment variables
 " 	        Only one :Toggle command is defined.
+" 	v2.2.2: new "hook" attribute for toggle-able menu items.
 " TODO:		
 " 	Should the argument to :Toggle be simplified to use the variable
 " 	name instead ?
@@ -39,6 +40,12 @@ endif
 
 "------------------------------------------------------------------------
 " ## Functions {{{1
+" # Version {{{2
+let s:k_version = 222
+function! lh#menu#version()
+  return s:k_version
+endfunction
+
 " # Debug {{{2
 function! lh#menu#verbose(level)
   let s:verbose = a:level
@@ -107,6 +114,14 @@ function! s:Set(Data)
     let l:Action = a:Data.actions[a:Data.idx_crt_value]
     if type(l:Action) == type(function('tr'))
       call l:Action()
+    else
+      exe l:Action
+    endif
+  endif
+  if has_key(a:Data, "hook")
+    let l:Action = a:Data.hook
+    if type(l:Action) == type(function('tr'))
+      call a:Data.hook()
     else
       exe l:Action
     endif
