@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.2.1)
+*lh-vim-lib.txt*        Vim common libraries (v2.2.2)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -32,6 +32,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#common#warning_msg()|
 - |lh#common#echomsg_multilines()|
 - |lh#encoding#iconv()|
+- |lh#encoding#strlen()|
+- |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
@@ -45,16 +47,20 @@ Functors related functions:                             |lhvl#function|
 - |lh#function#prepare()|
 Lists related functions:                                |lhvl#list|
 - |lh#list#accumulate()|
+- |lh#list#at()|
 - |lh#list#copy_if()|
+- |lh#list#equal_range()|, 
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#intersect()|
+- |lh#list#lower_bound()| and |lh#list#upper_bound()| 
 - |lh#list#match()|
+- |lh#list#matches()|
+- |lh#list#not_found()|
+- |lh#list#remove()|
 - |lh#list#subset()|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
-o |lh#list#equal_range()|, 
-  |lh#list#lower_bound()| and |lh#list#upper_bound()| 
 Graphs related functions:                               |lhvl#graph|
 - |lh#graph#tsort#depth()|
 - |lh#graph#tsort#breadth()|
@@ -290,6 +296,33 @@ This function just calls |iconv()| with the same arguments. The only
 difference is that it return {expr} when we know that |iconv()| will return an
 empty string.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#encoding#strlen()*  {{{3
+lh#encoding#strlen({mb_string})~
+This function returns the length of the multi-bytes string.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#encoding#at()*      {{{3
+lh#encoding#at({mb_string}, {i})~
+Returns the i-th character in a multi-bytes string.
+@param {i} 0-indexed offset.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#encoding#strpart()* {{{3
+lh#encoding#strpart({mb_string}, {position}, {length})~
+Returns {length} extracted characters from {position} in a multi-bytes string.
+@param {position} 0-indexed offset.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                               *lh#float#max()*     *lh#float#min()*    {{{3
+                               *lh#float#arg_max()* *lh#float#arg_min()*
+lh#float#min({list})~
+lh#float#arg_min({list})~
+lh#float#min({list})~
+lh#float#arg_min({list})~
+Returns The minimum, /arg-minimum, /maximum, /arg-maximum of a |List| of
+|expr-float|. 
+
 
 ------------------------------------------------------------------------------
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
@@ -397,6 +430,16 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 @see |index()|, |match()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#list#matches()*     {{{3
+lh#list#match({list},{pattern}[, {start-pos}])~
+@param      {list} |List| 
+@param   {pattern} |expr-string|
+@param {start-pos}  First index to check
+@return             The |List| of indices, >= {start-pos}, in |List| {list} where
+                    the item matches {pattern}.
+@return             [] if no item matches {pattern}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                             *lh#list#find_if()* *lh#list#Find_if()*     {{{3
 lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
 lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
@@ -433,6 +476,30 @@ rewritten as: >
     :echo l[i]
     28
 NB: Expect the Find_if() version to be replaced with the find_if() one.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                        *lh#list#lower_bound()* *lh#list#upper_bound()* {{{3
+			*lh#list#equal_range()*
+lh#list#lower_bound({list}, {value} [, {first}][, {last}])~
+lh#list#upper_bound({list}, {value} [, {first}][, {last}])~
+lh#list#equal_range({list}, {value} [, {first}][, {last}])~
+@param  {list}  Sorted |List| 
+@param  {value} Value to search
+@param  {first} First index to check
+@param  {last}  Last+1 index to check
+@return The lowest index, >= {first} and < {last}, in |List| {list}
+        such as the index is <= first {value} occurrence, in lower_bound case
+        such as the index is > last {value} occurrence, in upper_bound case
+@return -1 if no item matches {pattern}.
+@return the pair [lower_bound(), upper_bound()] in equal_range() case 
+@see C++ STL eponym algorithms.
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#list#not_found()*   {{{3
+lh#list#not_found({range})~
+Returns whether the {range} is empty. This function can be used to check
+|lh#list#equal_range()| functions results
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                    *lh#list#unique_sort()* *lh#list#unique_sort2()*     {{{3
@@ -481,7 +548,7 @@ This function is equivalent to (|lh#list#Transform()|) >
 except the action is not a string but a |lhvl#functor|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#list#transform_if()* {{{3
+                                              *lh#list#transform_if()* {{{3
 lh#list#transform_if({input},{output},{action},{predicate})~
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the transformed elements will be
@@ -493,7 +560,7 @@ lh#list#transform_if({input},{output},{action},{predicate})~
 @return              {output}
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#list#copy_if()*      {{{3
+                                               *lh#list#copy_if()*     {{{3
 lh#list#copy_if({input},{output},{predicate})~
 Appends in {output} the elements from {input} that verifies the {predicate}. 
 
@@ -504,7 +571,7 @@ Appends in {output} the elements from {input} that verifies the {predicate}.
 @return              {output}
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#list#accumulate()*   {{{3
+                                               *lh#list#accumulate()*  {{{3
 lh#list#accumulate({input},{transformation},{accumulator})~
 Accumulates the transformed elements from {input}.
 
@@ -523,7 +590,7 @@ Examples: >
    :echo lh#list#accumulate(l, 'string', 'join(v:1_, "##")')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#list#subset()*       {{{3
+                                               *lh#list#subset()*      {{{3
 lh#list#subset({input},{indices})~
 Returns a subset slice of the {input} list.
 
@@ -538,7 +605,23 @@ Example: >
     [ 1, 5, 6, 48 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                                               *lh#list#intersect()*    {{{3
+                                               *lh#list#remove()*      {{{3
+lh#list#remove({input},{indices})~
+Returns a subset slice of the {input} list trimmed of elements.
+
+@param[in,out] {input}   Input |List| from which  element will be removed
+@param[in]     {indices}|List| of indices to remove
+@return a |List| of the elements from {input} not indexed by the {indices}
+@pre {indices} MUST be sorted
+
+Example: >
+    :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
+    :let indices = [ 0, 3, 5, 7 ]
+    :echo lh#list#remove(l, indices) 
+    [ 25, 5, 25, 28 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                               *lh#list#intersect()*   {{{3
 lh#list#intersect({list1},{list2})~
 Returns the elements present in both input lists.
 
@@ -608,10 +691,11 @@ Ensures the returned directory name ends with a '/' or a '\'.
                                                 *lh#path#Simplify()*    {{{3
 lh#path#Simplify({pathname})  (*deprecated*)~
                                                 *lh#path#simplify()*
-lh#path#simplify({pathname})~
+lh#path#simplify({pathname} [{make_relative_to_pwd])~
 Simplifies a path by getting rid of useless '../' and './'.
 
-@param {pathname}  Pathname to simplify
+@param {pathname}             Pathname to simplify
+@param {make_relative_to_pwd} The {pathname} is made relative to pwd when set
 @return the simplified pathname
 
 This function works like |simplify()|, except that it also strips the leading
@@ -793,6 +877,11 @@ updated through a menu.
 - "texts": texts to display according to the variable value (|List|)
   Optional, "values" will be used by default. This option is to be used to
   distinguish the short encoded value, from the long self explanatory name.
+- "hook": |function| to call, or command to |:execute| when the value of the
+  variable is toggled through toggle-menu ; default: none.
+- "actions": list of functions to call, or commands to execute when the value
+  of the variable is toggled through toggle-menu. There shall be one action
+  per possible value when defined ; default: empty list
 
 Warning:
     If the variable is changed by hand without using the menu, then the menu
