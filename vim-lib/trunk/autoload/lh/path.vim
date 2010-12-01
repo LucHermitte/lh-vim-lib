@@ -3,7 +3,7 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.2
 " Created:	23rd Jan 2007
 " Last Update:	11th Feb 2008
 "------------------------------------------------------------------------
@@ -34,6 +34,9 @@
 " 	    lh#path#find()
 " 	(*) lh#path#simplify() fixed
 " 	(*) lh#path#to_relative() use simplify()
+" 	v 2.2.2
+" 	(*) lh#path#strip_common() fixed
+" 	(*) lh#path#simplify() new optional parameter: make_relative_to_pwd
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -48,6 +51,12 @@ set cpo&vim
 
 "=============================================================================
 " ## Functions {{{1
+" # Version {{{2
+let s:k_version = 222
+function! lh#path#version()
+  return s:k_version
+endfunction
+
 " # Debug {{{2
 let s:verbose = 0
 function! lh#path#verbose(...)
@@ -67,15 +76,18 @@ endfunction
 
 "=============================================================================
 " # Public {{{2
-" Function: lh#path#simplify({pathname}) {{{3
+" Function: lh#path#simplify({pathname}, [make_relative_to_pwd=true]) {{{3
 " Like |simplify()|, but also strip the leading './'
 " It seems unable to simplify '..\' when compiled without +shellslash
-function! lh#path#simplify(pathname)
+function! lh#path#simplify(pathname, ...)
+  let make_relative_to_pwd = a:0 == 0 || a:1 == 1
   let pathname = simplify(a:pathname)
   let pathname = substitute(pathname, '^\%(\.[/\\]\)\+', '', '')
   let pathname = substitute(pathname, '\([/\\]\)\%(\.[/\\]\)\+', '\1', 'g')
-  let pwd = getcwd().'/'
-  let pathname = substitute(pathname, '^'.lh#path#to_regex(pwd), '', 'g')
+  if make_relative_to_pwd
+    let pwd = getcwd().'/'
+    let pathname = substitute(pathname, '^'.lh#path#to_regex(pwd), '', 'g')
+  endif
   return pathname
 endfunction
 function! lh#path#Simplify(pathname)
@@ -91,7 +103,8 @@ function! lh#path#common(pathnames)
   while i < len(a:pathnames)
     let fcrt = a:pathnames[i]
     " pathnames should not contain @
-    let common = matchstr(common.'@@'.fcrt, '^\zs\(.*[/\\]\)\ze.\{-}@@\1.*$')
+    " let common = matchstr(common.'@@'.fcrt, '^\zs\(.*[/\\]\)\ze.\{-}@@\1.*$')
+    let common = matchstr(common.'@@'.fcrt, '^\zs\(.*\>\)\ze.\{-}@@\1\>.*$')
     if strlen(common) == 0
       " No need to further checks
       break
@@ -106,6 +119,7 @@ endfunction
 function! lh#path#strip_common(pathnames)
   " assert(len(pathnames)) > 1
   let common = lh#path#common(a:pathnames)
+  let common = lh#path#to_dirname(common)
   let l = strlen(common)
   if l == 0
     return a:pathnames
@@ -187,7 +201,7 @@ function! lh#path#depth(dirname)
   if lh#path#is_absolute_path(dirname)
     let dirname = matchstr(dirname, '.\{-}[/\\]\zs.*')
   endif
-  let depth = len(substitute(dirname, '[^/\\]\+[/\\]', '§', 'g'))
+  let depth = len(substitute(dirname, '[^/\\]\+[/\\]', '#', 'g'))
   return depth
 endfunction
 
