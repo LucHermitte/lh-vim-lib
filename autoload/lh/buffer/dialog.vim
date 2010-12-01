@@ -3,7 +3,7 @@
 " File:		autoload/lh/buffer/dialog.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.2
 " Created:	21st Sep 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -194,7 +194,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let title = '@  ' . a:title
   let helpstr = '| Toggle (h)elp'
   let title = title 
-	\ . repeat(' ', winwidth(bufwinnr(res.id))-strlen(title)-strlen(helpstr)-1)
+	\ . repeat(' ', winwidth(bufwinnr(res.id))-lh#encoding#strlen(title)-lh#encoding#strlen(helpstr)-1)
 	\ . helpstr
   call s:Display(res, title)
  
