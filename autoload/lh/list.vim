@@ -3,7 +3,7 @@
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.1
+" Version:      2.2.2
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -15,6 +15,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:      
+"       v2.2.2:
+"       (*) new functions: lh#list#remove(), lh#list#matches(),
+"           lh#list#not_found().
 "       v2.2.1:
 "       (*) use :unlet in :for loop to support heterogeneous lists
 "       (*) binary search algorithms (upper_bound, lower_bound, equal_range)
@@ -127,6 +130,20 @@ function! lh#list#Match(list, to_be_matched, ...)
   return lh#list#match(a:list, a:to_be_matched, idx)
 endfunction
 
+" Function: lh#list#matches(list, to_be_matched [,idx]) {{{3
+" Return the list of indices that match {to_be_matched}
+function! lh#list#matches(list, to_be_matched, ...)
+  let res = []
+  let idx = (a:0>0) ? a:1 : 0
+  while idx < len(a:list)
+    if match(a:list[idx], a:to_be_matched) != -1
+      let res += [idx]
+    endif
+    let idx += 1
+  endwhile
+  return res
+endfunction
+
 " Function: lh#list#Find_if(list, predicate [, predicate-arguments] [, start-pos]) {{{3
 function! lh#list#Find_if(list, predicate, ...)
   " Parameters
@@ -186,7 +203,7 @@ function! lh#list#lower_bound(list, val, ...)
   if a:0 >= 1     | let first = a:1
   elseif a:0 >= 2 | let last = a:2
   elseif a:0 > 2
-      throw "lh#list#equal_range: unexpected number of arguments: lh#list#equal_range(sorted_list, value  [, first[, last]])"
+      throw "lh#list#lower_bound: unexpected number of arguments: lh#list#lower_bound(sorted_list, value  [, first[, last]])"
   endif
 
   let len = last - first
@@ -211,7 +228,7 @@ function! lh#list#upper_bound(list, val, ...)
   if a:0 >= 1     | let first = a:1
   elseif a:0 >= 2 | let last = a:2
   elseif a:0 > 2
-      throw "lh#list#equal_range: unexpected number of arguments: lh#list#equal_range(sorted_list, value  [, first[, last]])"
+      throw "lh#list#upper_bound: unexpected number of arguments: lh#list#upper_bound(sorted_list, value  [, first[, last]])"
   endif
 
   let len = last - first
@@ -267,6 +284,12 @@ function! lh#list#equal_range(list, val, ...)
   return [first, first]
 endfunction
 
+" Function: lh#list#not_found(range) {{{3
+" @return the range returned from equal_range is empty (i.e. element not fount)
+function! lh#list#not_found(range)
+  return a:range[0] == a:range[1]
+endfunction
+
 " Function: lh#list#unique_sort(list [, func]) {{{3
 " See also http://vim.wikia.com/wiki/Unique_sorting
 "
@@ -316,6 +339,16 @@ function! lh#list#subset(list, indices)
     call add(result, a:list[e])
   endfor
   return result
+endfunction
+
+" Function: lh#list#remove(list, indices) {{{3
+function! lh#list#remove(list, indices)
+  " assert(is_sorted(indices))
+  let idx = reverse(copy(a:indices))
+  for i in idx
+    call remove(a:list, i)
+  endfor
+  return a:list
 endfunction
 
 " Function: lh#list#intersect(list1, list2) {{{3
