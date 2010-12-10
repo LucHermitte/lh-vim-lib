@@ -3,7 +3,7 @@
 " File:		autoload/lh/syntax.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.3
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -88,7 +88,8 @@ endfun
 " Function: Show current syntax kind {{{3
 command! SynShow echo 'hi<'.lh#syntax#name_at_mark('.',1).'> trans<'
       \ lh#syntax#name_at_mark('.',0).'> lo<'.
-      \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>'
+      \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>   ## '
+      \ lh#list#transform(synstack(line("."), col(".")), [], 'synIDattr(v:1_, "name")')
 
 
 " Function: lh#syntax#list_raw(name) : string                     {{{3
