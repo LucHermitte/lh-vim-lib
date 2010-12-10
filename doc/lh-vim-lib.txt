@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.2.2)
+*lh-vim-lib.txt*        Vim common libraries (v2.2.3)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -893,14 +893,17 @@ Examples:
    See tests/lh/test-toggle-menu.vim
 
                                                             *lhvl-:Toggle*
-:Toggle {variable-name}~
-@param {variable-name} must be a |global-variable| name used as "variable" in
-the definition of a toggable menu item thanks to |lh#menu#def_toggle_item()|.
+:Toggle {variable-name} [{text-value}]~
+@param {variable-name} 
+	    must be a |global-variable| name used as "variable" in the
+	    definition of a toggable menu item thanks to
+	    |lh#menu#def_toggle_item()|.
+@param {text-value}
+            when specified, :Toggle directly sets the variable to the value
+	    associated to {text-value}.
 
-This command supports autocompletion on the {variable-name}.
-
-Todo:
-    Propose a *lhvl-:Set{vaName}* command.
+This command supports autocompletion on the {variable-name}, and on
+{text-value}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                       *lh#menu#text()*  {{{3
