@@ -3,9 +3,9 @@
 " File:		autoload/lh/menu.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.2
+" Version:	2.2.3
 " Created:	13th Oct 2006
-" Last Update:	$Date$ (01st Dec 2010)
+" Last Update:	$Date$ (07th Dec 2010)
 "------------------------------------------------------------------------
 " Description:	
 " 	Defines the global function lh#menu#def_menu
@@ -17,13 +17,18 @@
 " 	Requires Vim 7+
 " History:	
 " 	v2.0.0:	Moving to vim7
-" 	v2.0.1:	:ToggleXxx echoes the new value
+" 	v2.0.1:	:Toggle echoes the new value
 " 	v2.2.0: Support environment variables
 " 	        Only one :Toggle command is defined.
-" 	v2.2.2: new "hook" attribute for toggle-able menu items.
+" 	v2.2.3: :Toggle can directly set the final value
+" 	       (prefer this way of proceeding to update the menu to the new
+" 	       value)
+" 	       :Toggle suports auto-completion on possible values
 " TODO:		
-" 	Should the argument to :Toggle be simplified to use the variable
-" 	name instead ?
+" 	* Should the argument to :Toggle be simplified to use the variable name
+" 	instead ? May be a banged :Toggle! could work on the real variable
+" 	name, and on the real value.
+" 	* show all possible values in a sub menu (on demand)
 " }}}1
 "=============================================================================
 
@@ -40,12 +45,6 @@ endif
 
 "------------------------------------------------------------------------
 " ## Functions {{{1
-" # Version {{{2
-let s:k_version = 222
-function! lh#menu#version()
-  return s:k_version
-endfunction
-
 " # Debug {{{2
 function! lh#menu#verbose(level)
   let s:verbose = a:level
@@ -85,16 +84,19 @@ endfunction
 " Searches for the index of {value} in {Data.values} list. Return 0 if not
 " found.
 function! s:Search(Data, value)
-  let idx = 0
-  while idx != len(a:Data.values)
-    if a:value == a:Data.values[idx]
-      " echo a:Data.variable . "[".idx."] == " . a:value
-      return idx
-    endif
-    let idx = idx + 1
-  endwhile
-  " echo a:Data.variable . "[".-1."] == " . a:value
-  return 0 " default is first element
+  let idx = index(a:Data.values, a:value)
+  " echo a:Data.variable . "[".idx."] == " . a:value
+  return idx > 0 ? idx : 0 " default is first element
+endfunction
+
+" Function: s:SearchText({Data},{value})                   {{{3
+" Searches for the index of {value} in {Data.values/text} list.
+" Returns -1 if not found.
+function! s:SearchText(Data, value)
+  let labels_key = s:MenuKey(a:Data)
+  let list = a:Data[labels_key]
+  let idx = index(list, a:value)
+  return idx
 endfunction
 
 " Function: s:Set({Data})                                  {{{3
@@ -140,6 +142,37 @@ function! s:MenuKey(Data)
     let menu_id = "values"
   endif
   return menu_id
+endfunction
+
+" Function: s:SetTextValue({Data},{TextValue})             {{{3
+" Force the value of the variable to the one associated to the {TextValue}
+" The menu, and the variable are updated in consequence.
+function! s:SetTextValue(Data, text)
+  " Where the texts for values must be fetched
+  let labels_key = s:MenuKey(a:Data)
+  " Fetch the old current value 
+  let old = s:Fetch(a:Data, labels_key)
+  let new_idx = s:SearchText(a:Data, a:text)
+  if -1 == new_idx
+    throw "toggle-menu: unsupported value for {".(a:Data.variable)."}"
+  endif
+  if a:Data.idx_crt_value == new_idx
+    " value unchanged => abort
+    return 
+  endif
+
+  " Remove the entry from the menu
+  call s:ClearMenu(a:Data.menu, old)
+
+  " Cycle/increment the current value
+  let a:Data.idx_crt_value = new_idx
+  " Fetch it
+  let new = s:Fetch(a:Data,labels_key)
+  " Add the updated entry in the menu
+  call s:UpdateMenu(a:Data.menu, new, a:Data.command)
+  " Update the binded global variable
+  let value = s:Set(a:Data)
+  echo a:Data.variable.'='.value
 endfunction
 
 " Function: s:NextValue({Data})                            {{{3
@@ -235,7 +268,7 @@ function! lh#menu#def_toggle_item(Data)
   let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
   " Lazy definition of the command
   if 2 != exists(':'.s:k_Toggle_cmd) 
-    exe 'command! -nargs=1 -complete=custom,lh#menu#_toggle_complete '
+    exe 'command! -nargs=+ -complete=custom,lh#menu#_toggle_complete '
 	  \ . s:k_Toggle_cmd . ' :call s:Toggle(<f-args>)'
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
@@ -250,16 +283,40 @@ endfunction
 
 
 "------------------------------------------------------------------------
-function! s:Toggle(cmdName)
+function! s:Toggle(cmdName, ...)
   if !has_key(s:toggle_commands, a:cmdName)
     throw "toggle-menu: unknown toggable variable ".a:cmdName
   endif
   let data = s:toggle_commands[a:cmdName]
-  call s:NextValue(data)
+  if a:0 > 0
+    call s:SetTextValue(data, a:1)
+  else
+    call s:NextValue(data)
+  endif
 endfunction
 
 function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos)
-  return join(keys(s:toggle_commands),"\n")
+  let cmdline = split(a:CmdLine)
+  " echomsg "cmd line: " . string(cmdline)." # ". (a:CmdLine =~ ' $')
+  let nb_args = len(cmdline)
+  if (a:CmdLine !~ ' $')
+    let nb_args -= 1
+  endif
+  " echomsg "nb args: ". nb_args
+  if nb_args < 2 
+    return join(keys(s:toggle_commands),"\n")
+  elseif nb_args == 2
+    let variable = cmdline[1]
+    if !has_key(s:toggle_commands, variable)
+      throw "toggle-menu: unknown toggable variable ".variable
+    endif
+    let data = s:toggle_commands[variable]
+    let labels_key = s:MenuKey(data)
+    " echomsg "keys: ".string(data[labels_key])
+    return join(data[labels_key], "\n")
+  else
+    return ''
+  endif
 endfunction
 
 "------------------------------------------------------------------------
