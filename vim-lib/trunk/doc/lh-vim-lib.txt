@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.2.3)
+*lh-vim-lib.txt*        Vim common libraries (v2.2.4)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -109,6 +109,7 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#skip_at_mark()|
 - |lh#syntax#list_raw()|
 - |lh#syntax#list()|
+Completion related functions				|lhvl#completion|
 
 }}}2
 ------------------------------------------------------------------------------
@@ -1333,11 +1334,18 @@ lh#syntax#list()~
 This function tries to interpret the result of the raw list of syntax
 elements. 
 
+------------------------------------------------------------------------------
+COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2
+
+                                              *lh#icomplete#run()*      {{{3
+lh#icomplete#run(startcol, matches, Hook)~
+Runs |complete()| and registers the {Hook} to be executed when the user
+selects one entry in the menu.
 
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================
- © Luc Hermitte, 2001-2010, <http://code.google.com/p/lh-vim/>       {{{1
+ © Luc Hermitte, 2001-2011, <http://code.google.com/p/lh-vim/>       {{{1
  $Id$
  VIM: let b:VS_language = 'american' 
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:

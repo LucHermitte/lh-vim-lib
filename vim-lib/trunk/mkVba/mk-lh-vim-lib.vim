@@ -3,8 +3,8 @@
 " File:		mk-lh-lib.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.3
-let s:version = '2.2.3'
+" Version:	2.2.4
+let s:version = '2.2.4'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -29,6 +29,7 @@ autoload/lh/env.vim
 autoload/lh/event.vim
 autoload/lh/float.vim
 autoload/lh/graph/tsort.vim
+autoload/lh/icomplete.vim
 autoload/lh/list.vim
 autoload/lh/menu.vim
 autoload/lh/option.vim
