@@ -3,7 +3,7 @@
 " File:		autoload/lh/position.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.4
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -77,7 +77,7 @@ endfunction
 " Function: lh#position#char_at_pos {{{3
 " @return the character at a given position (|getpos()|)
 function! lh#position#char_at_pos(pos)
-  let c = getline(a:pos[1])[col(a:pos[2])-1]
+  let c = getline(a:pos[1])[(a:pos[2])-1]
   return c
 endfunction
 function! lh#position#CharAtPos(pos)
