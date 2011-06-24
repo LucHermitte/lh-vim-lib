@@ -26,7 +26,7 @@
 let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
-
+" Exported functions {{{2
 " Function: lh#encoding#iconv(expr, from, to)  " {{{3
 " Unlike |iconv()|, this wrapper returns {expr} when we know no convertion can
 " be acheived.
