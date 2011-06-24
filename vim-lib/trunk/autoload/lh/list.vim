@@ -169,6 +169,7 @@ function! lh#list#Find_if(list, predicate, ...)
     let predicate = substitute(a:predicate, 'v:val', 'a:list['.idx.']', 'g')
     let predicate = substitute(predicate, 'v:\(\d\+\)_', 'args[\1-1]', 'g')
     let res = eval(predicate)
+    " echomsg string(predicate) . " --> " . res
     if res | return idx | endif
     let idx += 1
   endwhile

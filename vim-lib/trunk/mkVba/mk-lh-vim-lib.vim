@@ -3,8 +3,8 @@
 " File:		mk-lh-lib.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.4
-let s:version = '2.2.4'
+" Version:	2.2.5
+let s:version = '2.2.5'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
