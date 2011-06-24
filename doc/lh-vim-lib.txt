@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v2.2.4)
+*lh-vim-lib.txt*        Vim common libraries (v2.2.5)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -41,6 +41,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#char_at_pos()|
 - |lh#position#is_before()|
 - |lh#visual#selection()|
+- |lh#visual#cut()|
 Functors related functions:                             |lhvl#function|
 - |lh#function#bind()|
 - |lh#function#execute()|
@@ -275,6 +276,12 @@ lh#position#char_at_pos({pos})~
 lh#visual#selection()~
 @return             The current visual selection
 @post              |registers| are not altered by this function
+
+                                                *lh#visual#cut()*       {{{3
+lh#visual#cut()~
+@return             The current visual selection
+@post              |registers| are not altered by this function ; 
+                    selection is deleted.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                  *lh#event#RegisterForOneExecutionAt()* {{{3
