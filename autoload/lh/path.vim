@@ -3,9 +3,9 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.2
+" Version:	2.2.5
 " Created:	23rd Jan 2007
-" Last Update:	11th Feb 2008
+" Last Update:	$Date
 "------------------------------------------------------------------------
 " Description:	
 "       Functions related to the handling of pathnames
@@ -37,6 +37,8 @@
 " 	v 2.2.2
 " 	(*) lh#path#strip_common() fixed
 " 	(*) lh#path#simplify() new optional parameter: make_relative_to_pwd
+" 	v 2.2.5
+" 	(*) fix lh#path#to_dirname('') -> return ''
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -188,7 +190,7 @@ endfunction
 " Function: lh#path#to_dirname({dirname}) {{{3
 " todo: use &shellslash
 function! lh#path#to_dirname(dirname)
-  let dirname = a:dirname . (a:dirname[-1:] =~ '[/\\]' ? '' : '/')
+  let dirname = a:dirname . (empty(a:dirname) || a:dirname[-1:] =~ '[/\\]' ? '' : '/')
   return dirname
 endfunction
 
@@ -316,6 +318,17 @@ function! lh#path#find(paths, regex)
   endfor
   return ''
 endfunction
+
+" Function: lh#path#vimfiles() {{{3
+function! lh#path#vimfiles()
+  let expected_win = $HOME . '/vimfiles'
+  let expected_nix = $HOME . '/.vim'
+  let what =  lh#path#to_regex($HOME.'/').'\(vimfiles\|.vim\)'
+  " Comment what
+  let z = lh#path#find(&rtp,what)
+  return z
+endfunction
+" }}}1
 "=============================================================================
 let &cpo=s:cpo_save
 "=============================================================================
