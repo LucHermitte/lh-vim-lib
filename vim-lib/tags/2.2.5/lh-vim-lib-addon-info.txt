@@ -1,0 +1,10 @@
+{
+  "name" : "lh-vim-lib",
+  "version" : "dev",
+  "author" : "Luc Hermitte <http://code.google.com/p/lh-vim/wiki/contact>",
+  "maintainer" : "Luc Hermitte <http://code.google.com/p/lh-vim/wiki/contact>",
+  "repository" : {"type": "svn", "url": "http://lh-vim.googlecode.com/svn/vim-lib/trunk"},
+  "dependencies" : {},
+  "description" : "Library of VimL functions",
+  "homepage" : "http://code.google.com/p/lh-vim/wiki/lhVimLib"
+}
