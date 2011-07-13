@@ -3,7 +3,7 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.5
+" Version:	2.2.6
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -39,6 +39,9 @@
 " 	(*) lh#path#simplify() new optional parameter: make_relative_to_pwd
 " 	v 2.2.5
 " 	(*) fix lh#path#to_dirname('') -> return ''
+" 	v 2.2.6
+" 	(*) fix lh#path#glob_as_list() does not return the same path several
+" 	    times
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -239,7 +242,7 @@ function! s:GlobAsList(pathslist, expr)
       call filter(lResult, 'v:val !~ '.string(ignored_pattern))
     endif
   endfor
-  return lResult
+  return lh#list#unique_sort(lResult)
 endfunction
 
 function! lh#path#glob_as_list(pathslist, expr)
