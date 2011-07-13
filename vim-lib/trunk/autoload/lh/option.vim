@@ -3,7 +3,7 @@
 " File:		autoload/lh/option.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Version:	2.2.6
 " Created:	24th Jul 2004
 " Last Update:	$Date$ (07th Oct 2006)
 "------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 " 	Drop this file into {rtp}/autoload/lh/
 " 	Requires Vim 7+
 " History:	
+" 	v2.0.6
+" 	(*) lh#option#add() add values to a vim list |option|
 " 	v2.0.5
 " 	(*) lh#option#get_non_empty() manages Lists and Dictionaries
 " 	(*) lh#option#get() doesn't test emptyness anymore
@@ -79,7 +81,7 @@ function! s:IsEmpty(variable)
   endif
 endfunction
 
-" Function: lh#option#get_non_empty(name, default [, scope])            {{{3
+" Function: lh#option#get_non_empty(name, default [, scope])  {{{3
 " @return of b:{name}, g:{name}, or {default} the first which exists and is not empty 
 " The order of the variables checked can be specified through the optional
 " argument {scope}
@@ -98,6 +100,20 @@ endfunction
 function! lh#option#GetNonEmpty(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   return lh#option#get_non_empty(a:name, a:default, scope)
+endfunction
+
+" Function: lh#option#add(name, values)                       {{{3
+" Add fields to a vim option.
+" @param values list of values to add
+" @example let lh#option#add('l:tags', ['.tags'])
+function! lh#option#add(name,values)
+  let values = type(a:values) == type([])
+        \ ? copy(a:values)
+        \ : [a:values]
+  let old = split(eval('&'.a:name), ',')
+  let new = filter(values, 'match(old, v:val) < 0')
+  let val = join(old+new, ',')
+  exe 'let &'.a:name.' = val'
 endfunction
 
 " Functions }}}1
