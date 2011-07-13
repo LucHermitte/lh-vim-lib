@@ -4,7 +4,7 @@
 "               <URL:http://code.google.com/p/lh-vim/>
 " URL: http://hermitte.free.fr/vim/ressources/vimfiles/plugin/ui-functions.vim
 " 
-" Version:      2.2.1
+" Version:      2.2.6
 " Created:      18th nov 2002
 " Last Update:  28th Nov 2007
 "------------------------------------------------------------------------
@@ -39,6 +39,8 @@
 "       (*) :s/echoerr/throw/ => vim7 only
 "    v2.2.0
 "       (*) menu to switch the ui_type
+"    v2.2.6
+"       (*) CONFIRM() and WHICH() accept lists of {choices}
 " 
 " TODO:         {{{2
 "       (*) Save the hl-User1..9 before using them
@@ -87,7 +89,7 @@ function! SWITCH(var, ...)
       if a:var == a:{i}
         return a:{i+1}
       endif
-      let i = i - 2
+      let i -=  2
     endwhile
     return default
   elseif o =~ 'f\%[te]'           " {{{4
@@ -108,10 +110,15 @@ function! CONFIRM(text, ...)
   " build the parameters string {{{4
   let i = 1
   while i <= a:0
-    if i == 1 | let params = 'a:{1}'
-    else      | let params = params. ',a:{'.i.'}'
+    if i == 1
+      if type(a:1) == type([])
+        let params = string(join(a:1, "\n"))
+      else
+        let params = 'a:{1}'
+      endif
+    else      | let params .= ',a:{'.i.'}'
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
@@ -142,9 +149,9 @@ function! INPUT(prompt, ...)
   let i = 1 | let params = ''
   while i <= a:0
     if i == 1 | let params = 'a:{1}'
-    else      | let params = params. ',a:{'.i.'}'
+    else      | let params .= ',a:{'.i.'}'
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
@@ -171,9 +178,9 @@ function! COMBO(prompt, ...)
   let i = 1
   while i <= a:0
     if i == 1 | let params = 'a:{1}'
-    else      | let params = params. ',a:{'.i.'}'
+    else      | let params .=  ',a:{'.i.'}'
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
@@ -195,20 +202,22 @@ function! WHICH(fn, prompt, ...)
   " build the parameters string {{{4
   let i = 1
   while i <= a:0
-    if i == 1 | let params = 'a:{1}'
-    else      | let params = params. ',a:{'.i.'}'
+    if i == 1 
+      if type(a:1) == type([])
+        let choices = a:1
+      else
+        let choices = split(a:1, "\n")
+      endif
+      let params = 'a:{1}'
+    else      | let params .=  ',a:{'.i.'}'
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " 2- Execute the function {{{3
   exe 'let which = '.a:fn.'(a:prompt,'.params.')'
   if     0 >= which | return ''
-  elseif 1 == which
-    return substitute(matchstr(a:{1}, '^.\{-}\ze\%(\n\|$\)'), '&', '', 'g')
   else
-    return substitute(
-          \ matchstr(a:{1}, '^\%(.\{-}\n\)\{'.(which-1).'}\zs.\{-}\ze\%(\n\|$\)')
-          \ , '&', '', 'g')
+    return choices[which-1]
   endif
   " }}}3
 endfunction
@@ -224,9 +233,9 @@ function! CHECK(prompt, ...)
   let i = 1
   while i <= a:0
     if i == 1 | let params = 'a:{1}'
-    else      | let params = params. ',a:{'.i.'}'
+    else      | let params .=  ',a:{'.i.'}'
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
@@ -287,13 +296,13 @@ function! s:status_line(current, hl, ...)
   let sl_choices = '' | let i = 1
   while i <= a:0
     if i == a:current
-      let sl_choices = sl_choices . ' '. hl . 
+      let sl_choices .=  ' '. hl . 
             \ substitute(a:{i}, '&\(.\)', '%6*\1'.hl, '') . '%* '
     else
-      let sl_choices = sl_choices . ' ' . 
+      let sl_choices .=  ' ' . 
             \ substitute(a:{i}, '&\(.\)', '%6*\1%*', '') . ' '
     endif
-    let i = i + 1
+    let i +=  1
   endwhile
   " }}}3
   return sl_choices
@@ -326,7 +335,7 @@ function! s:confirm_text(box, text, ...)
   " Parse the choices
   let i = 0
   while choices != ""
-    let i = i + 1
+    let i +=  1
     let item    = matchstr(choices, "^.\\{-}\\ze\\(\n\\|$\\)")
     let choices = matchstr(choices, "\n\\zs.*$")
     " exe 'anoremenu ]'.a:text.'.'.item.' :let s:choice ='.i.'<cr>'
@@ -340,13 +349,13 @@ function! s:confirm_text(box, text, ...)
     if i == 1
       let list_choices = 'choice_{1}'
     else
-      let list_choices = list_choices . ',choice_{'.i.'}'
+      let list_choices .=  ',choice_{'.i.'}'
     endif
     " Update the hotkey.
     let key = toupper(matchstr(choice_{i}, '&\zs.\ze'))
     let hotkey_{key} = i
-    let hotkeys = hotkeys . tolower(key) . toupper(key)
-    let help_k = help_k . tolower(key)
+    let hotkeys .=  tolower(key) . toupper(key)
+    let help_k .=  tolower(key)
   endwhile
   let nb_choices = i
   if default > nb_choices | let default = nb_choices | endif
@@ -433,7 +442,7 @@ function! s:confirm_text(box, text, ...)
       if 'combo' == a:box
         let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
       endif
-      let i = i + direction
+      let i +=  direction
       if     i > nb_choices | let i = 1 
       elseif i == 0         | let i = nb_choices
       endif
@@ -459,8 +468,8 @@ function! s:confirm_text(box, text, ...)
   else
     let r = '' | let i = 1
     while i <= nb_choices
-      let r = r . ((choice_{i}[1] == 'X') ? '1' : '0')
-      let i = i + 1
+      let r .=  ((choice_{i}[1] == 'X') ? '1' : '0')
+      let i +=  1
     endwhile
     return r
   endif
