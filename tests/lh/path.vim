@@ -45,9 +45,14 @@ function! s:Test_strip_common()
 endfunction
 
 function! s:Test_common()
+  " Pick one ...
   Assert 'foo/' == lh#path#common(['foo/bar/dir', 'foo'])
   Assert 'foo/bar/' == lh#path#common(['foo/bar/dir', 'foo/bar'])
   Assert 'foo/' == lh#path#common(['foo/bar/dir', 'foo/bar2'])
+
+  Assert 'foo' == lh#path#common(['foo/bar/dir', 'foo'])
+  Assert 'foo/bar' == lh#path#common(['foo/bar/dir', 'foo/bar'])
+  Assert 'foo' == lh#path#common(['foo/bar/dir', 'foo/bar2'])
 endfunction
 
 function! s:Test_strip_start()

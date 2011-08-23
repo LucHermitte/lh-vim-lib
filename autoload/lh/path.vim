@@ -3,7 +3,7 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.6
+" Version:	2.2.«7»
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -42,6 +42,8 @@
 " 	v 2.2.6
 " 	(*) fix lh#path#glob_as_list() does not return the same path several
 " 	    times
+" 	v 2.2.7
+" 	(*) fix lh#path#strip_start() to strip as much as possible.
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -57,7 +59,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 222
+let s:k_version = 227
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -293,6 +295,8 @@ function! lh#path#strip_start(pathname, pathslist)
   " echomsg string(pathslist)
   " escape .
   call map(pathslist, '"^".escape(v:val, ".")')
+  " reverse the list to use the real best match, which is "after"
+  call reverse(pathslist)
   " build the strip regex
   let strip_re = join(pathslist, '\|')
   " echomsg strip_re

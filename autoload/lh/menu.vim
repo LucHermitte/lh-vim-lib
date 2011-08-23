@@ -409,10 +409,18 @@ function! lh#menu#make(prefix, code, text, binding, ...)
   if strlen(a:binding) != 0
     let build_cmd .=  '<tab>' . 
 	  \ substitute(lh#menu#text(a:binding), '&', '\0\0', 'g')
-    if b != 0
-      call lh#menu#map_all(prefix.nore."map", ' <buffer> '.a:binding, cmd)
+    if prefix == 'i' && exists('*IMAP')
+      if b != 0
+        call IMAP(a:binding, cmd, &ft)
+      else
+        call IMAP(a:binding, cmd)
+      endif
     else
-      call lh#menu#map_all(prefix.nore."map", a:binding, cmd)
+      if b != 0
+        call lh#menu#map_all(prefix.nore."map", ' <buffer> '.a:binding, cmd)
+      else
+        call lh#menu#map_all(prefix.nore."map", a:binding, cmd)
+      endif
     endif
   endif
   if has("gui_running")

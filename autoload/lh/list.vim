@@ -3,7 +3,7 @@
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.2
+" Version:      2.2.6
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -286,7 +286,7 @@ function! lh#list#equal_range(list, val, ...)
 endfunction
 
 " Function: lh#list#not_found(range) {{{3
-" @return the range returned from equal_range is empty (i.e. element not fount)
+" @return whether the range returned from equal_range is empty (i.e. element not fount)
 function! lh#list#not_found(range)
   return a:range[0] == a:range[1]
 endfunction
