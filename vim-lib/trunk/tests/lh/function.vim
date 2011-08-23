@@ -226,11 +226,13 @@ function! s:Test_double_bind_func()
 endfunction
 
 function! s:Test_double_bind_func_cplx()
-  let s:bar = "bar"
+  let g:bar = "bar"
   let f1 = lh#function#bind(function('Id'), 1, 2, 'v:1_', 4, 'v:2_', 'v:3_', 'v:4_', 'v:5_', 'v:6_', 'v:7_')
-  " Comment "f1=".string(f1)
-  let f2 = lh#function#bind(f1, 'v:1_', 5, 'foo', s:bar, 'len(s:bar.v:1_)+v:1_', [1,2], '[v:1_, v:2_]')
-  " Comment "f2=f1(v:1_, 5)=".string(f2)
+  " Comment "2bcpl# f1=".string(f1)
+  let f2 = lh#function#bind(f1, 'len(g:bar.v:1_)+v:1_', [1,2], '[v:1_, v:2_]', 4,5,6,7)
+
+  " let f2 = lh#function#bind(f1, 'v:1_', 5, 'foo', g:bar, 'len(g:bar.v:1_)+v:1_', [1,2], '[v:1_, v:2_]')
+  " Comment "2bcpl# f2=f1(v:1_, 5)=".string(f2)
 
   let r = lh#function#execute(f2, 42, "foo")
   Assert! 0 && "not ready"
