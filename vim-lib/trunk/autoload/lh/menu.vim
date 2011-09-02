@@ -3,7 +3,7 @@
 " File:		autoload/lh/menu.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.3
+" Version:	2.2.6
 " Created:	13th Oct 2006
 " Last Update:	$Date$ (07th Dec 2010)
 "------------------------------------------------------------------------
@@ -24,6 +24,7 @@
 " 	       (prefer this way of proceeding to update the menu to the new
 " 	       value)
 " 	       :Toggle suports auto-completion on possible values
+" 	v2.2.6: Toggle menus are silent, but not the actions executed
 " TODO:		
 " 	* Should the argument to :Toggle be simplified to use the variable name
 " 	instead ? May be a banged :Toggle! could work on the real variable
@@ -45,9 +46,17 @@ endif
 
 "------------------------------------------------------------------------
 " ## Functions {{{1
-" # Debug {{{2
-function! lh#menu#verbose(level)
-  let s:verbose = a:level
+" # Version {{{2
+let s:k_version = 226
+function! lh#menu#version()
+  return s:k_version
+endfunction
+
+" # Debug   {{{2
+let s:verbose = 0
+function! lh#menu#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
 endfunction
 
 function! s:Verbose(expr)
@@ -59,6 +68,7 @@ endfunction
 function! lh#menu#debug(expr)
   return eval(a:expr)
 endfunction
+
 
 "------------------------------------------------------------------------
 " # Common stuff       {{{2
@@ -225,7 +235,7 @@ function! s:UpdateMenu(Menu, text, command)
   if has('gui_running')
     let cmd = 'nnoremenu <silent> '.a:Menu.priority.' '.
 	  \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
-	  \ ' :silent '.s:k_Toggle_cmd.' '.a:command."\<cr>"
+	  \ ' :'.s:k_Toggle_cmd.' '.a:command."\<cr>"
     silent! exe cmd
   endif
 endfunction
