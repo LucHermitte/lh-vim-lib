@@ -90,7 +90,10 @@ function! lh#buffer#list()
   let res = lh#list#copy_if(all, [], 'buflisted')
   return res
 endfunction
-" Ex: echo lh#list#transform(lh#buffer#list(), [], "bufname")
+" Ex: Names of the buffers listed
+"  -> echo lh#list#transform(lh#buffer#list(), [], "bufname")
+" Ex: wipeout empty buffers listed
+"  -> echo 'bw'.join(lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_))'), ' ')
 "=============================================================================
 let &cpo=s:cpo_save
 "=============================================================================
