@@ -44,6 +44,7 @@
 " 	    times
 " 	v 2.2.7
 " 	(*) fix lh#path#strip_start() to strip as much as possible.
+" 	(*) lh#path#glob_as_list() changed to handle **
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -236,7 +237,8 @@ endfunction
 
 " Function: lh#path#glob_as_list({pathslist}, {expr}) {{{3
 function! s:GlobAsList(pathslist, expr)
-  let sResult = globpath(a:pathslist, a:expr)
+  let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
+  let sResult = globpath(pathslist, a:expr)
   let lResult = split(sResult, '\n')
   " workaround a non feature of wildignore: it does not ignore directories
   for ignored_pattern in split(&wildignore,',')
@@ -295,6 +297,8 @@ function! lh#path#strip_start(pathname, pathslist)
   " echomsg string(pathslist)
   " escape .
   call map(pathslist, '"^".escape(v:val, ".")')
+  " handle "**" as anything
+  call map(pathslist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
   " reverse the list to use the real best match, which is "after"
   call reverse(pathslist)
   " build the strip regex
