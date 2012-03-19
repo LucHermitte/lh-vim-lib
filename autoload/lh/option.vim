@@ -3,7 +3,9 @@
 " File:		autoload/lh/option.vim                                    {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.6
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	24th Jul 2004
 " Last Update:	$Date$ (07th Oct 2006)
 "------------------------------------------------------------------------
@@ -16,6 +18,8 @@
 " 	Drop this file into {rtp}/autoload/lh/
 " 	Requires Vim 7+
 " History:	
+"       v3.0.0
+"       (*) GPLv3
 " 	v2.0.6
 " 	(*) lh#option#add() add values to a vim list |option|
 " 	v2.0.5

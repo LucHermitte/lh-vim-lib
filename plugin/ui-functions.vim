@@ -2,11 +2,11 @@
 " File:         plugin/ui-functions.vim                                  {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" URL: http://hermitte.free.fr/vim/ressources/vimfiles/plugin/ui-functions.vim
-" 
-" Version:      2.2.6
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:      3.0.0
 " Created:      18th nov 2002
-" Last Update:  28th Nov 2007
+" Last Update:  $Date$ (19th Mar 2012)
 "------------------------------------------------------------------------
 " Description:  Functions for the interaction with a User Interface.
 "               The UI can be graphical or textual.
@@ -41,6 +41,7 @@
 "       (*) menu to switch the ui_type
 "    v2.2.6
 "       (*) CONFIRM() and WHICH() accept lists of {choices}
+"    v3.0.0  GPLv3
 " 
 " TODO:         {{{2
 "       (*) Save the hl-User1..9 before using them
@@ -217,7 +218,7 @@ function! WHICH(fn, prompt, ...)
   exe 'let which = '.a:fn.'(a:prompt,'.params.')'
   if     0 >= which | return ''
   else
-    return choices[which-1]
+    return substitute(choices[which-1], '&', '', '')
   endif
   " }}}3
 endfunction

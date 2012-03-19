@@ -3,7 +3,9 @@
 " File:		autoload/lh/command.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	08th Jan 2007
 " Last Update:	$Date$ (08th Jan 2007)
 "------------------------------------------------------------------------
@@ -17,8 +19,8 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
-" 	v2.0.0:
-" 		Code move from other plugins
+"       v3.0.0: GPLv3
+" 	v2.0.0: Code moved from other plugins
 " TODO:		«missing features»
 " }}}1
 "=============================================================================

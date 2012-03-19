@@ -1,5 +1,5 @@
 			   ------------------
-			    lh-vim-lib 2.2.6
+			    lh-vim-lib 3.0.0
 			   ------------------
 
 lh-vim-lib is a library plugin for vim v7+. It is just a collection of
@@ -9,7 +9,8 @@ Audience      : Vim script writers
 Requirements  : Vim 7.1, Vim 7.3 for some functions
 Required by   : Just a few other plugins for the moment
 Author        : Luc Hermitte
-License       : GPL2
+License       : GPLv3 with exceptions
+                http://code.google.com/p/lh-vim/wiki/License
 More Help At  : http://code.google.com/p/lh-vim/wiki/lhVimLib
 Vim script#214: http://www.vim.org/scripts/script.php?script_id=214
 Repository    :

@@ -3,7 +3,9 @@
 " File:		autoload/lh/syntax.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.3
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -17,6 +19,7 @@
 " 	v1.0.0:
 " 		Creation ;
 " 		Functions moved from lhVimSpell
+"       v3.0.0: GPLv3
 " TODO:
 " 	function, to inject "contained", see lhVimSpell approach
 " }}}1

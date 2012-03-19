@@ -3,7 +3,9 @@
 " File:		autoload/lh/path.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.«7»
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -45,6 +47,8 @@
 " 	v 2.2.7
 " 	(*) fix lh#path#strip_start() to strip as much as possible.
 " 	(*) lh#path#glob_as_list() changed to handle **
+"       v 3.0.0
+"       (*) GPLv3
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -60,7 +64,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 227
+let s:k_version = 300
 function! lh#path#version()
   return s:k_version
 endfunction

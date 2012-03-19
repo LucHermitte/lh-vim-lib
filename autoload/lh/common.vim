@@ -3,7 +3,9 @@
 " File:		autoload/lh/common.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	07th Oct 2006
 " Last Update:	$Date$ (08th Feb 2008)
 "------------------------------------------------------------------------
@@ -17,12 +19,14 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
+"       v3.0.0
+"       - GPLv3
 " 	v2.1.1
-" 		- New function: lh#common#echomsg_multilines()
-" 		- lh#common#warning_msg() supports multilines messages
+" 	- New function: lh#common#echomsg_multilines()
+" 	- lh#common#warning_msg() supports multilines messages
 "
 " 	v2.0.0:
-" 		- Code moved from other plugins
+" 	- Code moved from other plugins
 " }}}1
 "=============================================================================
 
