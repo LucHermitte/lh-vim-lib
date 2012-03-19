@@ -3,7 +3,8 @@
 " File:		autoload/lh/buffer.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.1
+" Licence:      GPLv3
+" Version:	3.0.0
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -15,10 +16,11 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
-"	v 1.0.0 First Version
+"	v1.0.0 First Version
 " 	(*) Functions moved from searchInRuntimeTime  
-" 	v 2.2.0
+" 	v2.2.0
 " 	(*) new function: lh#buffer#list()
+"       v3.0.0 GPLv3
 " TODO:	
 " }}}1
 "=============================================================================

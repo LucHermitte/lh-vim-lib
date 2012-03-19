@@ -3,7 +3,9 @@
 " File:		autoload/lh/position.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	2.2.4
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -16,6 +18,7 @@
 " History:	«history»
 " 	v1.0.0:
 " 		Creation
+"       v3.0.0: GPLv3
 " TODO:		
 " }}}1
 "=============================================================================

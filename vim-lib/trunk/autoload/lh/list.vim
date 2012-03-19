@@ -3,7 +3,9 @@
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.6
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:      3.0.0
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -15,6 +17,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:      
+"       v3.0.0:
+"       (*) GPLv3
 "       v2.2.2:
 "       (*) new functions: lh#list#remove(), lh#list#matches(),
 "           lh#list#not_found().

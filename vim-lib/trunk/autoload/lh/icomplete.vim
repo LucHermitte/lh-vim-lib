@@ -3,7 +3,9 @@
 " File:         autoload/lh/icomplete.vim                         {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.4
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:      3.0.0
 " Created:      03rd Jan 2011
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -15,6 +17,7 @@
 "       Drop this file into {rtp}/autoload/lh
 "       Requires Vim7+
 " History:
+"       v3.0.0: GPLv3
 " 	v2.2.4: first version
 " TODO:
 " 	- We are not able to detect the end of the completion mode. As a
@@ -29,7 +32,7 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 224
+let s:k_version = 300
 function! lh#icomplete#version()
   return s:k_version
 endfunction

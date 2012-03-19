@@ -6,10 +6,14 @@
 "
 " Purpose:	Define functions to build mappings and menus at the same time
 "
-" Version:	2.2.1
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:	3.0.0
 " Last Update:  $Date$ (02nd Dec 2006)
 "
 " Last Changes: {{{
+"       Version 3.0.0:
+"               GPLv3
 " 	Version 2.0.0:
 " 		Moved to vim7, 
 " 		Functions moved to {rtp}/autoload/

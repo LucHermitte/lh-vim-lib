@@ -3,7 +3,9 @@
 " File:         autoload/lh/float.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:      2.2.2
+" License:      GPLv3 with exceptions
+"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+" Version:      3.0.0
 " Created:      16th Nov 2010
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -16,6 +18,7 @@
 "       Requires Vim7+
 " History:     
 "       v2.0.0: first version
+"       v3.0.0: GPLv3
 " TODO:
 " }}}1
 "=============================================================================
@@ -25,7 +28,7 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 222
+let s:k_version = 300
 function! lh#float#version()
   return s:k_version
 endfunction
