@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.0
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -49,6 +49,9 @@
 " 	(*) lh#path#glob_as_list() changed to handle **
 "       v 3.0.0
 "       (*) GPLv3
+"       v 3.1.0
+"       (*) lh#path#glob_as_list accepts a new option: mustSort which value
+"       true by default.
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -64,7 +67,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 300
+let s:k_version = 310
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -239,8 +242,8 @@ function! lh#path#relative_to(from, to)
   return res
 endfunction
 
-" Function: lh#path#glob_as_list({pathslist}, {expr}) {{{3
-function! s:GlobAsList(pathslist, expr)
+" Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
+function! s:GlobAsList(pathslist, expr,  mustSort)
   let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
   let sResult = globpath(pathslist, a:expr)
   let lResult = split(sResult, '\n')
@@ -250,16 +253,17 @@ function! s:GlobAsList(pathslist, expr)
       call filter(lResult, 'v:val !~ '.string(ignored_pattern))
     endif
   endfor
-  return lh#list#unique_sort(lResult)
+  return a:mustSort ? lh#list#unique_sort(lResult) : lResult
 endfunction
 
-function! lh#path#glob_as_list(pathslist, expr)
+function! lh#path#glob_as_list(pathslist, expr, ...)
+  let mustSort = (a:0 > 0) ? (a:1) : 0
   if type(a:expr) == type('string')
-    return s:GlobAsList(a:pathslist, a:expr)
+    return s:GlobAsList(a:pathslist, a:expr, mustSort)
   elseif type(a:expr) == type([])
     let res = []
     for expr in a:expr
-      call extend(res, s:GlobAsList(a:pathslist, expr))
+      call extend(res, s:GlobAsList(a:pathslist, expr, mustSort))
     endfor
     return res
   else
