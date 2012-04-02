@@ -1,12 +1,12 @@
 "=============================================================================
 " $Id$
-" File:		mk-lh-lib.vim
+" File:		mkVba/mk-lh-lib.vim
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
-let s:version = '3.0.0'
+" Version:	3.1.0
+let s:version = '3.1.0'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -14,7 +14,7 @@ cd <sfile>:p:h
 try 
   let save_rtp = &rtp
   let &rtp = expand('<sfile>:p:h:h').','.&rtp
-  exe '22,$MkVimball! lh-vim-lib-'.s:version
+  exe '24,$MkVimball! lh-vim-lib-'.s:version
   set modifiable
   set buftype=
 finally

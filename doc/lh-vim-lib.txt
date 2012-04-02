@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.0.0)
+*lh-vim-lib.txt*        Vim common libraries (v3.1.0)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -816,7 +816,12 @@ Returns the relative directory that indentifies {to} from {from} location.
                                                 *lh#path#GlobAsList()*  {{{3
 lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
                                                 *lh#path#glob_as_list()*
-lh#path#glob_as_list({pathslist}, {expr})~
+lh#path#glob_as_list({pathslist}, {expr} [,{must_sort}])~
+@param[in] {pathslist} list (|List|, or comma separated list) of paths where
+                       to search.
+@param[in] {expr}      glob expression of the files to search.
+@param[in] {mustSort}  tells whether the results shall be sorted per
+                     {pathslist}, default: true.
 @return |globpath()|'s result, but formatted as a list of matching pathnames.
 In case {expr} is a |List|, |globpath()| is applied on each expression in
 {expr}.
