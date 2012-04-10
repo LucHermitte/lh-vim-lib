@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.0
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -20,6 +20,7 @@
 " 		Creation ;
 " 		Functions moved from lhVimSpell
 "       v3.0.0: GPLv3
+"       v3.1.0: lh#syntax#is_a_comment()
 " TODO:
 " 	function, to inject "contained", see lhVimSpell approach
 " }}}1
@@ -88,7 +89,7 @@ func! lh#syntax#SkipAtMark(mark)
   return lh#syntax#skip_at_mark(a:mark)
 endfun
 
-" Function: Show current syntax kind {{{3
+" Command: :SynShow Show current syntax kind                      {{{3
 command! SynShow echo 'hi<'.lh#syntax#name_at_mark('.',1).'> trans<'
       \ lh#syntax#name_at_mark('.',0).'> lo<'.
       \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>   ## '
@@ -109,7 +110,7 @@ function! lh#syntax#list_raw(name)
   return res
 endfunction
 
-" Function: lh#syntax#list(name) : List                     {{{3
+" Function: lh#syntax#list(name) : List                           {{{3
 function! lh#syntax#list(name)
   let raw = lh#syntax#list_raw(a:name)
   let res = [] 
@@ -133,6 +134,16 @@ function! lh#syntax#list(name)
   return res
 endfunction
 
+" Function: lh#syntax#is_a_comment(mark) : bool                   {{{3
+function! lh#syntax#is_a_comment(mark)
+  let stack = synstack(line(a:mark), col(a:mark))
+  for syn in stack
+    if synIDattr(syn, 'name') =~? 'comment'
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
 
 
 " Functions }}}1

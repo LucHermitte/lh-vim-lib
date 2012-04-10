@@ -1311,6 +1311,11 @@ lh#syntax#name_at({lnum},{col}[,{trans}])~
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                *lh#syntax#NameAtMark()* {{{3
 lh#syntax#NameAtMark({mark}[,{trans}])  (*deprecated*)~
+                                               *lh#syntax#is_a_comment()* {{{3
+lh#syntax#is_a_comment({mark})~
+@param {mark}  position of the character
+@return whether the character is within a Comment syntax element.
+
                                                *lh#syntax#name_at_mark()* {{{3
 lh#syntax#name_at_mark({mark}[,{trans}])~
 @param {mark}  position of the character
