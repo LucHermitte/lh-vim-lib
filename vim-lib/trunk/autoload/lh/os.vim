@@ -66,9 +66,9 @@ endfunction
 function! lh#os#cpu_number()
   if filereadable('/proc/cpuinfo')
     let procs = lh#os#system('cat /proc/cpuinfo | grep processor|wc -l')
-    return procs
+    return str2nr(procs)
   elseif has('win32') || has('win64')
-    return $NUMBER_OF_PROCESSORS
+    return str2nr($NUMBER_OF_PROCESSORS)
     " let procs = lh#os#system('wmic cpu get NumberOfCores')
     " return matchstr(procs, ".*[\r\n]\\zs.*$" )
   else " default: no idea
@@ -80,7 +80,7 @@ endfunction
 " @return 
 function! lh#os#cpu_cores_number()
   if filereadable('/proc/cpuinfo')
-    let procs = lh#os#system('fgrep -m 1 "cpu cores" /proc/cpuinfo | cut -d " " -f 3')
+    let procs = str2nr(lh#os#system('fgrep -m 1 "cpu cores" /proc/cpuinfo | cut -d " " -f 3'))
     return procs
   else " default: no idea
     return -1
