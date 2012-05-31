@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.0
+" Version:	3.1.1
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -52,6 +52,8 @@
 "       v 3.1.0
 "       (*) lh#path#glob_as_list accepts a new option: mustSort which value
 "       true by default.
+"       v 3.1.1
+"       (*) lh#path#strip_start() shall support very big lists of dirnames now.
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -309,11 +311,21 @@ function! lh#path#strip_start(pathname, pathslist)
   call map(pathslist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
   " reverse the list to use the real best match, which is "after"
   call reverse(pathslist)
-  " build the strip regex
-  let strip_re = join(pathslist, '\|')
-  " echomsg strip_re
-  let res = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
-  return res
+  if 0
+    " build the strip regex
+    let strip_re = join(pathslist, '\|')
+    " echomsg strip_re
+    let best_match = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
+  else
+    let best_match = ''
+    for path in pathslist
+      let a_match = substitute(a:pathname, '\%('.path.'\)[/\\]\=', '', '')
+      if len(a_match) < len(best_match) || empty(best_match)
+        let best_match = a_match
+      endif
+    endfor
+  endif
+  return best_match
 endfunction
 function! lh#path#StripStart(pathname, pathslist)
   return lh#path#strip_start(a:pathname, a:pathslist)
