@@ -154,7 +154,14 @@ function! lh#function#execute(Fn, ...)
     return a:Fn.execute(a:000)
   else
     let expr = lh#function#prepare(a:Fn, a:000)
-    return eval(expr)
+    try 
+      return eval(expr)
+    catch /.*/
+      " Note: if you are experimenting a E16: invalid range, you may want to
+      " escape the '[' from the expression part as [z-a] is not a valid range,
+      " even if your text as nothing to do with a range
+      throw "Cannot execute the expression: ".expr ."\nWith a:000=".string(a:000)
+    endtry
   endif
 endfunction
 
