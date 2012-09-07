@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.0.1
 " Created:	13th Oct 2006
 " Last Update:	$Date$ (07th Dec 2010)
 "------------------------------------------------------------------------
@@ -28,6 +28,7 @@
 " 	       :Toggle suports auto-completion on possible values
 " 	v2.2.6: Toggle menus are silent, but not the actions executed
 "       v3.0.0: GPLv3
+"       v3.0.1: Enhancements for string options, required by BTW 0.2.0
 " TODO:		
 " 	* Should the argument to :Toggle be simplified to use the variable name
 " 	instead ? May be a banged :Toggle! could work on the real variable
@@ -43,8 +44,12 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Internal Variables {{{1
 let s:k_Toggle_cmd = 'Toggle'
+let s:k_Set_cmd    = 'Set'
 if !exists('s:toggle_commands')
   let s:toggle_commands = {}
+endif
+if !exists('s:set_string_commands')
+  let s:set_string_commands = {}
 endif
 
 "------------------------------------------------------------------------
@@ -84,7 +89,7 @@ endfunction
 " # Toggling menu item {{{2
 " Function: s:Fetch({Data},{key})                          {{{3
 " @param[in] Data Menu-item definition
-" @param[in] key  Table table from which the result will be fetched
+" @param[in] key  Table from which the result will be fetched
 " @return the current value, or text, whose index is Data.idx_crt_value.
 function! s:Fetch(Data, key)
   let len = len(a:Data[a:key])
@@ -145,7 +150,7 @@ function! s:Set(Data)
 endfunction
 
 " Function: s:MenuKey({Data})                              {{{3
-" @return the table name from which the current value name (to dsplay in the
+" @return the table name from which the current value name (to display in the
 " menu) must be fetched. 
 " Priority is given to the optional "texts" table over the madatory "values" table.
 function! s:MenuKey(Data)
@@ -264,6 +269,9 @@ endfunction
 " Sets a toggle-able menu-item defined by {Data}.
 "
 function! lh#menu#def_toggle_item(Data)
+  function! a:Data.val_id() dict
+    return self.idx_crt_value
+  endfunction
   " Save the menu data as an internal script variable
   let id = s:SaveData(a:Data)
 
@@ -331,6 +339,149 @@ function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos)
     return ''
   endif
 endfunction
+
+" # String variable menu item {{{2
+" Function: s:VarFetch({Data},{key})                       {{{3
+" @param[in] Data Menu-item definition
+" @param[in] key  Table table from which the result will be fetched
+" @return the current value
+function! s:VarFetch(Data, key)
+  let len = len(a:Data[a:key])
+  let variable = (a:Data.variable[0] == '$' ? '' : 'g:') . a:Data.variable
+  let value = eval(variable)
+  return value
+endfunction
+
+" Function: s:VarSet({Data})                               {{{3
+" @param[in,out] Data Menu item definition
+"
+" Sets the global variable associated to the menu item according to the item's
+" current value.
+function! s:VarSet(Data, value)
+  let variable = a:Data.variable
+  let value = a:value
+  if variable[0] == '$' " environment variabmes
+    exe "let ".variable." = ".string(value)
+  else
+    let g:{variable} = value
+  endif
+  if has_key(a:Data, "hook")
+    let l:Action = a:Data.hook
+    if type(l:Action) == type(function('tr'))
+      call a:Data.hook()
+    else
+      exe l:Action
+    endif
+  endif
+  return value
+endfunction
+
+" Function: s:VarSetTextValue({Data},{TextValue})          {{{3
+" Force the value of the variable to the one associated to the {TextValue}
+" The menu, and the variable are updated in consequence.
+function! s:VarSetTextValue(Data, text)
+  " Where the texts for values must be fetched
+  let labels_key = s:MenuKey(a:Data)
+  " Fetch the old current value 
+  let old = s:VarFetch(a:Data, labels_key)
+  if old == a:text
+    " value unchanged => abort
+    return 
+  endif
+
+  " Remove the entry from the menu
+  call s:ClearMenu(a:Data.menu, old)
+
+  " Add the updated entry in the menu
+  call s:VarUpdateMenu(a:Data.menu, a:text, a:Data.command)
+  " Update the binded global variable
+  let value = s:VarSet(a:Data, a:text)
+  echo a:Data.variable.'='.value
+endfunction
+
+" Function: s:VarUpdateMenu({Menu}, {text}, {command})     {{{3
+" Adds a new menu item, with the text associated to the current value in
+" braces.
+"
+" @param[in] Menu.priority Priority of the new menu-item
+" @param[in] Menu.name     Name of the new menu-item
+" @param[in] text          Text of the current value of the variable binded to
+"                          the menu-item
+" @param[in] command       Toggle command to execute when the menu-item is selected
+function! s:VarUpdateMenu(Menu, text, command)
+  if has('gui_running')
+    let cmd = 'nnoremenu '.a:Menu.priority.' '.
+	  \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
+	  \ ' :'.s:k_Set_cmd.' '.a:command.' '
+    silent! exe cmd
+  endif
+endfunction
+
+" Function: lh#menu#def_string_item({Data})                  {{{3
+" @param Data.idx_crt_value
+" @param Data.definitions == [ {value:, menutext: } ]
+" @param Data.menu        == { name:, position: }
+"
+" Sets a string-variable defined by {Data}.
+"
+function! lh#menu#def_string_item(Data)
+  " Add evaluation function
+  function! a:Data.eval() dict
+    let key = s:MenuKey(self)
+    return s:VarFetch(self, key)
+  endfunction
+  function! a:Data.val_id() dict
+    return self.eval()
+  endfunction
+
+  " Save the menu data as an internal script variable
+  let id = s:SaveData(a:Data)
+
+  " Name of the auto-matically generated command
+  let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
+  " Lazy definition of the command
+  if 2 != exists(':'.s:k_Set_cmd) 
+    exe 'command! -nargs=1 -complete=custom,lh#menu#_string_complete '
+	  \ . s:k_Set_cmd . ' :call s:SetVariableFromCommand(<f-args>)'
+  endif
+  " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
+  let s:set_string_commands[cmdName] = eval('s:Data'.id)
+  let a:Data["command"] = cmdName
+
+  " Add the menu entry according to the current value
+  let key = s:MenuKey(a:Data)
+  let crt_value = s:VarFetch(a:Data, key)
+  call s:VarUpdateMenu(a:Data.menu, crt_value, cmdName)
+  " Update the associated global variable to the default value
+  call s:VarSet(a:Data, crt_value)
+endfunction
+
+
+"------------------------------------------------------------------------
+function! s:SetVariableFromCommand(all_in_string)
+  let [dummy, cmdName, value ; dummy2] = matchlist(a:all_in_string, '\(\S\+\)\s\+\(.*\)')
+  if !has_key(s:set_string_commands, cmdName)
+    throw "set_string-menu: unknown variable ".cmdName
+  endif
+  let data = s:set_string_commands[cmdName]
+  call s:VarSetTextValue(data, value)
+endfunction
+
+function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos)
+  let cmdline = split(CmdLine)
+  " echomsg "cmd line: " . string(cmdline)." # ". (CmdLine =~ ' $')
+  let nb_args = len(cmdline)
+  if (a:CmdLine !~ ' $')
+    let nb_args -= 1
+  endif
+  " echomsg "nb args: ". nb_args
+  if nb_args < 2 
+    return join(keys(s:set_string_commands),"\n")
+  else
+    return ''
+  endif
+endfunction
+
 
 "------------------------------------------------------------------------
 " # IVN Menus          {{{2
