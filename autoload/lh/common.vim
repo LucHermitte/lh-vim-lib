@@ -19,6 +19,8 @@
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
 " History:	
+"       v3.0.1
+"       lh#common#rand
 "       v3.0.0
 "       - GPLv3
 " 	v2.1.1
@@ -90,6 +92,15 @@ function! lh#common#CheckDeps(Symbol, File, path, plugin) " {{{3
   return lh#common#check_deps(a:Symbol, a:File, a:path, a:plugin)
 endfunction
 
+" Function: lh#common#rand(max) {{{3
+" This function requires ruby, and it may move to another autoload plugin
+function! lh#common#rand(max)
+    ruby << EOF
+    rmax = VIM::evaluate("a:max")
+    rmax = nil if rmax == ""
+    VIM::command("return #{rand(rmax).inspect}")
+EOF
+endfunction
 " Functions }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
