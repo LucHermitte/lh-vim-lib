@@ -458,6 +458,7 @@ endfunction
 
 
 "------------------------------------------------------------------------
+" Function: s:SetVariableFromCommand(all_in_string)          {{{3
 function! s:SetVariableFromCommand(all_in_string)
   let [dummy, cmdName, value ; dummy2] = matchlist(a:all_in_string, '\(\S\+\)\s\+\(.*\)')
   if !has_key(s:set_string_commands, cmdName)
@@ -467,8 +468,9 @@ function! s:SetVariableFromCommand(all_in_string)
   call s:VarSetTextValue(data, value)
 endfunction
 
+" Function: lh#menu#_string_complete(ArgLead, CmdLine, CursorPos) {{{3
 function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos)
-  let cmdline = split(CmdLine)
+  let cmdline = split(a:CmdLine)
   " echomsg "cmd line: " . string(cmdline)." # ". (CmdLine =~ ' $')
   let nb_args = len(cmdline)
   if (a:CmdLine !~ ' $')
