@@ -128,7 +128,9 @@ function! s:Set(Data)
   if variable[0] == '$' " environment variabmes
     exe "let ".variable." = ".string(value)
   else
-    let g:{variable} = value
+    " the following syntax doesn't work with dictionaries => use :exe
+    " let g:{variable} = value
+    exe 'let g:'.variable.' = '.string(value)
   endif
   if has_key(a:Data, "actions")
     let l:Action = a:Data.actions[a:Data.idx_crt_value]
@@ -363,7 +365,9 @@ function! s:VarSet(Data, value)
   if variable[0] == '$' " environment variabmes
     exe "let ".variable." = ".string(value)
   else
-    let g:{variable} = value
+    " the following syntax doesn't work with dictionaries => use :exe
+    " let g:{variable} = value
+    exe 'let g:'.variable.' = '.string(value)
   endif
   if has_key(a:Data, "hook")
     let l:Action = a:Data.hook
