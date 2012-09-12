@@ -28,7 +28,8 @@
 " 	       :Toggle suports auto-completion on possible values
 " 	v2.2.6: Toggle menus are silent, but not the actions executed
 "       v3.0.0: GPLv3
-"       v3.0.1: Enhancements for string options, required by BTW 0.2.0
+"       v3.1.2: Enhancements for string options, required by BTW 0.2.0
+"       v3.1.3: BugFix for CMake options, required by BTW 0.2.1
 " TODO:		
 " 	* Should the argument to :Toggle be simplified to use the variable name
 " 	instead ? May be a banged :Toggle! could work on the real variable
@@ -271,6 +272,10 @@ endfunction
 " Sets a toggle-able menu-item defined by {Data}.
 "
 function! lh#menu#def_toggle_item(Data)
+  function! a:Data.eval() dict
+    let key = s:MenuKey(self)
+    return s:Fetch(self, key)
+  endfunction
   function! a:Data.val_id() dict
     return self.idx_crt_value
   endfunction
