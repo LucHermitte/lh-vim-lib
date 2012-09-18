@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.1.0)
+*lh-vim-lib.txt*        Vim common libraries (v3.1.4)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -31,6 +31,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#common#error_msg()|
 - |lh#common#warning_msg()|
 - |lh#common#echomsg_multilines()|
+- |lh#common#rand()|
 - |lh#encoding#iconv()|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
@@ -84,6 +85,7 @@ Commands related functions:                             |lhvl#command|
 - |lh#command#Fargs2String()| (alpha version)
 - |lh#command#complete()| (alpha version)
 Menus related functions:                                |lhvl#menu|
+- |lh#menu#def_string_item()|
 - |lh#menu#def_toggle_item()|
 - |lh#menu#text()|
 - |lh#menu#make()|
@@ -92,6 +94,7 @@ Menus related functions:                                |lhvl#menu|
 - |lh#menu#map_all()|
 - |lh#askvim#menu()| (beta version)
 Buffers related functions:                              |lhvl#buffer|
+- |lh#buffer#get_nr()|
 - |lh#buffer#list()|
 - |lh#buffer#find()|
 - |lh#buffer#jump()|
@@ -112,6 +115,9 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#list()|
 Completion related functions				|lhvl#completion|
 
+
+COMMANDS                                              *lhvl#commands* {{{2
+- |LetIfUndef|
 }}}2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
@@ -180,6 +186,12 @@ Example: >
 
 Note: Since the introduction of |autoload| plugins in Vim 7, this function has
 lost most of its interrest.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#common#rand()*      {{{3
+lh#common#rand({max})~
+@return a random number in [0..max[.
+@requires vim to be compiled with |+python| feature.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#option#Get()*       {{{3
@@ -863,6 +875,51 @@ echoes >
 MENUS RELATED FUNCTIONS                               *lhvl#menu*       {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                             *lh#menu#def_string_item()*  {{{3
+lh#menu#def_string_item({Data})~
+@param[in,out] {Data} Definition of a |menu| item.
+
+This function defines a |menu| entry that will be associated to a
+|global-variable| whose values can be seen in, and updated, from the menu.
+
+{Data} is a |Dictionary| whose keys are:
+- "variable": name of the |global-variable| to bind to the menu entry
+  Mandatory.
+- "values": default associated value.
+  Optional.
+- "menu": describes where the menu entry must be placed (|Dictionary|)
+    - "priority": complete priority of the entry (see |sub-menu-priority|)
+    - "name": complete name of the entry -- ampersand (&) can be used to define
+      shortcut keys
+  Mandatory.
+- "hook": |function| to call, or command to |:execute| when the value of the
+  variable is toggled through toggle-menu ; default: none.
+- "actions": list of functions to call, or commands to execute when the value
+  of the variable is toggled through toggle-menu. There shall be one action
+  per possible value when defined ; default: empty list
+
+Warning:
+    If the variable is changed by hand without using the menu, then the menu
+    and the variable will be out of synch. Unless the command |lhvl-:Set|
+    is used to change the value of the options (and keep the menu
+    synchronized).
+
+Examples:
+   See tests/lh/test-toggle-menu.vim
+
+                                                            *lhvl-:Set*
+:Set {variable-name} {text-value}~
+@param {variable-name} 
+	    must be a |global-variable| name used as "variable" in the
+	    definition of a string menu item thanks to
+	    |lh#menu#def_string_item()|.
+@param {text-value}
+            :Set directly sets the variable to the value associated to
+            {text-value}.
+
+This command supports autocompletion on the {variable-name}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                              *lh#menu#def_toggle_item()*  {{{3
 lh#menu#def_toggle_item({Data})~
 @param[in,out] {Data} Definition of a |menu| item.
@@ -1137,6 +1194,15 @@ Under developpement
 
 ------------------------------------------------------------------------------
 BUFFERS RELATED FUNCTIONS                             *lhvl#buffer*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#buffer#get_nr()*    {{{3
+lh#buffer#get_nr()~
+@returns the buffer number associated to a buffername/filename.
+If no such file is known to vim, a buffer will be locally created.
+
+This function is required to assign a new buffer number to be used in qflist,
+after the filenames have been fixed -- see BTW's s:FixCTestOutput().
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#buffer#list()*      {{{3

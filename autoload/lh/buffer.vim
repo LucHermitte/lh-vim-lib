@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Licence:      GPLv3
-" Version:	3.0.0
+" Version:	3.1.4
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -21,7 +21,8 @@
 " 	v2.2.0
 " 	(*) new function: lh#buffer#list()
 "       v3.0.0 GPLv3
-" TODO:	
+"       v3.1.4 GPLv3
+"       (*) new function: lh#buffer#get_nr()
 " }}}1
 "=============================================================================
 
@@ -83,6 +84,22 @@ function! lh#buffer#scratch(bname, where)
 endfunction
 function! lh#buffer#Scratch(bname, where)
   return lh#buffer#scratch(a:bname, a:where)
+endfunction
+
+" Function: lh#buffer#get_nr({bname}) {{{3
+" Returns the buffer number associated to a buffername/filename.
+" If no such file is known to vim, a buffer will be locally created
+" This function is required to assign a new buffer number to be used in qflist,
+" after the filenames have been fixed -- see BTW's s:FixCTestOutput().
+function! lh#buffer#get_nr(bname)
+  let nr = bufnr(a:bname)
+  " nr may not always be -1 as it should => also test bname()
+  if -1 == nr || bufname(nr) != a:bname
+    exe 'sp '.a:bname
+    let nr = bufnr(a:bname)
+    q
+  endif
+  return nr
 endfunction
 
 " Function: lh#buffer#list() {{{3
