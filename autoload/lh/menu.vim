@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.1
+" Version:	3.1.5
 " Created:	13th Oct 2006
 " Last Update:	$Date$ (07th Dec 2010)
 "------------------------------------------------------------------------
@@ -56,7 +56,7 @@ endif
 "------------------------------------------------------------------------
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 300
+let s:k_version = 315
 function! lh#menu#version()
   return s:k_version
 endfunction
@@ -85,6 +85,13 @@ endfunction
 " @return a text to be used in menus where "\" and spaces have been escaped.
 function! lh#menu#text(text)
   return escape(a:text, '\ ')
+endfunction
+
+" Function: lh#menu#_var_name(variable_name) {{{3
+" Menu variable names are either global (without g: said), or from the
+" environment.
+function! lh#menu#_var_name(varname)
+  return (a:varname[0]=='$' ? '' : 'g:') . a:varname
 endfunction
 
 " # Toggling menu item {{{2
