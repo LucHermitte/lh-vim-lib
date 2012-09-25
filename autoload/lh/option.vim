@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.5
 " Created:	24th Jul 2004
 " Last Update:	$Date$ (07th Oct 2006)
 "------------------------------------------------------------------------
@@ -18,6 +18,8 @@
 " 	Drop this file into {rtp}/autoload/lh/
 " 	Requires Vim 7+
 " History:	
+"       v3.1.5
+"       (*) lh#option#get() support var names from dictionaries like "g:foo.bar"
 "       v3.0.0
 "       (*) GPLv3
 " 	v2.0.6
@@ -65,7 +67,9 @@ function! lh#option#get(name,default,...)
   while i != strlen(scope)
     if exists(scope[i].':'.name)
       " \ && (0 != strlen({scope[i]}:{name}))
-      return {scope[i]}:{name}
+      " This syntax doesn't work with dictionaries -> !exe
+      " return {scope[i]}:{name}
+      exe 'return '.scope[i].':'.name
     endif
     let i += 1
   endwhile 
