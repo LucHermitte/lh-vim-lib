@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Licence:      GPLv3
-" Version:	3.1.4
+" Version:	3.1.6
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -21,8 +21,11 @@
 " 	v2.2.0
 " 	(*) new function: lh#buffer#list()
 "       v3.0.0 GPLv3
-"       v3.1.4 GPLv3
+"       v3.1.4
 "       (*) new function: lh#buffer#get_nr()
+"       v3.1.6
+"       (*) lh#buffer#list(): new argument to specifies how to filter buffers
+"       (*) new function: lh#buffer#_loaded_buf_do()
 " }}}1
 "=============================================================================
 
@@ -95,7 +98,7 @@ function! lh#buffer#get_nr(bname)
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
   if -1 == nr || bufname(nr) != a:bname
-    exe 'sp '.a:bname
+    exe 'sp '.fnameescape(a:bname)
     let nr = bufnr(a:bname)
     q
   endif
@@ -103,16 +106,28 @@ function! lh#buffer#get_nr(bname)
 endfunction
 
 " Function: lh#buffer#list() {{{3
-function! lh#buffer#list()
-  let all = range(0, bufnr('$'))
+function! lh#buffer#list(...)
+  let which = a:0 == 0 ? 'buflisted' : a:1 
+  let all = range(1, bufnr('$'))
   " let res = lh#list#transform_if(all, [], 'v:1_', 'buflisted')
-  let res = lh#list#copy_if(all, [], 'buflisted')
+  let res = lh#list#copy_if(all, [], which)
   return res
 endfunction
 " Ex: Names of the buffers listed
 "  -> echo lh#list#transform(lh#buffer#list(), [], "bufname")
 " Ex: wipeout empty buffers listed
 "  -> echo 'bw'.join(lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_))'), ' ')
+
+" # Private {{{2
+" Function: lh#buffer#_loaded_buf_do(args) {{{3
+function! lh#buffer#_loaded_buf_do(args)
+  let buffers = lh#buffer#list('bufloaded')
+  for b in buffers
+    exe 'b '.b
+    exe a:args
+  endfor
+endfunction
+
 "=============================================================================
 let &cpo=s:cpo_save
 "=============================================================================
