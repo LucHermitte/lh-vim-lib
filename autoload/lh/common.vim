@@ -18,6 +18,7 @@
 " Installation:	
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
+" 	with ruby enabled for lh#common#rand()
 " History:	
 "       v3.0.1
 "       lh#common#rand
