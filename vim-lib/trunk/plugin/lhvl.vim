@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.6
 " Created:	27th Apr 2010
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -18,6 +18,8 @@
 " History:	
 "       v2.2.1  first version
 "       v3.0.0  GPLv3
+"       v3.1.6  
+"               New command: LoadedBufDo
 " TODO:		«missing features»
 " }}}1
 "=============================================================================
@@ -37,6 +39,8 @@ set cpo&vim
 " Commands and Mappings {{{1
 " Moved from lh-cpp
 command! PopSearch :call histdel('search', -1)| let @/=histget('search',-1)
+
+command! -nargs=1 LoadedBufDo :call lh#buffer#_loaded_buf_do(<q-args>)
 
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------
