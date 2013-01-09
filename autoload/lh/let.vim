@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.1
+" Version:      3.1.6
 " Created:      10th Sep 2012
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -55,18 +55,18 @@ function! lh#let#if_undef(var, value)
       " Dictionaries
       let dict2 = lh#let#if_undef(dict, string({}))
       if !has_key(dict2, key)
-        let dict2[key] = eval(a:value)
+        let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
       endif
       return dict2[key]
     else
       " other variables
       if !exists(a:var)
-        let {a:var} = eval(a:value)
+        let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
       endif
       return {a:var}
     endif
   catch /.*/
-    echoerr "Cannot set ".a:var." to ".a:value.": ".(v:exception .' @ '. v:throwpoint)
+    echoerr "Cannot set ".a:var." to ".string(a:value).": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
