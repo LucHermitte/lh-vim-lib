@@ -130,33 +130,38 @@ endfunction
 "
 " Sets the global variable associated to the menu item according to the item's
 " current value.
-function! s:Set(Data)
-  let value = a:Data.values[a:Data.idx_crt_value]
-  let variable = a:Data.variable
-  if variable[0] == '$' " environment variabmes
-    exe "let ".variable." = ".string(value)
-  else
-    " the following syntax doesn't work with dictionaries => use :exe
-    " let g:{variable} = value
-    exe 'let g:'.variable.' = '.string(value)
-  endif
-  if has_key(a:Data, "actions")
-    let l:Action = a:Data.actions[a:Data.idx_crt_value]
-    if type(l:Action) == type(function('tr'))
-      call l:Action()
+function! s:Set(Data) abort
+  try 
+    let value = a:Data.values[a:Data.idx_crt_value]
+    let variable = a:Data.variable
+    if variable[0] == '$' " environment variabmes
+      exe "let ".variable." = ".string(value)
     else
-      exe l:Action
+      " the following syntax doesn't work with dictionaries => use :exe
+      " let g:{variable} = value
+      exe 'let g:'.variable.' = '.string(value)
     endif
-  endif
-  if has_key(a:Data, "hook")
-    let l:Action = a:Data.hook
-    if type(l:Action) == type(function('tr'))
-      call a:Data.hook()
-    else
-      exe l:Action
+    if has_key(a:Data, "actions")
+      let l:Action = a:Data.actions[a:Data.idx_crt_value]
+      if type(l:Action) == type(function('tr'))
+        call l:Action()
+      else
+        exe l:Action
+      endif
     endif
-  endif
-  return value
+    if has_key(a:Data, "hook")
+      let l:Action = a:Data.hook
+      if type(l:Action) == type(function('tr'))
+        call a:Data.hook()
+      else
+        exe l:Action
+      endif
+    endif
+    return value
+  catch /.*/
+    throw "Cannot set: ".variable."=".value.": ".v:exception." in ".v:throwpoint
+  finally
+  endtry
 endfunction
 
 " Function: s:MenuKey({Data})                              {{{3
@@ -605,7 +610,7 @@ function! lh#menu#make(prefix, code, text, binding, ...)
       endif
     endif
   endif
-  if has("gui_running")
+  if has("gui_running") && has ('menu')
     while strlen(prefix)
       execute <SID>BMenu(b).prefix[0].build_cmd.<SID>Build_CMD(prefix[0],cmd)
       let prefix = strpart(prefix, 1)
