@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.8
 " Created:	15th Feb 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -49,7 +49,14 @@ function! s:RegisteredOnce(cmd, group)
   " We can't delete the current augroup autocommand => increment a counter
   if !exists('s:'.a:group) || s:{a:group} == 0 
     let s:{a:group} = 1
-    exe a:cmd
+    try 
+      exe a:cmd
+    finally
+      " But we can clean the group
+      exe 'augroup '.a:group
+      au!
+      augroup END
+    endtry
   endif
 endfunction
 

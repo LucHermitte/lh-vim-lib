@@ -5,8 +5,8 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.7
-let s:version = '3.1.7'
+" Version:	3.1.8
+let s:version = '3.1.8'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -35,6 +35,7 @@ autoload/lh/graph/tsort.vim
 autoload/lh/icomplete.vim
 autoload/lh/let.vim
 autoload/lh/list.vim
+autoload/lh/map.vim
 autoload/lh/menu.vim
 autoload/lh/option.vim
 autoload/lh/path.vim

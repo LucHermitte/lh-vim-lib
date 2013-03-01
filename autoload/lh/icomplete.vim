@@ -32,7 +32,7 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 300
+let s:k_version = 318
 function! lh#icomplete#version()
   return s:k_version
 endfunction
@@ -68,25 +68,61 @@ endfunction
 " ## Internal functions {{{1
 " Function: lh#icomplete#_clear_key_bindings() {{{2
 function! lh#icomplete#_clear_key_bindings()
-  iunmap <cr>
-  iunmap <c-y>
-  iunmap <esc>
+  iunmap <buffer> <cr>
+  iunmap <buffer> <c-y>
+  iunmap <buffer> <esc>
+  " iunmap <space>
+  " iunmap <tab>
+endfunction
+
+" Function: lh#icomplete#_restore_key_bindings() {{{2
+function! lh#icomplete#_restore_key_bindings(previous_mappings)
+  call s:Verbose('Restore keybindings after completion')
+  if has_key(a:previous_mappings, 'cr') && has_key(a:previous_mappings.cr, 'buffer') && a:previous_mappings.cr.buffer
+    let cmd = lh#map#define(a:previous_mappings.cr)
+  else
+    iunmap <buffer> <cr>
+  endif
+  if has_key(a:previous_mappings, 'c_y') && has_key(a:previous_mappings.c_y, 'buffer') && a:previous_mappings.c_y.buffer
+    let cmd = lh#map#define(a:previous_mappings.c_y)
+  else
+    iunmap <buffer> <c-y>
+  endif
+  if has_key(a:previous_mappings, 'esc') && has_key(a:previous_mappings.esc, 'buffer') && a:previous_mappings.esc.buffer
+    let cmd = lh#map#define(a:previous_mappings.esc)
+  else
+    iunmap <buffer> <esc>
+  endif
   " iunmap <space>
   " iunmap <tab>
 endfunction
 
 " Function: lh#icomplete#_register_hook(Hook) {{{2
 function! lh#icomplete#_register_hook(Hook)
-  exe 'inoremap <silent> <cr> <cr><c-\><c-n>:call' .a:Hook . '()<cr>'
-  exe 'inoremap <silent> <c-y> <c-y><c-\><c-n>:call' .a:Hook . '()<cr>'
+  " call s:Verbose('Register hook on completion')
+  let old_keybindings = {}
+  let old_keybindings.cr = maparg('<cr>', 'i', 0, 1)
+  let old_keybindings.c_y = maparg('<c-y>', 'i', 0, 1)
+  let old_keybindings.esc = maparg('<esc>', 'i', 0, 1)
+  exe 'inoremap <buffer> <silent> <cr> <c-y><c-\><c-n>:call' .a:Hook . '()<cr>'
+  exe 'inoremap <buffer> <silent> <c-y> <c-y><c-\><c-n>:call' .a:Hook . '()<cr>'
   " <c-o><Nop> doesn't work as expected... 
   " To stay in INSERT-mode:
   " inoremap <silent> <esc> <c-e><c-o>:<cr>
   " To return into NORMAL-mode:
-  inoremap <silent> <esc> <c-e><esc>
+  inoremap <buffer> <silent> <esc> <c-e><esc>
 
   call lh#event#register_for_one_execution_at('InsertLeave',
-	\ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
+	\ ':call lh#icomplete#_restore_key_bindings('.string(old_keybindings).')', 'CompleteGroup')
+        " \ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
+endfunction
+
+" Why is it triggered even before entering the completion ? 
+function! lh#icomplete#_register_hook2(Hook)
+  " call lh#event#register_for_one_execution_at('InsertLeave',
+  call lh#event#register_for_one_execution_at('CompleteDone',
+	\ ':debug call'.a:Hook.'()<cr>', 'CompleteGroup')
+        " \ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
 endfunction
 
 "------------------------------------------------------------------------
