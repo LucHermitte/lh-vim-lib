@@ -47,7 +47,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 " Function: lh#let#if_undef(var, value) {{{3
-function! lh#let#if_undef(var, value)
+function! lh#let#if_undef(var, value) abort
   try 
     let [all, dict, key ; dummy] = matchlist(a:var, '^\(.\{-}\)\%(\.\([^.]\+\)\)\=$')
     " echomsg a:var." --> dict=".dict." --- key=".key

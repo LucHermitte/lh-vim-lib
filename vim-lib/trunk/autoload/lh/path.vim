@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.1
+" Version:	3.1.4
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -54,6 +54,9 @@
 "       true by default.
 "       v 3.1.1
 "       (*) lh#path#strip_start() shall support very big lists of dirnames now.
+"       v 3.1.4
+"       (*) Force to display numerous choices from lh#path#select_one()
+"       vertically
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -69,7 +72,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 310
+let s:k_version = 314
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -179,7 +182,13 @@ function! lh#path#select_one(pathnames, prompt)
     let simpl_pathnames = lh#path#strip_common(simpl_pathnames)
     let simpl_pathnames = [ '&Cancel' ] + simpl_pathnames
     " Consider guioptions+=c is case of difficulties with the gui
-    let selection = confirm(a:prompt, join(simpl_pathnames,"\n"), 1, 'Question')
+    try
+      let guioptions_save = &guioptions
+      set guioptions+=v
+      let selection = confirm(a:prompt, join(simpl_pathnames,"\n"), 1, 'Question')
+    finally
+      let &guioptions = guioptions_save
+    endtry
     let file = (selection == 1) ? '' : a:pathnames[selection-2]
     return file
   elseif len(a:pathnames) == 0
