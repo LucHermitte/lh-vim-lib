@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.1.4)
+*lh-vim-lib.txt*        Vim common libraries (v3.1.9)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -71,15 +71,17 @@ Paths related functions:                                |lhvl#path|
 - |lh#path#depth()|
 - |lh#path#glob_as_list()|
 - |lh#path#is_absolute_path()|
+- |lh#path#is_in()|
 - |lh#path#is_url()|
+- |lh#path#readlink()|
+- |lh#path#relative_to()|
 - |lh#path#select_one()|
 - |lh#path#simplify()|
 - |lh#path#strip_common()|
 - |lh#path#strip_start()|
 - |lh#path#to_dirname()|
-- |lh#path#to_relative()|
-- |lh#path#relative_to()|
 - |lh#path#to_regex()|
+- |lh#path#to_relative()|
 Commands related functions:                             |lhvl#command|
 - |lh#command#new()| (alpha version)
 - |lh#command#Fargs2String()| (alpha version)
@@ -825,6 +827,15 @@ Returns the relative directory that indentifies {to} from {from} location.
         from the {from} directory.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#readlink()*  {{{3
+lh#path#readlink({pathname})~
+Resolves any symbolic links in pathnames.
+Where the *nix command readlink is available, it returns >
+    readlink -f {pathname} 
+elsewhere it returns {pathname}.
+@param[in] pathslist to resolve
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#path#GlobAsList()*  {{{3
 lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
                                                 *lh#path#glob_as_list()*
@@ -870,6 +881,12 @@ e.g.: >
 echoes >
  [/\\]home[/\\]luc[/\\]\(vimfiles\|.vim\)
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#path#is_in()*    {{{3
+lh#path#is_in({file}, {path})~
+Tells whether a {file} is within a directory tree.
+The function first tries to check whether the names match, then it tries again
+but on resolved pathnames (with |lh#path#readlink()|.
 
 ------------------------------------------------------------------------------
 MENUS RELATED FUNCTIONS                               *lhvl#menu*       {{{2

@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.4
+" Version:	3.1.9
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -57,6 +57,11 @@
 "       v 3.1.4
 "       (*) Force to display numerous choices from lh#path#select_one()
 "       vertically
+"       v 3.1.9
+"       (*) lh#path#is_in() that resolves symbolic links to tell wheither a
+"       file is within a directory
+"       (*) lh#path#readlink() that resolves symbolic links (where readlink is
+"       available)
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -72,7 +77,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 314
+let s:k_version = 319
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -367,6 +372,27 @@ function! lh#path#vimfiles()
   " Comment what
   let z = lh#path#find(&rtp,what)
   return z
+endfunction
+
+" Function: lh#path#is_in(file, path) {{{3
+function! lh#path#is_in(file, path)
+  if stridx(a:file, a:path) == 0
+    return 1
+  else
+    " try to check with readlink
+    return stridx(lh#path#readlink(a:file), lh#path#readlink(a:path)) == 0
+  endif
+endfunction
+
+" Function: lh#path#readlink(pathname) {{{3
+let s:has_readlink = 0
+function! lh#path#readlink(pathname)
+  if s:has_readlink || executable('readlink')
+    let s:has_readlink = 1
+    return lh#os#system('readlink -f '.shellescape(a:pathname))
+  else
+    return a:pathname
+  endif
 endfunction
 " }}}1
 "=============================================================================
