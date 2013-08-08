@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.1.9)
+*lh-vim-lib.txt*        Vim common libraries (v3.1.10)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -1334,7 +1334,7 @@ The dictionary returned is filled with the following information:
 
 
 Regarding the callback function: *lhvl-dialog-select-callback*
-- It ca not be a |script-local| function, only global and autoload functions
+- It can not be a |script-local| function, only global and autoload functions
   are supported.
 - When called, we are still within the scratch buffer context.
 - It must accept a |List| of numbers as its first parameter: the index (+1) of
