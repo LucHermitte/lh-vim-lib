@@ -139,6 +139,11 @@ function! s:Display(dialog, atitle)
     silent $put='  '.choice
   endfor
   set ro
+  " Resize to have all elements fit, up to max(15, winfixheight)
+  let nl = 15 > &winfixheight ? 15 : &winfixheight
+  let nl = line('$') < nl ? line('$') : nl
+  exe nl.' wincmd _'
+  normal! gg
   exe s:Help_NbL()+1
 endfunction
 
