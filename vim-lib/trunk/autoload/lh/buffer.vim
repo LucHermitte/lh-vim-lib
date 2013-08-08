@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Licence:      GPLv3
-" Version:	3.1.6
+" Version:	3.1.10
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -26,6 +26,8 @@
 "       v3.1.6
 "       (*) lh#buffer#list(): new argument to specifies how to filter buffers
 "       (*) new function: lh#buffer#_loaded_buf_do()
+"       v3.1.10
+"       (*) lh#buffer#jump() returns the number of the window opened.
 " }}}1
 "=============================================================================
 
@@ -69,8 +71,10 @@ endfunction
 
 " Function: lh#buffer#jump({filename},{cmd}) {{{3
 function! lh#buffer#jump(filename, cmd)
-  if lh#buffer#find(a:filename) != -1 | return | endif
+  let b = lh#buffer#find(a:filename)
+  if b != -1 | return b | endif
   exe a:cmd . ' ' . a:filename
+  return winnr()
 endfunction
 function! lh#buffer#Jump(filename, cmd)
   return lh#buffer#jump(a:filename, a:cmd)
@@ -79,6 +83,7 @@ endfunction
 " Function: lh#buffer#scratch({bname},{where}) {{{3
 function! lh#buffer#scratch(bname, where)
   try
+    set modifiable
     silent exe a:where.' sp '.a:bname
   catch /.*/
     throw "Can't open a buffer named '".a:bname."'!"
