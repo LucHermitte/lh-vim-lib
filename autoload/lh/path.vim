@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.9
+" Version:	3.1.11
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -62,6 +62,10 @@
 "       file is within a directory
 "       (*) lh#path#readlink() that resolves symbolic links (where readlink is
 "       available)
+"       v 3.1.11
+"       (*) lh#path#strip_start() can find the best match in the middle of a
+"       sequence. This fixes a bug in Mu-Template: the filetype of
+"       template-files wasn't always correctly working.
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -77,7 +81,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 319
+let s:k_version = 3111
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -309,13 +313,15 @@ function! lh#path#strip_start(pathname, pathslist)
   " apply a realpath like operation
   let nb_paths = len(pathslist) " set before the loop
   let i = 0
-  while i != nb_paths
-    if pathslist[i] =~ '^\.\%(/\|$\)'
-      let path2 = getcwd().pathslist[i][1:]
-      call add(pathslist, path2)
-    endif
-    let i += 1
-  endwhile
+  " while i != nb_paths
+    " if pathslist[i] =~ '^\.\%(/\|$\)'
+      " let path2 = getcwd().pathslist[i][1:]
+      " call add(pathslist, path2)
+    " endif
+    " let i += 1
+  " endwhile
+  let pathslist_abs=filter(copy(pathslist), 'v:val =~ "^\\.\\%(/\\|$\\)"')
+  let pathslist += pathslist_abs
   " replace path separators by a regex that can match them
   call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")')
   " echomsg string(pathslist)
@@ -331,13 +337,15 @@ function! lh#path#strip_start(pathname, pathslist)
     " echomsg strip_re
     let best_match = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
   else
-    let best_match = ''
-    for path in pathslist
-      let a_match = substitute(a:pathname, '\%('.path.'\)[/\\]\=', '', '')
-      if len(a_match) < len(best_match) || empty(best_match)
-        let best_match = a_match
-      endif
-    endfor
+    if !empty(pathslist)
+      let best_match = substitute(a:pathname, '\%('.pathslist[0].'\)[/\\]\=', '', '')
+      for path in pathslist[1:]
+        let a_match = substitute(a:pathname, '\%('.path.'\)[/\\]\=', '', '')
+        if len(a_match) < len(best_match)
+          let best_match = a_match
+        endif
+      endfor
+    endif
   endif
   return best_match
 endfunction
