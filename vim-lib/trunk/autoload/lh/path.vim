@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.11
+" Version:	3.1.12
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -66,6 +66,8 @@
 "       (*) lh#path#strip_start() can find the best match in the middle of a
 "       sequence. This fixes a bug in Mu-Template: the filetype of
 "       template-files wasn't always correctly working.
+"       v 3.1.12
+"       (*) New function: lh#path#add_if_exists()
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -400,6 +402,14 @@ function! lh#path#readlink(pathname)
     return lh#os#system('readlink -f '.shellescape(a:pathname))
   else
     return a:pathname
+  endif
+endfunction
+
+" Function: lh#path#add_path_if_exists(listname, path) {{{3
+function! lh#path#add_path_if_exists(listname, path)
+  let path = substitute(a:path, '[/\\]\*\*$', '', '')
+  if isdirectory(path)
+    let {a:listname} += [a:path]
   endif
 endfunction
 " }}}1
