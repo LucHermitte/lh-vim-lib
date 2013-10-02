@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Licence:      GPLv3
-" Version:	3.1.10
+" Version:	3.1.12
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -25,9 +25,11 @@
 "       (*) new function: lh#buffer#get_nr()
 "       v3.1.6
 "       (*) lh#buffer#list(): new argument to specifies how to filter buffers
-"       (*) new function: lh#buffer#_loaded_buf_do()
+"       (*) new function: lh#buffer#_loaded_buf_do() for :LoadedBufDo
 "       v3.1.10
 "       (*) lh#buffer#jump() returns the number of the window opened.
+"       v3.1.12
+"       (*) new function lh#buffer#_clean_empty_buffers() for :CleanEmptyBuffers
 " }}}1
 "=============================================================================
 
@@ -131,6 +133,14 @@ function! lh#buffer#_loaded_buf_do(args)
     exe 'b '.b
     exe a:args
   endfor
+endfunction
+
+" Function: lh#buffer#_clean_empty_buffers() {{{3
+function! lh#buffer#_clean_empty_buffers()
+  let buffers = lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_)) && bufwinnr(v:1_)<0')
+  if !empty(buffers)
+    exe 'bw '.join(buffers, ' ')
+  endif
 endfunction
 
 "=============================================================================
