@@ -107,7 +107,7 @@ function! lh#list#copy_if(input, output, predicate)
     if lh#function#execute(a:predicate, element)
       call add(a:output, element)
     endif
-    unlet element " for heterogeneous lists
+    silent! unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction
