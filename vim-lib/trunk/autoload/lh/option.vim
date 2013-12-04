@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.5
+" Version:	3.1.13
 " Created:	24th Jul 2004
 " Last Update:	$Date$ (07th Oct 2006)
 "------------------------------------------------------------------------
@@ -18,6 +18,9 @@
 " 	Drop this file into {rtp}/autoload/lh/
 " 	Requires Vim 7+
 " History:	
+"       v3.1.13
+"       (*) lh#option#add() don't choke when option value contains characters that
+"           means something in a regex context
 "       v3.1.5
 "       (*) lh#option#get() support var names from dictionaries like "g:foo.bar"
 "       v3.0.0
@@ -119,7 +122,7 @@ function! lh#option#add(name,values)
         \ ? copy(a:values)
         \ : [a:values]
   let old = split(eval('&'.a:name), ',')
-  let new = filter(values, 'match(old, v:val) < 0')
+  let new = filter(values, 'match(old, escape(v:val, "\\*.")) < 0')
   let val = join(old+new, ',')
   exe 'let &'.a:name.' = val'
 endfunction
