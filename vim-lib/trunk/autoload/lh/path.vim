@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.12
+" Version:	3.1.14
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -68,6 +68,10 @@
 "       template-files wasn't always correctly working.
 "       v 3.1.12
 "       (*) New function: lh#path#add_if_exists()
+"       v 3.1.14
+"       (*) New functions: lh#path#split() and lh#path#join()
+"       (*) lh#path#common() fixed as matchstr('^\zs\(.*\)\ze.\{-}@@\1.*$')
+"           doesn't work as expected
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -125,24 +129,55 @@ function! lh#path#Simplify(pathname)
   return lh#path#simplify(a:pathname)
 endfunction
 
+" Function: lh#path#split(pathname) {{{3
+" Split pathname parts: "/home/me/foo/bar" -> [ "home", "me", "foo", "bar" ]
+function! lh#path#split(pathname)
+  let parts = split(a:pathname, '[/\\]')
+  return parts
+endfunction
+
+" Function: lh#path#join(pathparts, {path_separator}) {{{3
+function! lh#path#join(pathparts, ...)
+  let sep
+        \ = (a:0) == 0                       ? '/'
+        \ : type(a:1)==type(0) && (a:1) == 0 ? '/'
+        \ : (a:1) == 1                       ? '\'
+        \ : (a:1) =~ 'shellslash\|ssl'       ? (&ssl ? '\' : '/')
+        \ :                                    (a:1)
+  return join(a:pathparts, sep)
+endfunction
+
 " Function: lh#path#common({pathnames}) {{{3
 " Find the common leading path between all pathnames
 function! lh#path#common(pathnames)
   " assert(len(pathnames)) > 1
   let common = a:pathnames[0]
+  let lCommon = lh#path#split(common)
   let i = 1
   while i < len(a:pathnames)
     let fcrt = a:pathnames[i]
-    " pathnames should not contain @
+    " Can't make it work => split paths, and test each subdir manually...
     " let common = matchstr(common.'@@'.fcrt, '^\zs\(.*[/\\]\)\ze.\{-}@@\1.*$')
-    let common = matchstr(common.'@@'.fcrt, '^\zs\(.*\>\)\ze.\{-}@@\1\>.*$')
-    if strlen(common) == 0
-      " No need to further checks
+    " let common = matchstr(common.'@@'.fcrt, '^\zs\(.*\>\)\ze.\{-}@@\1\>.*$')
+    let lFcrt = lh#path#split(fcrt)
+    let Mcrt = len(lFcrt)
+    let Mcom = len(lCommon)
+    let p = 0
+    while 1
+      if p == Mcom
+        break
+      elseif p==Mcrt || lCommon[p] != lFcrt[p]
+        call remove(lCommon, p, -1)
+        break
+      endif
+      let p += 1
+    endwhile
+    if len(lCommon) == 0 " No need to further checks
       break
     endif
     let i += 1
   endwhile
-  return common
+  return join(lCommon, '/')
 endfunction
 
 " Function: lh#path#strip_common({pathnames}) {{{3
@@ -155,9 +190,10 @@ function! lh#path#strip_common(pathnames)
   if l == 0
     return a:pathnames
   else
-  let pathnames = a:pathnames
-  call map(pathnames, 'strpart(v:val, '.l.')' )
-  return pathnames
+    let pathnames = a:pathnames
+    call map(pathnames, 'strpart(v:val, '.l.')' )
+    call map(pathnames, 'substitute(v:val, "^/", "", "")' )
+    return pathnames
   endif
 endfunction
 function! lh#path#StripCommon(pathnames)
@@ -376,9 +412,10 @@ endfunction
 
 " Function: lh#path#vimfiles() {{{3
 function! lh#path#vimfiles()
-  let expected_win = $LUCHOME . '/vimfiles'
-  let expected_nix = $LUCHOME . '/.vim'
-  let what =  lh#path#to_regex($LUCHOME.'/').'\(vimfiles\|.vim\)'
+  let HOME = exists('$LUCHOME') ? $LUCHOME : $HOME
+  let expected_win = HOME . '/vimfiles'
+  let expected_nix = HOME . '/.vim'
+  let what =  lh#path#to_regex($HOME.'/').'\(vimfiles\|.vim\)'
   " Comment what
   let z = lh#path#find(&rtp,what)
   return z

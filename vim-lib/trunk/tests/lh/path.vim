@@ -5,17 +5,15 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.14
 " Created:	28th May 2009
 " Last Update:	$Date$
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/path.vim
+" 	Run it with :UTRun % (see UT.vim)
 " 
 "------------------------------------------------------------------------
-" Installation:	«install details»
-" History:	«history»
-" TODO:		«missing features»
 " }}}1
 "=============================================================================
 
@@ -40,17 +38,71 @@ function! s:Test_simplify()
   endif
 endfunction
 
+function! s:Test_split()
+  Assert ['home', 'me', 'foo', 'bar'] == lh#path#split('/home/me/foo/bar')
+  Assert ['home', 'me', 'foo', 'bar'] == lh#path#split('/home/me/foo/bar/')
+  Assert ['home'] == lh#path#split('/home')
+  Assert ['home'] == lh#path#split('/home/')
+  Assert [] == lh#path#split('/')
+  Assert [] == lh#path#split('')
+endfunction
+
+function! s:Test_join()
+  " With default '/'
+  Assert '/home/me/foo/bar'  == lh#path#join(['', 'home', 'me', 'foo', 'bar'])
+  Assert '/home/me/foo/bar/' == lh#path#join(['', 'home', 'me', 'foo', 'bar', ''])
+  Assert '/home'             == lh#path#join(['', 'home'])
+  Assert '/'                 == lh#path#join(['',''])
+  Assert ''                  == lh#path#join([])
+  " With forced '\', with 1
+  Assert '\home\me\foo\bar'  == lh#path#join(['', 'home', 'me', 'foo', 'bar'], 1)
+  Assert '\home\me\foo\bar\' == lh#path#join(['', 'home', 'me', 'foo', 'bar', ''], 1)
+  Assert '\home'             == lh#path#join(['', 'home'], 1)
+  Assert '\'                 == lh#path#join(['', ''], 1)
+  Assert ''                  == lh#path#join([], 1)
+  " With forced '/', with 0
+  Assert '/home/me/foo/bar'  == lh#path#join(['', 'home', 'me', 'foo', 'bar'], 0)
+  Assert '/home/me/foo/bar/' == lh#path#join(['', 'home', 'me', 'foo', 'bar', ''], 0)
+  Assert '/home'             == lh#path#join(['', 'home'], 0)
+  Assert '/'                 == lh#path#join(['', ''], 0)
+  Assert ''                  == lh#path#join([], 0)
+  " With forced '%%'
+  Assert '%%home%%me%%foo%%bar'   == lh#path#join(['', 'home', 'me', 'foo', 'bar'], '%%')
+  Assert '%%home%%me%%foo%%bar%%' == lh#path#join(['', 'home', 'me', 'foo', 'bar', ''], '%%')
+  Assert '%%home'                 == lh#path#join(['', 'home'], '%%')
+  Assert '%%'                     == lh#path#join(['', ''], '%%')
+  Assert ''                       == lh#path#join([], '%%')
+  " With default shellslash
+  Assert substitute('/home/me/foo/bar', '/', &ssl? '\\' : '/', 'g')  == lh#path#join(['', 'home', 'me', 'foo', 'bar'], 'shellslash')
+  Assert substitute('/home/me/foo/bar/', '/', &ssl? '\\' : '/', 'g') == lh#path#join(['', 'home', 'me', 'foo', 'bar', ''], 'shellslash')
+  Assert substitute('/home', '/', &ssl ? '\\' : '/', 'g')            == lh#path#join(['', 'home'], 'shellslash')
+  Assert substitute('/', '/', &ssl ? '\\' : '/', 'g')                == lh#path#join(['', ''], 'shellslash')
+  Assert ''                                                          == lh#path#join([], 'ssl')
+endfunction
+
 function! s:Test_strip_common()
   let paths = ['foo/bar/file', 'foo/file', 'foo/foo/file']
   let expected = [ 'bar/file', 'file', 'foo/file']
+  Assert lh#path#strip_common(paths) == expected
+
+  let paths = ['foo/bar/file', 'foo/bar/file', 'foo/foo/file']
+  let expected = [ 'bar/file', 'bar/file', 'foo/file']
+  Assert lh#path#strip_common(paths) == expected
+
+  let paths = ['/foo/bar/file', '/foo/bar/file', '/foo/foo/file']
+  let expected = [ 'bar/file', 'bar/file', 'foo/file']
+  Assert lh#path#strip_common(paths) == expected
+
+  let paths = ['/foo/bar/', '/foo/bar']
+  let expected = [ '', '']
   Assert lh#path#strip_common(paths) == expected
 endfunction
 
 function! s:Test_common()
   " Pick one ...
-  Assert 'foo/' == lh#path#common(['foo/bar/dir', 'foo'])
-  Assert 'foo/bar/' == lh#path#common(['foo/bar/dir', 'foo/bar'])
-  Assert 'foo/' == lh#path#common(['foo/bar/dir', 'foo/bar2'])
+  Assert 'foo' == lh#path#common(['foo/bar/dir', 'foo'])
+  Assert 'foo/bar' == lh#path#common(['foo/bar/dir', 'foo/bar'])
+  Assert 'foo' == lh#path#common(['foo/bar/dir', 'foo/bar2'])
 
   Assert 'foo' == lh#path#common(['foo/bar/dir', 'foo'])
   Assert 'foo/bar' == lh#path#common(['foo/bar/dir', 'foo/bar'])
