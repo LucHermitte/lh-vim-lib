@@ -4,7 +4,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Licence:      GPLv3
-" Version:	3.1.12
+" Version:	3.1.15
 " Created:	23rd Jan 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -30,6 +30,9 @@
 "       (*) lh#buffer#jump() returns the number of the window opened.
 "       v3.1.12
 "       (*) new function lh#buffer#_clean_empty_buffers() for :CleanEmptyBuffers
+"       v3.1.15
+"       (*) Bug fix in lh#buffer#get_nr() that does not need to reopen the
+"           buffer every time
 " }}}1
 "=============================================================================
 
@@ -101,10 +104,13 @@ endfunction
 " If no such file is known to vim, a buffer will be locally created
 " This function is required to assign a new buffer number to be used in qflist,
 " after the filenames have been fixed -- see BTW's s:FixCTestOutput().
+"
+" Bug: this function clears syntax highlighting in some buffers if we :sp when
+" bufname() != a:bname
 function! lh#buffer#get_nr(bname)
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
-  if -1 == nr || bufname(nr) != a:bname
+  if -1 == nr " || bufname(nr) != a:bname
     exe 'sp '.fnameescape(a:bname)
     let nr = bufnr(a:bname)
     q
