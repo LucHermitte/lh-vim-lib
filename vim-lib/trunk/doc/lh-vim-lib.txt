@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.1.10)
+*lh-vim-lib.txt*        Vim common libraries (v3.1.16)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -345,6 +345,10 @@ lh#float#arg_min({list})~
 Returns The minimum, /arg-minimum, /maximum, /arg-maximum of a |List| of
 |expr-float|. 
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                *lh#ft#is_text()*                       {{{3
+lh#ft#is_text([ft])~
+Tells whether the corresponding filetype correspond to a text filetype.
 
 ------------------------------------------------------------------------------
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
