@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.16
+" Version:      3.1.17
 " Created:      28th Jan 2014
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -21,7 +21,7 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 3116
+let s:k_version = 3117
 function! lh#ft#version()
   return s:k_version
 endfunction
@@ -49,7 +49,7 @@ endfunction
 " Function: lh#ft#is_text(...) {{{3
 function! lh#ft#is_text(...)
   let ft = a:0 == 0 ? &ft : (a:1)
-  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml'
+  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown'
 endfunction
 
 "------------------------------------------------------------------------
