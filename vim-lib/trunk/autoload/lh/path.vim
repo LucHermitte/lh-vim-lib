@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.14
+" Version:	3.1.17
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -72,6 +72,8 @@
 "       (*) New functions: lh#path#split() and lh#path#join()
 "       (*) lh#path#common() fixed as matchstr('^\zs\(.*\)\ze.\{-}@@\1.*$')
 "           doesn't work as expected
+"       v 3.1.17
+"       (*) Fix lh#start#strip_start() to work under windows
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -87,7 +89,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 3111
+let s:k_version = 3117
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -363,8 +365,8 @@ function! lh#path#strip_start(pathname, pathslist)
   " replace path separators by a regex that can match them
   call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")')
   " echomsg string(pathslist)
-  " escape .
-  call map(pathslist, '"^".escape(v:val, ".")')
+  " escape . and ~
+  call map(pathslist, '"^".escape(v:val, ".~")')
   " handle "**" as anything
   call map(pathslist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
   " reverse the list to use the real best match, which is "after"
