@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+" Version:	3.1.17
 " Created:	07th Oct 2006
 " Last Update:	$Date$ (08th Feb 2008)
 "------------------------------------------------------------------------
@@ -20,8 +20,10 @@
 " 	Vim 7+ required.
 " 	with ruby enabled for lh#common#rand()
 " History:	
+"       v3.1.17
+"       - Fix lh#common#echomsg_multilines() to accept lists
 "       v3.0.1
-"       lh#common#rand
+"       - lh#common#rand
 "       v3.0.0
 "       - GPLv3
 " 	v2.1.1
@@ -42,7 +44,7 @@ set cpo&vim
 
 " Function: lh#common#echomsg_multilines {{{2
 function! lh#common#echomsg_multilines(text)
-  let lines = split(a:text, "[\n\r]")
+  let lines = type(a:text) == type([]) ? a:text : split(a:text, "[\n\r]")
   for line in lines
     echomsg line
   endfor
