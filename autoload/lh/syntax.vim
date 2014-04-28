@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.0
+" Version:	3.1.18
 " Created:	05th Sep 2007
 " Last Update:	$Date$ (05th Sep 2007)
 "------------------------------------------------------------------------
@@ -136,7 +136,12 @@ endfunction
 
 " Function: lh#syntax#is_a_comment(mark) : bool                   {{{3
 function! lh#syntax#is_a_comment(mark)
-  let stack = synstack(line(a:mark), col(a:mark))
+  return lh#syntax#is_a_comment_at(line(a:mark), col(a:mark))
+endfunction
+
+" Function: lh#syntax#is_a_comment_at(l,c) : bool                 {{{3
+function! lh#syntax#is_a_comment_at(l,c)
+  let stack = synstack(a:l, a:c)
   for syn in stack
     if synIDattr(syn, 'name') =~? 'comment'
       return 1
