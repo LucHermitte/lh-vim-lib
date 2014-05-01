@@ -135,18 +135,23 @@ function! lh#syntax#list(name)
 endfunction
 
 " Function: lh#syntax#is_a_comment(mark) : bool                   {{{3
-function! lh#syntax#is_a_comment(mark)
+function! lh#syntax#is_a_comment(mark) abort
   return lh#syntax#is_a_comment_at(line(a:mark), col(a:mark))
 endfunction
 
-" Function: lh#syntax#is_a_comment_at(l,c) : bool                 {{{3
-function! lh#syntax#is_a_comment_at(l,c)
-  let stack = synstack(a:l, a:c)
-  for syn in stack
-    if synIDattr(syn, 'name') =~? 'comment'
-      return 1
-    endif
-  endfor
+
+" Function: lh#syntax#is_a_comment_at(l,c) : bool                  {{{3
+function! lh#syntax#is_a_comment_at(l,c) abort
+  try 
+    let stack = synstack(a:l, a:c)
+    for syn in stack
+      if synIDattr(syn, 'name') =~? 'comment'
+        return 1
+      endif
+    endfor
+  catch /.*/
+    throw "Cannot fetch synstack at line:".a:l.", col:".a:c
+  endtry
   return 0
 endfunction
 
