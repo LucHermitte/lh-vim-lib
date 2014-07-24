@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.0
+" Version:	3.2.1
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -76,6 +76,8 @@
 "       (*) Fix lh#start#strip_start() to work under windows
 "       v 3.2.0
 "       (*) New function lh#path#find_in_parents() used in local_vimrc
+"       v 3.2.1
+"       (*) Bug fix: no more infinite recursion possible
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -91,7 +93,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 3200
+let s:k_version = 3201
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -458,6 +460,9 @@ endfunction
 
 " Function: lh#path#find_in_parents(paths, kinds) {{{3
 function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
+  if a:path =~ '^\(//\|\\\\\)$'
+    return []
+  endif
   let path = fnamemodify(a:path, ':p')
   if path[len(path)-1] == '/'
     let path = path[:-2]
@@ -476,7 +481,7 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
   " Recursive call: 
   " - first check the parent directory
   let res = []
-  if path !~ a:last_valid_path
+  if path !~ a:last_valid_path && path != up_path
     " Terminal condition
     let res += lh#path#find_in_parents(up_path, a:path_patterns, a:kinds, a:last_valid_path)
   endif
