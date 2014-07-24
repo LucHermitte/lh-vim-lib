@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.17
+" Version:	3.2.0
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -74,6 +74,8 @@
 "           doesn't work as expected
 "       v 3.1.17
 "       (*) Fix lh#start#strip_start() to work under windows
+"       v 3.2.0
+"       (*) New function lh#path#find_in_parents() used in local_vimrc
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -89,13 +91,15 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 3117
+let s:k_version = 3200
 function! lh#path#version()
   return s:k_version
 endfunction
 
 " # Debug {{{2
-let s:verbose = 0
+if !exists('s:verbose')
+  let s:verbose = 0
+endif
 function! lh#path#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
@@ -450,6 +454,53 @@ function! lh#path#add_path_if_exists(listname, path)
   if isdirectory(path)
     let {a:listname} += [a:path]
   endif
+endfunction
+
+" Function: lh#path#find_in_parents(paths, kinds) {{{3
+function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
+  let path = fnamemodify(a:path, ':p')
+  if path[len(path)-1] == '/'
+    let path = path[:-2]
+  endif
+
+  let up_path = fnamemodify(path,':h')
+  if up_path == '.' " Likely a non existent path
+    if ! isdirectory(path)
+      call lh#common#warning_msg("The current file '".expand('%:p:')."' seems to be in a non-existent directory: '".path."'")
+    endif
+    let up_path = getcwd()
+  endif
+  " call confirm('crt='.path."\nup=".up_path."\n$HOME=".s:home, '&Ok', 1)
+  " echomsg ('crt='.path."\nup=".up_path."\n$HOME=".s:home)
+
+  " Recursive call: 
+  " - first check the parent directory
+  let res = []
+  if path !~ a:last_valid_path
+    " Terminal condition
+    let res += lh#path#find_in_parents(up_path, a:path_patterns, a:kinds, a:last_valid_path)
+  endif
+
+  " - then check the current path
+  let path_patterns = type(a:path_patterns) == type([]) ? a:path_patterns : [a:path_patterns]
+  for pattern in path_patterns
+    let tested_path = path.'/'.pattern
+    let smthg_found = 0
+    if a:kinds =~ '.*dir.*' && isdirectory(tested_path)
+      let res += [tested_path]
+      let smthg_found = 1
+      call s:Verbose('Check '.path.' ... '.pattern.' directory found!')
+    elseif a:kinds =~ '.*file.*' && filereadable(tested_path)
+      let res += [tested_path]
+      let smthg_found = 1
+      call s:Verbose('Check '.path.' ... '.pattern.' file found!')
+    endif
+  endfor
+  if smthg_found == 0
+    call s:Verbose('Check '.path.' for '.string(path_patterns).' ... none found!')
+  endif
+
+  return res
 endfunction
 " }}}1
 "=============================================================================
