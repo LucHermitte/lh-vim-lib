@@ -1148,7 +1148,7 @@ The definition of the different functions and commands involved just follows.
   " activation states of the brackets and marking features are.
   function! s:Close()
     if strlen(maparg('{')) == 0                    | exe "normal a} \<esc>"
-    elseif exists("b:usemarks") && (b:usemarks==1) | exe "normal ¡jump! "
+    elseif lh#brackets#usemarks()                  | exe "normal ¡jump! "
     else                                           | exe "normal a "
     endif
   endfunction
@@ -1449,7 +1449,7 @@ selects one entry in the menu.
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================
- © Luc Hermitte, 2001-2012 <http://code.google.com/p/lh-vim/>, CC by SA 3.0 {{{1
+ © Luc Hermitte, 2001-2014 <http://code.google.com/p/lh-vim/>, CC by SA 3.0 {{{1
  $Id$
  VIM: let b:VS_language = 'american' 
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
