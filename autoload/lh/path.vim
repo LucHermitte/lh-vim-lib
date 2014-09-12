@@ -5,7 +5,7 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.1
+" Version:	3.2.2
 " Created:	23rd Jan 2007
 " Last Update:	$Date
 "------------------------------------------------------------------------
@@ -77,7 +77,13 @@
 "       v 3.2.0
 "       (*) New function lh#path#find_in_parents() used in local_vimrc
 "       v 3.2.1
-"       (*) Bug fix: no more infinite recursion possible
+"       (*) Bug fix: lh#path#find_in_parents() no more infinite recursion
+"           possible
+"       v 3.2.2
+"       (*) Bug fix: lh#path#find_in_parents() better handling of some paths
+"       (see Issue #50)
+"       (*) New function lh#path#shellslash()
+"       (*) Several functions fixed to take &shellslash into account
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -93,7 +99,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 3201
+let s:k_version = 3202
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -267,9 +273,9 @@ function! lh#path#ToRelative(pathname)
 endfunction
 
 " Function: lh#path#to_dirname({dirname}) {{{3
-" todo: use &shellslash
 function! lh#path#to_dirname(dirname)
-  let dirname = a:dirname . (empty(a:dirname) || a:dirname[-1:] =~ '[/\\]' ? '' : '/')
+  let dirname = a:dirname . (empty(a:dirname) || a:dirname[-1:] =~ '[/\\]'
+        \ ? '' : lh#path#shellslash())
   return dirname
 endfunction
 
@@ -297,7 +303,7 @@ function! lh#path#relative_to(from, to)
   let to   = lh#path#to_dirname(a:to  )
   let [from, to] = lh#path#strip_common([from, to])
   let nb_up =  lh#path#depth(from)
-  return repeat('../', nb_up).to
+  return repeat('..'.lh#path#shellslash(), nb_up).to
 
   " cannot rely on :cd (as it alters things, and doesn't work with
   " non-existant paths)
@@ -458,38 +464,68 @@ function! lh#path#add_path_if_exists(listname, path)
   endif
 endfunction
 
-" Function: lh#path#find_in_parents(paths, kinds) {{{3
+" Function: lh#path#shellslash() {{{3
+function! lh#path#shellslash()
+  return exists('+shellslash') && !&ssl ? '\' : '/'
+endfunction
+
+" Function: lh#path#find_in_parents(paths, kinds, last_valid_path) {{{3
+" @param {last_valid_path} will likelly contain a REGEX pattern aimed at
+" identifying things like $HOME
 function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
   if a:path =~ '^\(//\|\\\\\)$'
+    " The root path (/) is not a place where to store files like _vimrc_local
+    call s:Verbose('Stop recursion in UNC invalid root path: '.a:path)
     return []
-  endif
-  let path = fnamemodify(a:path, ':p')
-  if path[len(path)-1] == '/'
-    let path = path[:-2]
+  elseif a:path =~ '^\v(|\a:[/\\]*|[/\\])$'
+    " The root path (/) is not a place where to store files like _vimrc_local
+    call s:Verbose('Wont recurse anymore in root path: '.a:path)
+    let can_try_to_recurse = 0
+  else
+    let can_try_to_recurse = 1
   endif
 
-  let up_path = fnamemodify(path,':h')
-  if up_path == '.' " Likely a non existent path
-    if ! isdirectory(path)
-      call lh#common#warning_msg("The current file '".expand('%:p:')."' seems to be in a non-existent directory: '".path."'")
-    endif
-    let up_path = getcwd()
-  endif
-  " call confirm('crt='.path."\nup=".up_path."\n$HOME=".s:home, '&Ok', 1)
-  " echomsg ('crt='.path."\nup=".up_path."\n$HOME=".s:home)
-
-  " Recursive call: 
-  " - first check the parent directory
   let res = []
-  if path !~ a:last_valid_path && path != up_path
-    " Terminal condition
-    let res += lh#path#find_in_parents(up_path, a:path_patterns, a:kinds, a:last_valid_path)
+
+  let path = fnamemodify(a:path, ':p')
+
+  if can_try_to_recurse
+    if path[len(path)-1] =~ '[/\\]'
+      let path = path[:-2]
+    endif
+    let up_path = fnamemodify(path,':h')
+    if up_path == '.' " Likely a non existent path
+      if ! isdirectory(path)
+        call lh#common#warning_msg("The current file '".expand('%:p:')."' seems to be in a non-existent directory: '".path."'")
+      endif
+      let up_path = getcwd()
+    endif
+    " call confirm('crt='.path."\nup=".up_path."\n$HOME=".s:home, '&Ok', 1)
+    " echomsg ('crt='.path."\nup=".up_path."\n$HOME=".s:home)
+
+    " Recursive call: 
+    " - first check the parent directory
+    if path !~ a:last_valid_path && path != up_path
+      " Terminal condition
+      let res += lh#path#find_in_parents(up_path, a:path_patterns, a:kinds, a:last_valid_path)
+    else
+      call s:Verbose('Terminal condition reached: path '.path.' matches '.string(a:last_valid_path). ' or parent dir is the same')
+
+    endif
   endif
 
   " - then check the current path
+  "   Unless it's not a directory
+  if ! isdirectory(path)
+    return res
+  endif
+  " Restore the trailling '/' 
+  if empty(path) || path[len(path)-1] !~ '[/\\]'
+    let path .= lh#path#shellslash()
+  endif
   let path_patterns = type(a:path_patterns) == type([]) ? a:path_patterns : [a:path_patterns]
   for pattern in path_patterns
-    let tested_path = path.'/'.pattern
+    let tested_path = path.pattern
     let smthg_found = 0
     if a:kinds =~ '.*dir.*' && isdirectory(tested_path)
       let res += [tested_path]
