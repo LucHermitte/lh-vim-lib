@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.1.16)
+*lh-vim-lib.txt*        Vim common libraries (v3.2.3)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -437,6 +437,46 @@ The evaluation is meant to be done with |eval()|.
    >:let call = lh#function#prepare('Print', [1,2,"foo"])
    >:echo eval(call)
    1 ## 2 ## 'foo'
+
+
+------------------------------------------------------------------------------
+STACKS RELATED FUNCTIONS                              *lhvl#stack*      {{{2
+Stacks functions helps to implement the LIFO/FILO ADT type.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#stack#push()*       {{{3
+lh#stack#push({stack}, {value})~
+Push a new value into the stack.
+ 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#stack#pop()*        {{{3
+lh#stack#pop({stack})~
+@pre !empty({stack})
+Removes a value from the stack and returns it.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#stack#pop()*        {{{3
+lh#stack#top({stack})~
+@pre !empty({stack})
+Returns the top value of the stack.
+ 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *lh#stack#new()*        {{{3
+lh#stack#new({[values]})~
+Returns a new stack object on which the usual methods can be called: >
+NB: the {values} parameter is optional.
+
+   let s = lh#stack#new([12, 42])
+   echo s.len()    " -> 2
+   echo s.empty()  " -> 0
+   echo s.top()    " -> 42
+   echo s.pop()    " -> 42
+   echo s.len()    " -> 1
+   echo s.empty()  " -> 0
+   echo s.top()    " -> 12
+   call s.push(48) 
+   echo s.len()    " -> 2
+   ...
 
 
 ------------------------------------------------------------------------------
