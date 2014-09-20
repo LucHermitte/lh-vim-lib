@@ -76,10 +76,10 @@ function! lh#stack#new(...)
   function! s.push(value) dict
     let self.values+=[a:value]
   endfunction
-  function! s.top() dict
+  function! s.top() dict abort
     return lh#stack#top(self.values)
   endfunction
-  function! s.pop() dict
+  function! s.pop() dict abort
     return lh#stack#pop(self.values)
   endfunction
   function! s.len() dict
@@ -88,6 +88,69 @@ function! lh#stack#new(...)
   function! s.empty() dict
     return empty(self.values)
   endfunction
+  return s
+endfunction
+
+" Function: lh#stack#new_list(...) {{{3
+" builds what repeat([lh#stack#new()], 42) cannot build
+function! lh#stack#new_list(nb)
+  let s = {
+        \ 'stacks': []
+        \}
+  function! s.push(stack, value) dict abort
+    let idx_is_slice = type(a:stack) == type([])
+    let last_idx = idx_is_slice ? (a:stack[-1]) : (a:stack)
+    if last_idx >= len(self.stacks)
+      throw "Cannout push anything onto the stack #".last_idx."; there are only ".len(self.stacks)
+    endif
+    if idx_is_slice
+      let self.stacks[(a:stack[0]) : (a:stack[1])]+=repeat([[a:value]], 1+a:stack[1]-a:stack[0])
+    else
+      let self.stacks[a:stack]+=[a:value]
+    endif
+  endfunction
+  function! s.top(stack) dict abort
+    if a:stack >= len(self.stacks)
+      throw "Cannot access anything onto the stack #".a:stack."; there are only ".len(self.stacks)
+    endif
+    return lh#stack#top(self.stacks[a:stack])
+  endfunction
+  function! s.pop(stack) dict abort
+    if a:stack >= len(self.stacks)
+      throw "Cannot remove anything onto the stack #".a:stack."; there are only ".len(self.stacks)
+    endif
+    return lh#stack#pop(self.stacks[a:stack])
+  endfunction
+  function! s.len(stack) dict abort
+    if a:stack >= len(self.stacks)
+      throw "Cannot access anything onto the stack #".a:stack."; there are only ".len(self.stacks)
+    endif
+    return len(self.stacks[a:stack])
+  endfunction
+  function! s.empty(stack) dict abort
+    if a:stack >= len(self.stacks)
+      throw "Cannot access anything onto the stack #".a:stack."; there are only ".len(self.stacks)
+    endif
+    return empty(self.stacks[a:stack])
+  endfunction
+  function! s.expand(nb) dict abort
+    " The following is sharing the same (empty) list
+    " let self.stacks += repeat([[]], a:nb)
+    let i = 0
+    while i != a:nb
+      let self.stacks += [[]]
+      let i += 1
+    endwhile
+  endfunction
+  function! s.clear(nb) dict abort
+    let self.stacks = []
+    call self.expand(a:nb)
+  endfunction
+  function! s.nb_stacks() dict
+    return len(self.stacks)
+  endfunction
+  
+  call s.expand(a:nb)
   return s
 endfunction
 
