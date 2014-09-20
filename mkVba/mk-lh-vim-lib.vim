@@ -5,8 +5,8 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.2
-let s:version = '3.2.2'
+" Version:	3.2.3
+let s:version = '3.2.3'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -40,6 +40,7 @@ autoload/lh/menu.vim
 autoload/lh/option.vim
 autoload/lh/path.vim
 autoload/lh/position.vim
+autoload/lh/stack.vim
 autoload/lh/syntax.vim
 autoload/lh/visual.vim
 doc/lh-vim-lib.txt

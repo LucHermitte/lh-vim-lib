@@ -1,9 +1,9 @@
 			   ------------------
-			    lh-vim-lib 3.2.0
+			    lh-vim-lib 3.2.3
 			   ------------------
 
-lh-vim-lib is a library plugin for vim v7+. It is just a collection of
-functions that are meant to be used by script writers.
+lh-vim-lib is a library plugin for vim v7+. It is a collection of functions
+that are meant to be used by script writers.
 
 Audience      : Vim script writers
 Requirements  : Vim 7.1, Vim 7.3 for some functions
@@ -17,4 +17,5 @@ Repository    :
 	svn checkout http://lh-vim.googlecode.com/svn/vim-lib/trunk lh-vim-lib
 VAM           :
 	http://code.google.com/p/lh-vim/source/browse/vim-lib/trunk/lh-vim-lib-addon-info.txt
-
+Github Mirror : (not necessarily up to date)
+        https://github.com/vim-scripts/lh-vim-lib
