@@ -463,9 +463,9 @@ Returns the top value of the stack.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
                                                 *lh#stack#new()*        {{{3
 lh#stack#new({[values]})~
-Returns a new stack object on which the usual methods can be called: >
+Returns a new stack object on which the usual methods can be called: 
 NB: the {values} parameter is optional.
-
+>
    let s = lh#stack#new([12, 42])
    echo s.len()    " -> 2
    echo s.empty()  " -> 0
@@ -478,6 +478,35 @@ NB: the {values} parameter is optional.
    echo s.len()    " -> 2
    ...
 
+
+------------------------------------------------------------------------------
+                                                *lh#stack#new_list()*        {{{3
+lh#stack#new_list({nb_stacks})~
+Returns a new object that implements a list a stacks.
+The usual operations can be called on the indexed stacks
+NB: the {values} parameter is optional.
+>
+   let s = lh#stack#new_list(10)
+   echo s.nb_stacks()            " -> 10
+   echo s.len(3)                 " -> 0
+   call s.push(3, 42)
+   echo s.len(3)                 " -> 1
+   echo s.top(3)                 " -> 42
+   echo s.empty(0)               " -> 1
+
+   call s.push([1,5], 28)
+   echo s.empty(0)               " -> 1
+   echo s.empty(6)               " -> 1
+   echo s.top(3)                 " -> 28
+   echo s.pop(5)                 " -> 28
+   ...
+
+Other functions are also provded:
+>
+  " Clear a list, and ensure 28 elements
+  s.clear(28)
+  " Augment the size to hold 12 more elements
+  s.expand(12)
 
 ------------------------------------------------------------------------------
 LISTS RELATED FUNCTIONS                               *lhvl#list*       {{{2
