@@ -35,6 +35,9 @@
 " 	instead ? May be a banged :Toggle! could work on the real variable
 " 	name, and on the real value.
 " 	* show all possible values in a sub menu (on demand)
+"
+" Notes:
+" .hook cannot be used to execute a toggle action. Use .actions instead.
 " }}}1
 "=============================================================================
 
