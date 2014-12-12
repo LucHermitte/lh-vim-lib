@@ -5,18 +5,20 @@
 "               <URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.0.0
+" Version:      3.2.4
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
-" Description:  
+" Description:
 "       Defines functions related to |Lists|
-" 
+"
 "------------------------------------------------------------------------
-" Installation: 
+" Installation:
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
-" History:      
+" History:
+"       v3.2.4:
+"       (*) new function lh#list#push_if_new()
 "       v3.0.0:
 "       (*) GPLv3
 "       v2.2.2:
@@ -30,7 +32,7 @@
 "           lh#list#transform_if, lh#list#find_if, lh#list#copy_if,
 "           lh#list#subset, lh#list#intersect
 "       (*) the functions are compatible with lh#function functors
-"       v2.1.1: 
+"       v2.1.1:
 "       (*) unique_sort
 "       v2.0.7:
 "       (*) Bug fix: lh#list#Match()
@@ -367,6 +369,15 @@ function! lh#list#intersect(list1, list2)
       call result(result, e)
     endif
   endfor
+endfunction
+
+" Function: lh#list#push_if_new(list, value) {{{3
+function! lh#list#push_if_new(list, value)
+  let matching = filter(copy(a:list), 'v:val == a:value')
+  if empty(matching)
+    call add (a:list, a:value)
+  endif
+  return a:list
 endfunction
 
 " Functions }}}1
