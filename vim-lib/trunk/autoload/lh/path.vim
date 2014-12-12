@@ -1,52 +1,52 @@
 "=============================================================================
 " $Id$
-" File:		autoload/lh/path.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/path.vim                               {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.2
-" Created:	23rd Jan 2007
-" Last Update:	$Date
+" Version:      3.2.4
+" Created:      23rd Jan 2007
+" Last Update:  $Date
 "------------------------------------------------------------------------
-" Description:	
+" Description:
 "       Functions related to the handling of pathnames
-" 
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop this file into {rtp}/autoload/lh
-" 	Requires Vim7+
-" History:	
-"	v 1.0.0 First Version
-" 	(*) Functions moved from searchInRuntimeTime  
-" 	v 2.0.1
-" 	(*) lh#path#Simplify() becomes like |simplify()| except for trailing
-" 	v 2.0.2
-" 	(*) lh#path#SelectOne() 
-" 	(*) lh#path#ToRelative() 
-" 	v 2.0.3
-" 	(*) lh#path#GlobAsList() 
-" 	v 2.0.4
-" 	(*) lh#path#StripStart()
-" 	v 2.0.5
-" 	(*) lh#path#StripStart() interprets '.' as getcwd()
-" 	v 2.2.0
-" 	(*) new functions: lh#path#common(), lh#path#to_dirname(),
-" 	    lh#path#depth(), lh#path#relative_to(), lh#path#to_regex(),
-" 	    lh#path#find()
-" 	(*) lh#path#simplify() fixed
-" 	(*) lh#path#to_relative() use simplify()
-" 	v 2.2.2
-" 	(*) lh#path#strip_common() fixed
-" 	(*) lh#path#simplify() new optional parameter: make_relative_to_pwd
-" 	v 2.2.5
-" 	(*) fix lh#path#to_dirname('') -> return ''
-" 	v 2.2.6
-" 	(*) fix lh#path#glob_as_list() does not return the same path several
-" 	    times
-" 	v 2.2.7
-" 	(*) fix lh#path#strip_start() to strip as much as possible.
-" 	(*) lh#path#glob_as_list() changed to handle **
+" Installation:
+"       Drop this file into {rtp}/autoload/lh
+"       Requires Vim7+
+" History:
+"       v 1.0.0 First Version
+"       (*) Functions moved from searchInRuntimeTime
+"       v 2.0.1
+"       (*) lh#path#Simplify() becomes like |simplify()| except for trailing
+"       v 2.0.2
+"       (*) lh#path#SelectOne()
+"       (*) lh#path#ToRelative()
+"       v 2.0.3
+"       (*) lh#path#GlobAsList()
+"       v 2.0.4
+"       (*) lh#path#StripStart()
+"       v 2.0.5
+"       (*) lh#path#StripStart() interprets '.' as getcwd()
+"       v 2.2.0
+"       (*) new functions: lh#path#common(), lh#path#to_dirname(),
+"           lh#path#depth(), lh#path#relative_to(), lh#path#to_regex(),
+"           lh#path#find()
+"       (*) lh#path#simplify() fixed
+"       (*) lh#path#to_relative() use simplify()
+"       v 2.2.2
+"       (*) lh#path#strip_common() fixed
+"       (*) lh#path#simplify() new optional parameter: make_relative_to_pwd
+"       v 2.2.5
+"       (*) fix lh#path#to_dirname('') -> return ''
+"       v 2.2.6
+"       (*) fix lh#path#glob_as_list() does not return the same path several
+"           times
+"       v 2.2.7
+"       (*) fix lh#path#strip_start() to strip as much as possible.
+"       (*) lh#path#glob_as_list() changed to handle **
 "       v 3.0.0
 "       (*) GPLv3
 "       v 3.1.0
@@ -84,6 +84,8 @@
 "       (see Issue #50)
 "       (*) New function lh#path#shellslash()
 "       (*) Several functions fixed to take &shellslash into account
+"       v3.2.4:
+"       (*) new function lh#path#munge()
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -99,7 +101,7 @@ set cpo&vim
 "=============================================================================
 " ## Functions {{{1
 " # Version {{{2
-let s:k_version = 3202
+let s:k_version = 3204
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -217,9 +219,9 @@ endfunction
 " Function: lh#path#is_absolute_path({path}) {{{3
 function! lh#path#is_absolute_path(path)
   return a:path =~ '^/'
-	\ . '\|^[a-zA-Z]:[/\\]'
-	\ . '\|^[/\\]\{2}'
-  "    Unix absolute path 
+        \ . '\|^[a-zA-Z]:[/\\]'
+        \ . '\|^[/\\]\{2}'
+  "    Unix absolute path
   " or Windows absolute path
   " or UNC path
 endfunction
@@ -239,7 +241,7 @@ endfunction
 " Function: lh#path#select_one({pathnames},{prompt}) {{{3
 function! lh#path#select_one(pathnames, prompt)
   if len(a:pathnames) > 1
-    let simpl_pathnames = deepcopy(a:pathnames) 
+    let simpl_pathnames = deepcopy(a:pathnames)
     let simpl_pathnames = lh#path#strip_common(simpl_pathnames)
     let simpl_pathnames = [ '&Cancel' ] + simpl_pathnames
     " Consider guioptions+=c is case of difficulties with the gui
@@ -414,8 +416,8 @@ endfunction
 " Function: lh#path#find({pathname}, {regex}) {{{3
 function! lh#path#find(paths, regex)
   let paths = (type(a:paths) == type([]))
-	\ ? (a:paths) 
-	\ : split(a:paths,',')
+        \ ? (a:paths)
+        \ : split(a:paths,',')
   for path in paths
     if match(path ,a:regex) != -1
       return path
@@ -503,7 +505,7 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
     " call confirm('crt='.path."\nup=".up_path."\n$HOME=".s:home, '&Ok', 1)
     " echomsg ('crt='.path."\nup=".up_path."\n$HOME=".s:home)
 
-    " Recursive call: 
+    " Recursive call:
     " - first check the parent directory
     if path !~ a:last_valid_path && path != up_path
       " Terminal condition
@@ -519,7 +521,7 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
   if ! isdirectory(path)
     return res
   endif
-  " Restore the trailling '/' 
+  " Restore the trailling '/'
   if empty(path) || path[len(path)-1] !~ '[/\\]'
     let path .= lh#path#shellslash()
   endif
@@ -542,6 +544,15 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
   endif
 
   return res
+endfunction
+
+" Function: lh#path#munge(pathlist, path) {{{3
+function! lh#path#munge(pathlist, path)
+  " if filereadable(a:path) || isdirectory(a:path)
+  if ! empty(glob(a:path))
+    call lh#list#push_if_new(a:pathlist, a:path)
+  endif
+  return a:pathlist
 endfunction
 " }}}1
 "=============================================================================
