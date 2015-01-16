@@ -110,7 +110,7 @@ endfunction
 function! lh#buffer#get_nr(bname)
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
-  if -1 == nr " || bufname(nr) != a:bname
+  if -1 == nr  || bufname(nr) != a:bname
     exe 'sp '.fnameescape(a:bname)
     let nr = bufnr(a:bname)
     q
