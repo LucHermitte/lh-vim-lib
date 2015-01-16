@@ -5,13 +5,13 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.4
-let s:version = '3.2.4'
+" Version:	3.2.5
+let s:version = '3.2.5'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
 cd <sfile>:p:h
-try 
+try
   let save_rtp = &rtp
   let &rtp = expand('<sfile>:p:h:h').','.&rtp
   exe '24,$MkVimball! lh-vim-lib-'.s:version
@@ -37,6 +37,7 @@ autoload/lh/let.vim
 autoload/lh/list.vim
 autoload/lh/map.vim
 autoload/lh/menu.vim
+autoload/lh/on.vim
 autoload/lh/option.vim
 autoload/lh/path.vim
 autoload/lh/position.vim

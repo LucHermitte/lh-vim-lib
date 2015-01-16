@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.3)
+*lh-vim-lib.txt*        Vim common libraries (v3.2.5)
                         For Vim version 7+      Last change: $Date$
 
                         By Luc Hermitte
@@ -9,7 +9,7 @@
 CONTENTS                                      *lhvl-contents*      {{{1
 |lhvl-presentation|     Presentation
 |lhvl-functions|        Functions
-    
+
 |add-local-help|        Instructions on installing this help file
 
 
@@ -36,6 +36,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
+- |lh#on#exit()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
 - |lh#position#char_at_mark()|
@@ -51,10 +52,10 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#accumulate()|
 - |lh#list#at()|
 - |lh#list#copy_if()|
-- |lh#list#equal_range()|, 
+- |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#intersect()|
-- |lh#list#lower_bound()| and |lh#list#upper_bound()| 
+- |lh#list#lower_bound()| and |lh#list#upper_bound()|
 - |lh#list#match()|
 - |lh#list#matches()|
 - |lh#list#not_found()|
@@ -115,7 +116,7 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#skip_at_mark()|
 - |lh#syntax#list_raw()|
 - |lh#syntax#list()|
-Completion related functions				|lhvl#completion|
+Completion related functions                            |lhvl#completion|
 
 
 COMMANDS                                              *lhvl#commands* {{{2
@@ -124,7 +125,7 @@ COMMANDS                                              *lhvl#commands* {{{2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                        *lh#common#echomsgMultilines()*  {{{3
 lh#common#echomsgMultilines()({text}) (*deprecated*)~
                                       *lh#common#echomsg_multilines()*
@@ -137,7 +138,7 @@ in the original {text}.
 This is a workaround |:echomsg| that is unable to handle correctly multi-lines
 messages.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#common#ErrorMsg()*  {{{3
 lh#common#ErrorMsg({text}) (*deprecated*)~
                                                *lh#common#error_msg()*
@@ -146,9 +147,9 @@ lh#common#error_msg({text})~
 @return             Nothing
 
 This function displays an error message in a |confirm()| box if gvim is being
-used, or as a standard vim error message through |:echoerr| otherwise. 
+used, or as a standard vim error message through |:echoerr| otherwise.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#common#WarningMsg()* {{{3
 lh#common#WarningMsg({text}) (*deprecated*)~
                                               *lh#common#warning_msg()*
@@ -158,7 +159,7 @@ lh#common#warning_msg({text})~
 
 This function displays a warning message highlighted with |WarningMsg| syntax.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#common#CheckDeps()* {{{3
 lh#common#CheckDeps({symbol},{file},{path},{requester}) (*deprecated*)~
                                                *lh#common#check_deps()*
@@ -175,8 +176,8 @@ to |:source| the {file} in which the {symbol} is expected to be defined. If the
 |lh#common#error_msg()|, and 0 is returned.
 
 Example: >
-    if   
-          \    !lh#common#check_deps('*Cpp_CurrentScope', 
+    if
+          \    !lh#common#check_deps('*Cpp_CurrentScope',
           \                     'cpp_FindContextClass.vim', 'ftplugin/cpp/',
           \                     'cpp#GotoFunctionImpl.vim')
           \ || !lh#common#check_deps(':CheckOptions',
@@ -189,13 +190,36 @@ Example: >
 Note: Since the introduction of |autoload| plugins in Vim 7, this function has
 lost most of its interrest.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#common#rand()*      {{{3
 lh#common#rand({max})~
 @return a random number in [0..max[.
 @requires vim to be compiled with |+python| feature.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#on#exit()*           {{{3
+lh#on#exit()~
+This function will register action to be executed at the end on a scope, and
+more precisally in a |:finally| section.
+e.g. >
+
+   " Here let suppose g:foo exists, but not g:bar
+   let cleanup = lh#on#exit()
+      \ . restore('g:foo')
+      \ . restore('g:bar')
+      \ . register('echo "The END"')
+      " note: |function|s can be registered as well
+    try
+      let g:foo = 1 - g:foo
+      let g:bar = 42
+      other actions that may throw
+    finally
+      call cleanup.finalize()
+    endtry
+    " Then g:foo and g:bar are restored, and "The END" has been echoed
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#Get()*       {{{3
 lh#option#Get({name},{default}[,{scopes}])  (*deprecated*)~
                                                 *lh#option#get()*
@@ -218,7 +242,7 @@ argument {scopes}. By default, buffer-local options have the priority over
 global options.
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#option#GetNonEmpty()* {{{3
 lh#option#GetNonEmpty({name},{default}[,{scopes}])  (*deprecated*)~
                                               *lh#option#get_non_empty()*
@@ -236,7 +260,7 @@ An |expr-string| will be considered empty if its |strlen()| is 0, an
 |expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
 is 0.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#Exe()*       {{{3
 lh#askvim#Exe({command}) (*deprecated*)~
                                                 *lh#askvim#exe()*
@@ -250,7 +274,7 @@ Some information aren't directly accessible (yet) through vim API
 (|functions|).  However, they can be obtained by executing some commands, and
 redirecting the result of these commands.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#menu()*      {{{3
 lh#askvim#menu({menuid},{modes})~
 @param {menuid}     Menu identifier.
@@ -263,7 +287,7 @@ Vim.
 
 The format of the result being «to be stabilized»
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#position#IsBefore()* {{{3
 lh#position#IsBefore({lhs_pos},{rhs_pos})  (*deprecated*)~
                                                *lh#position#is_before()*
@@ -271,21 +295,21 @@ lh#position#is_before({lhs_pos},{rhs_pos})~
 @param[in]          Positions as those returned from |getpos()|
 @return             Whether {lhs_pos} is before {rhs_pos}
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                              *lh#position#CharAtMark()* {{{3
 lh#position#CharAtMark({mark})  (*deprecated*)~
                                              *lh#position#char_at_mark()*
 lh#position#char_at_mark({mark})~
 @return             The character at a given |mark|.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#position#CharAtPos()* {{{3
 lh#position#CharAtPos({pos})  (*deprecated*)~
                                               *lh#position#char_at_pos()* {{{3
 lh#position#char_at_pos({pos})~
 @return             The character at a position (see |getpos()|).
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#visual#selection()* {{{3
 lh#visual#selection()~
 @return             The current visual selection
@@ -294,10 +318,10 @@ lh#visual#selection()~
                                                 *lh#visual#cut()*       {{{3
 lh#visual#cut()~
 @return             The current visual selection
-@post              |registers| are not altered by this function ; 
+@post              |registers| are not altered by this function ;
                     selection is deleted.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                  *lh#event#RegisterForOneExecutionAt()* {{{3
 lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})  (*deprecated*)~
                                  *lh#event#register_for_one_execution_at()*
@@ -311,31 +335,31 @@ triggered on the current file.
                 registered.
 @todo possibility to specify the file pattern
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#iconv()*   {{{3
 lh#encoding#iconv({expr}, {from}, {to})~
 This function just calls |iconv()| with the same arguments. The only
 difference is that it return {expr} when we know that |iconv()| will return an
 empty string.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#strlen()*  {{{3
 lh#encoding#strlen({mb_string})~
 This function returns the length of the multi-bytes string.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#at()*      {{{3
 lh#encoding#at({mb_string}, {i})~
 Returns the i-th character in a multi-bytes string.
 @param {i} 0-indexed offset.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#strpart()* {{{3
 lh#encoding#strpart({mb_string}, {position}, {length})~
 Returns {length} extracted characters from {position} in a multi-bytes string.
 @param {position} 0-indexed offset.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                *lh#float#max()*     *lh#float#min()*    {{{3
                                *lh#float#arg_max()* *lh#float#arg_min()*
 lh#float#min({list})~
@@ -343,9 +367,9 @@ lh#float#arg_min({list})~
 lh#float#min({list})~
 lh#float#arg_min({list})~
 Returns The minimum, /arg-minimum, /maximum, /arg-maximum of a |List| of
-|expr-float|. 
+|expr-float|.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                 *lh#ft#is_text()*                       {{{3
 lh#ft#is_text([ft])~
 Tells whether the corresponding filetype correspond to a text filetype.
@@ -364,7 +388,7 @@ A functor is implemented as a |Dictionary| that has the following fields:
 - {execute}  is the |Funcref| that will be actually executed by
              |lh#function#execute()|. Its only argument is a |List| of
               arguments for {function}.
-- {function} that identifies the function to execute, 
+- {function} that identifies the function to execute,
               internals: it could be either a |Funcref|or a |expr-string|, or
               whatever is compatible with the {execute} |FuncRef| field.
 - {args}     will contain the binded arguments as defined by
@@ -443,27 +467,27 @@ The evaluation is meant to be done with |eval()|.
 STACKS RELATED FUNCTIONS                              *lhvl#stack*      {{{2
 Stacks functions helps to implement the LIFO/FILO ADT type.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#push()*       {{{3
 lh#stack#push({stack}, {value})~
 Push a new value into the stack.
- 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#pop()*        {{{3
 lh#stack#pop({stack})~
 @pre !empty({stack})
 Removes a value from the stack and returns it.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#pop()*        {{{3
 lh#stack#top({stack})~
 @pre !empty({stack})
 Returns the top value of the stack.
- 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#new()*        {{{3
 lh#stack#new({[values]})~
-Returns a new stack object on which the usual methods can be called: 
+Returns a new stack object on which the usual methods can be called:
 NB: the {values} parameter is optional.
 >
    let s = lh#stack#new([12, 42])
@@ -474,7 +498,7 @@ NB: the {values} parameter is optional.
    echo s.len()    " -> 1
    echo s.empty()  " -> 0
    echo s.top()    " -> 12
-   call s.push(48) 
+   call s.push(48)
    echo s.len()    " -> 2
    ...
 
@@ -511,12 +535,12 @@ Other functions are also provded:
 ------------------------------------------------------------------------------
 LISTS RELATED FUNCTIONS                               *lhvl#list*       {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#Match()*       {{{3
 lh#list#Match({list},{pattern}[, {start-pos}])  (*deprecated*)~
                                                 *lh#list#match()*
 lh#list#match({list},{pattern}[, {start-pos}])~
-@param      {list} |List| 
+@param      {list} |List|
 @param   {pattern} |expr-string|
 @param {start-pos}  First index to check
 @return             The lowest index, >= {start-pos}, in |List| {list} where
@@ -524,21 +548,21 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 @return             -1 if no item matches {pattern}.
 @see |index()|, |match()|
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#matches()*     {{{3
 lh#list#match({list},{pattern}[, {start-pos}])~
-@param      {list} |List| 
+@param      {list} |List|
 @param   {pattern} |expr-string|
 @param {start-pos}  First index to check
 @return             The |List| of indices, >= {start-pos}, in |List| {list} where
                     the item matches {pattern}.
 @return             [] if no item matches {pattern}.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*     {{{3
 lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
 lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
-@param             {list} |List| 
+@param             {list} |List|
 @param      {*-predicate}  Predicate to evaluate
 @param {pred-parameters}] |List| of Parameters to bind to special arguments in
                            the {predicate}.
@@ -553,7 +577,7 @@ The {string-predicate} recognizes some special arguments:
 - *v:1_* *v:2_* , ..., are substituted with the i-th elements from
   {pred-parameters}.
   NB: the "v:\d\+_" are 1-indexed while {pred-parameters} is indeed seen as
-  0-indexed by Vim. 
+  0-indexed by Vim.
   This particular feature permits to pass any type of variable to the
   predicate: a |expr-string|, a |List|, a |Dictionary|, ...
 
@@ -572,13 +596,13 @@ rewritten as: >
     28
 NB: Expect the Find_if() version to be replaced with the find_if() one.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                         *lh#list#lower_bound()* *lh#list#upper_bound()* {{{3
-			*lh#list#equal_range()*
+                        *lh#list#equal_range()*
 lh#list#lower_bound({list}, {value} [, {first}][, {last}])~
 lh#list#upper_bound({list}, {value} [, {first}][, {last}])~
 lh#list#equal_range({list}, {value} [, {first}][, {last}])~
-@param  {list}  Sorted |List| 
+@param  {list}  Sorted |List|
 @param  {value} Value to search
 @param  {first} First index to check
 @param  {last}  Last+1 index to check
@@ -586,17 +610,17 @@ lh#list#equal_range({list}, {value} [, {first}][, {last}])~
         such as the index is <= first {value} occurrence, in lower_bound case
         such as the index is > last {value} occurrence, in upper_bound case
 @return -1 if no item matches {pattern}.
-@return the pair [lower_bound(), upper_bound()] in equal_range() case 
+@return the pair [lower_bound(), upper_bound()] in equal_range() case
 @see C++ STL eponym algorithms.
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#not_found()*   {{{3
 lh#list#not_found({range})~
 Returns whether the {range} is empty. This function can be used to check
 |lh#list#equal_range()| functions results
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                    *lh#list#unique_sort()* *lh#list#unique_sort2()*     {{{3
 lh#list#unique_sort({list} [, {cmp}])~
 lh#list#unique_sort2({list} [, {cmp}])~
@@ -614,7 +638,7 @@ The difference between the two functions is the following:
 - unique_sort2() sorts all the elements from the initial |List|, and then
   keeps only the elements that appear once.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#Transform()*   {{{3
 lh#list#Transform({input},{output},{action})~
 @param[in]   {input} Input |List| to transform
@@ -628,7 +652,7 @@ lh#list#Transform({input},{output},{action})~
 This function is actually returning >
     extend(a:output, map(copy(a:input), a:action))
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#transform()*   {{{3
 lh#list#transform({input},{output},{action})~
 @param[in]   {input} Input |List| to transform
@@ -642,7 +666,7 @@ This function is equivalent to (|lh#list#Transform()|) >
     extend(a:output, map(copy(a:input), a:action))
 except the action is not a string but a |lhvl#functor|.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#list#transform_if()* {{{3
 lh#list#transform_if({input},{output},{action},{predicate})~
 @param[in]   {input} Input |List| to transform
@@ -654,10 +678,10 @@ lh#list#transform_if({input},{output},{action},{predicate})~
                      transforming it.
 @return              {output}
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#copy_if()*     {{{3
 lh#list#copy_if({input},{output},{predicate})~
-Appends in {output} the elements from {input} that verifies the {predicate}. 
+Appends in {output} the elements from {input} that verifies the {predicate}.
 
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the elements that verify the
@@ -665,7 +689,7 @@ Appends in {output} the elements from {input} that verifies the {predicate}.
 @param   {predicate} Boolean |lhvl#functor| tested on each element.
 @return              {output}
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#accumulate()*  {{{3
 lh#list#accumulate({input},{transformation},{accumulator})~
 Accumulates the transformed elements from {input}.
@@ -684,7 +708,7 @@ Examples: >
    :let l = [ 1, 2, 'foo', ['bar']]
    :echo lh#list#accumulate(l, 'string', 'join(v:1_, "##")')
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#subset()*      {{{3
 lh#list#subset({input},{indices})~
 Returns a subset slice of the {input} list.
@@ -696,10 +720,10 @@ Returns a subset slice of the {input} list.
 Example: >
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
     :let indices = [ 0, 5, 7, 3 ]
-    :echo lh#list#subset(l, indices) 
+    :echo lh#list#subset(l, indices)
     [ 1, 5, 6, 48 ]
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#remove()*      {{{3
 lh#list#remove({input},{indices})~
 Returns a subset slice of the {input} list trimmed of elements.
@@ -712,16 +736,16 @@ Returns a subset slice of the {input} list trimmed of elements.
 Example: >
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
     :let indices = [ 0, 3, 5, 7 ]
-    :echo lh#list#remove(l, indices) 
+    :echo lh#list#remove(l, indices)
     [ 25, 5, 25, 28 ]
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#intersect()*   {{{3
 lh#list#intersect({list1},{list2})~
 Returns the elements present in both input lists.
 
-@param[in] {list1}|List| 
-@param[in] {list2}|List| 
+@param[in] {list1}|List|
+@param[in] {list2}|List|
 @return a |List| of the elements in both {list1} and {list2}, the elements are
 kepts in the same order as in {list1}
 @note the algorithm is in O(len({list1})*len({list2}))
@@ -729,19 +753,19 @@ kepts in the same order as in {list1}
 Example: >
     :let l1 = [ 1, 25, 7, 48, 26, 5, 28, 6]
     :let l2 = [ 3, 8, 7, 25, 6 ]
-    :echo lh#list#intersect(l1, l2) 
+    :echo lh#list#intersect(l1, l2)
     [ 25, 7, 6 ]
 
 ------------------------------------------------------------------------------
 GRAPHS RELATED FUNCTIONS                              *lhvl#graph*      {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                              *lh#graph#tsort#depth()*   {{{3
                                              *lh#graph#tsort#breadth()* {{{3
 lh#graph#tsort#depth({dag}, {start-nodes})~
 lh#graph#tsort#breadth({dag}, {start-nodes})~
 These two functions implement a topological sort on the Direct Acyclic Graph.
-- depth() is a recursive implementation of a depth-first search. 
+- depth() is a recursive implementation of a depth-first search.
 - breadth() is a non recursive implementation of a breadth-first search.
 
 @param {dag} is a direct acyclic graph defined either:
@@ -761,20 +785,20 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
 ------------------------------------------------------------------------------
 PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                    *lh#path#depth()*    {{{3
 lh#path#depth({dirname})~
 Returns the depth of a directory name.
 
 @param {dirname}  Pathname to simplify
-@return the depth of the simplified directory name, i.e. 
+@return the depth of the simplified directory name, i.e.
         lh#path#depth("bar/b2/../../foo/") returns 1
 
 @todo However, it is not able to return depth of negative paths like
       "../../foo/". I still need to decide whether the function should return
       -1 or 3.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                  *lh#path#dirname()*    {{{3
 lh#path#dirname({dirname})~
 Ensures the returned directory name ends with a '/' or a '\'.
@@ -782,7 +806,7 @@ Ensures the returned directory name ends with a '/' or a '\'.
 @todo On windows, it should take 'shellslash' into account to decide the
       character to append.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#Simplify()*    {{{3
 lh#path#Simplify({pathname})  (*deprecated*)~
                                                 *lh#path#simplify()*
@@ -800,7 +824,7 @@ Note: when vim is compiled for unix, it seems unable to |simplify()| paths
 containing "..\". (It likelly works this way when vim is compiled without
 'shellslash' support)
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                     *lh#path#common()*  {{{3
 lh#path#common({pathnames})~
 @param[in] {pathnames} |List| of pathnames to analyse
@@ -811,7 +835,7 @@ e.g.: >
 echoes >
  foo/
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#StripCommon()* {{{3
 lh#path#StripCommon({pathnames})  (*deprecated*)~
                                                 *lh#path#strip_common()*
@@ -827,7 +851,7 @@ e.g.: >
 echoes >
  ['bar/file','file', 'foo/file']
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                  *lh#path#StripStart()* {{{3
 lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
                                                  *lh#path#strip_start()*
@@ -845,7 +869,7 @@ e.g.: >
 echoes >
  template/bar.template
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#IsAbsolutePath()* {{{3
 lh#path#IsAbsolutePath({path})  (*deprecated*)~
                                                 *lh#path#is_absolute_path()*
@@ -854,7 +878,7 @@ lh#path#is_absolute_path({path})~
 @return whether the path is an absolute path
 @note Supports Unix absolute paths, Windows absolute paths, and UNC paths
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#IsURL()*       {{{3
 lh#path#IsURL({path})  (*deprecated*)~
                                                 *lh#path#is_url()*
@@ -864,7 +888,7 @@ lh#path#is_url({path})~
 @note Supports http(s)://, (s)ftp://, dav://, fetch://, file://, rcp://,
 rsynch://, scp://
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#SelectOne()*   {{{3
 lh#path#SelectOne({pathnames},{prompt})  (*deprecated*)~
                                                 *lh#path#select_one()*
@@ -881,7 +905,7 @@ The pathnames displayed will be simplified thanks to |lh#path#strip_common()|
 -- the pathname returned is the "full" original pathname matching the
 simplified pathname selected.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#ToRelative()*  {{{3
 lh#path#ToRelative({pathname})  (*deprecated*)~
                                                 *lh#path#to_relative()*
@@ -890,7 +914,7 @@ lh#path#to_relative({pathname})~
 @return the simplified {pathname} in its relative form as it would be seen
         from the current directory.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#relative_to()*  {{{3
 lh#path#relative_to({from}, {to})~
 Returns the relative directory that indentifies {to} from {from} location.
@@ -899,16 +923,16 @@ Returns the relative directory that indentifies {to} from {from} location.
 @return the simplified pathname {to} in its relative form as it would be seen
         from the {from} directory.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#readlink()*  {{{3
 lh#path#readlink({pathname})~
 Resolves any symbolic links in pathnames.
 Where the *nix command readlink is available, it returns >
-    readlink -f {pathname} 
+    readlink -f {pathname}
 elsewhere it returns {pathname}.
 @param[in] pathslist to resolve
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#GlobAsList()*  {{{3
 lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
                                                 *lh#path#glob_as_list()*
@@ -922,7 +946,7 @@ lh#path#glob_as_list({pathslist}, {expr} [,{must_sort}])~
 In case {expr} is a |List|, |globpath()| is applied on each expression in
 {expr}.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                     *lh#path#find()*    {{{3
 lh#path#find({pathslist}, {regex})~
 @param[in] {pathslist} List of paths which can be received as a |List| or as a
@@ -940,10 +964,10 @@ e.g.: >
    Assert z == expected_nix
  endif
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#to_regex()*    {{{3
 lh#path#to_regex({pathname})~
-Transforms the {pathname} to separate each node-name by the string '[/\\]' 
+Transforms the {pathname} to separate each node-name by the string '[/\\]'
 
 The rationale behind this function is to build system independant regex
 pattern to use on pathnames as sometimes pathnames are built by appending
@@ -954,7 +978,7 @@ e.g.: >
 echoes >
  [/\\]home[/\\]luc[/\\]\(vimfiles\|.vim\)
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#is_in()*    {{{3
 lh#path#is_in({file}, {path})~
 Tells whether a {file} is within a directory tree.
@@ -964,7 +988,7 @@ but on resolved pathnames (with |lh#path#readlink()|.
 ------------------------------------------------------------------------------
 MENUS RELATED FUNCTIONS                               *lhvl#menu*       {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                              *lh#menu#def_string_item()*  {{{3
 lh#menu#def_string_item({Data})~
 @param[in,out] {Data} Definition of a |menu| item.
@@ -999,17 +1023,17 @@ Examples:
 
                                                             *lhvl-:Set*
 :Set {variable-name} {text-value}~
-@param {variable-name} 
-	    must be a |global-variable| name used as "variable" in the
-	    definition of a string menu item thanks to
-	    |lh#menu#def_string_item()|.
+@param {variable-name}
+            must be a |global-variable| name used as "variable" in the
+            definition of a string menu item thanks to
+            |lh#menu#def_string_item()|.
 @param {text-value}
             :Set directly sets the variable to the value associated to
             {text-value}.
 
 This command supports autocompletion on the {variable-name}.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                              *lh#menu#def_toggle_item()*  {{{3
 lh#menu#def_toggle_item({Data})~
 @param[in,out] {Data} Definition of a |menu| item.
@@ -1054,18 +1078,18 @@ Examples:
 
                                                             *lhvl-:Toggle*
 :Toggle {variable-name} [{text-value}]~
-@param {variable-name} 
-	    must be a |global-variable| name used as "variable" in the
-	    definition of a toggable menu item thanks to
-	    |lh#menu#def_toggle_item()|.
+@param {variable-name}
+            must be a |global-variable| name used as "variable" in the
+            definition of a toggable menu item thanks to
+            |lh#menu#def_toggle_item()|.
 @param {text-value}
             when specified, :Toggle directly sets the variable to the value
-	    associated to {text-value}.
+            associated to {text-value}.
 
 This command supports autocompletion on the {variable-name}, and on
 {text-value}.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                       *lh#menu#text()*  {{{3
 lh#menu#text({text})~
 @param[in] {text} Text to send to |:menu| commands
@@ -1074,7 +1098,7 @@ lh#menu#text({text})~
 This helper function transforms a regular text into a text that can be
 directly used with |:menu| commands.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                       *lh#menu#make()*  {{{3
 option: *[gb]:want_buffermenu_or_global_disable*
 If Michael Geddes's |buffer-menu| plugin is installed, this option tells
@@ -1087,7 +1111,7 @@ Creates a menu entry and its associated mappings for several modes at once.
 @param[in] {menu-priority} |sub-menu-priority| for the new menu entry
 @param[in] {menu-text}      Name of the new menu entry
 @param[in] {key-binding}    Sequence of keys to execute the associated action
-@param[in] "<buffer>"       If the string "<buffer>" is provided, then the 
+@param[in] "<buffer>"       If the string "<buffer>" is provided, then the
                             associated mapping will be a |map-<buffer>|, and
                             the menu will be available to the current buffer
                             only. See |[gb]:want_buffermenu_or_global_disable|
@@ -1123,7 +1147,7 @@ as a default name for the section to insert:
     endif
     " ...
   endfunction
-  
+
   call lh#menu#make("vnic", '50.360.100', '&LaTeX.&Insert.&Section',
           \ "<C-L><C-S>", '<buffer>', ":call TKinsertSec()<CR>")
 
@@ -1141,19 +1165,19 @@ Fourth thing: actually, lh#menu#make() is not restricted to commands. The
 action can be anything that could come at the right hand side of any |:map| or
 |:menu| action. But this time, you have to be cautious with the modes you
 dedicate your map to. I won't give any related example ; this is the
-underlying approach in |lh#menu#IVN_make()|. 
+underlying approach in |lh#menu#IVN_make()|.
 
 
                                                     *lh#menu#make()_modes*
 Implementation details:~
-The actual creation of the mappings is delegated to |lh#menu#map_all()|. 
+The actual creation of the mappings is delegated to |lh#menu#map_all()|.
 If the {action} to execute doesn't start with ':', it is left untransformed,
 otherwise it is adapted depending on each {mode}:
-- INSERT-mode: each recognized |:command| call is prepended with |i_CTRL-O| 
+- INSERT-mode: each recognized |:command| call is prepended with |i_CTRL-O|
 - NORMAL-mode: the {action} is used as it is
 - VISUAL-mode: ":Vcall" is replaced by "\<cr>gV", otherwise the selection is
   recorded into @v register, the {action} command is executed after a
-  |v_CTRL-C|, and eventually @v is cleared. 
+  |v_CTRL-C|, and eventually @v is cleared.
   The use is @v is deprecated, rely instead on |lh#menu#is_in_visual_mode()|
   and on |lh#selection#visual()|.
 - COMMAND-mode: the {action} is prepended with |c_CTRL-C|.
@@ -1161,7 +1185,7 @@ otherwise it is adapted depending on each {mode}:
 Examples:
    See tests/lh/test-menu-map.vim
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                   *lh#menu#IVN_make()*  {{{3
 Mappings & menus inserting text~
 lh#menu#IVN_make(<priority>, {text}, {key}, {IM-action}, {VM-action}, {NM-action} [, {nore-IM}, {nore-VM}, {nore-NM}])~
@@ -1183,7 +1207,7 @@ ftplugin/html/html_set.vim.
   :MapMenu 50.370.300 &LaTeX.&Fonts.&Emphasize ]em emph
   call <SID>MapMenu4Env("50.370.200", '&LaTeX.&Environments.&itemize',
         \ ']ei', 'itemize', '\item ')
-  
+
 
 The first command binds ]em to \emph{} for the three different modes. In
 INSERT mode, the cursor is positioned between the curly brackets, and a marker
@@ -1196,11 +1220,11 @@ The second call binds for the three modes: ]ei to:
       \begin{itemize}
           \item
       \end{itemize}
-    
+
 The definition of the different functions and commands involved just follows.
 >
   command -nargs=1 -buffer MapMenu :call <SID>MapMenu(<f-args>)
-  
+
   function! s:MapMenu(code,text,binding, tex_cmd, ...)
     let _2visual = (a:0 > 0) ? a:1 : "viw"
     " If the tex_cmd starts with an alphabetic character, then suppose the
@@ -1239,7 +1263,7 @@ Examples:
    See tests/lh/test-menu-map.vim
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                          *lh#menu#is_in_visual_mode()*  {{{3
 lh#menu#is_in_visual_mode()~
 @return a boolean that tells whether the {action} used in
@@ -1247,7 +1271,7 @@ lh#menu#is_in_visual_mode()~
 
 NB: this function deprecates the test on @v.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                    *lh#menu#map_all()*  {{{3
 lh#menu#map_all({map-type}[, {map-args...}])~
 This function is a helper function that defines several mappings at once as
@@ -1266,17 +1290,17 @@ The action to execute will be corrected depending on the current mode. See
 ------------------------------------------------------------------------------
 COMMANDS RELATED FUNCTIONS                            *lhvl#command*    {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#command#new()*      {{{3
 Highly Experimental.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                        *lh#command#Fargs2String()*      {{{3
 lh#command#Fargs2String({aList})~
 @param[in,out] aList list of params from <f-args>
 @see tests/lh/test-Fargs2String.vim
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                             *lh#command#complete()*     {{{3
 lh#command#complete({argLead}, {cmdLine}, {cursorPos})~
 Under developpement
@@ -1285,7 +1309,7 @@ Under developpement
 ------------------------------------------------------------------------------
 BUFFERS RELATED FUNCTIONS                             *lhvl#buffer*     {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#get_nr()*    {{{3
 lh#buffer#get_nr()~
 @returns the buffer number associated to a buffername/filename.
@@ -1294,7 +1318,7 @@ If no such file is known to vim, a buffer will be locally created.
 This function is required to assign a new buffer number to be used in qflist,
 after the filenames have been fixed -- see BTW's s:FixCTestOutput().
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#list()*      {{{3
 lh#buffer#list()~
 @return The |List| of |buflisted| buffers.
@@ -1302,7 +1326,7 @@ lh#buffer#list()~
 e.g.: >
  echo lh#list#transform(lh#buffer#list(), [], "bufname")
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#Find()*      {{{3
 lh#buffer#Find({filename})  (*deprecated*)~
                                                 *lh#buffer#find()*
@@ -1315,7 +1339,7 @@ Searchs for a window where the buffer is opened.
 If {filename} is opened in a window, jump to this window. Otherwise, return
 -1.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#Jump()*      {{{3
 lh#buffer#Jump({filename}, {cmd})  (*deprecated*)~
                                                 *lh#buffer#jump()*
@@ -1327,7 +1351,7 @@ windows if none match.
 @param {cmd}
 @return Nothing.
 
-If {filename} is opened in a window, jump to this window. 
+If {filename} is opened in a window, jump to this window.
 Otherwise, execute {cmd} with {filename} as a parameter. Typical values for
 the command will be "sp" or "vsp". (see |:split|, |:vsplit|).
 
@@ -1335,7 +1359,7 @@ N.B.: While it is not the rationale behind this function, other commands that
 does not open the buffer may be used in the {cmd} parameter.
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#Scratch()*   {{{3
 lh#buffer#Scratch({bname},{where})  (*deprecated*)~
                                       *scratch* *lh#buffer#scratch()*
@@ -1344,10 +1368,10 @@ Split-opens a new scratch buffer.
 
 @param {bname} Name for the new scratch buffer
 @param {where} Where the new scratch buffer will be opened ('', or 'v')
-@post          The buffer has the following properties set: 
+@post          The buffer has the following properties set:
                    'bt'=nofile, 'bh'=wipe, 'nobl', 'noswf', 'ro'
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                              *lhvl-dialog*      *lh#buffer#dialog#*     {{{3
 Functions for building interactive dialogs~
 Unlike other |lh-vim-lib| functions which can be used independently from each
@@ -1368,7 +1392,7 @@ The items displayed can be of any kind (function signatures, email addresses,
 suggested spellings, ...), as well as the validating action.  The
 help-header can be customized, as well as colours, other mappings, ...
 
-However the list displaying + selection aspect is almost hardcoded. 
+However the list displaying + selection aspect is almost hardcoded.
 
 
 How it works~
@@ -1454,7 +1478,7 @@ years of evolution), and it is a little bit cumbersome.
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#syntax#NameAt()*    {{{3
 lh#syntax#NameAt({lnum},{col}[,{trans}])  (*deprecated*)~
                                                 *lh#syntax#name_at()*
@@ -1464,7 +1488,7 @@ lh#syntax#name_at({lnum},{col}[,{trans}])~
 @param {trans} see |synID()|, default=0
 @return the syntax kind of the given character at {lnum}, {col}
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#syntax#NameAtMark()* {{{3
 lh#syntax#NameAtMark({mark}[,{trans}])  (*deprecated*)~
                                                *lh#syntax#is_a_comment()* {{{3
@@ -1478,7 +1502,7 @@ lh#syntax#name_at_mark({mark}[,{trans}])~
 @param {trans} see |synID()|, default=0
 @return the syntax kind of the character at the given |mark|.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        *lh#syntax#Skip()* *lh#syntax#SkipAt()* *lh#syntax#SkipAtMark()* {{{3
 lh#syntax#Skip()  (*deprecated*)~
 lh#syntax#SkipAt({lnum},{col})  (*deprecated*)~
@@ -1492,20 +1516,20 @@ Functions to be used with |searchpair()| functions in order to search for a
 pair of elements, without taking comments, strings, characters and doxygen
 (syntax) contexts into account while searching.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#syntax#list_raw()*   {{{3
 lh#syntax#list_raw({name})~
-@param {group-name} 
+@param {group-name}
 @return the result of "syn list {group-name}" as a string
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#syntax#list()*      {{{3
 lh#syntax#list()~
-@param {group-name} 
-@return the result of "syn list {group-name}" as a list. 
+@param {group-name}
+@return the result of "syn list {group-name}" as a list.
 
 This function tries to interpret the result of the raw list of syntax
-elements. 
+elements.
 
 ------------------------------------------------------------------------------
 COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2
@@ -1520,6 +1544,6 @@ selects one entry in the menu.
 ==============================================================================
  © Luc Hermitte, 2001-2014 <http://code.google.com/p/lh-vim/>, CC by SA 3.0 {{{1
  $Id$
- VIM: let b:VS_language = 'american' 
+ VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
