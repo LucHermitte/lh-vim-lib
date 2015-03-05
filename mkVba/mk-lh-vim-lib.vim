@@ -47,7 +47,6 @@ autoload/lh/visual.vim
 doc/lh-vim-lib.txt
 lh-vim-lib-addon-info.txt
 lh-vim-lib.README
-macros/menu-map.vim
 mkVba/mk-lh-vim-lib.vim
 plugin/let.vim
 plugin/lhvl.vim
