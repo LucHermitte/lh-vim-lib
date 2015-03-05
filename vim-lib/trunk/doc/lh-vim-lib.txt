@@ -479,7 +479,7 @@ lh#stack#pop({stack})~
 Removes a value from the stack and returns it.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#stack#pop()*        {{{3
+                                                *lh#stack#top()*        {{{3
 lh#stack#top({stack})~
 @pre !empty({stack})
 Returns the top value of the stack.
