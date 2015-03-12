@@ -5,7 +5,7 @@
 "               <URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.2.4
+" Version:      3.2.7
 " Created:      17th Apr 2007
 " Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
@@ -17,6 +17,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.2.4:
+"       (*) new function lh#list#match_re()
 "       v3.2.4:
 "       (*) new function lh#list#push_if_new()
 "       v3.0.0:
@@ -118,6 +120,19 @@ function! lh#list#accumulate(input, transformation, accumulator)
   let transformed = lh#list#transform(a:input, [], a:transformation)
   let res = lh#function#execute(a:accumulator, transformed)
   return res
+endfunction
+
+" Function: lh#list#match_re(list, to_be_matched [, idx]) {{{3
+" Search first regex that match the parameter
+function! lh#list#match_re(list, to_be_matched, ...)
+  let idx = (a:0>0) ? a:1 : 0
+  while idx < len(a:list)
+    if match(a:to_be_matched, a:list[idx]) != -1
+      return idx
+    endif
+    let idx += 1
+  endwhile
+  return -1
 endfunction
 
 " Function: lh#list#match(list, to_be_matched [, idx]) {{{3
