@@ -1,4 +1,4 @@
-Copyright 2001-2012, Luc Hermitte
+Copyright 2001-2015, Luc Hermitte
 
 # Scripts License
 
