@@ -307,7 +307,7 @@ function! lh#list#equal_range(list, val, ...)
 endfunction
 
 " Function: lh#list#not_found(range) {{{3
-" @return whether the range returned from equal_range is empty (i.e. element not fount)
+" @return whether the range returned from equal_range is empty (i.e. element not found)
 function! lh#list#not_found(range)
   return a:range[0] == a:range[1]
 endfunction
