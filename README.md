@@ -12,19 +12,21 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 # Functions
 
-  * [Miscellanous functions](README#Miscellanous_functions.md)
-  * [Lists related functions](README#Lists_related_functions.md)
-  * [Graphs related functions](README#Graphs_related_functions.md)
-  * [Paths related functions](README#Graphs_related_functions.md)
-  * [Commands related functions](README#Commands_related_functions.md)
-  * [Menus related functions](README#Menus_related_functions.md)
-  * [Buffers related functions](README#Buffers_related_functions.md)
-  * [Syntax related functions](README#Syntax_related_functions.md)
-  * [UI functions](README#UI_functions.md)
+  * [Miscellanous functions](#Miscellanous-functions)
+  * [Lists related functions](#Lists-related-functions)
+  * [Graphs related functions](#Graphs-related-functions)
+  * [Paths related functions](#Graphs-related-functions)
+  * [Commands related functions](#Commands-related-functions)
+  * [Menus related functions](#Menus-related-functions)
+  * [Buffers related functions](#Buffers-related-functions)
+  * [Syntax related functions](#Syntax-related-functions)
+  * [UI functions](#UI-functions)
 
 ## Miscellanous functions
+
+| Function | Purpose |
+|------------------|-----------------------------------|
 | `lh#askvim#exe()` | Returns what a VimL command echoes |
-|:------------------|:-----------------------------------|
 | `lh#common#check_deps()` | Checks a VimL symbol is loaded     |
 | `lh#common#echomsg_multilines()` | Applies `:echomsg` on a multi-lines text |
 | `lh#common#error_msg()` | Displays an error message          |
@@ -41,8 +43,9 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 
 ## Lists related functions
-| `lh#list#acculate()` | Accumulates the elements from a list |
+| Function | Purpose |
 |:---------------------|:-------------------------------------|
+| `lh#list#acculate()` | Accumulates the elements from a list |
 | `lh#list#copy_if()`  | Copies the elements from a list that match a predicate |
 | `lh#list#find_if()`  | Searches the first element in a list that verifies a predicate |
 | `lh#list#intersect()` | Insersection of two lists            |
@@ -53,14 +56,16 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 
 ## Graphs related functions
-| `lh#graph#tsort#depth()` | Implements a Topological Sort on a Direct Acyclic Graph, with a recursive depth-first search |
+| Function | Purpose |
 |:-------------------------|:---------------------------------------------------------------------------------------------|
+| `lh#graph#tsort#depth()` | Implements a Topological Sort on a Direct Acyclic Graph, with a recursive depth-first search |
 | `lh#graph#tsort#breadth()` | Same as `depth()`, but with a non-recursive breadth-first search                             |
 
 
 ## Paths related functions
-| `lh#path#common()` | Returns the biggest common part between several paths |
+| Function | Purpose |
 |:-------------------|:------------------------------------------------------|
+| `lh#path#common()` | Returns the biggest common part between several paths |
 | `lh#path#depth()`  | Returns the depth of a path                           |
 | `lh#path#glob_as_list()` | Returns `globpath()`result as a list                  |
 | `lh#path#is_absolute_path()` | Tells whether the parameter is an absolute pathname   |
@@ -76,39 +81,43 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 
 ## Commands related functions
-| `lh#command#New()` | Experimental way to define commands that support auto-completion |
+| Function | Purpose |
 |:-------------------|:-----------------------------------------------------------------|
+| `lh#command#New()` | Experimental way to define commands that support auto-completion |
 | `lh#command#Fargs2String()` | Merges a set strings into a set of parameters (experimental)     |
 
 
 ## Menus related functions
+| Function | Purpose |
+|:-------------------|:-----------------------------------------------------------------|
 | `lh#menu#def_toggleitem()` | This function defines a |menu| entry that will be associated to a |global-variable| whose values can be cycled and explored from the menu. This global variable can be seen as an enumerate whose value can be cyclically updated through a menu. |
-|:---------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `lh#menu#text()`           | Transforms a regular text into a text that can be directly used with `:menu` commands.                                                                                                                                                            |
-| `lh#menu#make()`           | Helper function to associate menus and mappings to actions in different modes.                                                                                                                                                                    |
-| `lh#menu#IVN_make()`       | Like `lh#menu#Make()`, but dedicated to text inserting actions and INSERT, NORMAL, and VISUAL modes.                                                                                                                                              |
-| `lh#menu#is_in_visual_mode()` | Tells whether the action triggered by a menu/map was initiated while in visual mode.                                                                                                                                                              |
-| `lh#menu#map_all()`        | Helper function to define several mappings at once as `:amenu` would do                                                                                                                                                                           |
-| `lh#askvim#menu()`         | Experimental functions to ask vim which menus are defined                                                                                                                                                                                         |
+| `lh#menu#text()`           | Transforms a regular text into a text that can be directly used with `:menu` commands.         |
+| `lh#menu#make()`           | Helper function to associate menus and mappings to actions in different modes.  |
+| `lh#menu#IVN_make()`       | Like `lh#menu#Make()`, but dedicated to text inserting actions and INSERT, NORMAL, and VISUAL modes. |
+| `lh#menu#is_in_visual_mode()` | Tells whether the action triggered by a menu/map was initiated while in visual mode.             |
+| `lh#menu#map_all()`        | Helper function to define several mappings at once as `:amenu` would do                                |
+| `lh#askvim#menu()`         | Experimental functions to ask vim which menus are defined                                              |
 
 See also the documentation of the old functions at http://hermitte.free.fr/vim/general.php#expl_menu_map
 
 
 ## Buffers related functions
-| `lh#buffer#list()` | Returns the list of `buflisted` buffers. |
+| Function | Purpose |
 |:-------------------|:-----------------------------------------|
+| `lh#buffer#list()` | Returns the list of `buflisted` buffers. |
 | `lh#buffer#find()` | Finds and jumps to the window that matches the buffer identifier, does nothing if not found. |
 | `lh#buffer#jump()` | Like `lh#buffer#Find()`, but opens the buffer in a new window if it no matching window was opened before. |
-| `lh#buffer#scratch()` | Opens a new scratch buffer.              |
-| `lh#buffer#dialog#toggle_help()` | see [lh-vim-lib/dialog](Dialog.md)       |
-| `lh#buffer#dialog#add_help()` | see [lh-vim-lib/dialog](Dialog.md)       |
-| `lh#buffer#dialog#new()` | see [lh-vim-lib/dialog](Dialog.md)       |
-| `lh#buffer#dialog#select()` | see [lh-vim-lib/dialog](Dialog.md)       |
+| `lh#buffer#scratch()` | Opens a new scratch buffer.                       |
+| `lh#buffer#dialog#toggle_help()` | see [lh-vim-lib/dialog](doc/Dialog.md) |
+| `lh#buffer#dialog#add_help()` | see [lh-vim-lib/dialog](doc/Dialog.md)    |
+| `lh#buffer#dialog#new()` | see [lh-vim-lib/dialog](doc/Dialog.md)         |
+| `lh#buffer#dialog#select()` | see [lh-vim-lib/dialog](doc/Dialog.md)      |
 
 
 ## Syntax related functions
-| `lh#syntax#name_at()` | Tells the syntax kind of the character at the given position |
+| Function | Purpose |
 |:----------------------|:-------------------------------------------------------------|
+| `lh#syntax#name_at()` | Tells the syntax kind of the character at the given position |
 | `lh#syntax#name_at_mark()` | Tells the syntax kind of the character at the given mark     |
 | `lh#syntax#skip()` `lh#syntax#SkipAt()` `lh#syntax#SkipAtMark()` | Helper functions to be used with `searchpair()` in order to ignore comments, doxygen comments, strings, and characters while searching |
 | `lh#syntax#syn_list_raw()` | Returns the result of "`syn list {group-name}`" as a string  |
@@ -116,8 +125,9 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 
 
 ## Functors
-| `lh#function#bind()` | Builds a functor object. |
+| Function | Purpose |
 |:---------------------|:-------------------------|
+| `lh#function#bind()` | Builds a functor object. |
 | `lh#function#execute()` | Executes a functor object. |
 | `lh#function#prepare()` | Prepares a functor object to be `eval`uated. |
 
@@ -128,8 +138,9 @@ interactive functions. Depeding on a configuration variable
 (`[bg]:ui_type`), they will delegate the interaction to a gvim UI
 function, or a plain text UI function (defined by vim, or emulated)
 
-| `IF()`  | Acts as the ternary operator |
+| Function | Purpose |
 |:--------|:-----------------------------|
+| `IF()`  | Acts as the ternary operator |
 | `SWITCH()` | Â«Â»                     |
 | `CONFIRM()` | Similar to `confirm()`       |
 | `INPUT()` | Calls `inputdialog()` or `input()` |
