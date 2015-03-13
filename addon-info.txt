@@ -1,0 +1,10 @@
+{
+  "name" : "lh-vim-lib",
+  "version" : "dev",
+  "author" : "Luc Hermitte <http://github.com/LucHermitte/>",
+  "maintainer" : "Luc Hermitte <http://github.com/LucHermitte/>",
+  "repository" : {"type": "git", "url": "git@github.com:LucHermitte/lh-vim-lib.git"},
+  "dependencies" : {},
+  "description" : "Library of VimL functions",
+  "homepage" : "http://github.com/LucHermitte/lh-vim-lib"
+}
