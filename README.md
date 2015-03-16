@@ -28,7 +28,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 ## Miscellaneous functions
 
 | Function                                    | Purpose                                                                                                               |
-|------------------------------------------- -|-----------------------------------------------------------------------------------------------------------------------|
+|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `lh#askvim#exe()`                           | Returns what a VimL command echoes                                                                                    |
 | `lh#common#check_deps()`                    | Checks a VimL symbol is loaded                                                                                        |
 | `lh#common#echomsg_multilines()`            | Applies `:echomsg` on a multi-lines text                                                                              |
@@ -187,6 +187,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 
 ## Syntax related functions
 | Function                                                         | Purpose                                                                                                                                |
+|:-----------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#syntax#is_a_comment()`                                       | Tells the syntax kind of the character at the given mark is a comment                                                                  |
 | `lh#syntax#is_a_comment_at()`                                    | Tells the syntax kind of the character at the given position is a comment                                                              |
 | `lh#syntax#list()`                                               | Like `lh#syntax#list_raw()`, but reinterprets the results (experimental)                                                               |
