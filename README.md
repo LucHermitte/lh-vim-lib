@@ -231,7 +231,7 @@ See http://hermitte.free.fr/vim/general.php#expl_words_tools
 # Installation
   * Requirements: Vim 7.4
   * Clone from the git repository
-```vim
+```
 git clone git@github.com:LucHermitte/lh-vim-lib.git
 ```
   * [Vim Addon Manager](http://github.com/MarcWeber/vim-addon-manager): (this
