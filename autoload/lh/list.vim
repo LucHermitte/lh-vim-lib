@@ -1,13 +1,11 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.2.7
+"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
+" Version:      3.2.8
 " Created:      17th Apr 2007
-" Last Update:  $Date$ (17th Apr 2007)
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -17,6 +15,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.2.8:
+"       (*) lh#list#sort() wraps sort() to work around error fixed in vim
+"           version 7.4.411
 "       v3.2.4:
 "       (*) new function lh#list#match_re()
 "       v3.2.4:
@@ -312,6 +313,21 @@ function! lh#list#not_found(range)
   return a:range[0] == a:range[1]
 endfunction
 
+" Function: lh#list#sort(list) {{{3
+" Up to vim version 7.4.411
+"    echo sort(['{ *//', '{', 'a', 'b'])
+" gives: ['a', 'b', '{ *//', '{']
+" While
+"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_str_cmp'))
+" gives the correct: ['a', 'b', '{', '{ *//']
+function! lh#list#sort(list) abort
+  if has("patch-7.4-411")
+    return sort(a:list)
+  else
+    return sort(a:list, 'lh#list#_str_cmp')
+  endif
+endfunction
+
 " Function: lh#list#unique_sort(list [, func]) {{{3
 " See also http://vim.wikia.com/wiki/Unique_sorting
 "
@@ -393,6 +409,21 @@ function! lh#list#push_if_new(list, value)
     call add (a:list, a:value)
   endif
   return a:list
+endfunction
+
+" # Private {{{2
+" Function: lh#list#_str_cmp(lhs, rhs) {{{3
+" Up to vim version 7.4.411
+"    echo sort(['{ *//', '{', 'a', 'b'])
+" gives: ['a', 'b', '{ *//', '{']
+" While
+"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_str_cmp'))
+" gives the correct: ['a', 'b', '{', '{ *//']
+function! lh#list#_str_cmp(lhs, rhs) abort
+  let res = a:lhs <  a:rhs ? -1
+        \ : a:lhs == a:rhs ? 0
+        \ :                  1
+  return res
 endfunction
 
 " Functions }}}1

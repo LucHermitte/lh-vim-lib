@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.7)
-                        For Vim version 7+      Last change: 13th Mar 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.2.8)
+                        For Vim version 7+      Last change: 19th Mar 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -60,6 +60,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#matches()|
 - |lh#list#not_found()|
 - |lh#list#remove()|
+- |lh#list#sort()|
 - |lh#list#subset()|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
@@ -707,6 +708,13 @@ Examples: >
 
    :let l = [ 1, 2, 'foo', ['bar']]
    :echo lh#list#accumulate(l, 'string', 'join(v:1_, "##")')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#sort()*      {{{3
+lh#list#sort({list})~
+This function is an encapsulation of |sort()| that fixes the bug where
+"foo bar" is sorted before "foo".
+This bug has been fixed in vim version 7.4.411.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#subset()*      {{{3
