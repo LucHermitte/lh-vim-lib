@@ -1,29 +1,24 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/function.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/function.vim                               {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
-" Created:	03rd Nov 2008
-" Last Update:	$Date$
+"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
+" Version:      3.2.9
+" Created:      03rd Nov 2008
 "------------------------------------------------------------------------
-" Description:	
-" 	Implements:
-" 	- lh#function#bind()
-" 	- lh#function#execute()
-" 	- lh#function#prepare()
-" 	- a binded function type
-" 
+" Description:
+"       Implements:
+"       - lh#function#bind()
+"       - lh#function#execute()
+"       - lh#function#prepare()
+"       - a binded function type
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	
-"       v2.2.0: first implementation
+" History:
+"       v3.2.9: Bug fix when &isk is messed up in lh#function#execute()
 "       v3.0.0: GPLv3
-" TODO:		«missing features»
+"       v2.2.0: first implementation
 " }}}1
 "=============================================================================
 
@@ -62,7 +57,7 @@ function! s:Join(args)
 endfunction
 
 " # Function: s:DoBindList(arguments...) {{{2
-function! s:DoBindList(formal, real)
+function! s:DoBindList(formal, real) abort
   let args = []
   for arg in a:formal
     if type(arg)==type('string') && arg =~ '^v:\d\+_$'
@@ -80,18 +75,25 @@ function! s:DoBindList(formal, real)
 endfunction
 
 " # Function: s:DoBindString(arguments...) {{{2
-function! s:DoBindString(expr, real)
-  let expr = substitute(a:expr, '\<v:\(\d\+\)_\>', a:real.'[\1-1]', 'g')
-  return expr
+function! s:DoBindString(expr, real) abort
+  let cleanup = lh#on#exit()
+        \.restore('&isk')
+  try
+    set isk&vim
+    let expr = substitute(a:expr, '\<v:\(\d\+\)_\>', a:real.'[\1-1]', 'g')
+    return expr
+  finally
+    call cleanup.finalize()
+  endtry
 endfunction
 
-function! s:ToString(expr)
+function! s:ToString(expr) abort
   return  type(a:expr) != type('')
-	\ ? string(a:expr)
-	\ : (a:expr)
+        \ ? string(a:expr)
+        \ : (a:expr)
 endfunction
 
-function! s:DoBindEvaluatedString(expr, real)
+function! s:DoBindEvaluatedString(expr, real) abort
   let expr = a:expr
   let p = 0
   while 1
@@ -100,8 +102,8 @@ function! s:DoBindEvaluatedString(expr, real)
     let e = matchend(expr, '\<v:\d\+_\>', p)
     let n = eval(expr[p+2 : e-2])
     " let new = (type(a:real[n-1])==type('') && a:real[n-1]=~ '\<v:\d\+_\>')
-	  " \ ? a:real[n-1]
-	  " \ : string(a:real[n-1])
+          " \ ? a:real[n-1]
+          " \ : string(a:real[n-1])
     let new = s:ToString(a:real[n-1])
     " let new = string(a:real[n-1]) " -> bind_counpound vars
     let expr = ((p>0) ? (expr[0:p-1]) : '') . new . expr[e : -1]
@@ -114,7 +116,7 @@ function! s:DoBindEvaluatedString(expr, real)
 endfunction
 
 " # Function: s:Execute(arguments...) {{{2
-function! s:Execute(args) dict
+function! s:Execute(args) dict abort
   if type(self.function) == type(function('exists'))
     let args = s:DoBindList(self.args, a:args)
     " echomsg '##'.string(self.function).'('.join(args, ',').')'
@@ -131,7 +133,7 @@ function! s:Execute(args) dict
 endfunction
 
 " # Function: lh#function#prepare(function, arguments_list) {{{2
-function! lh#function#prepare(Fn, arguments_list)
+function! lh#function#prepare(Fn, arguments_list) abort
   if     type(a:Fn) == type(function('exists'))
     let expr = string(a:Fn).'('.s:Join(a:arguments_list).')'
     return expr
@@ -149,12 +151,12 @@ function! lh#function#prepare(Fn, arguments_list)
 endfunction
 
 " # Function: lh#function#execute(function, arguments...) {{{2
-function! lh#function#execute(Fn, ...)
+function! lh#function#execute(Fn, ...) abort
   if type(a:Fn) == type({}) && has_key(a:Fn, 'execute')
     return a:Fn.execute(a:000)
   else
     let expr = lh#function#prepare(a:Fn, a:000)
-    try 
+    try
       return eval(expr)
     catch /.*/
       " Note: if you are experimenting a E16: invalid range, you may want to
@@ -166,10 +168,10 @@ function! lh#function#execute(Fn, ...)
 endfunction
 
 " # Function: lh#function#bind(function, arguments...) {{{2
-function! lh#function#bind(Fn, ...)
+function! lh#function#bind(Fn, ...) abort
   let args = copy(a:000)
   if type(a:Fn) == type('string') && a:Fn =~ '^[a-zA-Z0-9_#]\+$'
-	\ && exists('*'.a:Fn)
+        \ && exists('*'.a:Fn)
     let Fn = function(a:Fn)
   elseif type(a:Fn) == type({})
     " echo string(a:Fn).'('.string(a:000).')'
@@ -183,17 +185,17 @@ function! lh#function#bind(Fn, ...)
       let i = 0
       let t_args = [] " necessary to avoid type changes
       while i != N
-	silent! unlet arg
-	let arg = a:Fn.args[i]
-	if arg =~ 'v:\d\+_$'
-	  let arg2 = eval(s:DoBindString(arg, string(args)))
-	  " echo arg."-(".string(args).")->".string(arg2)
-	  unlet arg
-	  let arg = arg2
-	  unlet arg2
-	endif
-	call add(t_args, arg)
-	let i += 1
+        silent! unlet arg
+        let arg = a:Fn.args[i]
+        if arg =~ 'v:\d\+_$'
+          let arg2 = eval(s:DoBindString(arg, string(args)))
+          " echo arg."-(".string(args).")->".string(arg2)
+          unlet arg
+          let arg = arg2
+          unlet arg2
+        endif
+        call add(t_args, arg)
+        let i += 1
       endwhile
       unlet a:Fn.args
       let a:Fn.args = t_args
@@ -209,10 +211,10 @@ function! lh#function#bind(Fn, ...)
   endif
 
   let binded_fn = {
-	\ 'function': Fn,
-	\ 'args':     args,
-	\ 'execute':  function('s:Execute')
-	\}
+        \ 'function': Fn,
+        \ 'args':     args,
+        \ 'execute':  function('s:Execute')
+        \}
   return binded_fn
 endfunction
 

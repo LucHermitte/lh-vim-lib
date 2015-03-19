@@ -199,7 +199,7 @@ function! lh#list#Find_if(list, predicate, ...)
 endfunction
 
 " Function: lh#list#find_if(list, predicate [, predicate-arguments] [, start-pos]) {{{3
-function! lh#list#find_if(list, predicate, ...)
+function! lh#list#find_if(list, predicate, ...) abort
   " Parameters
   let idx = 0
   let args = []

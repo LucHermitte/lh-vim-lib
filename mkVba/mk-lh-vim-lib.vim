@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:	3.2.8
-let s:version = '3.2.8'
+" Version:	3.2.9
+let s:version = '3.2.9'
 " Created:	06th Nov 2007
 "------------------------------------------------------------------------
 cd <sfile>:p:h
