@@ -1,18 +1,16 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/vcs.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      3.2.6.
-let s:k_version = '3.2.6'
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
+" Version:      3.2.10.
+let s:k_version = '3.2.10'
 " Created:      11th Mar 2015
-" Last Update:  $Date$
+" Last Update:  20th Mar 2015
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
-"
-" History:      «history»
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -71,6 +69,34 @@ function! lh#vcs#get_type(...) abort
         \ : lh#vcs#_is_git(path)            ? 'git'
         \ :                                   'unknown'
   return kind
+endfunction
+
+" # VCS URL decoding {{{2
+
+" Function: lh#vcs#get_url() {{{3
+function! lh#vcs#get_url(...) abort
+  let cd
+        \ = a:0 == 0               ? ''
+        \ : exists('*FixPathName') ? 'cd ' . FixPathName(a:1) . ' && '
+        \ :                          'cd ' . fnameescape(a:1) . ' && '
+  if lh#vcs#is_git()
+    let url = lh#os#system(cd.'git config --get remote.origin.url')
+    return url
+  else
+    return '-TBD-'
+  endif
+endfunction
+
+" Function: lh#vcs#decode_github_url(url) {{{3
+" Regex stolen and adapted from fugitive
+function! lh#vcs#decode_github_url(url) abort
+  let domain_pattern = 'github\.com'
+  let domains = exists('g:fugitive_github_domains') ? g:fugitive_github_domains : []
+  for domain in domains
+    let domain_pattern .= '\|' . escape(split(domain, '://')[-1], '.')
+  endfor
+  let repo = matchlist(a:url, '^\%(\(ssh\)://\|https\=://\|git://\|git@\)\=\zs\(\%(\1\.\)\='.domain_pattern.'\)[/:]\(.\{-}\)/\(.\{-\}\)\ze\%(\.git\)\=$')
+  return !empty(repo) ? lh#list#subset(repo, [1, 3,4]) : []
 endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
