@@ -1,23 +1,22 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/buffer.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " Licence:      GPLv3
 " Version:	3.1.15
 " Created:	23rd Jan 2007
-" Last Update:	$Date$
+" Last Update:	23rd Mar 2015
 "------------------------------------------------------------------------
-" Description:	
+" Description:
 " 	Defines functions that help finding windows and handling buffers.
-" 
+"
 "------------------------------------------------------------------------
-" Installation:	
+" Installation:
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
-" History:	
+" History:
 "	v1.0.0 First Version
-" 	(*) Functions moved from searchInRuntimeTime  
+" 	(*) Functions moved from searchInRuntimeTime
 " 	v2.2.0
 " 	(*) new function: lh#buffer#list()
 "       v3.0.0 GPLv3
@@ -120,7 +119,7 @@ endfunction
 
 " Function: lh#buffer#list() {{{3
 function! lh#buffer#list(...)
-  let which = a:0 == 0 ? 'buflisted' : a:1 
+  let which = a:0 == 0 ? 'buflisted' : a:1
   let all = range(1, bufnr('$'))
   " let res = lh#list#transform_if(all, [], 'v:1_', 'buflisted')
   let res = lh#list#copy_if(all, [], which)

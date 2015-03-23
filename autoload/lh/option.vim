@@ -1,23 +1,17 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/option.vim                                    {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/option.vim                                    {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.13
-" Created:	24th Jul 2004
-" Last Update:	$Date$ (07th Oct 2006)
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:      3.1.13
+" Created:      24th Jul 2004
+" Last Update:  23rd Mar 2015
 "------------------------------------------------------------------------
 " Description:
-" 	Defines the global function lh#option#get().
+"       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
-" 
-"------------------------------------------------------------------------
-" Installation:
-" 	Drop this file into {rtp}/autoload/lh/
-" 	Requires Vim 7+
-" History:	
+" History:
 "       v3.1.13
 "       (*) lh#option#add() don't choke when option value contains characters that
 "           means something in a regex context
@@ -25,13 +19,13 @@
 "       (*) lh#option#get() support var names from dictionaries like "g:foo.bar"
 "       v3.0.0
 "       (*) GPLv3
-" 	v2.0.6
-" 	(*) lh#option#add() add values to a vim list |option|
-" 	v2.0.5
-" 	(*) lh#option#get_non_empty() manages Lists and Dictionaries
-" 	(*) lh#option#get() doesn't test emptyness anymore
-" 	v2.0.0
-" 		Code moved from {rtp}/macros/ 
+"       v2.0.6
+"       (*) lh#option#add() add values to a vim list |option|
+"       v2.0.5
+"       (*) lh#option#get_non_empty() manages Lists and Dictionaries
+"       (*) lh#option#get() doesn't test emptyness anymore
+"       v2.0.0
+"       (*) Code moved from {rtp}/macros/
 " }}}1
 "=============================================================================
 
@@ -75,7 +69,7 @@ function! lh#option#get(name,default,...)
       exe 'return '.scope[i].':'.name
     endif
     let i += 1
-  endwhile 
+  endwhile
   return a:default
 endfunction
 function! lh#option#Get(name,default,...)
@@ -93,7 +87,7 @@ function! s:IsEmpty(variable)
 endfunction
 
 " Function: lh#option#get_non_empty(name, default [, scope])  {{{3
-" @return of b:{name}, g:{name}, or {default} the first which exists and is not empty 
+" @return of b:{name}, g:{name}, or {default} the first which exists and is not empty
 " The order of the variables checked can be specified through the optional
 " argument {scope}
 function! lh#option#get_non_empty(name,default,...)
@@ -105,7 +99,7 @@ function! lh#option#get_non_empty(name,default,...)
       return {scope[i]}:{name}
     endif
     let i += 1
-  endwhile 
+  endwhile
   return a:default
 endfunction
 function! lh#option#GetNonEmpty(name,default,...)
