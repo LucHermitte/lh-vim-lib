@@ -27,40 +27,42 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 ## Miscellaneous functions
 
-| Function                                    | Purpose                                                                                                               |
-|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `lh#askvim#exe()`                           | Returns what a VimL command echoes                                                                                    |
-| `lh#common#check_deps()`                    | Checks a VimL symbol is loaded                                                                                        |
-| `lh#common#echomsg_multilines()`            | Applies `:echomsg` on a multi-lines text                                                                              |
-| `lh#common#error_msg()`                     | Displays an error message                                                                                             |
-| `lh#common#rand()`                          | Returns a random number                                                                                               |
-| `lh#common#warning_msg()`                   | Displays a warning                                                                                                    |
-| `lh#encoding#at(mb_string, i)`              | Returns the i-th character in a multibytes string                                                                     |
-| `lh#encoding#iconv()`                       | Unlike `iconv()`, this wrapper returns {expr} when we know no conversion can be achieved.                             |
-| `lh#encoding#iconv(expr, from, to)`         | Converts an expression from an encoding to another                                                                    |
-| `lh#encoding#strlen(mb_string)`             | Executes `strlen()` on a multibytes string                                                                            |
-| `lh#encoding#strpart(mb_string, p, l)`      | Executes `strpart()` on a multibytes string                                                                           |
-| `lh#event#register_for_one_execution_at()`  | Registers a command to be executed once (and only once) when an event is triggered on the current file                |
-| `lh#float#arg_max(list)`                    | Returns the index of the maximum element of a list of floats                                                          |
-| `lh#float#arg_min(list)`                    | Returns the index of the minimum element of a list of floats                                                          |
-| `lh#float#max(list)`                        | Returns the maximum of a list of floats                                                                               |
-| `lh#float#min(list)`                        | Returns the minimum of a list of floats                                                                               |
-| `lh#ft#is_text()`                           | Tells whether the filetype is a text filetype                                                                         |
-| `lh#icomplete#run(startcol, matches, Hook)` | Prepares an insert mode completion menu that'll trigger actions instead of inserting text as `complete()` does        |
-| `lh#let#let_if_undef()`                     | Defines a vim variable (with ` :let`) on the condition the variable does not exist yet                                |
-| `lh#on#exit()`                              | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions |
-| `lh#option#add()`                           | Adds new values to a vim option -- and avoid the values being listed more than once                                   |
+| Function                                    | Purpose                                                                                                                                                                  |
+|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `lh#askvim#exe()`                           | Returns what a VimL command echoes                                                                                                                                       |
+| `lh#common#check_deps()`                    | Checks a VimL symbol is loaded                                                                                                                                           |
+| `lh#common#echomsg_multilines()`            | Applies `:echomsg` on a multi-lines text                                                                                                                                 |
+| `lh#common#error_msg()`                     | Displays an error message                                                                                                                                                |
+| `lh#common#rand()`                          | Returns a random number                                                                                                                                                  |
+| `lh#common#warning_msg()`                   | Displays a warning                                                                                                                                                       |
+| `lh#encoding#at(mb_string, i)`              | Returns the i-th character in a multibytes string                                                                                                                        |
+| `lh#encoding#iconv()`                       | Unlike `iconv()`, this wrapper returns {expr} when we know no conversion can be achieved.                                                                                |
+| `lh#encoding#iconv(expr, from, to)`         | Converts an expression from an encoding to another                                                                                                                       |
+| `lh#encoding#strlen(mb_string)`             | Executes `strlen()` on a multibytes string                                                                                                                               |
+| `lh#encoding#strpart(mb_string, p, l)`      | Executes `strpart()` on a multibytes string                                                                                                                              |
+| `lh#event#register_for_one_execution_at()`  | Registers a command to be executed once (and only once) when an event is triggered on the current file                                                                   |
+| `lh#float#arg_max(list)`                    | Returns the index of the maximum element of a list of floats                                                                                                             |
+| `lh#float#arg_min(list)`                    | Returns the index of the minimum element of a list of floats                                                                                                             |
+| `lh#float#max(list)`                        | Returns the maximum of a list of floats                                                                                                                                  |
+| `lh#float#min(list)`                        | Returns the minimum of a list of floats                                                                                                                                  |
+| `lh#ft#is_text()`                           | Tells whether the filetype is a text filetype                                                                                                                            |
+| `lh#icomplete#run(startcol, matches, Hook)` | Prepares an insert mode completion menu that'll trigger actions instead of inserting text as `complete()` does                                                           |
+| `lh#let#let_if_undef()`                     | Defines a vim variable (with ` :let`) on the condition the variable does not exist yet                                                                                   |
+| `lh#on#exit()`                              | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions                                                    |
+| `lh#option#add()`                           | Adds new values to a vim option -- and avoid the values being listed more than once                                                                                      |
 | `lh#option#get(name [,default [, scope]])`  | Fetches the value of a user defined option, that may be _empty_. `default` is returned if the option does not exists. Default value for `default` is `g:lh#option#unset` |
-| `lh#option#get_non_empty()`                 | Fetches the value of a user defined option, that is not _empty_                                                       |
-| `lh#option#is_unset(expr)`                  | Tells whether the expression is not set (i.e. identical to `g:lh#option#unset`)                                       |
-| `lh#position#char_at_mark()`                | Obtains the character under a mark                                                                                    |
-| `lh#position#char_at_pos()`                 | Obtains the character at a given position                                                                             |
-| `lh#position#is_before()`                   | Tells if a position in a buffer is before another one                                                                 |
-| `lh#vcs#get_type(...)`                      | Returns the type of the versioning system the file is under                                                           |
-| `lh#vcs#is_git(...)`                        | Tells whether the file is under a git repository                                                                      |
-| `lh#vcs#is_svn(...)`                        | Tells whether the file is under a svn repository                                                                      |
-| `lh#visual#cut()`                           | Cut and returns the visually selected text                                                                            |
-| `lh#visual#selection()`                     | Returns the visually selected text                                                                                    |
+| `lh#option#get_non_empty()`                 | Fetches the value of a user defined option, that is not _empty_                                                                                                          |
+| `lh#option#getbufvar(buf, varname [,def])`  | Encapsulates `getbufvar(buf, varname, g:lh#option#unset)` when `def` is not passed                                                                                       |
+| `lh#option#is_set(expr)`                    | Tells whether the expression is set (i.e. different from `g:lh#option#unset`)                                                                                            |
+| `lh#option#is_unset(expr)`                  | Tells whether the expression is not set (i.e. identical to `g:lh#option#unset`)                                                                                          |
+| `lh#position#char_at_mark()`                | Obtains the character under a mark                                                                                                                                       |
+| `lh#position#char_at_pos()`                 | Obtains the character at a given position                                                                                                                                |
+| `lh#position#is_before()`                   | Tells if a position in a buffer is before another one                                                                                                                    |
+| `lh#vcs#get_type(...)`                      | Returns the type of the versioning system the file is under                                                                                                              |
+| `lh#vcs#is_git(...)`                        | Tells whether the file is under a git repository                                                                                                                         |
+| `lh#vcs#is_svn(...)`                        | Tells whether the file is under a svn repository                                                                                                                         |
+| `lh#visual#cut()`                           | Cut and returns the visually selected text                                                                                                                               |
+| `lh#visual#selection()`                     | Returns the visually selected text                                                                                                                                       |
 
 ## System related functions
 

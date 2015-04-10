@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.2.11
+" Version:      3.2.12
 " Created:      24th Jul 2004
 " Last Update:  10th Apr 2015
 "------------------------------------------------------------------------
@@ -12,16 +12,18 @@
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 " History:
+"       v3.2.12
+"       (*) New functions: lh#option#getbufvar(), lh#option#is_set()
 "       v3.2.11
 "       (*) New function and variable: lh#option#is_unset() and
 "           g:lh#option#unset
-"       (*) Now lh#option#get() {default} parameter is optional and have the
+"       (*) Now lh#option#get() {default} parameter is optional and has the
 "           default value g:lh#option#unset
 "       v3.1.13
 "       (*) lh#option#add() don't choke when option value contains characters that
 "           means something in a regex context
 "       v3.1.5
-"       (*) lh#option#get() support var names from dictionaries like "g:foo.bar"
+"       (*) lh#option#get() supports var names from dictionaries like "g:foo.bar"
 "       v3.0.0
 "       (*) GPLv3
 "       v2.0.6
@@ -64,6 +66,11 @@ function! lh#option#is_unset(expr) abort
   return a:expr is g:lh#option#unset
 endfunction
 
+" Function: lh#option#is_set(expr) {{{3
+function! lh#option#is_set(expr) abort
+  return ! (a:expr is g:lh#option#unset)
+endfunction
+
 " Function: lh#option#get(name [, default [, scope]])            {{{3
 " @return b:{name} if it exists, or g:{name} if it exists, or {default}
 " otherwise
@@ -89,6 +96,7 @@ function! lh#option#Get(name,default,...)
   return lh#option#get(a:name, a:default, scope)
 endfunction
 
+" Function: s:IsEmpty(variable) {{{3
 function! s:IsEmpty(variable)
   if     type(a:variable) == type('string') | return 0 == strlen(a:variable)
   elseif type(a:variable) == type(42)       | return 0 == a:variable
@@ -98,12 +106,12 @@ function! s:IsEmpty(variable)
   endif
 endfunction
 
-" Function: lh#option#get_non_empty(name, default [, scope])  {{{3
+" Function: lh#option#get_non_empty(name [, default [, scope]])  {{{3
 " @return of b:{name}, g:{name}, or {default} the first which exists and is not empty
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#get_non_empty(name,default,...)
-  let scope = (a:0 == 1) ? a:1 : 'bg'
+function! lh#option#get_non_empty(name,...)
+  let scope = (a:0 == 2) ? a:2 : 'bg'
   let name = a:name
   let i = 0
   while i != strlen(scope)
@@ -112,11 +120,21 @@ function! lh#option#get_non_empty(name,default,...)
     endif
     let i += 1
   endwhile
-  return a:default
+  return a:0 > 0 ? (a:1) : g:lh#option#unset
 endfunction
 function! lh#option#GetNonEmpty(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   return lh#option#get_non_empty(a:name, a:default, scope)
+endfunction
+
+" Function: lh#option#getbufvar(expr, name [, default])            {{{3
+" This is an encapsulation of
+"   getbufvar(expr, name, g:lh#option#unset)
+" This function ensures g:lh#option#unset is known (the lazy-loading mecanism
+" of autoload plugins doesn't apply to variables, only to functions)
+function! lh#option#getbufvar(buf, name,...)
+  let def = a:0 == 0 ? g:lh#option#unset : a:1
+  return getbufvar(a:buf, a:name, def)
 endfunction
 
 " Function: lh#option#add(name, values)                       {{{3

@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.10)
+*lh-vim-lib.txt*        Vim common libraries (v3.2.12)
                         For Vim version 7+      Last change: 10th Apr 2015
 
                         By Luc Hermitte
@@ -39,6 +39,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#on#exit()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
+- |lh#option#getbufvar()|
+- |lh#option#is_set()|
 - |lh#option#is_unset()|
 - |lh#position#char_at_mark()|
 - |lh#position#char_at_pos()|
@@ -247,9 +249,10 @@ global options.
                                               *lh#option#GetNonEmpty()* {{{3
 lh#option#GetNonEmpty({name},{default}[,{scopes}])  (*deprecated*)~
                                               *lh#option#get_non_empty()*
-lh#option#get_non_empty({name},{default}[,{scopes}])~
+lh#option#get_non_empty({name}[,{default}[,{scopes}]])~
 @param {name}       Name of the option to fetch
 @param {default}    Default value in case the option is not defined, nor empty
+                    Its default value is |g:lh#option#unset|.
 @param {scopes}     Vim scopes in which the options must be searched,
                     default="bg".
 @return b:{name}    If it exists, of g:{name} if it exists, or {default}
@@ -262,20 +265,32 @@ An |expr-string| will be considered empty if its |strlen()| is 0, an
 is 0.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#option#is_unset()*  {{{3
+                                                *lh#option#getbufvar()* {{{3
+lh#option#getbufvar({expr}, {name}[,{default}])~
+This function encapsulates  |getbufvar| >
+    getbufvar(expr, name, g:lh#option#unset)
+
+Unlike the direct call of the previous expression, this function ensures
+|g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins
+doesn't apply to variables, only to functions)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#is_set()*    {{{3
+                                                *lh#option#is_unset()*
                                                 *g:lh#option#unset*
+lh#option#is_set({expr})~
 lh#option#is_unset({expr})~
-@return whether expr is identical to |g:lh#option#unset|.
+@return whether expr is defferent (/resp identical) to |g:lh#option#unset|.
 This function will permit to test whether an option is set or not: >
-    unlet g:foobar
+    silent! unlet g:foobar
     Assert lh#option#is_unset(lh#option#get('foobar'))
     let g:foobar = 1
-    Assert ! lh#option#is_unset(lh#option#get('foobar'))
+    Assert lh#option#is_set(lh#option#get('foobar'))
 
-    unlet b:foobar
-    Assert lh#option#is_unset(getbufvar(bufnr('%'), 'foobar', g:lh#option#unset))
+    silent! unlet b:foobar
+    Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
     let b:foobar = 1
-    Assert ! lh#option#is_unset(getbufvar(bufnr('%'), 'foobar', g:lh#option#unset))
+    Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#Exe()*       {{{3
