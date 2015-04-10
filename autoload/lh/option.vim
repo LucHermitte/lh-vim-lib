@@ -4,14 +4,19 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.1.13
+" Version:      3.2.11
 " Created:      24th Jul 2004
-" Last Update:  23rd Mar 2015
+" Last Update:  10th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 " History:
+"       v3.2.11
+"       (*) New function and variable: lh#option#is_unset() and
+"           g:lh#option#unset
+"       (*) Now lh#option#get() {default} parameter is optional and have the
+"           default value g:lh#option#unset
 "       v3.1.13
 "       (*) lh#option#add() don't choke when option value contains characters that
 "           means something in a regex context
@@ -52,13 +57,20 @@ function! lh#option#debug(expr)
 endfunction
 
 " # Public {{{2
-" Function: lh#option#get(name, default [, scope])            {{{3
+
+" Function: lh#option#is_unset(expr) {{{3
+let g:lh#option#unset = {}
+function! lh#option#is_unset(expr) abort
+  return a:expr is g:lh#option#unset
+endfunction
+
+" Function: lh#option#get(name [, default [, scope]])            {{{3
 " @return b:{name} if it exists, or g:{name} if it exists, or {default}
 " otherwise
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#get(name,default,...)
-  let scope = (a:0 == 1) ? a:1 : 'bg'
+function! lh#option#get(name,...)
+  let scope = (a:0 == 2) ? a:2 : 'bg'
   let name = a:name
   let i = 0
   while i != strlen(scope)
@@ -70,7 +82,7 @@ function! lh#option#get(name,default,...)
     endif
     let i += 1
   endwhile
-  return a:default
+  return a:0 > 0 ? (a:1) : g:lh#option#unset
 endfunction
 function! lh#option#Get(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'

@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.8)
-                        For Vim version 7+      Last change: 19th Mar 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.2.10)
+                        For Vim version 7+      Last change: 10th Apr 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -39,6 +39,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#on#exit()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
+- |lh#option#is_unset()|
 - |lh#position#char_at_mark()|
 - |lh#position#char_at_pos()|
 - |lh#position#is_before()|
@@ -219,14 +220,14 @@ e.g. >
     endtry
     " Then g:foo and g:bar are restored, and "The END" has been echoed
 
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#Get()*       {{{3
 lh#option#Get({name},{default}[,{scopes}])  (*deprecated*)~
                                                 *lh#option#get()*
-lh#option#get({name},{default}[,{scopes}])~
+lh#option#get({name}[,{default}[,{scopes}]])~
 @param {name}       Name of the option to fetch
-@param {default}    Default value in case the option is not defined
+@param {default}    Default value in case the option is not defined.
+                    Its default value is |g:lh#option#unset|.
 @param {scopes}     Vim scopes in which the options must be searched,
                     default="bg".
 @return             b:{name} if it exists, or g:{name} if it exists, or
@@ -241,7 +242,6 @@ a|window-variable|.
 The order of the variables checked can be specified through the optional
 argument {scopes}. By default, buffer-local options have the priority over
 global options.
-
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#option#GetNonEmpty()* {{{3
@@ -260,6 +260,22 @@ variable with an empty value will be ignored as well.
 An |expr-string| will be considered empty if its |strlen()| is 0, an
 |expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
 is 0.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#is_unset()*  {{{3
+                                                *g:lh#option#unset*
+lh#option#is_unset({expr})~
+@return whether expr is identical to |g:lh#option#unset|.
+This function will permit to test whether an option is set or not: >
+    unlet g:foobar
+    Assert lh#option#is_unset(lh#option#get('foobar'))
+    let g:foobar = 1
+    Assert ! lh#option#is_unset(lh#option#get('foobar'))
+
+    unlet b:foobar
+    Assert lh#option#is_unset(getbufvar(bufnr('%'), 'foobar', g:lh#option#unset))
+    let b:foobar = 1
+    Assert ! lh#option#is_unset(getbufvar(bufnr('%'), 'foobar', g:lh#option#unset))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#Exe()*       {{{3

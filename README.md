@@ -50,8 +50,9 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#let#let_if_undef()`                     | Defines a vim variable (with ` :let`) on the condition the variable does not exist yet                                |
 | `lh#on#exit()`                              | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions |
 | `lh#option#add()`                           | Adds new values to a vim option -- and avoid the values being listed more than once                                   |
-| `lh#option#get()`                           | Fetches the value of a user defined option, that may be _empty_                                                       |
+| `lh#option#get(name [,default [, scope]])`  | Fetches the value of a user defined option, that may be _empty_. `default` is returned if the option does not exists. Default value for `default` is `g:lh#option#unset` |
 | `lh#option#get_non_empty()`                 | Fetches the value of a user defined option, that is not _empty_                                                       |
+| `lh#option#is_unset(expr)`                  | Tells whether the expression is not set (i.e. identical to `g:lh#option#unset`)                                       |
 | `lh#position#char_at_mark()`                | Obtains the character under a mark                                                                                    |
 | `lh#position#char_at_pos()`                 | Obtains the character at a given position                                                                             |
 | `lh#position#is_before()`                   | Tells if a position in a buffer is before another one                                                                 |
