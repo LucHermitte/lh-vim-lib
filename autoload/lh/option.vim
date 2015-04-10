@@ -13,7 +13,8 @@
 "       Aimed at (ft)plugin writers.
 " History:
 "       v3.2.12
-"       (*) New functions: lh#option#getbufvar(), lh#option#is_set()
+"       (*) New functions: lh#option#getbufvar(), lh#option#is_set(),
+"           lh#option#unset()
 "       v3.2.11
 "       (*) New function and variable: lh#option#is_unset() and
 "           g:lh#option#unset
@@ -60,8 +61,13 @@ endfunction
 
 " # Public {{{2
 
-" Function: lh#option#is_unset(expr) {{{3
+" Function: lh#option#unset() {{{3
 let g:lh#option#unset = {}
+function! lh#option#unset() abort
+  return g:lh#option#unset
+endfunction
+
+" Function: lh#option#is_unset(expr) {{{3
 function! lh#option#is_unset(expr) abort
   return a:expr is g:lh#option#unset
 endfunction
