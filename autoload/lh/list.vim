@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.2.13
+" Version:      3.2.14
 " Created:      17th Apr 2007
 " Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.2.14:
+"       (*) new function lh#list#mask()
 "       v3.2.13:
 "       (*) new function lh#list#possible_values()
 "       v3.2.8:
@@ -49,8 +51,6 @@
 " }}}1
 "=============================================================================
 
-
-"=============================================================================
 let s:cpo_save=&cpo
 set cpo&vim
 
@@ -379,6 +379,21 @@ function! lh#list#subset(list, indices)
     call add(result, a:list[e])
   endfor
   return result
+endfunction
+
+" Function: lh#list#mask(list, masks) {{{3
+function! lh#list#mask(list, masks) abort
+  let len = len(a:list)
+  if len != len(a:masks)
+    throw "lh#list#mask() needs as many masks as elements in the list"
+  endif
+  let res = []
+  for i in range(len)
+    if a:masks[i]
+      let res += [a:list[i]]
+    endif
+  endfor
+  return res
 endfunction
 
 " Function: lh#list#remove(list, indices) {{{3

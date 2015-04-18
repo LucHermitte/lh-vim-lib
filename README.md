@@ -85,6 +85,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                          |
 | `lh#list#intersect()`       | Intersection of two lists                                                                               |
 | `lh#list#lower_bound()`     | See C++ [`std::lower_bound`](http://en.cppreference.com/w/cpp/algorithm/lower_bound)                    |
+| `lh#list#mask()`            | Builds a subset of the input list ; elements are kept according to a mask list.                         |
 | `lh#list#match()`           | Searches the first element in a list that matches a pattern                                             |
 | `lh#list#match_re()`        | Searches the first pattern in a list that  is matched by a text                                         |
 | `lh#list#matches()`         | Returns the list of indices of elements that match the pattern                                          |

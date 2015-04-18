@@ -1,25 +1,26 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/buffer/dialog.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:	3.2.14
 " Created:	21st Sep 2007
-" Last Update:	$Date$
+" Last Update:	18th Apr 2015
 "------------------------------------------------------------------------
-" Description:	«description»
-" 
+" Description:	?description?
+"
 "------------------------------------------------------------------------
-" Installation:	
+" Installation:
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
-" History:	
-"	v1.0.0 First Version
+" History:
+"       v3.2.14  Dialog buffer name may now contain a '#'
+"                Lines modifications silenced
+"       v3.0.0   GPLv3
+"	v1.0.0   First Version
 " 	(*) Functions imported from Mail_mutt_alias.vim
-"       v3.0.0  GPLv3
-" TODO:		
+" TODO:
 " 	(*) --abort-- line
 " 	(*) custom messages
 " 	(*) do not mess with search history
@@ -118,25 +119,25 @@ function! s:RedisplayHelp(dialog)
   silent! 2,$g/^@/d_
   normal! gg
   for help in a:dialog['help_'.a:dialog.help_type]
-    silent put=help
+    silent! put=help
   endfor
 endfunction
 
 function! lh#buffer#dialog#update(dialog)
   set noro
-  exe (s:Help_NbL()+1).',$d_'
+  silent! exe (s:Help_NbL()+1).',$d_'
   for choice in a:dialog.choices
-    silent $put='  '.choice
+    silent! $put='  '.choice
   endfor
   set ro
 endfunction
 
 function! s:Display(dialog, atitle)
   set noro
-  0 put = a:atitle
+  silent 0 put = a:atitle
   call s:RedisplayHelp(a:dialog)
   for choice in a:dialog.choices
-    silent $put='  '.choice
+    silent! $put='  '.choice
   endfor
   set ro
   " Resize to have all elements fit, up to max(15, winfixheight)
@@ -153,7 +154,7 @@ function! s:ToggleHelp(bufferId)
 endfunction
 
 function! lh#buffer#dialog#toggle_help() dict
-  let self.help_type 
+  let self.help_type
 	\ = (self.help_type == 'short')
 	\ ? 'long'
 	\ : 'short'
@@ -168,7 +169,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let res.where_it_started = where_it_started
 
   try
-    call lh#buffer#scratch(a:bname, a:where)
+    call lh#buffer#scratch(escape(a:bname, '#'), a:where)
   catch /.*/
     echoerr v:exception
     return res
@@ -201,11 +202,11 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let res.toggle_help = function("lh#buffer#dialog#toggle_help")
   let title = '@  ' . a:title
   let helpstr = '| Toggle (h)elp'
-  let title = title 
+  let title = title
 	\ . repeat(' ', winwidth(bufwinnr(res.id))-lh#encoding#strlen(title)-lh#encoding#strlen(helpstr)-1)
 	\ . helpstr
   call s:Display(res, title)
- 
+
   call s:Mappings(res)
   return res
 endfunction
@@ -230,9 +231,9 @@ function! lh#buffer#dialog#select(line, bufferId, ...)
     call lh#buffer#dialog#quit()
     return
   " elseif a:line <= s:Help_NbL() + 1
-  elseif a:line <= s:Help_NbL() 
+  elseif a:line <= s:Help_NbL()
     echoerr "Unselectable item"
-    return 
+    return
   else
     let dialog = s:LHdialog[a:bufferId]
     let results = { 'dialog' : dialog, 'selection' : []  }

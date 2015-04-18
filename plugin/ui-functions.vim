@@ -4,9 +4,9 @@
 "               <URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.0.0
+" Version:      3.2.14
 " Created:      18th nov 2002
-" Last Update:  $Date$ (19th Mar 2012)
+" Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
 " Description:  Functions for the interaction with a User Interface.
 "               The UI can be graphical or textual.
@@ -14,8 +14,8 @@
 "               mu-template's templates.
 "
 " Option:       {{{2
-"       {[bg]:ui_type} 
-"               = "g\%[ui]", 
+"       {[bg]:ui_type}
+"               = "g\%[ui]",
 "               = "t\%[ext]" ; the call must not be |:silent|
 "               = "f\%[te]"
 " }}}2
@@ -24,7 +24,7 @@
 " History:      {{{2
 "    v0.01 Initial Version
 "    v0.02
-"       (*) Code "factorisations" 
+"       (*) Code "factorisations"
 "       (*) Help on <F1> enhanced.
 "       (*) Small changes regarding the parameter accepted
 "       (*) Function SWITCH
@@ -42,8 +42,10 @@
 "    v2.2.6
 "       (*) CONFIRM() and WHICH() accept lists of {choices}
 "    v3.0.0  GPLv3
-" 
+"
 " TODO:         {{{2
+"       (*) Modernize the code to Vim7 Lists and dicts
+"           Move to autoload plugin
 "       (*) Save the hl-User1..9 before using them
 "       (*) Possibility other than &statusline:
 "           echohl User1 |echon "bla"|echohl User2|echon "bli"|echohl None
@@ -56,9 +58,9 @@
 " }}}1
 "=============================================================================
 " Avoid reinclusion {{{1
-" 
+"
 if exists("g:loaded_ui_functions") && !exists('g:force_reload_ui_functions')
-  finish 
+  finish
 endif
 let g:loaded_ui_functions = 1
 let s:cpo_save=&cpo
@@ -203,7 +205,7 @@ function! WHICH(fn, prompt, ...)
   " build the parameters string {{{4
   let i = 1
   while i <= a:0
-    if i == 1 
+    if i == 1
       if type(a:1) == type([])
         let choices = a:1
       else
@@ -292,15 +294,15 @@ function! s:status_line(current, hl, ...)
   elseif a:hl == "Question" | let hl = '%5*'
   else                      | let hl = '%1*'
   endif
-  
+
   " Build the string {{{3
   let sl_choices = '' | let i = 1
   while i <= a:0
     if i == a:current
-      let sl_choices .=  ' '. hl . 
+      let sl_choices .=  ' '. hl .
             \ substitute(a:{i}, '&\(.\)', '%6*\1'.hl, '') . '%* '
     else
-      let sl_choices .=  ' ' . 
+      let sl_choices .=  ' ' .
             \ substitute(a:{i}, '&\(.\)', '%6*\1%*', '') . ' '
     endif
     let i +=  1
@@ -353,10 +355,12 @@ function! s:confirm_text(box, text, ...)
       let list_choices .=  ',choice_{'.i.'}'
     endif
     " Update the hotkey.
-    let key = toupper(matchstr(choice_{i}, '&\zs.\ze'))
-    let hotkey_{key} = i
-    let hotkeys .=  tolower(key) . toupper(key)
-    let help_k .=  tolower(key)
+    if choice_{i} =~ '&[A-Za-z]'
+      let key = toupper(matchstr(choice_{i}, '&\zs.\ze'))
+      let hotkey_{key} = i
+      let hotkeys .=  tolower(key) . toupper(key)
+      let help_k .=  tolower(key)
+    endif
   endwhile
   let nb_choices = i
   if default > nb_choices | let default = nb_choices | endif
@@ -371,11 +375,11 @@ function! s:confirm_text(box, text, ...)
   " save the statusline
   let sl = &l:statusline
   " Color schemes for selected item {{{5
-  :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow 
+  :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow
         \ guifg=Black guibg=Yellow
   :hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
         \ guifg=Black guibg=LightRed
-  :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red 
+  :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red
         \ guifg=Black guibg=Red
   :hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
         \ guifg=Black guibg=Cyan
@@ -431,7 +435,7 @@ function! s:confirm_text(box, text, ...)
         let direction = 1
       elseif key =~ "\<left>\\|\<s-tab>"                " Previous  {{{5
         let direction = -1
-      elseif -1 != stridx(hotkeys, complType )          " Hotkeys     {{{5
+      elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
         if '' == complType  | continue | endif
         let direction = hotkey_{toupper(complType)} - i
         let toggle = 1
@@ -444,14 +448,14 @@ function! s:confirm_text(box, text, ...)
         let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
       endif
       let i +=  direction
-      if     i > nb_choices | let i = 1 
+      if     i > nb_choices | let i = 1
       elseif i == 0         | let i = nb_choices
       endif
       let direction = 0
     endif
     if toggle == 1    " {{{5
       if 'check' == a:box
-        let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]') 
+        let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]')
               \ . strpart(choice_{i}, 3)
       endif
       let toggle = 0

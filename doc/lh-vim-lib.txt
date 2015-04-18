@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.13)
+*lh-vim-lib.txt*        Vim common libraries (v3.2.14)
                         For Vim version 7+      Last change: 18th Apr 2015
 
                         By Luc Hermitte
@@ -59,6 +59,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#intersect()|
 - |lh#list#lower_bound()| and |lh#list#upper_bound()|
+- |lh#list#mask()|
 - |lh#list#match()|
 - |lh#list#matches()|
 - |lh#list#not_found()|
@@ -753,7 +754,7 @@ This bug has been fixed in vim version 7.4.411.
 lh#list#subset({input},{indices})~
 Returns a subset slice of the {input} list.
 
-@param[in] {input}   Input |List| from which  element will be extracted
+@param[in] {input}   Input |List| from which elements will be extracted
 @param[in] {indices}|List| of indices to extract
 @return a |List| of the elements from {input} indexed by the {indices}
 
@@ -762,6 +763,21 @@ Example: >
     :let indices = [ 0, 5, 7, 3 ]
     :echo lh#list#subset(l, indices)
     [ 1, 5, 6, 48 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#subset()*      {{{3
+lh#list#mask({input},{masks})~
+Returns a subset of the {input} list according to a {mask} list.
+
+@param[in] {input} Input |List| from which elements will be extracted
+@param[in] {masks} Each elements tells whether the element of same index in
+the {input} will be returned.
+
+Example: >
+    :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
+    :let masks = [ 1, 0, 0, 1, 0, 1, 0, 1]
+    :echo lh#list#masks(l, masks)
+    [ 1, 48, 5, 6 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#remove()*      {{{3
