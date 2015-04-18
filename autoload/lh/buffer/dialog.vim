@@ -161,7 +161,7 @@ function! lh#buffer#dialog#toggle_help() dict
   call s:RedisplayHelp(self)
 endfunction
 
-function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, choices)
+function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, choices) abort
   " The ID will be the buffer id
   let res = {}
   let where_it_started = getpos('.')
@@ -169,7 +169,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let res.where_it_started = where_it_started
 
   try
-    call lh#buffer#scratch(escape(a:bname, '#'), a:where)
+    call lh#buffer#scratch(a:bname, a:where)
   catch /.*/
     echoerr v:exception
     return res

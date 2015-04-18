@@ -3,7 +3,7 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " Licence:      GPLv3
-" Version:	3.1.15
+" Version:	3.2.14
 " Created:	23rd Jan 2007
 " Last Update:	23rd Mar 2015
 "------------------------------------------------------------------------
@@ -32,6 +32,8 @@
 "       v3.1.15
 "       (*) Bug fix in lh#buffer#get_nr() that does not need to reopen the
 "           buffer every time
+"       v3.2.14
+"       (*) lh#buffer#scratch() resists to filenames with "*", "#", or "%" within
 " }}}1
 "=============================================================================
 
@@ -88,7 +90,7 @@ endfunction
 function! lh#buffer#scratch(bname, where)
   try
     set modifiable
-    silent exe a:where.' sp '.a:bname
+    silent exe a:where.' sp '.escape(substitute(a:bname, '\*', '...', 'g'), '#%')
   catch /.*/
     throw "Can't open a buffer named '".a:bname."'!"
   endtry
