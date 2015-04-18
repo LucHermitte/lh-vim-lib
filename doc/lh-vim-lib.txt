@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.2.12)
-                        For Vim version 7+      Last change: 10th Apr 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.2.13)
+                        For Vim version 7+      Last change: 18th Apr 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -62,6 +62,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#match()|
 - |lh#list#matches()|
 - |lh#list#not_found()|
+- |lh#list#possible_values()|
 - |lh#list#remove()|
 - |lh#list#sort()|
 - |lh#list#subset()|
@@ -317,7 +318,7 @@ lh#askvim#menu({menuid},{modes})~
 This function provides a way to obtain information related to a menu entry in
 Vim.
 
-The format of the result being «to be stabilized»
+The format of the result being ?to be stabilized?
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#position#IsBefore()* {{{3
@@ -783,8 +784,8 @@ Example: >
 lh#list#intersect({list1},{list2})~
 Returns the elements present in both input lists.
 
-@param[in] {list1}|List|
-@param[in] {list2}|List|
+@param[in] {list1} |List|
+@param[in] {list2} |List|
 @return a |List| of the elements in both {list1} and {list2}, the elements are
 kepts in the same order as in {list1}
 @note the algorithm is in O(len({list1})*len({list2}))
@@ -794,6 +795,59 @@ Example: >
     :let l2 = [ 3, 8, 7, 25, 6 ]
     :echo lh#list#intersect(l1, l2)
     [ 25, 7, 6 ]
+
+------------------------------------------------------------------------------
+                                               *lh#list#possible_values()*   {{{3
+lh#list#possible_values(list [, key|index [, default_when_absent])~
+
+Mandatory Param:
+    @param[in] {list} Flat |List|, or |List| of |List|s, or |List| of |Dict|s
+First Optional param
+    @param[in] {index} Index to be used to extract values in the inner |List|s.
+    @param[in] {key}   Key to be used to extract values in the inner |Dict|s.
+Second Optional param
+    @param[in] {default} Default value used when nothing is found at the given
+    {key} or {index}. Default value for {default} is |lh#option#unset()|.
+
+@eturns of sorted list of the values that are stored in:
+- a flat list
+- or at a given {index} in the lists from the input {list}
+- or at a given {key} in the dictionaries from the input {list}
+
+Examples: >
+    " Flat lists
+    let list = [ 'a', 'b', 42, 'a', 15, 'c', 'c', 8]
+    Assert lh#list#possible_values(list) == ['a', 'b', 'c', 15, 42, 8]
+
+    " List of Lists
+    let list =
+          \ [ [ 0, 'a', 42, [] ]
+          \ , [ 1, 'b', 42, 12 ]
+          \ , [ 2, 42, 42 ]
+          \ , [ 3, 'a', 42 ]
+          \ , [ 4, 15, 42 ]
+          \ , [ 5, 'c', 42 ]
+          \ , [ 6, 'c', 42 ]
+          \ , [ 7, 8, 42 ]
+          \ ]
+    AssertEquals (lh#list#possible_values(list, 0), range(8))
+    AssertEquals (lh#list#possible_values(list, 1), ['a', 'b', 'c', 15, 42, 8])
+    " OK, this ine is odd, but it works!
+    AssertEquals (lh#list#possible_values(list, 3), [ 12, [], {}])
+
+    " List of Dicts
+    let list =
+          \ [ { 'k1': 0, 'k2': 'a'}
+          \ , { 'k1': 1, 'k2': 'b'}
+          \ , { 'k1': 2, 'k2': 42}
+          \ , { 'k1': 3, 'k2': 'a'}
+          \ , { 'k1': 4, 'k2': 15}
+          \ , { 'k1': 5, 'k2': 'c'}
+          \ , { 'k1': 6, 'k2': 'c'}
+          \ , { 'k1': 7, 'k2': 8}
+          \ ]
+    AssertEquals (lh#list#possible_values(list, 'k1'), range(8))
+    AssertEquals (lh#list#possible_values(list, 'k2'), ['a', 'b', 'c', 15, 42, 8])
 
 ------------------------------------------------------------------------------
 GRAPHS RELATED FUNCTIONS                              *lhvl#graph*      {{{2
@@ -1234,7 +1288,7 @@ INSERT, VISUAL and NORMAL. The mappings defined will be relative to the
 current buffer -- this function is addressed to ftplugins writers. The last
 arguments specify whether the inner mappings and abbreviations embedded within
 the actions should be expanded or not ; i.e. are we defining
-«noremaps/noremenus» ?
+?noremaps/noremenus? ?
 
 You will find very simple examples of what could be done at the end of
 menu-map.vim. Instead, I'll show here an extract of my TeX ftplugin: it
@@ -1280,19 +1334,19 @@ The definition of the different functions and commands involved just follows.
   " activation states of the brackets and marking features are.
   function! s:Close()
     if strlen(maparg('{')) == 0                    | exe "normal a} \<esc>"
-    elseif lh#brackets#usemarks()                  | exe "normal ¡jump! "
+    elseif lh#brackets#usemarks()                  | exe "normal ?jump! "
     else                                           | exe "normal a "
     endif
   endfunction
 
-  imap <buffer> ¡close! <c-o>:call <SID>Close()<cr>
+  imap <buffer> ?close! <c-o>:call <SID>Close()<cr>
 
   function! s:MapMenu4Env(code,text,binding, tex_env, middle, ...)
     let _2visual = (a:0 > 0) ? a:1 : "vip"
     let b = "'" . '\begin{' . a:tex_env . '}' . "'"
     let e = "'" . '\end{' . a:tex_env . '}' . "'"
     call IVN_MenuMake(a:code, a:text, a:binding,
-          \ '\begin{'.a:tex_env.'¡close!<CR>'.a:middle.' <CR>\end{'.a:tex_env.'}<C-F><esc>ks',
+          \ '\begin{'.a:tex_env.'?close!<CR>'.a:middle.' <CR>\end{'.a:tex_env.'}<C-F><esc>ks',
           \ ':VCall MapAroundVisualLines('.b. ',' .e.',1,1)',
           \ _2visual.a:binding,
           \ 0, 1, 0)
@@ -1581,7 +1635,7 @@ selects one entry in the menu.
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================
- © Luc Hermitte, 2001-2015 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ ? Luc Hermitte, 2001-2015 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:

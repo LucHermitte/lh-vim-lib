@@ -1,11 +1,12 @@
 "=============================================================================
 " File:         autoload/lh/list.vim                                      {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://github.com/LucHermitte>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.2.8
+" Version:      3.2.13
 " Created:      17th Apr 2007
+" Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -15,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.2.13:
+"       (*) new function lh#list#possible_values()
 "       v3.2.8:
 "       (*) lh#list#sort() wraps sort() to work around error fixed in vim
 "           version 7.4.411
@@ -43,7 +46,6 @@
 "       (*) lh#list#Find_if() supports search predicate, and start index
 "       (*) lh#list#Match() supports start index
 "       v2.0.0:
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -409,6 +411,25 @@ function! lh#list#push_if_new(list, value)
     call add (a:list, a:value)
   endif
   return a:list
+endfunction
+
+" Function: lh#list#possible_values(list [, key|index [, default_when_absent]) {{{3
+function! lh#list#possible_values(list, ...) abort
+  if a:0 == 0
+    return lh#list#unique_sort(a:list)
+  elseif a:0 == 1
+    let default = a:0 == 2 ? a:2 : lh#option#unset()
+    let dRes = {}
+    for e in a:list
+      let v = get(e, a:1, default)
+      let dRes[string(v)] = v
+      unlet v
+    endfor
+    " this hack regarding using values and not keyx permits to not alter the
+    " type of the elements
+    let res = sort(values(dRes))
+    return res
+  endif
 endfunction
 
 " # Private {{{2
