@@ -89,7 +89,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#match_re()`        | Searches the first pattern in a list that  is matched by a text                                         |
 | `lh#list#matches()`         | Returns the list of indices of elements that match the pattern                                          |
 | `lh#list#not_found()`       | Returns whether the range returned from `equal_range` is empty (i.e. element not found)                 |
-| `lh#list#possible_values()` | of sorted list of the values that are stored in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
+| `lh#list#possible_values()` | Returns a sorted list of the values that are stored: in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
 | `lh#list#push_if_new()`     | Adds a elements is not already present in the list                                                      |
 | `lh#list#remove()`          | Remove elements from list according to a list of indices                                                |
 | `lh#list#sort()`            | Workaround `sort()` bug which has been fixed in Vim v7.4.411                                            |
