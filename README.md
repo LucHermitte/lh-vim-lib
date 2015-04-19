@@ -68,13 +68,16 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
-| Function                   | Purpose                                                                       |
-|----------------------------|------------------------------------------------                               |
-| `lh#env#expand_all()`      | Expands environment variables found in strings                                |
-| `lh#os#chomp(text)`        | Like Perl `chomp`, remove the trailing character produced by `system()` calls |
-| `lh#os#system(cmd)`        | Returns `lh#os#chomp(system(command))`                                        |
-| `lh#os#cpu_number()`       | Returns the number of processors on the machine                               |
-| `lh#os#cpu_cores_number()` | Returns the number of cores on the machine                                    |
+| Function                           | Purpose                                                                            |
+|------------------------------------|------------------------------------------------------------------------------------|
+| `lh#env#expand_all()`              | Expands environment variables found in strings                                     |
+| `lh#os#has_unix_layer_installed()` | Tells whether the enduser has declared a unix layer installed (on a Windows box)   |
+| `lh#os#OnDOSWindows()`             | Tells whether the current vim is a native windows flavour of gvim                  |
+| `lh#os#sys_cd()`                   | Build a portable string to use to change directoy when executing external commands |
+| `lh#os#chomp(text)`                | Like Perl `chomp`, remove the trailing character produced by `system()` calls      |
+| `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(command))`                                             |
+| `lh#os#cpu_number()`               | Returns the number of processors on the machine                                    |
+| `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
 
 ## Lists related functions
 | Function                    | Purpose                                                                                                 |
@@ -134,6 +137,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#depth()`                            | Returns the depth of a path                                                                              |
 | `lh#path#find(pathlist, regex)`              | Returns the first path in a list that matches a regex                                                    |
 | `lh#path#find_in_parents()`                  | Support function at the root of [local_vimrc](http://github.com/LucHermitte/local_vimrc)                 |
+| `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                  |
 | `lh#path#glob_as_list()`                     | Returns `globpath()`result as a list                                                                     |
 | `lh#path#is_absolute_path()`                 | Tells whether the parameter is an absolute pathname                                                      |
 | `lh#path#is_in(node, path)`                  | Tells whether a node is already present in a path -- `readlink()` is applied on both parameters          |

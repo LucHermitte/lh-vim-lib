@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:	3.2.14
-let s:version = '3.2.14'
+" Version:	3.3.0
+let s:version = '3.3.0'
 " Created:	06th Nov 2007
 " Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
@@ -55,6 +55,7 @@ plugin/words_tools.vim
 tests/lh/function.vim
 tests/lh/list.vim
 tests/lh/path.vim
+tests/lh/UT-fixpath.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim

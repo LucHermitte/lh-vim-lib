@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.2.12.
-let s:k_version = '3.2.12'
+" Version:      3.3.0
+let s:k_version = '3.3.0'
 " Created:      11th Mar 2015
-" Last Update:  10th Apr 2015
+" Last Update:  19th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -77,8 +77,7 @@ endfunction
 function! lh#vcs#get_url(...) abort
   let cd
         \ = a:0 == 0               ? ''
-        \ : exists('*FixPathName') ? 'cd ' . FixPathName(a:1) . ' && '
-        \ :                          'cd ' . fnameescape(a:1) . ' && '
+        \ :                          'cd ' . lh#path#fix(a:1) . ' && '
   if lh#vcs#is_git()
     let url = lh#os#system(cd.'git config --get remote.origin.url')
     return url

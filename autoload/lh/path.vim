@@ -1,13 +1,13 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/path.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.2.4
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:      3.3.0
+let s:k_version = 3300
 " Created:      23rd Jan 2007
-" Last Update:  $Date
+" Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -86,6 +86,8 @@
 "       (*) Several functions fixed to take &shellslash into account
 "       v3.2.4:
 "       (*) new function lh#path#munge()
+"       v3.3.0:
+"       (*) Steal functions from system-tools
 " TODO:
 "       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
@@ -99,9 +101,8 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 "=============================================================================
-" ## Functions {{{1
+" ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 3204
 function! lh#path#version()
   return s:k_version
 endfunction
@@ -126,7 +127,74 @@ function! lh#path#debug(expr)
 endfunction
 
 "=============================================================================
+" ## Exported functions {{{1
 " # Public {{{2
+
+" Function: lh#path#fix(pathname [, shellslash [, quote_char ]]) {{{3
+" This function was FixEnsurePath from system_tools
+function! lh#path#fix(pathname, ...) abort
+  " Parameters       {{{4
+  " Ignore the last slash or backslash character, if any
+  let pathname   = matchstr(a:pathname, '^.*[^/\\]')
+  " Default value for the quote character
+  let quote_char = ''
+  " Determine if 'shellslash' exists (dos-like platforms)
+  if lh#os#OnDOSWindows()
+    if lh#os#system_detected() == 'msdos'
+      let shellslash = 0
+    else
+      let shellslash = &shellslash
+    endif
+  else "unix
+    let shellslash = 1
+  endif
+  " Determine if we will use slashes or backslashes to distinguish directories
+  if a:0 >= 1   "
+    let shellslash = a:1
+    if a:0 >= 2
+      let quote_char = a:2
+    endif
+  endif
+
+  " Smart definition of quote chars for $COMSPEC
+  if (lh#os#system_detected() == 'msdos') && !shellslash && (''==quote_char)
+    if (&shell =~ 'command\.com')
+      if pathname =~ ' '
+        " should also test long directory-names...
+        " Best: AVOID command.com !!!
+        if &verbose >= 1
+          call lh#common#error_msg('lh#path#fix: '.
+                \ 'Problem expected because of the space in <'.pathname.'>')
+        endif
+      else
+        let quote_char = ''
+      endif
+    else
+      let quote_char = '"'
+    endif
+  endif
+
+  " Fix the pathname {{{4
+  if shellslash
+    " return substitute(dname, '\\\([^ ]\|$\)', '/\1', 'g')
+    let res = substitute(
+          \ substitute(pathname, '\\\([^ ]\|$\)', '/\1', 'g'),
+          \ '\(^\|[^\\]\) ', '\1\\ ', 'g')
+  else
+    " return substitute(
+          " \ substitute(pathname, '\([^\\]\) ', '\1\\ ', 'g'),
+          " \ '/', '\\', 'g')
+    let res = substitute(
+          \ substitute(pathname, '\\ ', ' ', 'g'),
+          \ '/', '\\', 'g')
+  endif
+  " Note: problem to take care (that explains the complex substition schemes):
+  " sometimes the path passed to the function mix the two writtings, e.g.:
+  " "c:\Program Files/longpath/some\ spaces/foo"
+  " }}}4
+  return quote_char . res . quote_char
+endfunction
+
 " Function: lh#path#simplify({pathname}, [make_relative_to_pwd=true]) {{{3
 " Like |simplify()|, but also strip the leading './'
 " It seems unable to simplify '..\' when compiled without +shellslash

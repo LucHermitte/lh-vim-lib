@@ -5,7 +5,7 @@
 " Licence:      GPLv3
 " Version:	3.2.14
 " Created:	23rd Jan 2007
-" Last Update:	23rd Mar 2015
+" Last Update:	18th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
