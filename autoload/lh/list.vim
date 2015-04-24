@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.2.14
+" Version:      3.3.1
 " Created:      17th Apr 2007
-" Last Update:  18th Apr 2015
+" Last Update:  24th Apr 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.1
+"       (*) Enhance lh#list#find_if() to support "v:val" as well.
 "       v3.2.14:
 "       (*) new function lh#list#mask()
 "       v3.2.13:
@@ -213,8 +215,8 @@ function! lh#list#find_if(list, predicate, ...) abort
 
   " The search loop
   while idx != len(a:list)
-    " let predicate = substitute(a:predicate, 'v:val', 'a:list['.idx.']', 'g')
-    let res = lh#function#execute(a:predicate, a:list[idx])
+    let predicate = substitute(a:predicate, 'v:val', 'v:1_', 'g')
+    let res = lh#function#execute(predicate, a:list[idx])
     if res | return idx | endif
     let idx += 1
   endwhile
