@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.0)
-                        For Vim version 7+      Last change: 19th Apr 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.1)
+                        For Vim version 7+      Last change: 18th Jun 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -289,7 +289,6 @@ doesn't apply to variables, only to functions)
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#is_set()*              {{{3
                                                 *lh#option#is_unset()*
-                                                *g:lh#option#unset*
 lh#option#is_set({expr})~
 lh#option#is_unset({expr})~
 @return whether expr is defferent (/resp identical) to |g:lh#option#unset|.
@@ -303,6 +302,17 @@ This function will permit to test whether an option is set or not: >
     Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
     let b:foobar = 1
     Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#unset()*
+                                                *g:lh#option#unset*
+lh#option#unset()~
+@return the value |g:lh#option#unset|, that can be tested with
+|lh#option#is_set()|and |lh#option#is_unset()|.
+@note Never use |g:lh#option#unset| from your plugins but |lh#option#unset()|
+as it will get lazily loaded on need.
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#Exe()*                 {{{3
@@ -775,7 +785,7 @@ Example: >
     [ 1, 5, 6, 48 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#list#subset()*                 {{{3
+                                               *lh#list#mask()*                   {{{3
 lh#list#mask({input},{masks})~
 Returns a subset of the {input} list according to a {mask} list.
 
