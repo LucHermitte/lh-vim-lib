@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:	3.3.1
-let s:version = '3.3.1'
+" Version:	3.3.2
+let s:version = '3.3.2'
 " Created:	06th Nov 2007
-" Last Update:  24th Apr 2015
+" Last Update:  18th Aug 2015
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try

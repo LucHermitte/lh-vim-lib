@@ -1,17 +1,17 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/ft.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.17
+" Version:      3.3.2
+let s:k_version = 3320
 " Created:      28th Jan 2014
-" Last Update:  $Date$
+" Last Update:  18th Aug 2015
 "------------------------------------------------------------------------
 " Description:
 "       library functions related to filetype manipulations
-" 
+"
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -21,7 +21,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 3117
 function! lh#ft#version()
   return s:k_version
 endfunction
@@ -49,7 +48,7 @@ endfunction
 " Function: lh#ft#is_text(...) {{{3
 function! lh#ft#is_text(...)
   let ft = a:0 == 0 ? &ft : (a:1)
-  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown'
+  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown\|gitcommit'
 endfunction
 
 "------------------------------------------------------------------------
