@@ -4,10 +4,10 @@
 "		<URL:http://code.google.com/p/lh-vim/>
 " License:      GPLv3 with exceptions
 "               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.3.2
-let s:k_version = 3320
+" Version:      3.3.3
+let s:k_version = 3330
 " Created:      28th Jan 2014
-" Last Update:  18th Aug 2015
+" Last Update:  24th Sep 2015
 "------------------------------------------------------------------------
 " Description:
 "       library functions related to filetype manipulations
@@ -49,6 +49,12 @@ endfunction
 function! lh#ft#is_text(...)
   let ft = a:0 == 0 ? &ft : (a:1)
   return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown\|gitcommit'
+endfunction
+
+" Function: lh#ft#is_script(...) {{{3
+function! lh#ft#is_script(...) abort
+  let ft = a:0 == 0 ? &ft : (a:1)
+  return ft =~ 'sh$\|perl\|ruby\|python'
 endfunction
 
 "------------------------------------------------------------------------

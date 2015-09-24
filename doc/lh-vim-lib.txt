@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.1)
-                        For Vim version 7+      Last change: 18th Jun 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.3)
+                        For Vim version 7+      Last change: 24th Sep 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -427,6 +427,12 @@ Returns The minimum, /arg-minimum, /maximum, /arg-maximum of a |List| of
                                 *lh#ft#is_text()*                                 {{{3
 lh#ft#is_text([ft])~
 Tells whether the corresponding filetype correspond to a text filetype.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                *lh#ft#is_script()*                               {{{3
+lh#ft#is_text([ft])~
+Tells whether the corresponding filetype correspond to a script filetype (sh,
+python, ruby, perl).
 
 ------------------------------------------------------------------------------
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
