@@ -83,6 +83,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | Function                    | Purpose                                                                                                 |
 |:----------------------------|:--------------------------------------------------------------------------------------------------------|
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                    |
+| `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                         |
 | `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                  |
 | `lh#list#equal_range()`     | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                    |
 | `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                          |
