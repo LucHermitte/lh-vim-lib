@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.1)
-                        For Vim version 7+      Last change: 18th Jun 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.4)
+                        For Vim version 7+      Last change: 01st Oct 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -428,6 +428,12 @@ Returns The minimum, /arg-minimum, /maximum, /arg-maximum of a |List| of
 lh#ft#is_text([ft])~
 Tells whether the corresponding filetype correspond to a text filetype.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                *lh#ft#is_script()*                               {{{3
+lh#ft#is_text([ft])~
+Tells whether the corresponding filetype correspond to a script filetype (sh,
+python, ruby, perl).
+
 ------------------------------------------------------------------------------
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
 
@@ -750,7 +756,7 @@ Accumulates the transformed elements from {input}.
 
 @param[in]      {input} Input |List| to transform
 @param {transformation}|lhvl#functor| applied on each element from {input}.
-@param    {accumulator}|lhvl#functor| taking the list of tranformaed elements
+@param    {accumulator}|lhvl#functor| taking the list of tranformed elements
                         as input
 @return                 the result of {accumulator}
 
@@ -761,6 +767,32 @@ Examples: >
 
    :let l = [ 1, 2, 'foo', ['bar']]
    :echo lh#list#accumulate(l, 'string', 'join(v:1_, "##")')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#accumulate2()*            {{{3
+lh#list#accumulate2({input},{init}[,{accumulator}])~
+Accumulates elements from {input}.
+
+@param[in]      {input} Input |List| to transform
+@param[in]       {init} Initial value to accumulate to
+@param    {accumulator} |lhvl#functor| adds an element in the accumulated
+                        result. Default: add the two elements.
+@return                 the result of {accumulator}
+
+Examples: >
+   :let llist = [ [1,2], [5,6], [3,4]]
+   :echo lh#list#accumulate2(llist, [])
+   [1, 2, 5, 6, 3, 4]
+
+   :echo lh#list#accumulate2(llist, [], 'v:2_ + v:1_')
+   [3, 4, 5, 6, 1, 2]
+
+   :let l = [1, 2, 5, 6, 3, 4]
+   :echo lh#list#accumulate(l, 0)
+   21
+
+   :echo lh#list#accumulate(l, 1, 'v:1_ * v:2_')
+   720
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#sort()*                   {{{3

@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.1
+" Version:      3.3.4
 " Created:      17th Apr 2007
 " Last Update:  24th Apr 2015
 "------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.4
+"       (*) New function lh#list#accumulate2()
 "       v3.3.1
 "       (*) Enhance lh#list#find_if() to support "v:val" as well.
 "       v3.2.14:
@@ -91,6 +93,7 @@ function! lh#list#Transform(input, output, action)
   return a:output
 endfunction
 
+" Function: lh#list#transform(input, output, action) {{{3
 function! lh#list#transform(input, output, action)
   for element in a:input
     let res = lh#function#execute(a:action, element)
@@ -100,6 +103,7 @@ function! lh#list#transform(input, output, action)
   return a:output
 endfunction
 
+" Function: lh#list#transform_if(input, output, action, predicate) {{{3
 function! lh#list#transform_if(input, output, action, predicate)
   for element in a:input
     if lh#function#execute(a:predicate, element)
@@ -111,6 +115,7 @@ function! lh#list#transform_if(input, output, action, predicate)
   return a:output
 endfunction
 
+" Function: lh#list#copy_if(input, output, predicate) {{{3
 function! lh#list#copy_if(input, output, predicate)
   for element in a:input
     if lh#function#execute(a:predicate, element)
@@ -121,9 +126,20 @@ function! lh#list#copy_if(input, output, predicate)
   return a:output
 endfunction
 
+" Function: lh#list#accumulate(input, transformation, accumulator) {{{3
 function! lh#list#accumulate(input, transformation, accumulator)
   let transformed = lh#list#transform(a:input, [], a:transformation)
   let res = lh#function#execute(a:accumulator, transformed)
+  return res
+endfunction
+
+" Function: lh#list#accumulate2(input, init, [accumulator = a+b]) {{{3
+function! lh#list#accumulate2(input, init, ...)
+  let accumulator = a:0 == 0 ? 'v:1_ + v:2_' : a:1
+  let res = a:init
+  for e in a:input
+    let res = lh#function#execute(accumulator, res, e)
+  endfor
   return res
 endfunction
 
