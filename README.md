@@ -97,6 +97,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#possible_values()` | Returns a sorted list of the values that are stored: in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
 | `lh#list#push_if_new()`     | Adds a elements is not already present in the list                                                      |
 | `lh#list#remove()`          | Remove elements from list according to a list of indices                                                |
+| `lh#list#rotate()`          | Rotate elements from list                                                                               |
 | `lh#list#sort()`            | Workaround `sort()` bug which has been fixed in Vim v7.4.411                                            |
 | `lh#list#subset()`          | Builds a subset slice of a list                                                                         |
 | `lh#list#transform()`       | Applies a transformation on each element from a list ; unlike `map()`, the input list is left unchanged |

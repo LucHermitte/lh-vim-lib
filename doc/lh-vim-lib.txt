@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.4)
-                        For Vim version 7+      Last change: 01st Oct 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.5)
+                        For Vim version 7+      Last change: 08th Oct 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -807,7 +807,7 @@ lh#list#subset({input},{indices})~
 Returns a subset slice of the {input} list.
 
 @param[in] {input}   Input |List| from which elements will be extracted
-@param[in] {indices}|List| of indices to extract
+@param[in] {indices} |List| of indices to extract
 @return a |List| of the elements from {input} indexed by the {indices}
 
 Example: >
@@ -815,6 +815,20 @@ Example: >
     :let indices = [ 0, 5, 7, 3 ]
     :echo lh#list#subset(l, indices)
     [ 1, 5, 6, 48 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#rotate()*                 {{{3
+lh#list#rotate({list}, {rot})~
+@param[in] {list} Input |List| to rotate
+@param[in] {rot}  Number of elements to rotate.
+@pre {rot} must belong to [-len({list}), +len({list})]
+>
+    :echo lh#list#rotate([1,2,3,4,5], 1)
+    [2, 3, 4, 5, 1]
+    :echo lh#list#rotate([1,2,3,4,5], -1)
+    [5, 1, 2, 3, 4]
+    :echo lh#list#rotate([1,2,3,4,5], -2)
+    [4, 5, 1, 2, 3]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#mask()*                   {{{3
