@@ -80,31 +80,32 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
 
 ## Lists related functions
-| Function                    | Purpose                                                                                                 |
-|:----------------------------|:--------------------------------------------------------------------------------------------------------|
-| `lh#list#accumulate()`      | Accumulates the elements from a list                                                                    |
-| `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                         |
-| `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                  |
-| `lh#list#equal_range()`     | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                    |
-| `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                          |
-| `lh#list#intersect()`       | Intersection of two lists                                                                               |
-| `lh#list#lower_bound()`     | See C++ [`std::lower_bound`](http://en.cppreference.com/w/cpp/algorithm/lower_bound)                    |
-| `lh#list#mask()`            | Builds a subset of the input list ; elements are kept according to a mask list.                         |
-| `lh#list#match()`           | Searches the first element in a list that matches a pattern                                             |
-| `lh#list#match_re()`        | Searches the first pattern in a list that  is matched by a text                                         |
-| `lh#list#matches()`         | Returns the list of indices of elements that match the pattern                                          |
-| `lh#list#not_found()`       | Returns whether the range returned from `equal_range` is empty (i.e. element not found)                 |
+| Function                    | Purpose                                                                                                           |
+|:----------------------------|:--------------------------------------------------------------------------------------------------------          |
+| `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
+| `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                                   |
+| `lh#list#chain_transform()` | Applies a series of transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
+| `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                            |
+| `lh#list#equal_range()`     | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
+| `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                                    |
+| `lh#list#intersect()`       | Intersection of two lists                                                                                         |
+| `lh#list#lower_bound()`     | See C++ [`std::lower_bound`](http://en.cppreference.com/w/cpp/algorithm/lower_bound)                              |
+| `lh#list#mask()`            | Builds a subset of the input list ; elements are kept according to a mask list.                                   |
+| `lh#list#match()`           | Searches the first element in a list that matches a pattern                                                       |
+| `lh#list#match_re()`        | Searches the first pattern in a list that  is matched by a text                                                   |
+| `lh#list#matches()`         | Returns the list of indices of elements that match the pattern                                                    |
+| `lh#list#not_found()`       | Returns whether the range returned from `equal_range` is empty (i.e. element not found)                           |
 | `lh#list#possible_values()` | Returns a sorted list of the values that are stored: in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
-| `lh#list#push_if_new()`     | Adds a elements is not already present in the list                                                      |
-| `lh#list#remove()`          | Remove elements from list according to a list of indices                                                |
-| `lh#list#rotate()`          | Rotate elements from list                                                                               |
-| `lh#list#sort()`            | Workaround `sort()` bug which has been fixed in Vim v7.4.411                                            |
-| `lh#list#subset()`          | Builds a subset slice of a list                                                                         |
-| `lh#list#transform()`       | Applies a transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
-| `lh#list#transform_if()`    | Applies a transformation on each element from a list that match the predicate                           |
-| `lh#list#unique_sort()`     | Sorts the elements of a list, and makes sure they are all unique                                        |
-| `lh#list#unique_sort2()`    | Another implementation of `unique_sort`                                                                 |
-| `lh#list#upper_bound()`     | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                    |
+| `lh#list#push_if_new()`     | Adds a elements is not already present in the list                                                                |
+| `lh#list#remove()`          | Remove elements from list according to a list of indices                                                          |
+| `lh#list#rotate()`          | Rotate elements from list                                                                                         |
+| `lh#list#sort()`            | Workaround `sort()` bug which has been fixed in Vim v7.4.411                                                      |
+| `lh#list#subset()`          | Builds a subset slice of a list                                                                                   |
+| `lh#list#transform()`       | Applies a transformation on each element from a list ; unlike `map()`, the input list is left unchanged           |
+| `lh#list#transform_if()`    | Applies a transformation on each element from a list that match the predicate                                     |
+| `lh#list#unique_sort()`     | Sorts the elements of a list, and makes sure they are all unique                                                  |
+| `lh#list#unique_sort2()`    | Another implementation of `unique_sort`                                                                           |
+| `lh#list#upper_bound()`     | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                              |
 
 
 ## Stacks related functions

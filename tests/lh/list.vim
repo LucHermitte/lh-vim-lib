@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.2.13
+" Version:      3.3.6
 " Created:	19th Nov 2008
-" Last Update:  18th Apr 2015
+" Last Update:  09th Oct 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -122,6 +122,20 @@ function! s:Test_accumulate_join()
   let ll = [ 1, 2, 'foo', ['bar'] ]
   let res = lh#list#accumulate(ll, 'string', 'join(v:1_,  " ## ")')
   Assert res == "1 ## 2 ## 'foo' ## ['bar']"
+  " This test will fail because it seems :for each loop cannot iterate on
+  " heterogeneous containers
+endfunction
+
+function! s:Test_accumulate_multiple()
+  " http://vi.stackexchange.com/questions/5038/how-to-replace-a-list-of-numbers-or-times-timestamps-with-their-sum
+  let min_sec = [
+        \ '3:04', '3:14', '5:38', '4:12', '10:30', '6:29', '6:53', '11:49',
+        \ '9:33', '4:17', '7:49', '6:10', '6:04', '6:28', '6:40', '4:21' ]
+  let res = eval(lh#list#accumulate(min_sec, ['split(v:1_, ":")', 'v:1_[0]*60 + v:1_[1]'], 'join(v:1_,  "+")'))
+  AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
+
+  let res = lh#list#accumulate2(lh#list#chain_transform(min_sec, ['split(v:1_, ":")', 'v:1_[0]*60 + v:1_[1]']), 0)
+  AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
   " This test will fail because it seems :for each loop cannot iterate on
   " heterogeneous containers
 endfunction

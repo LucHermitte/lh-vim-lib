@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.5
+" Version:      3.3.6
 " Created:      17th Apr 2007
-" Last Update:  24th Apr 2015
+" Last Update:  09th Oct 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.6
+"       (*) New function lh#list#chain_transform(), and new "overload" for
+"           lh#list#accumulate()
 "       v3.3.5
 "       (*) New function lh#list#rotate()
 "       v3.3.4
@@ -81,7 +84,7 @@ endfunction
 " # Public {{{2
 " Function: lh#list#Transform(input, output, action) {{{3
 " deprecated version
-function! lh#list#Transform(input, output, action)
+function! lh#list#Transform(input, output, action) abort
   let new = map(copy(a:input), a:action)
   let res = extend(a:output,new)
   return res
@@ -96,7 +99,7 @@ function! lh#list#Transform(input, output, action)
 endfunction
 
 " Function: lh#list#transform(input, output, action) {{{3
-function! lh#list#transform(input, output, action)
+function! lh#list#transform(input, output, action) abort
   for element in a:input
     let res = lh#function#execute(a:action, element)
     call add(a:output, res)
@@ -105,8 +108,17 @@ function! lh#list#transform(input, output, action)
   return a:output
 endfunction
 
+" Function: lh#list#chain_transform(input, actions) {{{3
+function! lh#list#chain_transform(input, actions) abort
+  let input = a:input
+  for transformation in a:actions
+    let input = lh#list#transform(input, [], transformation)
+  endfor
+  return input
+endfunction
+
 " Function: lh#list#transform_if(input, output, action, predicate) {{{3
-function! lh#list#transform_if(input, output, action, predicate)
+function! lh#list#transform_if(input, output, action, predicate) abort
   for element in a:input
     if lh#function#execute(a:predicate, element)
       let res = lh#function#execute(a:action, element)
@@ -118,7 +130,7 @@ function! lh#list#transform_if(input, output, action, predicate)
 endfunction
 
 " Function: lh#list#copy_if(input, output, predicate) {{{3
-function! lh#list#copy_if(input, output, predicate)
+function! lh#list#copy_if(input, output, predicate) abort
   for element in a:input
     if lh#function#execute(a:predicate, element)
       call add(a:output, element)
@@ -129,14 +141,18 @@ function! lh#list#copy_if(input, output, predicate)
 endfunction
 
 " Function: lh#list#accumulate(input, transformation, accumulator) {{{3
-function! lh#list#accumulate(input, transformation, accumulator)
-  let transformed = lh#list#transform(a:input, [], a:transformation)
+function! lh#list#accumulate(input, transformations, accumulator) abort
+  if type(a:transformations) == type('')
+    let transformed = lh#list#transform(a:input, [], a:transformations)
+  else
+    let transformed = lh#list#chain_transform(a:input, a:transformations)
+  endif
   let res = lh#function#execute(a:accumulator, transformed)
   return res
 endfunction
 
 " Function: lh#list#accumulate2(input, init, [accumulator = a+b]) {{{3
-function! lh#list#accumulate2(input, init, ...)
+function! lh#list#accumulate2(input, init, ...) abort
   let accumulator = a:0 == 0 ? 'v:1_ + v:2_' : a:1
   let res = a:init
   for e in a:input
@@ -147,7 +163,7 @@ endfunction
 
 " Function: lh#list#match_re(list, to_be_matched [, idx]) {{{3
 " Search first regex that match the parameter
-function! lh#list#match_re(list, to_be_matched, ...)
+function! lh#list#match_re(list, to_be_matched, ...) abort
   let idx = (a:0>0) ? a:1 : 0
   while idx < len(a:list)
     if match(a:to_be_matched, a:list[idx]) != -1
@@ -159,7 +175,7 @@ function! lh#list#match_re(list, to_be_matched, ...)
 endfunction
 
 " Function: lh#list#match(list, to_be_matched [, idx]) {{{3
-function! lh#list#match(list, to_be_matched, ...)
+function! lh#list#match(list, to_be_matched, ...) abort
   let idx = (a:0>0) ? a:1 : 0
   while idx < len(a:list)
     if match(a:list[idx], a:to_be_matched) != -1
@@ -169,14 +185,14 @@ function! lh#list#match(list, to_be_matched, ...)
   endwhile
   return -1
 endfunction
-function! lh#list#Match(list, to_be_matched, ...)
+function! lh#list#Match(list, to_be_matched, ...) abort
   let idx = (a:0>0) ? a:1 : 0
   return lh#list#match(a:list, a:to_be_matched, idx)
 endfunction
 
 " Function: lh#list#matches(list, to_be_matched [,idx]) {{{3
 " Return the list of indices that match {to_be_matched}
-function! lh#list#matches(list, to_be_matched, ...)
+function! lh#list#matches(list, to_be_matched, ...) abort
   let res = []
   let idx = (a:0>0) ? a:1 : 0
   while idx < len(a:list)
@@ -189,7 +205,7 @@ function! lh#list#matches(list, to_be_matched, ...)
 endfunction
 
 " Function: lh#list#Find_if(list, predicate [, predicate-arguments] [, start-pos]) {{{3
-function! lh#list#Find_if(list, predicate, ...)
+function! lh#list#Find_if(list, predicate, ...) abort
   " Parameters
   let idx = 0
   let args = []
@@ -242,7 +258,7 @@ function! lh#list#find_if(list, predicate, ...) abort
 endfunction
 
 " Function: lh#list#lower_bound(sorted_list, value  [, first[, last]]) {{{3
-function! lh#list#lower_bound(list, val, ...)
+function! lh#list#lower_bound(list, val, ...) abort
   let first = 0
   let last = len(a:list)
   if a:0 >= 1     | let first = a:1
@@ -267,7 +283,7 @@ function! lh#list#lower_bound(list, val, ...)
 endfunction
 
 " Function: lh#list#upper_bound(sorted_list, value  [, first[, last]]) {{{3
-function! lh#list#upper_bound(list, val, ...)
+function! lh#list#upper_bound(list, val, ...) abort
   let first = 0
   let last = len(a:list)
   if a:0 >= 1     | let first = a:1
@@ -295,7 +311,7 @@ endfunction
 " @return [f, l], where
 "   f : First position where {value} could be inserted
 "   l : Last position where {value} could be inserted
-function! lh#list#equal_range(list, val, ...)
+function! lh#list#equal_range(list, val, ...) abort
   let first = 0
   let last = len(a:list)
 
@@ -331,7 +347,7 @@ endfunction
 
 " Function: lh#list#not_found(range) {{{3
 " @return whether the range returned from equal_range is empty (i.e. element not found)
-function! lh#list#not_found(range)
+function! lh#list#not_found(range) abort
   return a:range[0] == a:range[1]
 endfunction
 
@@ -356,7 +372,7 @@ endfunction
 " Works like sort(), optionally taking in a comparator (just like the
 " original), except that duplicate entries will be removed.
 " todo: support another argument that act as an equality predicate
-function! lh#list#unique_sort(list, ...)
+function! lh#list#unique_sort(list, ...) abort
   let dictionary = {}
   for i in a:list
     let dictionary[string(i)] = i
@@ -371,7 +387,7 @@ function! lh#list#unique_sort(list, ...)
   return result
 endfunction
 
-function! lh#list#unique_sort2(list, ...)
+function! lh#list#unique_sort2(list, ...) abort
   let list = copy(a:list)
   if ( exists( 'a:1' ) )
     call sort(list, a:1 )
@@ -393,7 +409,7 @@ function! lh#list#unique_sort2(list, ...)
 endfunction
 
 " Function: lh#list#subset(list, indices) {{{3
-function! lh#list#subset(list, indices)
+function! lh#list#subset(list, indices) abort
   let result=[]
   for e in a:indices
     call add(result, a:list[e])
@@ -417,7 +433,7 @@ function! lh#list#mask(list, masks) abort
 endfunction
 
 " Function: lh#list#remove(list, indices) {{{3
-function! lh#list#remove(list, indices)
+function! lh#list#remove(list, indices) abort
   " assert(is_sorted(indices))
   let idx = reverse(copy(a:indices))
   for i in idx
@@ -427,7 +443,7 @@ function! lh#list#remove(list, indices)
 endfunction
 
 " Function: lh#list#intersect(list1, list2) {{{3
-function! lh#list#intersect(list1, list2)
+function! lh#list#intersect(list1, list2) abort
   let result = copy(a:list1)
   call filter(result, 'index(a:list2, v:val) >= 0')
   return result
@@ -440,7 +456,7 @@ function! lh#list#intersect(list1, list2)
 endfunction
 
 " Function: lh#list#push_if_new(list, value) {{{3
-function! lh#list#push_if_new(list, value)
+function! lh#list#push_if_new(list, value) abort
   let matching = filter(copy(a:list), 'v:val == a:value')
   if empty(matching)
     call add (a:list, a:value)

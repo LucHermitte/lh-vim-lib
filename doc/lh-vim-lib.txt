@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.5)
-                        For Vim version 7+      Last change: 08th Oct 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.6)
+                        For Vim version 7+      Last change: 09th Oct 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -54,6 +54,7 @@ Functors related functions:                             |lhvl#function|
 Lists related functions:                                |lhvl#list|
 - |lh#list#accumulate()|
 - |lh#list#at()|
+- |lh#list#chain_transform()|
 - |lh#list#copy_if()|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
@@ -739,6 +740,27 @@ lh#list#transform_if({input},{output},{action},{predicate})~
 @return              {output}
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#list#chain_transform()*       {{{3
+lh#list#chain_transform({input},{actions})~
+@param[in]   {input}  Input |List| to transform
+@param[out] {output}  Output |List| where the transformed elements will be
+                      appended.
+@param      {actions} |lhvl#functor| actions to apply on each element from
+                      {input}.
+@return               {output}
+
+Example: >
+   :let min_sec = [
+      \ '3:04', '3:14', '5:38', '4:12', '10:30', '6:29', '6:53', '11:49',
+      \ '9:33', '4:17', '7:49', '6:10', '6:04', '6:28', '6:40', '4:21' ]
+   :let res = lh#list#accumulate2(
+   \   lh#list#chain_transform(
+   \      min_sec,
+   \      ['split(v:1_, ":")', 'v:1_[0]*60 + v:1_[1]']),
+   \   0)
+   :AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#copy_if()*                {{{3
 lh#list#copy_if({input},{output},{predicate})~
 Appends in {output} the elements from {input} that verifies the {predicate}.
@@ -751,14 +773,15 @@ Appends in {output} the elements from {input} that verifies the {predicate}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#accumulate()*             {{{3
-lh#list#accumulate({input},{transformation},{accumulator})~
+lh#list#accumulate({input},{transformation[s]},{accumulator})~
 Accumulates the transformed elements from {input}.
 
-@param[in]      {input} Input |List| to transform
-@param {transformation}|lhvl#functor| applied on each element from {input}.
-@param    {accumulator}|lhvl#functor| taking the list of tranformed elements
-                        as input
-@return                 the result of {accumulator}
+@param[in]      {input}    Input |List| to transform
+@param {transformation[s]} |lhvl#functor|, or list of functors, applied on
+                           each element from {input}.
+@param    {accumulator}    |lhvl#functor| taking the list of tranformed elements
+                           as input
+@return                    the result of {accumulator}
 
 Examples: >
    :let strings = [ 'foo', 'bar', 'toto' ]
@@ -767,6 +790,13 @@ Examples: >
 
    :let l = [ 1, 2, 'foo', ['bar']]
    :echo lh#list#accumulate(l, 'string', 'join(v:1_, "##")')
+
+   :let min_sec = [
+        \ '3:04', '3:14', '5:38', '4:12', '10:30', '6:29', '6:53', '11:49',
+        \ '9:33', '4:17', '7:49', '6:10', '6:04', '6:28', '6:40', '4:21' ]
+   :let res = eval(lh#list#accumulate(min_sec,
+        \ ['split(v:1_, ":")', 'v:1_[0]*60 + v:1_[1]'], 'join(v:1_,  "+")'))
+   :AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#accumulate2()*            {{{3
