@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.4
+" Version:      3.3.5
 " Created:      17th Apr 2007
 " Last Update:  24th Apr 2015
 "------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.5
+"       (*) New function lh#list#rotate()
 "       v3.3.4
 "       (*) New function lh#list#accumulate2()
 "       v3.3.1
@@ -463,6 +465,13 @@ function! lh#list#possible_values(list, ...) abort
     let res = sort(values(dRes))
     return res
   endif
+endfunction
+
+" Function: lh#list#rotate(list, rot) {{{3
+" {rot} must belong to [-len(list)n +len(list)]
+function! lh#list#rotate(list, rot) abort
+  let res = a:list[a:rot :] + a:list[: (a:rot-1)]
+  return res
 endfunction
 
 " # Private {{{2
