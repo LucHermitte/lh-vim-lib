@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.6
+" Version:      3.3.7
 " Created:      17th Apr 2007
-" Last Update:  09th Oct 2015
+" Last Update:  27th Oct 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.7
+"       (*) lh#list#sort() emulates the correct behaviour of sort(), regarding
+"           patches 7.4-341 and 7.4-411
 "       v3.3.6
 "       (*) New function lh#list#chain_transform(), and new "overload" for
 "           lh#list#accumulate()
@@ -356,14 +359,33 @@ endfunction
 "    echo sort(['{ *//', '{', 'a', 'b'])
 " gives: ['a', 'b', '{ *//', '{']
 " While
-"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_str_cmp'))
+"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_regular_cmp'))
 " gives the correct: ['a', 'b', '{', '{ *//']
-function! lh#list#sort(list) abort
-  if has("patch-7.4-411")
-    return sort(a:list)
+"
+" Also Vim 7.4-341 fixes number comparison
+"
+" Behaviours
+" - default: string cmp
+" - 'n' -> number comp
+let s:k_has_num_cmp = has("patch-7.4-341")
+let s:k_has_fixed_str_cmp = has("patch-7.4-411")
+" For testing purposes...
+" let s:k_has_num_cmp = 0
+" let s:k_has_fixed_str_cmp = 0
+function! lh#list#sort(list,...) abort
+  let args = [a:list] + a:000
+  if len(args) > 1
+    if !s:k_has_num_cmp && args[1]=='n'
+      let args[1] = 'lh#list#_regular_cmp'
+    elseif !s:k_has_fixed_str_cmp && args[1]==''
+      let args[1] = 'lh#list#_str_cmp'
+    endif
   else
-    return sort(a:list, 'lh#list#_str_cmp')
+    if !s:k_has_fixed_str_cmp
+      let args += ['lh#list#_str_cmp']
+    endif
   endif
+  return call('sort', args)
 endfunction
 
 " Function: lh#list#unique_sort(list [, func]) {{{3
@@ -372,27 +394,35 @@ endfunction
 " Works like sort(), optionally taking in a comparator (just like the
 " original), except that duplicate entries will be removed.
 " todo: support another argument that act as an equality predicate
-function! lh#list#unique_sort(list, ...) abort
-  let dictionary = {}
-  for i in a:list
-    let dictionary[string(i)] = i
-  endfor
-  let result = []
-  " echo join(values(dictionary),"\n")
-  if ( exists( 'a:1' ) )
-    let result = sort( values( dictionary ), a:1 )
-  else
-    let result = sort( values( dictionary ) )
-  endif
-  return result
-endfunction
+if exists('*uniq')
+  function! lh#list#unique_sort(list, ...) abort
+    call call('lh#list#sort', [a:list] + a:000)
+    call uniq(a:list)
+    return a:list
+  endfunction
+else
+  function! lh#list#unique_sort(list, ...) abort
+    let dictionary = {}
+    for i in a:list
+      let dictionary[string(i)] = i
+    endfor
+    let result = []
+    " echo join(values(dictionary),"\n")
+    if ( exists( 'a:1' ) )
+      let result = lh#list#sort( values( dictionary ), a:1 )
+    else
+      let result = lh#list#sort( values( dictionary ) )
+    endif
+    return result
+  endfunction
+endif
 
 function! lh#list#unique_sort2(list, ...) abort
   let list = copy(a:list)
   if ( exists( 'a:1' ) )
-    call sort(list, a:1 )
+    call lh#list#sort(list, a:1 )
   else
-    call sort(list)
+    call lh#list#sort(list)
   endif
   if len(list) <= 1 | return list | endif
   let result = [ list[0] ]
@@ -478,7 +508,7 @@ function! lh#list#possible_values(list, ...) abort
     endfor
     " this hack regarding using values and not keyx permits to not alter the
     " type of the elements
-    let res = sort(values(dRes))
+    let res = lh#list#sort(values(dRes))
     return res
   endif
 endfunction
@@ -491,14 +521,22 @@ function! lh#list#rotate(list, rot) abort
 endfunction
 
 " # Private {{{2
-" Function: lh#list#_str_cmp(lhs, rhs) {{{3
+" Function: lh#list#_regular_cmp(lhs, rhs) {{{3
 " Up to vim version 7.4.411
 "    echo sort(['{ *//', '{', 'a', 'b'])
 " gives: ['a', 'b', '{ *//', '{']
 " While
-"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_str_cmp'))
+"    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_regular_cmp'))
 " gives the correct: ['a', 'b', '{', '{ *//']
 function! lh#list#_str_cmp(lhs, rhs) abort
+  let lhs = string(a:lhs)
+  let rhs = string(a:rhs)
+  return lh#list#_regular_cmp(lhs, rhs)
+endfunction
+
+" Function: lh#list#_regular_cmp(lhs, rhs) {{{3
+" This function can be used to compare numbers up-to-vim 7.4.341
+function! lh#list#_regular_cmp(lhs, rhs) abort
   let res = a:lhs <  a:rhs ? -1
         \ : a:lhs == a:rhs ? 0
         \ :                  1

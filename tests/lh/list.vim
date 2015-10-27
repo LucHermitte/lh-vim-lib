@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.6
+" Version:      3.3.7
 " Created:	19th Nov 2008
-" Last Update:  09th Oct 2015
+" Last Update:  27th Oct 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -56,25 +56,42 @@ UTIgnore Test_find_if_double_bind
 
 "------------------------------------------------------------------------
 " Unique Sorting {{{2
-function! CmpNumbers(lhs, rhs)
-  if     a:lhs < a:rhs  | return -1
-  elseif a:lhs == a:rhs | return 0
-  else                  | return +1
-  endif
-endfunction
-
-function! s:Test_sort()
+function! s:Test_sort_num()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
-    :let expected = [ 1, 5, 6, 25, 28, 48]
-    :let s = lh#list#unique_sort(l, "CmpNumbers")
+    :let expected = [ 1, 5, 5, 6, 25, 28, 48]
+    :let s = lh#list#sort(l, 'n')
     " Comment string(s)
     Assert s == expected
 endfunction
 
-function! s:Test_sort2()
+function! s:Test_sort_num_as_str()
+    :let l = [ 1, 5, 48, 25, 5, 28, 6]
+    :let expected = [ 1, 25, 28, 48, 5, 5, 6]
+    :let s = lh#list#sort(l)
+    " Comment string(s)
+    AssertEquals(s, expected)
+endfunction
+
+function! s:Test_sort_str()
+    :let l = ['{ *//', '{', 'a', 'b']
+    :let expected = ['a', 'b', '{', '{ *//']
+    :let s = lh#list#sort(l)
+    " Comment string(s)
+    AssertEquals(s, expected)
+endfunction
+
+function! s:Test_usort()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let expected = [ 1, 5, 6, 25, 28, 48]
-    :let s = lh#list#unique_sort2(l, "CmpNumbers")
+    :let s = lh#list#unique_sort(l, 'n')
+    " Comment string(s)
+    Assert s == expected
+endfunction
+
+function! s:Test_usort2()
+    :let l = [ 1, 5, 48, 25, 5, 28, 6]
+    :let expected = [ 1, 5, 6, 25, 28, 48]
+    :let s = lh#list#unique_sort2(l, 'n')
     " Comment string(s)
     Assert s == expected
 endfunction
