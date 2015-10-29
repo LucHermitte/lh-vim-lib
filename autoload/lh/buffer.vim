@@ -3,7 +3,8 @@
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " Licence:      GPLv3
-" Version:	3.2.14
+" Version:	3.3.8
+let s:k_version = '338'
 " Created:	23rd Jan 2007
 " Last Update:	18th Apr 2015
 "------------------------------------------------------------------------
@@ -34,6 +35,9 @@
 "           buffer every time
 "       v3.2.14
 "       (*) lh#buffer#scratch() resists to filenames with "*", "#", or "%" within
+"       v3.3.8
+"       (*) All :split goes through lh#window#create_window_with() is order to
+"       workaround E36
 " }}}1
 "=============================================================================
 
@@ -42,8 +46,13 @@
 let s:cpo_save=&cpo
 set cpo&vim
 
-" ## Functions {{{1
 "------------------------------------------------------------------------
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#buffer#version()
+  return s:k_version
+endfunction
+
 " # Debug {{{2
 function! lh#buffer#verbose(level)
   let s:verbose = a:level
@@ -79,7 +88,7 @@ endfunction
 function! lh#buffer#jump(filename, cmd)
   let b = lh#buffer#find(a:filename)
   if b != -1 | return b | endif
-  exe a:cmd . ' ' . a:filename
+  call lh#window#create_window_with(a:cmd . ' ' . a:filename)
   return winnr()
 endfunction
 function! lh#buffer#Jump(filename, cmd)
@@ -90,7 +99,7 @@ endfunction
 function! lh#buffer#scratch(bname, where)
   try
     set modifiable
-    silent exe a:where.' sp '.escape(substitute(a:bname, '\*', '...', 'g'), '#%')
+    call lh#window#create_window_with(a:where.' sp '.escape(substitute(a:bname, '\*', '...', 'g'), '#%'))
   catch /.*/
     throw "Can't open a buffer named '".a:bname."'!"
   endtry
@@ -112,7 +121,7 @@ function! lh#buffer#get_nr(bname)
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
   if -1 == nr  || bufname(nr) != a:bname
-    exe 'sp '.fnameescape(a:bname)
+    call lh#window#create_window_with('sp '.fnameescape(a:bname))
     let nr = bufnr(a:bname)
     q
   endif

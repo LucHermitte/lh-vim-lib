@@ -196,6 +196,10 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#buffer#jump()`               | Like `lh#buffer#find()`, but opens the buffer in a new window if it no matching window was opened before.                        |
 | `lh#buffer#list()`               | Returns the list of `buflisted` buffers.                                                                                         |
 | `lh#buffer#scratch()`            | Opens a new scratch buffer.                                                                                                      |
+|:---------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
+| `lh#window#split()`              | Forces to open a new split, ignoring E36                                                                                         |
+| `lh#window#new()`                | Forces to open a new window, ignoring E36                                                                                        |
+| `lh#window#create_window_with()` | Forces to create a new split, with any split related command, ignoring E36                                                       |
 
 
 ## Syntax related functions
