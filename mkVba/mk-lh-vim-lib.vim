@@ -3,11 +3,11 @@
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:	3.3.8
 let s:version = '3.3.8'
 " Created:	06th Nov 2007
-" Last Update:  29th Oct 2015
+" Last Update:  09th Nov 2015
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
