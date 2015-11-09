@@ -1,16 +1,16 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/syntax.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+"
 " Version:	3.1.18
 " Created:	05th Sep 2007
-" Last Update:	$Date$ (05th Sep 2007)
+" Last Update:	03rd Nov 2015
 "------------------------------------------------------------------------
 " Description:	«description»
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 " 	Drop it into {rtp}/autoload/lh/
@@ -113,7 +113,7 @@ endfunction
 " Function: lh#syntax#list(name) : List                           {{{3
 function! lh#syntax#list(name)
   let raw = lh#syntax#list_raw(a:name)
-  let res = [] 
+  let res = []
   let lines = split(raw, '\n')
   let started = 0
   for l in lines
@@ -142,10 +142,10 @@ endfunction
 
 " Function: lh#syntax#is_a_comment_at(l,c) : bool                  {{{3
 function! lh#syntax#is_a_comment_at(l,c) abort
-  try 
+  try
     let stack = synstack(a:l, a:c)
     for syn in stack
-      if synIDattr(syn, 'name') =~? 'comment'
+      if synIDattr(syn, 'name') =~? 'comment\|doxygen'
         return 1
       endif
     endfor
