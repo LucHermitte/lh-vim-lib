@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.6)
-                        For Vim version 7+      Last change: 09th Oct 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.9)
+                        For Vim version 7+      Last change: 13th Nov 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -28,14 +28,17 @@ FUNCTIONS                                    *lhvl-functions*     {{{1
 Miscellanous functions:                                 |lhvl#misc|
 - |lh#askvim#exe()|
 - |lh#common#check_deps()|
-- |lh#common#error_msg()|
-- |lh#common#warning_msg()|
 - |lh#common#echomsg_multilines()|
+- |lh#common#error_msg()|
 - |lh#common#rand()|
+- |lh#common#warning_msg()|
 - |lh#encoding#iconv()|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
+- |lh#leader#get()|
+- |lh#leader#get_local()|
+- |lh#leader#set_local_if_unset()|
 - |lh#on#exit()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
@@ -45,8 +48,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#char_at_mark()|
 - |lh#position#char_at_pos()|
 - |lh#position#is_before()|
-- |lh#visual#selection()|
 - |lh#visual#cut()|
+- |lh#visual#selection()|
 Functors related functions:                             |lhvl#function|
 - |lh#function#bind()|
 - |lh#function#execute()|
@@ -314,6 +317,18 @@ lh#option#unset()~
 @note Never use |g:lh#option#unset| from your plugins but |lh#option#unset()|
 as it will get lazily loaded on need.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#leader#get()*                {{{3
+                                                *lh#leader#get_local()*
+lh#leader#get([default='\'])~
+lh#leader#get_local([default='\'])~
+Returns the value of g:|mapleader| (/resp g:|maplocalleader|), or the default
+value otherwise. The default value for the {default} value (sic) for the leader is '\'.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#leader#set_local_if_unset()* {{{3
+lh#leader#set_local_is_unset(value)~
+Sets g:|maplocalleader| to {value}, if and only if it isn't already set
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#Exe()*                 {{{3

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.8
-let s:version = '3.3.8'
+" Version:	3.3.9
+let s:version = '3.3.9'
 " Created:	06th Nov 2007
-" Last Update:  09th Nov 2015
+" Last Update:  13th Nov 2015
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -32,6 +32,7 @@ autoload/lh/float.vim
 autoload/lh/function.vim
 autoload/lh/graph/tsort.vim
 autoload/lh/icomplete.vim
+autoload/lh/leader.vim
 autoload/lh/let.vim
 autoload/lh/list.vim
 autoload/lh/map.vim
@@ -53,10 +54,10 @@ plugin/let.vim
 plugin/lhvl.vim
 plugin/ui-functions.vim
 plugin/words_tools.vim
+tests/lh/UT-fixpath.vim
 tests/lh/function.vim
 tests/lh/list.vim
 tests/lh/path.vim
-tests/lh/UT-fixpath.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim
