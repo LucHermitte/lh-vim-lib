@@ -175,7 +175,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | Function                      | Purpose                                                                                                                                                  |
 |:------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#askvim#menu()`            | Experimental functions to ask vim which menus are defined                                                                                                |
-| `lh#map#define()`                          | Defines a new mapping given given a mapping definition                                                                                      |
+| `lh#mapping#define()`         | Defines a new mapping given a mapping definition                                                                                                         |
 | `lh#menu#IVN_make()`          | Like `lh#menu#make()`, but dedicated to text inserting actions and INSERT, NORMAL, and VISUAL modes.                                                     |
 | `lh#menu#def_string_item()`   | This function defines a [|`:menu`|](http://vimhelp.appspot.com/gui.txt.html#:menu) entry that will be associated to a |global-variable| string variable. |
 | `lh#menu#def_toggle_item()`   | This function defines a [|`:menu`|](http://vimhelp.appspot.com/gui.txt.html#:menu) entry that will be associated to a |global-variable| whose values can be cycled and explored from the menu. This global variable can be seen as an enumerate whose value can be cyclically updated through a menu. |

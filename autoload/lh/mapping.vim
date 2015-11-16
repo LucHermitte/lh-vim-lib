@@ -1,17 +1,17 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/map.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.8
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:	3.3.10
+let s:version = '3.3.10'
 " Created:      01st Mar 2013
-" Last Update:  $Date$
+" Last Update:  16th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 "       Drop this file into {rtp}/autoload/lh
@@ -26,14 +26,13 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 318
-function! lh#map#version()
+function! lh#mapping#version()
   return s:k_version
 endfunction
 
 " # Debug   {{{2
 let s:verbose = 0
-function! lh#map#verbose(...)
+function! lh#mapping#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
@@ -44,17 +43,17 @@ function! s:Verbose(expr)
   endif
 endfunction
 
-function! lh#map#debug(expr)
+function! lh#mapping#debug(expr)
   return eval(a:expr)
 endfunction
 
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-" Function: lh#map#_build_command(mapping_definition) {{{3
+" Function: lh#mapping#_build_command(mapping_definition) {{{3
 " @param mapping_definition is a dictionary witch the same keys than the ones
 " filled by maparg()
-function! lh#map#_build_command(mapping_definition)
+function! lh#mapping#_build_command(mapping_definition)
   let cmd = a:mapping_definition.mode
   if has_key(a:mapping_definition, 'noremap') && a:mapping_definition.noremap
     let cmd .= 'nore'
@@ -72,9 +71,9 @@ function! lh#map#_build_command(mapping_definition)
   return cmd
 endfunction
 
-" Function: lh#map#define(mapping_definition) {{{3
-function! lh#map#define(mapping_definition)
-  let cmd = lh#map#_build_command(a:mapping_definition)
+" Function: lh#mapping#define(mapping_definition) {{{3
+function! lh#mapping#define(mapping_definition)
+  let cmd = lh#mapping#_build_command(a:mapping_definition)
   silent exe cmd
 endfunction
 "------------------------------------------------------------------------

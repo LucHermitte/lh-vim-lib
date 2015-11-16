@@ -1,24 +1,25 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/icomplete.vim                         {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:	3.3.10
+let s:version = '3.3.10'
 " Created:      03rd Jan 2011
-" Last Update:  $Date$
+" Last Update:  16th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 "       Drop this file into {rtp}/autoload/lh
 "       Requires Vim7+
 " History:
-"       v3.0.0: GPLv3
-" 	v2.2.4: first version
+"       v3.3.10: Fix conflict with lh-brackets
+"       v3.0.0 : GPLv3
+" 	v2.2.4 : first version
 " TODO:
 " 	- We are not able to detect the end of the completion mode. As a
 " 	consequence we can't prevent c/for<space> to trigger an abbreviation
@@ -32,7 +33,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 318
 function! lh#icomplete#version()
   return s:k_version
 endfunction
@@ -79,17 +79,17 @@ endfunction
 function! lh#icomplete#_restore_key_bindings(previous_mappings)
   call s:Verbose('Restore keybindings after completion')
   if has_key(a:previous_mappings, 'cr') && has_key(a:previous_mappings.cr, 'buffer') && a:previous_mappings.cr.buffer
-    let cmd = lh#map#define(a:previous_mappings.cr)
+    let cmd = lh#mapping#define(a:previous_mappings.cr)
   else
     iunmap <buffer> <cr>
   endif
   if has_key(a:previous_mappings, 'c_y') && has_key(a:previous_mappings.c_y, 'buffer') && a:previous_mappings.c_y.buffer
-    let cmd = lh#map#define(a:previous_mappings.c_y)
+    let cmd = lh#mapping#define(a:previous_mappings.c_y)
   else
     iunmap <buffer> <c-y>
   endif
   if has_key(a:previous_mappings, 'esc') && has_key(a:previous_mappings.esc, 'buffer') && a:previous_mappings.esc.buffer
-    let cmd = lh#map#define(a:previous_mappings.esc)
+    let cmd = lh#mapping#define(a:previous_mappings.esc)
   else
     iunmap <buffer> <esc>
   endif
@@ -106,7 +106,7 @@ function! lh#icomplete#_register_hook(Hook)
   let old_keybindings.esc = maparg('<esc>', 'i', 0, 1)
   exe 'inoremap <buffer> <silent> <cr> <c-y><c-\><c-n>:call' .a:Hook . '()<cr>'
   exe 'inoremap <buffer> <silent> <c-y> <c-y><c-\><c-n>:call' .a:Hook . '()<cr>'
-  " <c-o><Nop> doesn't work as expected... 
+  " <c-o><Nop> doesn't work as expected...
   " To stay in INSERT-mode:
   " inoremap <silent> <esc> <c-e><c-o>:<cr>
   " To return into NORMAL-mode:
@@ -117,7 +117,7 @@ function! lh#icomplete#_register_hook(Hook)
         " \ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
 endfunction
 
-" Why is it triggered even before entering the completion ? 
+" Why is it triggered even before entering the completion ?
 function! lh#icomplete#_register_hook2(Hook)
   " call lh#event#register_for_one_execution_at('InsertLeave',
   call lh#event#register_for_one_execution_at('CompleteDone',
