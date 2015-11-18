@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.2.9
+" Version:      3.3.11
 " Created:      03rd Nov 2008
 "------------------------------------------------------------------------
 " Description:
@@ -16,9 +16,10 @@
 "
 "------------------------------------------------------------------------
 " History:
-"       v3.2.9: Bug fix when &isk is messed up in lh#function#execute()
-"       v3.0.0: GPLv3
-"       v2.2.0: first implementation
+"       v3.3.11: Bug fix: pass tests
+"       v3.2.9:  Bug fix when &isk is messed up in lh#function#execute()
+"       v3.0.0:  GPLv3
+"       v2.2.0:  first implementation
 " }}}1
 "=============================================================================
 
@@ -60,8 +61,8 @@ endfunction
 function! s:DoBindList(formal, real) abort
   let args = []
   for arg in a:formal
-    if type(arg)==type('string') && arg =~ '^v:\d\+_$'
-      let new = a:real[matchstr(arg, 'v:\zs\d\+\ze_')-1]
+    if type(arg)==type('string') && arg =~ '\v^v:\d+_$'
+      let new = a:real[matchstr(arg, '\vv:\zs\d+\ze_')-1]
     elseif type(arg)==type('string')
       let new = eval(s:DoBindEvaluatedString(arg, a:real))
     else
@@ -80,7 +81,7 @@ function! s:DoBindString(expr, real) abort
         \.restore('&isk')
   try
     set isk&vim
-    let expr = substitute(a:expr, '\<v:\(\d\+\)_\>', a:real.'[\1-1]', 'g')
+    let expr = substitute(a:expr, '\v<v:(\d+)_>', a:real.'[\1-1]', 'g')
     return expr
   finally
     call cleanup.finalize()
@@ -88,30 +89,17 @@ function! s:DoBindString(expr, real) abort
 endfunction
 
 function! s:ToString(expr) abort
-  return  type(a:expr) != type('')
-        \ ? string(a:expr)
-        \ : (a:expr)
+  return
+        \   type(a:expr) != type('')  ? string(a:expr)
+        \ : a:expr =~ '\v<v:(\d+)_>'  ? a:expr
+        \ :                             string(a:expr)
+        " \ : (a:expr)
 endfunction
 
 function! s:DoBindEvaluatedString(expr, real) abort
   let expr = a:expr
-  let p = 0
-  while 1
-    let p = match(expr, '\<v:\d\+_\>', p)
-    if -1 == p | break | endif
-    let e = matchend(expr, '\<v:\d\+_\>', p)
-    let n = eval(expr[p+2 : e-2])
-    " let new = (type(a:real[n-1])==type('') && a:real[n-1]=~ '\<v:\d\+_\>')
-          " \ ? a:real[n-1]
-          " \ : string(a:real[n-1])
-    let new = s:ToString(a:real[n-1])
-    " let new = string(a:real[n-1]) " -> bind_counpound vars
-    let expr = ((p>0) ? (expr[0:p-1]) : '') . new . expr[e : -1]
-    " echo expr
-    let p += len(new)
-    " silent! unlet new
-  endwhile
-
+  let expr = substitute(expr,  '\v<v:(\d+)_>', '\=s:ToString(a:real[submatch(1)-1])', 'g')
+  " let expr = substitute(expr,  '\<v:\(\d\+\)_\>', '\=string(a:real[submatch(1)-1])', 'g')
   return expr
 endfunction
 
