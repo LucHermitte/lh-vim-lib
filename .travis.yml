@@ -1,0 +1,9 @@
+language: ruby
+#cache: bundler
+rvm:
+  - 2.1.5
+script: rake ci
+before_install: sudo apt-get install vim-gtk
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
