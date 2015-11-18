@@ -1,73 +1,71 @@
 "=============================================================================
-" $Id$
 " File:		tests/lh/test-Fargs2String.vim                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:	3.3.11
 " Created:	16th Apr 2007
-" Last Update:	$Date$
+" Last Update:	18th Nov 2015
 "------------------------------------------------------------------------
 " Description:	Tests for lh-vim-lib . lh#command#Fargs2String
-" 
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Relies on the version «patched by myself|1?» of vim_units
-" History:	«history»
-" TODO:		«missing features»
+" Installation:
+" 	Relies on vim-UT
 " }}}1
 "=============================================================================
 
 function! s:TestEmpty()
   let empty = []
   let res = lh#command#Fargs2String(empty)
-  call VUAssertEquals(len(empty), 0, 'Expected empty', 22)
-  call VUAssertEquals(res, '', 'Expected empty result', 23)
+  AssertTxt(len(empty)==0, 'Expected empty')
+  AssertEquals(res, '')
 endfunction
 
 function! s:TestSimpleText1()
   let expected = 'text'
   let one = [ expected ]
   let res = lh#command#Fargs2String(one)
-  call VUAssertEquals(len(one), 0, 'Expected empty', 27)
-  call VUAssertEquals(res, expected, 'Expected a simple result', 28)
+  AssertEquals(len(one), 0)
+  AssertEquals(res, expected)
 endfunction
 
 function! s:TestSimpleTextN()
   let expected = 'text'
   let list = [ expected , 'stuff1', 'stuff2']
   let res = lh#command#Fargs2String(list)
-  call VUAssertEquals(len(list), 2, 'Expected not empty', 38)
-  call VUAssertEquals(res, expected, 'Expected a simple result', 39)
+  AssertEquals(len(list), 2)
+  AssertEquals(res, expected)
 endfunction
 
 function! s:TestComposedN()
   let expected = '"a several tokens string"'
   let list = [ '"a', 'several', 'tokens', 'string"', 'stuff1', 'stuff2']
   let res = lh#command#Fargs2String(list)
-  call VUAssertEquals(len(list), 2, 'Expected not empty', 46)
-  call VUAssertEquals(res, expected, 'Expected a composed string', 47)
-  call VUAssertEquals(list, ['stuff1', 'stuff2'], 'Expected a list', 48)
-  call VUAssertNotSame(list, ['stuff1', 'stuff2'], 'Expected different lists', 49)
+  AssertEquals(len(list), 2)
+  AssertEquals(res, expected)
+  AssertEquals(list, ['stuff1', 'stuff2'])
+  AssertIs(list, list)
+  AssertIsNot(list, ['stuff1', 'stuff2'])
 endfunction
 
 function! s:TestComposed1()
   let expected = '"string"'
   let list = [ '"string"', 'stuff1', 'stuff2']
   let res = lh#command#Fargs2String(list)
-  call VUAssertEquals(len(list), 2, 'Expected not empty', 56)
-  call VUAssertEquals(res, expected, 'Expected a string', 57)
-  call VUAssertEquals(list, ['stuff1', 'stuff2'], 'Expected a list', 58)
-  call VUAssertNotSame(list, ['stuff1', 'stuff2'], 'Expected different lists', 59)
+  AssertEquals(len(list), 2)
+  AssertEquals(res, expected)
+  AssertEquals(list, ['stuff1', 'stuff2'])
+  AssertIsNot(list, ['stuff1', 'stuff2'])
 endfunction
 
 function! s:TestInvalidString()
   let expected = '"a string'
   let list = [ '"a', 'string']
   let res = lh#command#Fargs2String(list)
-  call VUAssertEquals(len(list), 0, 'Expected empty', 66)
-  call VUAssertEquals(res, expected, 'Expected an invalid string', 67)
+  AssertEquals(len(list), 0)
+  AssertEquals(res, expected)
 endfunction
 
 function! AllTests()
@@ -77,9 +75,6 @@ function! AllTests()
   call s:TestComposed1()
   call s:TestComposedN()
 endfunction
-
-" call VURunnerRunTest('AllTests')
-VURun % AllTests
 
 "=============================================================================
 " vim600: set fdm=marker:
