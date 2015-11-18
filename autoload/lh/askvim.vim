@@ -1,26 +1,25 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/askvim.vim                                    {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/askvim.vim                                    {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
-" Created:	17th Apr 2007
-" Last Update:	$Date$ (17th Apr 2007)
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:      3.3.11
+" Created:      17th Apr 2007
+" Last Update:  18th Nov 2015
 "------------------------------------------------------------------------
-" Description:	
-" 	Defines functions that asks vim what it is relinquish to tell us
-" 	- menu
-" 
+" Description:
+"       Defines functions that asks vim what it is relinquish to tell us
+"       - menu
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	
-" 	v2.0.0:
-" 	v3.0.0: GPLv3
-" TODO:		«missing features»
+" Installation:
+"       Drop it into {rtp}/autoload/lh/
+"       Vim 7+ required.
+" History:
+"       v2.0.0:
+"       v3.0.0: GPLv3
+" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -49,14 +48,14 @@ endfunction
 "------------------------------------------------------------------------
 " # Public {{{2
 " Function: lh#askvim#exe(command) {{{3
-function! lh#askvim#Exe(command)
+function! lh#askvim#Exe(command) abort
   echomsg 'lh#askvim#Exe() is deprecated, use lh#askvim#exe()'
   return lh#askvim#exe(a:command)
 endfunction
 
-function! lh#askvim#exe(command)
+function! lh#askvim#exe(command) abort
   let save_a = @a
-  try 
+  try
     silent! redir @a
     silent! exe a:command
     redir END
@@ -70,7 +69,7 @@ endfunction
 
 
 " Function: lh#askvim#menu(menuid) {{{3
-function! s:AskOneMenu(menuact, res)
+function! s:AskOneMenu(menuact, res) abort
   let sKnown_menus = lh#askvim#exe(a:menuact)
   let lKnown_menus = split(sKnown_menus, '\n')
   " echo string(lKnown_menus)
@@ -114,7 +113,7 @@ function! s:AskOneMenu(menuact, res)
     "    - == disable(-)/of not
     let act = {}
     let menu_def = matchlist(lKnown_menus[idx],
-	  \ '^\s*\([invocs]\)\([&* ]\) \([- ]\) \(.*\)$')
+          \ '^\s*\([invocs]\)\([&* ]\) \([- ]\) \(.*\)$')
     if len(menu_def) > 4
       let act.mode        = menu_def[1]
       let act.nore_script = menu_def[2]
@@ -124,7 +123,7 @@ function! s:AskOneMenu(menuact, res)
       echomsg string(menu_def)
       echoerr "lh#askvim#menu(): Cannot decode ``".lKnown_menus[idx]."''"
     endif
-    
+
     let a:res.actions["mode_" . act.mode] = act
 
     let idx += 1
@@ -134,7 +133,7 @@ function! s:AskOneMenu(menuact, res)
   return a:res
 endfunction
 
-function! lh#askvim#menu(menuid, modes)
+function! lh#askvim#menu(menuid, modes) abort
   let res = {}
   let i = 0
   while i != strlen(a:modes)

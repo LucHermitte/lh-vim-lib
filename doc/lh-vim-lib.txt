@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.9)
-                        For Vim version 7+      Last change: 13th Nov 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.11)
+                        For Vim version 7+      Last change: 18th Nov 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -36,6 +36,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
+- |lh#exception#callstack()|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
@@ -392,20 +393,6 @@ lh#visual#cut()~
                     selection is deleted.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                 *lh#event#RegisterForOneExecutionAt()*           {{{3
-lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})  (*deprecated*)~
-                                 *lh#event#register_for_one_execution_at()*
-lh#event#register_for_one_execution_at({event}, {cmd}, {group})~
-Registers a command to be executed once (and only once) when {event} is
-triggered on the current file.
-
-@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
-@param   {cmd} |expression-command| to execute
-@param {group} |autocmd-groups| under which the internal autocommand will be
-                registered.
-@todo possibility to specify the file pattern
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#iconv()*             {{{3
 lh#encoding#iconv({expr}, {from}, {to})~
 This function just calls |iconv()| with the same arguments. The only
@@ -428,6 +415,30 @@ Returns the i-th character in a multi-bytes string.
 lh#encoding#strpart({mb_string}, {position}, {length})~
 Returns {length} extracted characters from {position} in a multi-bytes string.
 @param {position} 0-indexed offset.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                 *lh#event#RegisterForOneExecutionAt()*           {{{3
+lh#event#RegisterForOneExecutionAt({event}, {cmd}, {group})  (*deprecated*)~
+                                 *lh#event#register_for_one_execution_at()*
+lh#event#register_for_one_execution_at({event}, {cmd}, {group})~
+Registers a command to be executed once (and only once) when {event} is
+triggered on the current file.
+
+@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
+@param   {cmd} |expression-command| to execute
+@param {group} |autocmd-groups| under which the internal autocommand will be
+                registered.
+@todo possibility to specify the file pattern
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#exception#callstack()*      {{{3
+lh#exception#callstack({throwpoint})~
+Decodes the {throwpoint} and return a list of dictionaries made of:
+- "script": name of the file where the exception comes from
+- "pos": abolute line number in the script where the exception has been issued
+- "fname": name of the function where the exception has been issued
+- "offset": Relative line number from the function first line where the
+  exception....
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                *lh#float#max()*     *lh#float#min()*              {{{3

@@ -4,22 +4,25 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.10
-let s:version = '3.3.10'
+" Version:	3.3.11
+let s:version = '3.3.11'
 " Created:	06th Nov 2007
-" Last Update:  16th Nov 2015
+" Last Update:  18th Nov 2015
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
   let save_rtp = &rtp
   let &rtp = expand('<sfile>:p:h:h').','.&rtp
-  exe '22,$MkVimball! lh-vim-lib-'.s:version
+  exe '23,$MkVimball! lh-vim-lib-'.s:version
   set modifiable
   set buftype=
 finally
   let &rtp = save_rtp
 endtry
 finish
+README.md
+License.md
+addon-info.json
 autoload/lh/askvim.vim
 autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
@@ -47,8 +50,6 @@ autoload/lh/vcs.vim
 autoload/lh/visual.vim
 autoload/lh/window.vim
 doc/lh-vim-lib.txt
-lh-vim-lib-addon-info.txt
-lh-vim-lib.README
 mkVba/mk-lh-vim-lib.vim
 plugin/let.vim
 plugin/lhvl.vim
