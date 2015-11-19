@@ -1,15 +1,13 @@
 "=============================================================================
-" $Id$
 " File:         tests/lh/let.vim                                  {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      001
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
+" Version:      3.3.11
 " Created:      10th Sep 2012
-" Last Update:  $Date$
+" Last Update:  19th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for plugin/let.vim's LetIfUndef
-" 
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -19,7 +17,11 @@ UTSuite [lh-vim-lib] Testing LetIfUndef command
 let s:cpo_save=&cpo
 set cpo&vim
 
-Reload plugin/let.vim
+if exists(':Reload')
+  Reload plugin/let.vim
+else
+  runtime plugin/let.vim
+endif
 
 "------------------------------------------------------------------------
 function! s:Test_variables()

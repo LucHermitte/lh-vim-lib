@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:	3.3.11
 " Created:	16th Apr 2007
-" Last Update:	18th Nov 2015
+" Last Update:	19th Nov 2015
 "------------------------------------------------------------------------
 " Description:	Tests for lh-vim-lib . lh#command#Fargs2String
 "
@@ -15,6 +15,8 @@
 " 	Relies on vim-UT
 " }}}1
 "=============================================================================
+
+UTSuite [lh-vim-lib] Testing lh#command#Fargs2String
 
 function! s:TestEmpty()
   let empty = []
