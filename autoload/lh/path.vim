@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.0
-let s:k_version = 3300
+" Version:      3.3.11
+let s:k_version = 3311
 " Created:      23rd Jan 2007
-" Last Update:  18th Apr 2015
+" Last Update:  19th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -88,8 +88,9 @@ let s:k_version = 3300
 "       (*) new function lh#path#munge()
 "       v3.3.0:
 "       (*) Steal functions from system-tools
+"       v3.3.11
+"       (*) Fix lh#path#to_relative() and lh#path#depth()
 " TODO:
-"       (*) Decide what #depth('../../bar') shall return
 "       (*) Fix #simplify('../../bar')
 " }}}1
 "=============================================================================
@@ -333,9 +334,16 @@ function! lh#path#SelectOne(pathnames, prompt)
 endfunction
 
 " Function: lh#path#to_relative({pathname}) {{{3
+" Notes:
+" - ":p:." turns getcwd().'/../bar' into an absolute path
+" - ":~:." turns getcwd().'/../bar' into "../bar"
+" - ":p:." turns getcwd().'/./foo' into "foo"
+" - ":~:." turns getcwd().'/./foo' into "./foo"
+" Hence lh#path#simplify() executed at the end.
 function! lh#path#to_relative(pathname)
-  let newpath = fnamemodify(a:pathname, ':p:.')
-  let newpath = simplify(newpath)
+  " let newpath = fnamemodify(a:pathname, ':p:.')
+  let newpath = fnamemodify(a:pathname, ':~:.')
+  let newpath = lh#path#simplify(newpath)
   return newpath
 endfunction
 function! lh#path#ToRelative(pathname)
@@ -358,7 +366,8 @@ function! lh#path#depth(dirname)
   if lh#path#is_absolute_path(dirname)
     let dirname = matchstr(dirname, '.\{-}[/\\]\zs.*')
   endif
-  let depth = len(substitute(dirname, '[^/\\]\+[/\\]', '#', 'g'))
+  let parts = split(dirname, '[/\\]')
+  let depth = len(parts) - 2 * count(parts, '..')
   return depth
 endfunction
 
