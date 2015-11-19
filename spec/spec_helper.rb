@@ -21,18 +21,20 @@ end
 Vimrunner::RSpec.configure do |config|
   config.reuse_server = true
 
-  vim_brackets_path = File.expand_path('.')
+  vim_plugin_path = File.expand_path('.')
   vim_flavor_path   = ENV['HOME']+'/.vim/flavors'
 
   config.start_vim do
     vim = Vimrunner.start_gvim
     # vim = Vimrunner.start_vim
-    vim.add_plugin(vim_flavor_path, 'bootstrap.vim')
-    pp vim_flavor_path
     # LetIfUndef
     # vim_lib_path      = File.expand_path('../../../lh-vim-lib', __FILE__)
+    vim.append_runtimepath(vim_plugin_path)
     vim_UT_path      = File.expand_path('../../../vim-UT', __FILE__)
     vim.add_plugin(vim_UT_path, 'plugin/UT.vim')
+
+    vim.add_plugin(vim_flavor_path, 'bootstrap.vim')
+    pp vim_flavor_path
     pp vim.echo('&rtp')
 
     vim

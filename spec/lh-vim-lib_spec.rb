@@ -18,9 +18,9 @@ RSpec.describe "autoload/lh/map.vim" do
       files = Dir.glob('./tests/lh/*.vim')
       files.each{ |file|
           it "Run [#{file}]" do
-              # expect(vim.echo('lh#UT#run("", "'+file+'")')).to match(/1$/)
               result = vim.echo('lh#UT#run("", "'+file+'")')
               # Keep only the list
+              # pp result
               result = result.match(/\[\d,.*\]\]/)[0]
               expect(eval(result)).to be_successful
           end
