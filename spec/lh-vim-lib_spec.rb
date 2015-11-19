@@ -2,7 +2,7 @@
 require 'spec_helper'
 require 'pp'
 
-RSpec.describe "autoload/lh/map.vim" do
+RSpec.describe "lh-vim-lib unit tests" do
   # after(:all) do
     # vim.kill
   # end
