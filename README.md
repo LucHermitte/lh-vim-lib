@@ -263,7 +263,7 @@ git clone git@github.com:LucHermitte/lh-vim-lib.git
 ```vim
 ActivateAddons lh-vim-lib
 ```
-  * Note that [vim-flavor](https://github.com/kana/vim-flavor) also handle
+  * Note that [vim-flavor](https://github.com/kana/vim-flavor) also handles
     dependencies which will permit to automatically import lh-vim-lib from
     plugins that use it:
 ```
