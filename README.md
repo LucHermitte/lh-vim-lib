@@ -1,4 +1,6 @@
-﻿# Introduction
+﻿# lh-vim-lib [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+
+## Introduction
 
 _lh-vim-lib_ is a library that defines some common VimL functions I use in my various plugins and ftplugins.
 
@@ -11,7 +13,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
 - Since version 3.2.7, it's no longer hosted on google-code but on github**
 
-# Functions
+## Functions
 
   * [Miscellaneous functions](#miscellaneous-functions)
   * [System related functions](#system-related-functions)
@@ -25,7 +27,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Syntax related functions](#syntax-related-functions)
   * [UI functions](#ui-functions)
 
-## Miscellaneous functions
+### Miscellaneous functions
 
 | Function                                    | Purpose                                                                                                                                                                  |
 |---------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -68,7 +70,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#visual#cut()`                           | Cut and returns the visually selected text                                                                                                                               |
 | `lh#visual#selection()`                     | Returns the visually selected text                                                                                                                                       |
 
-## System related functions
+### System related functions
 
 See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
@@ -83,7 +85,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#cpu_number()`               | Returns the number of processors on the machine                                    |
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
 
-## Lists related functions
+### Lists related functions
 | Function                    | Purpose                                                                                                           |
 |:----------------------------|:--------------------------------------------------------------------------------------------------------          |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
@@ -112,9 +114,9 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#upper_bound()`     | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                              |
 
 
-## Stacks related functions
+### Stacks related functions
 
-### Procedural way
+#### Procedural way
 
 | Function                      | Purpose                                                                                      |
 |:------------------------------|:---------------------------------------------------------------------------------------------|
@@ -122,21 +124,21 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#stack#top(stack)`         | Fetches the top of the stack                                                                 |
 | `lh#stack#pop(stack)`         | Pops the top of the stack                                                                    |
 
-### OO way
+#### OO way
 
 | Function                      | Purpose                                                                                      |
 |:------------------------------|:---------------------------------------------------------------------------------------------|
 | `lh#stack#new(...)`           | Creates a new _stack_ object that proposes `push`, `top` and `pop` methods.                  |
 | `lh#stack#new_list(nb)`       | Builds what `repeat([lh#stack#new()], 42)` cannot build                                      |
 
-## Graphs related functions
+### Graphs related functions
 | Function                   | Purpose                                                                                      |
 |:---------------------------|:---------------------------------------------------------------------------------------------|
 | `lh#graph#tsort#breadth()` | Same as `depth()`, but with a non-recursive breadth-first search                             |
 | `lh#graph#tsort#depth()`   | Implements a Topological Sort on a Direct Acyclic Graph, with a recursive depth-first search |
 
 
-## Paths related functions
+### Paths related functions
 | Function                                     | Purpose                                                                                                  |
 |:---------------------------------------------|:---------------------------------------------------------------------------------------------------------|
 | `lh#path#add_path_if_exists(listname, path)` | Adds a path is a list iff the path points to an existing node                                            |
@@ -165,14 +167,14 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#vimfiles()`                         | Returns where the current user vimfiles are (`$HOME/.vim` `~/vimfiles`, ...)                             |
 
 
-## Commands related functions
+### Commands related functions
 | Function                    | Purpose                                                          |
 |:----------------------------|:-----------------------------------------------------------------|
 | `lh#command#new()`          | Experimental way to define commands that support auto-completion |
 | `lh#command#Fargs2String()` | Merges a set strings into a set of parameters (experimental)     |
 
 
-## Menus related functions
+### Menus related functions
 | Function                      | Purpose                                                                                                                                                  |
 |:------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#askvim#menu()`            | Experimental functions to ask vim which menus are defined                                                                                                |
@@ -188,7 +190,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 See also the documentation of the old functions at http://hermitte.free.fr/vim/general.php#expl_menu_map
 
 
-## Buffers related functions
+### Buffers related functions
 | Function                         | Purpose                                                                                                                          |
 |:---------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
 | `lh#buffer#dialog#add_help()`    | see [lh-vim-lib/dialog](doc/Dialog.md)                                                                                           |
@@ -206,7 +208,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#window#create_window_with()` | Forces to create a new split, with any split related command, ignoring E36                                                       |
 
 
-## Syntax related functions
+### Syntax related functions
 | Function                                                         | Purpose                                                                                                                                |
 |:-----------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#syntax#is_a_comment()`                                       | Tells the syntax kind of the character at the given mark is a comment                                                                  |
@@ -220,7 +222,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 |:-----------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
 
 
-## Functors
+### Functors
 | Function                | Purpose                                      |
 |:------------------------|:---------------------------------------------|
 | `lh#function#bind()`    | Builds a functor object.                     |
@@ -228,7 +230,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#function#prepare()` | Prepares a functor object to be `eval`uated. |
 
 
-## UI functions
+### UI functions
 All the functions defined in ui-functions.vim are wrappers around Vim
 interactive functions. Depending on a configuration variable
 (`[bg]:ui_type`), they will delegate the interaction to a gvim UI
@@ -246,11 +248,11 @@ function, or a plain text UI function (defined by vim, or emulated)
 
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
 
-## Word Tools
+### Word Tools
 See http://hermitte.free.fr/vim/general.php#expl_words_tools
 
 
-# Installation
+## Installation
   * Requirements: Vim 7.4
   * Clone from the git repository
 ```
@@ -267,7 +269,7 @@ ActivateAddons lh-vim-lib
 Bundle 'LucHermitte/lh-vim-lib'
 ```
 
-# Some other VimL libraries
+## Some other VimL libraries
   * [genutils](http://www.vim.org/scripts/script.php?script_id=197)
   * [pathogen](http://www.vim.org/scripts/script.php?script_id=2332)
   * [Tom Link's tlib](http://www.vim.org/scripts/script.php?script_id=1863)
