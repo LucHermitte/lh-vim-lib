@@ -15,11 +15,12 @@
 
 UTSuite [lh-vim-lib] Testing lh#list functions
 
+let s:cpo_save=&cpo
+set cpo&vim
+
 " # Dependencies {{{1
 runtime autoload/lh/function.vim
 runtime autoload/lh/list.vim
-let s:cpo_save=&cpo
-set cpo&vim
 
 " # Tests {{{1
 "------------------------------------------------------------------------
@@ -193,7 +194,7 @@ endfunction
 " possible_values {{{2
 function! s:Test_possible_values_list()
   let list = [ 'a', 'b', 42, 'a', 15, 'c', 'c', 8]
-  Assert lh#list#possible_values(list) == ['a', 'b', 'c', 15, 42, 8]
+  AssertEquals(lh#list#possible_values(list), ['a', 'b', 'c', 15, 42, 8])
 endfunction
 
 function! s:Test_possible_values_list_list()
@@ -209,8 +210,11 @@ function! s:Test_possible_values_list_list()
         \ ]
   AssertEquals (lh#list#possible_values(list, 0), range(8))
   AssertEquals (lh#list#possible_values(list, 1), ['a', 'b', 'c', 15, 42, 8])
-  " OK, this ine is odd, but it works!
-  AssertEquals (lh#list#possible_values(list, 3), [ 12, [], {}])
+  " OK, this line is odd, but it works!
+  if has("patch-7.4-411")
+    " It'll fail with vim 7.3, but I don't care
+    AssertEquals (lh#list#possible_values(list, 3), [ 12, [], {}])
+  endif
 endfunction
 
 function! s:Test_possible_values_list_dict()

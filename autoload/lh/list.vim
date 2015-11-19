@@ -529,8 +529,23 @@ endfunction
 "    sort(['{ *//', '{', 'a', 'b'], function('lh#list#_regular_cmp'))
 " gives the correct: ['a', 'b', '{', '{ *//']
 function! lh#list#_str_cmp(lhs, rhs) abort
-  let lhs = string(a:lhs)
-  let rhs = string(a:rhs)
+  let lhs = a:lhs
+  let rhs = a:rhs
+  if type(lhs) == type(rhs) && type(lhs) != type('')
+    unlet lhs
+    unlet rhs
+    let lhs = string(a:lhs)
+    let rhs = string(a:rhs)
+  else
+    if type(lhs) != type(0) && type(lhs) != type('')
+      unlet lhs
+      let lhs = string(a:lhs)
+    endif
+    if type(rhs) != type(0) && type(rhs) != type('')
+      unlet rhs
+      let rhs = string(a:rhs)
+    endif
+  endif
   return lh#list#_regular_cmp(lhs, rhs)
 endfunction
 
