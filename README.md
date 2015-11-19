@@ -263,7 +263,12 @@ git clone git@github.com:LucHermitte/lh-vim-lib.git
 ```vim
 ActivateAddons lh-vim-lib
 ```
-
+  * Note that [vim-flavor](https://github.com/kana/vim-flavor) also handle
+    dependencies which will permit to automatically import lh-vim-lib from
+    plugins that use it:
+```
+flavor LucHermitte/lh-vim-lib
+```
   * Vundle/NeoBundle:
 ```vim
 Bundle 'LucHermitte/lh-vim-lib'
@@ -276,5 +281,3 @@ Bundle 'LucHermitte/lh-vim-lib'
   * [theonevimlib](http://github.com/MarcWeber/theonevimlib/tree/master), initiated by Marc Weber
   * [anwolib](http://www.vim.org/scripts/script.php?script_id=3800), by Andy Wokula
   * [l9](http://www.vim.org/scripts/script.php?script_id=3252), by Takeshi NISHIDA
-
-[![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
