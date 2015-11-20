@@ -1,16 +1,15 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/position.vim                               {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:	3.3.13
 " Created:	05th Sep 2007
-" Last Update:	$Date$ (05th Sep 2007)
+" Last Update:	20th Nov 2015
 "------------------------------------------------------------------------
 " Description:	«description»
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 " 	Drop it into {rtp}/autoload/lh/
@@ -19,7 +18,7 @@
 " 	v1.0.0:
 " 		Creation
 "       v3.0.0: GPLv3
-" TODO:		
+" TODO:
 " }}}1
 "=============================================================================
 
@@ -56,7 +55,7 @@ function! lh#position#is_before(lhs_pos, rhs_pos)
   endif
   "1 test lines
   "2 test cols
-  let before 
+  let before
 	\ = (a:lhs_pos[1] == a:rhs_pos[1])
 	\ ? (a:lhs_pos[2] < a:rhs_pos[2])
 	\ : (a:lhs_pos[1] < a:rhs_pos[1])
@@ -87,6 +86,11 @@ function! lh#position#CharAtPos(pos)
   return  lh#position#char_at_pos(a:pos)
 endfunction
 
+" Function: lh#position#char_at {{{3
+function! lh#position#char_at(lin, col)
+  let c = getline(a:lin)[(a:col)-1]
+  return c
+endfunction
 
 
 " Functions }}}1
