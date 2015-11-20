@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.13
-let s:version = '3.3.13'
+" Version:	3.3.14
+let s:version = '3.3.14'
 " Created:	06th Nov 2007
 " Last Update:  20th Nov 2015
 "------------------------------------------------------------------------
@@ -32,6 +32,7 @@ autoload/lh/encoding.vim
 autoload/lh/env.vim
 autoload/lh/event.vim
 autoload/lh/float.vim
+autoload/lh/fmt.vim
 autoload/lh/function.vim
 autoload/lh/graph/tsort.vim
 autoload/lh/icomplete.vim
@@ -62,6 +63,7 @@ tests/lh/path.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim
+tests/lh/test-format.vim
 tests/lh/test-menu-map.vim
 tests/lh/test-toggle-menu.vim
 tests/lh/topological-sort.vim
