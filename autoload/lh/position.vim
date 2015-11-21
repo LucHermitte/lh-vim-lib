@@ -4,17 +4,17 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.13
+" Version:	3.3.14
 " Created:	05th Sep 2007
-" Last Update:	20th Nov 2015
+" Last Update:	21st Nov 2015
 "------------------------------------------------------------------------
-" Description:	«description»
+" Description:	?description?
 "
 "------------------------------------------------------------------------
 " Installation:
 " 	Drop it into {rtp}/autoload/lh/
 " 	Vim 7+ required.
-" History:	«history»
+" History:	?history?
 " 	v1.0.0:
 " 		Creation
 "       v3.0.0: GPLv3
@@ -92,6 +92,14 @@ function! lh#position#char_at(lin, col)
   return c
 endfunction
 
+" Function: lh#position#extract(pos1, pos2) {{{3
+" positions from |getpos()|
+function! lh#position#extract(pos1, pos2) abort
+  let lines = getline(a:pos1[0], a:pos2[0])
+  let lines[-1] = lines[-1][:a:pos2[1]-2]
+  let lines[0]  = lines[0][a:pos1[1] : ]
+  return join(lines, "\n")
+endfunction
 
 " Functions }}}1
 "------------------------------------------------------------------------
