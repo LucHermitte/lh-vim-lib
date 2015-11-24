@@ -67,6 +67,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#get()|
 - |lh#list#intersect()|
 - |lh#list#lower_bound()| and |lh#list#upper_bound()|
+- |lh#list#map_on()|
 - |lh#list#mask()|
 - |lh#list#match()|
 - |lh#list#matches()|
@@ -812,6 +813,59 @@ Example: >
    :AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#list#map_on()*                {{{3
+lh#list#map_on({list}, {index}|{key},{action})~
+@param[in] {list}    |List| of |List|s, or |List| of |Dict|s
+@param[in] {index}   Index to be used to extract values in the inner |List|s.
+or
+@param[in] {key}     Key to be used to extract values in the inner |Dict|s.
+@param[in] {action}  |lhvl#functor| action to apply on each element from {list}
+
+@returns of list of the values that are stored:
+  - at a given {index} in the lists from the input {list}
+  - or at a given {key} in the dictionaries from the input {list}
+after |map()| transformation with {action}
+
+Examples: >
+    " List of Lists
+    let list =
+          \ [ [ 0, 'a', 42, [] ]
+          \ , [ 1, 'b', 42, 12 ]
+          \ , [ 2, 42, 42 ]
+          \ , [ 3, 'a', 42 ]
+          \ , [ 4, 15, 42 ]
+          \ , [ 5, 'c', 42 ]
+          \ , [ 6, 'c', 42 ]
+          \ , [ 7, 8, 42 ]
+          \ ]
+    let l0 = lh#list#map_on(deepcopy(list), 0, 'v:val * 2')
+    AssertEquals (lh#list#get(l0, 0), map(range(8), 'v:val * 2'))
+    AssertEquals (lh#list#get(l0, 1), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+
+    let l1 = lh#list#map_on(deepcopy(list), 1, 'strlen(v:val) . "foo"')
+    AssertEquals (lh#list#get(l1, 0), range(8))
+    AssertEquals (lh#list#get(l1, 1), ['1foo', '1foo', '2foo', '1foo', '2foo', '1foo', '1foo', '1foo'])
+
+    " List of Dicts
+    let list =
+          \ [ { 'k1': 0, 'k2': 'a'}
+          \ , { 'k1': 1, 'k2': 'b'}
+          \ , { 'k1': 2, 'k2': 42}
+          \ , { 'k1': 3, 'k2': 'a'}
+          \ , { 'k1': 4, 'k2': 15}
+          \ , { 'k1': 5, 'k2': 'c'}
+          \ , { 'k1': 6, 'k2': 'c'}
+          \ , { 'k1': 7, 'k2': 8}
+          \ ]
+    let l0 = lh#list#map_on(deepcopy(list), 'k1', 'v:val * 2')
+    AssertEquals (lh#list#get(l0, 'k1'), map(range(8), 'v:val * 2'))
+    AssertEquals (lh#list#get(l0, 'k2'), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+
+    let l1 = lh#list#map_on(deepcopy(list), 'k2', 'strlen(v:val) . "foo"')
+    AssertEquals (lh#list#get(l1, 'k1'), range(8))
+    AssertEquals (lh#list#get(l1, 'k2'), ['1foo', '1foo', '2foo', '1foo', '2foo', '1foo', '1foo', '1foo'])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#copy_if()*                {{{3
 lh#list#copy_if({input},{output},{predicate})~
 Appends in {output} the elements from {input} that verifies the {predicate}.
@@ -964,7 +1018,7 @@ Example: >
 lh#list#get(list [, key|index [, default_when_absent])~
 
 Mandatory Params:
-    @param[in] {list} |List| of |List|s, or |List| of |Dict|s
+    @param[in] {list}    |List| of |List|s, or |List| of |Dict|s
     @param[in] {index}   Index to be used to extract values in the inner |List|s.
     or
     @param[in] {key}     Key to be used to extract values in the inner |Dict|s.

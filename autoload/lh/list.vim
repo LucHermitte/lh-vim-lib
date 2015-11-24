@@ -17,7 +17,9 @@
 "       Vim 7+ required.
 " History:
 "       v3.3.15
-"       (*) New function lh#list#get() -> map get list
+"       (*) New functions
+"           - lh#list#get() -> map get list
+"           - lh#list#map_on() -> map map list
 "       v3.3.7
 "       (*) lh#list#sort() emulates the correct behaviour of sort(), regarding
 "           patches 7.4-341 and 7.4-411
@@ -530,6 +532,11 @@ function! lh#list#rotate(list, rot) abort
   return res
 endfunction
 
+" Function: lh#list#map_on(list, index|key, action) {{{3
+function! lh#list#map_on(list, index, action) abort
+  return map(a:list, 'lh#list#_apply_on(v:val, a:index, a:action)')
+endfunction
+
 " # Private {{{2
 " Function: lh#list#_regular_cmp(lhs, rhs) {{{3
 " Up to vim version 7.4.411
@@ -566,6 +573,14 @@ function! lh#list#_regular_cmp(lhs, rhs) abort
         \ : a:lhs == a:rhs ? 0
         \ :                  1
   return res
+endfunction
+
+" Function: lh#list#_apply_on(list/dict, index/key, action) {{{3
+function! lh#list#_apply_on(list, index, action) abort
+  let in  = get(a:list, a:index)
+  let out = lh#function#execute(a:action, in)
+  let a:list[a:index] = out
+  return a:list
 endfunction
 
 " Functions }}}1

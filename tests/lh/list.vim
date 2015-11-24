@@ -278,6 +278,50 @@ function! s:Test_get_dict() abort
   AssertEquals (lh#list#get(list, 'k2'), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
 endfunction
 
+"------------------------------------------------------------------------
+" lh#list#map_on() {{{2
+" Function: s:Test_map_on_list() {{{3
+function! s:Test_map_on_list() abort
+  let list =
+        \ [ [ 0, 'a', 42, [] ]
+        \ , [ 1, 'b', 42, 12 ]
+        \ , [ 2, 42, 42 ]
+        \ , [ 3, 'a', 42 ]
+        \ , [ 4, 15, 42 ]
+        \ , [ 5, 'c', 42 ]
+        \ , [ 6, 'c', 42 ]
+        \ , [ 7, 8, 42 ]
+        \ ]
+  let l0 = lh#list#map_on(deepcopy(list), 0, 'v:val * 2')
+  AssertEquals (lh#list#get(l0, 0), map(range(8), 'v:val * 2'))
+  AssertEquals (lh#list#get(l0, 1), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+
+  let l1 = lh#list#map_on(deepcopy(list), 1, 'strlen(v:val) . "foo"')
+  AssertEquals (lh#list#get(l1, 0), range(8))
+  AssertEquals (lh#list#get(l1, 1), ['1foo', '1foo', '2foo', '1foo', '2foo', '1foo', '1foo', '1foo'])
+endfunction
+
+" Function: s:Test_map_on_dict() {{{3
+function! s:Te0st_map_on_dict() abort
+  let list =
+        \ [ { 'k1': 0, 'k2': 'a'}
+        \ , { 'k1': 1, 'k2': 'b'}
+        \ , { 'k1': 2, 'k2': 42}
+        \ , { 'k1': 3, 'k2': 'a'}
+        \ , { 'k1': 4, 'k2': 15}
+        \ , { 'k1': 5, 'k2': 'c'}
+        \ , { 'k1': 6, 'k2': 'c'}
+        \ , { 'k1': 7, 'k2': 8}
+        \ ]
+  let l0 = lh#list#map_on(deepcopy(list), 'k1', 'v:val * 2')
+  AssertEquals (lh#list#get(l0, 'k1'), map(range(8), 'v:val * 2'))
+  AssertEquals (lh#list#get(l0, 'k2'), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+
+  let l1 = lh#list#map_on(deepcopy(list), 'k2', 'strlen(v:val) . "foo"')
+  AssertEquals (lh#list#get(l1, 'k1'), range(8))
+  AssertEquals (lh#list#get(l1, 'k2'), ['1foo', '1foo', '2foo', '1foo', '2foo', '1foo', '1foo', '1foo'])
+endfunction
+
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
