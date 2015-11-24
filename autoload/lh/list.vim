@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.7
+" Version:      3.3.15
 " Created:      17th Apr 2007
-" Last Update:  27th Oct 2015
+" Last Update:  24th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.15
+"       (*) New function lh#list#get() -> map get list
 "       v3.3.7
 "       (*) lh#list#sort() emulates the correct behaviour of sort(), regarding
 "           patches 7.4-341 and 7.4-411
@@ -506,11 +508,19 @@ function! lh#list#possible_values(list, ...) abort
       let dRes[string(v)] = v
       unlet v
     endfor
-    " this hack regarding using values and not keyx permits to not alter the
+    " this hack regarding using values and not keys permits to not alter the
     " type of the elements
     let res = lh#list#sort(values(dRes))
     return res
   endif
+endfunction
+
+" Function: lh#list#get(list, index|key [, default]) {{{3
+" Extract the i-th element in list of lists, or the element named {index} in a
+" list of dictionaries
+function! lh#list#get(list, index, ...) abort
+  let res = map(copy(a:list), 'call ("get", [v:val, a:index]+a:000)')
+  return res
 endfunction
 
 " Function: lh#list#rotate(list, rot) {{{3

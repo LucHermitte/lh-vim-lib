@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.7
+" Version:      3.3.15
 " Created:	19th Nov 2008
-" Last Update:  27th Oct 2015
+" Last Update:  24th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -245,6 +245,42 @@ function! s:Test_possible_values_list_dict()
 endfunction
 
 "------------------------------------------------------------------------
+" lh#list#get() {{{2
+" Function: s:Test_get_list() {{{3
+function! s:Test_get_list() abort
+  let list =
+        \ [ [ 0, 'a', 42, [] ]
+        \ , [ 1, 'b', 42, 12 ]
+        \ , [ 2, 42, 42 ]
+        \ , [ 3, 'a', 42 ]
+        \ , [ 4, 15, 42 ]
+        \ , [ 5, 'c', 42 ]
+        \ , [ 6, 'c', 42 ]
+        \ , [ 7, 8, 42 ]
+        \ ]
+  AssertEquals (lh#list#get(list, 0), range(8))
+  AssertEquals (lh#list#get(list, 1), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+endfunction
+
+" Function: s:Test_get_dict() {{{3
+function! s:Test_get_dict() abort
+  let list =
+        \ [ { 'k1': 0, 'k2': 'a'}
+        \ , { 'k1': 1, 'k2': 'b'}
+        \ , { 'k1': 2, 'k2': 42}
+        \ , { 'k1': 3, 'k2': 'a'}
+        \ , { 'k1': 4, 'k2': 15}
+        \ , { 'k1': 5, 'k2': 'c'}
+        \ , { 'k1': 6, 'k2': 'c'}
+        \ , { 'k1': 7, 'k2': 8}
+        \ ]
+  AssertEquals (lh#list#get(list, 'k1'), range(8))
+  AssertEquals (lh#list#get(list, 'k2'), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
+endfunction
+
+" }}}1
+"------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:
+"
