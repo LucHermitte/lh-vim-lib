@@ -544,6 +544,8 @@ will echo: >
    >:echo lh#function#execute(func, 1, 'two', [1,2,3])
    3 ## 42 ## 'two' ## 1
 < NB: func["args"] is defined, but empty, and unused.
+ NB: |v:val| is supported as well.
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#function#execute()*           {{{3

@@ -3,8 +3,8 @@
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.11
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
+" Version:      3.3.15
 " Created:      03rd Nov 2008
 "------------------------------------------------------------------------
 " Description:
@@ -16,6 +16,7 @@
 "
 "------------------------------------------------------------------------
 " History:
+"       v3.3.15: lh#function#execute(string) supports now v:val as well.
 "       v3.3.11: Bug fix: pass tests
 "       v3.2.9:  Bug fix when &isk is messed up in lh#function#execute()
 "       v3.0.0:  GPLv3
@@ -81,7 +82,8 @@ function! s:DoBindString(expr, real) abort
         \.restore('&isk')
   try
     set isk&vim
-    let expr = substitute(a:expr, '\v<v:(\d+)_>', a:real.'[\1-1]', 'g')
+    let expr = substitute(a:expr, '\v<v:val>', a:real.'[0]', 'g')
+    let expr = substitute(expr, '\v<v:(\d+)_>', a:real.'[\1-1]', 'g')
     return expr
   finally
     call cleanup.finalize()
