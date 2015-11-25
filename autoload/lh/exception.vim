@@ -1,11 +1,11 @@
 "=============================================================================
 " File:         autoload/lh/exception.vim                         {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.3.11.
-let s:k_version = '3311'
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" Version:      3.3.16.
+let s:k_version = '3316'
 " Created:      18th Nov 2015
-" Last Update:
+" Last Update:  25th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -69,14 +69,16 @@ function! lh#exception#callstack(throwpoint) abort
       let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
       let script = substitute(script, '^\~', $HOME, '')
       let fname  = substitute(func_data[1], '<SNR>\d\+_', 's:', '')
-      if !has_key(dScripts, script)
-	let dScripts[script] = reverse(readfile(script))
+      if filereadable(script)
+        if !has_key(dScripts, script)
+          let dScripts[script] = reverse(readfile(script))
+        endif
+        let fstart = len(dScripts[script]) - match(dScripts[script], '^\s*fu\%[nction]!\=\s\+'.fname)
+        let function_stack += [{'script': script, 'fname': fname,
+              \ 'offset': func_data[2], 'fstart': fstart,
+              \ 'pos': (func_data[2]+fstart)
+              \ }]
       endif
-      let fstart = len(dScripts[script]) - match(dScripts[script], '^\s*fu\%[nction]!\=\s\+'.fname)
-      let function_stack += [{'script': script, 'fname': fname,
-            \ 'offset': func_data[2], 'fstart': fstart,
-            \ 'pos': (func_data[2]+fstart)
-            \ }]
     endif
   endfor
   return function_stack
