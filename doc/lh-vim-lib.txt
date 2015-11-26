@@ -1022,6 +1022,23 @@ Examples: >
   AssertEquals(lh#list#flat_extend(copy(list), [5,6]), [1,2,3,5,6])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#add_new()*                {{{3
+lh#dict#add_new(dict1, dict2)~
+@param[in,out] {dict1} |Dict| to extend
+@param[in]     {dict2}  Element to insert, if new.
+@return        The {dict1}
+Adds an element into a dictionary if not already present
+
+Examples: >
+
+  let d1 = {'k1': 1, 'k2': 2}
+
+  AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k4': 'quatre'}),
+                                       \ {'k1': 1, 'k2': 2, 'k3': 'trois', 'k4': 'quatre'})
+  AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k1': 'un'}),
+                                       \ {'k1': 1, 'k2': 2, 'k3': 'trois'})
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#push_if_new()*            {{{3
 lh#list#push_if_new(list, value)~
 @param[in,out] {list} |List| to extend

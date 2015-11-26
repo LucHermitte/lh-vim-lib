@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.16
-let s:version = '3.3.16'
+" Version:	3.3.17
+let s:version = '3.3.17'
 " Created:	06th Nov 2007
 " Last Update:  26th Nov 2015
 "------------------------------------------------------------------------
@@ -28,6 +28,7 @@ autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
 autoload/lh/command.vim
 autoload/lh/common.vim
+autoload/lh/dict.vim
 autoload/lh/encoding.vim
 autoload/lh/env.vim
 autoload/lh/event.vim

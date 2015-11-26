@@ -356,10 +356,20 @@ function! s:Test_push_if_new() abort
 endfunction
 
 "------------------------------------------------------------------------
+" Function: s:Test_dict_add_new() {{{3
+function! s:Test_dict_add_new() abort
+  let d1 = {'k1': 1, 'k2': 2}
+
+  AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k4': 'quatre'}), {'k1': 1, 'k2': 2, 'k3': 'trois', 'k4': 'quatre'})
+  AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k1': 'un'}), {'k1': 1, 'k2': 2, 'k3': 'trois'})
+endfunction
+
+"------------------------------------------------------------------------
 " Function: s:Test_for_each_call() {{{3
 function! s:Test_for_each_call() abort
   let cleanup = lh#on#exit()
         \.restore('g:d')
+  silent! unlet g:d
   try
     let l = [1,2,3,4,5]
     let g:d = []

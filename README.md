@@ -88,9 +88,11 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#cpu_number()`               | Returns the number of processors on the machine                                    |
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
 
-### Lists related functions
+### Lists and dictionary related functions
 | Function                    | Purpose                                                                                                           |
-|:----------------------------|:--------------------------------------------------------------------------------------------------------          |
+|:----------------------------|:------------------------------------------------------------------------------------------------------------------|
+| `lh#dict#add_new()`         | Adds elements from the second dictionary if they are not set yet in the first                                     |
+| `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                                   |
 | `lh#list#chain_transform()` | Applies a series of transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
