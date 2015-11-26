@@ -65,6 +65,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#flat_extend()|
+- |lh#list#for_each_call()|
 - |lh#list#get()|
 - |lh#list#intersect()|
 - |lh#list#lower_bound()| and |lh#list#upper_bound()|
@@ -815,8 +816,30 @@ Example: >
    :AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#list#for_each_call()*         {{{3
+lh#list#for_each_call({list}, {action})~
+@param[in] {list}    |List|
+@param[in] {action}  |function| to call of each elements of the {list}
+@Return    nothing
+
+Examples: >
+    let l = [1,2,3,4,5]
+    let g:d = []
+    call lh#list#for_each_call(l, 'add(g:d, v:val)')
+    AssertEquals(g:d, l)
+
+    let l = ['a', 'b', 'c', 'd']
+    let g:d = []
+    call lh#list#for_each_call(l, 'add(g:d, v:val)')
+    AssertEquals(g:d, l)
+
+
+    " lh-cpp class-skeleton.template
+    VimL: call lh#list#for_each_call(s:parents_data[1], "lh#mut#_add_post_expand_callback(\"lh#dev#import#add(v:val)\")")
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#map_on()*                {{{3
-lh#list#map_on({list}, {index}|{key},{action})~
+lh#list#map_on({list}, {index}|{key}, {action})~
 @param[in] {list}    |List| of |List|s, or |List| of |Dict|s
 @param[in] {index}   Index to be used to extract values in the inner |List|s.
 or

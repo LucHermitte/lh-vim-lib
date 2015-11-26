@@ -16,6 +16,11 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.16
+"       (*) New functions
+"           - lh#list#for_each_call()
+"           - lh#list#flat_extend()
+"       (*) lh#list#possible_values() supports mixed types
 "       v3.3.15
 "       (*) New functions
 "           - lh#list#get() -> map get list
@@ -489,6 +494,15 @@ function! lh#list#intersect(list1, list2) abort
   endfor
 endfunction
 
+" Function: lh#list#flat_extend(list, rhs) {{{3
+function! lh#list#flat_extend(list, rhs) abort
+  if type(a:rhs) == type([])
+    return extend(a:list, a:rhs)
+  else
+    return add(a:list, a:rhs)
+  endif
+endfunction
+
 " Function: lh#list#push_if_new(list, value) {{{3
 function! lh#list#push_if_new(list, value) abort
   let matching = filter(copy(a:list), 'v:val == a:value')
@@ -540,13 +554,17 @@ function! lh#list#map_on(list, index, action) abort
   return map(a:list, 'lh#list#_apply_on(v:val, a:index, a:action)')
 endfunction
 
-" Function: lh#list#flat_extend(list, rhs) {{{3
-function! lh#list#flat_extend(list, rhs) abort
-  if type(a:rhs) == type([])
-    return extend(a:list, a:rhs)
-  else
-    return add(a:list, a:rhs)
-  endif
+" Function: lh#list#for_each_call(list, action) {{{3
+function! lh#list#for_each_call(list, action) abort
+  try
+    for e in a:list
+      let action = substitute(a:action, '\v<v:val>', '\=string(e)', 'g')
+      exe 'call '.action
+      unlet e
+    endfor
+  catch /.*/
+    throw "lh#list#for_each_call: ".v:exception." in ``".action."''"
+  endtry
 endfunction
 
 " # Private {{{2

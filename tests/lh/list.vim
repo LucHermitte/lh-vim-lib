@@ -354,6 +354,26 @@ function! s:Test_push_if_new() abort
   AssertEquals(lh#list#push_if_new(copy(list), 5), [1,2,3,5])
   AssertEquals(lh#list#push_if_new(copy(list), 2), [1,2,3])
 endfunction
+
+"------------------------------------------------------------------------
+" Function: s:Test_for_each_call() {{{3
+function! s:Test_for_each_call() abort
+  let cleanup = lh#on#exit()
+        \.restore('g:d')
+  try
+    let l = [1,2,3,4,5]
+    let g:d = []
+    call lh#list#for_each_call(l, 'add(g:d, v:val)')
+    AssertEquals(g:d, l)
+
+    let l = ['a', 'b', 'c', 'd']
+    let g:d = []
+    call lh#list#for_each_call(l, 'add(g:d, v:val)')
+    AssertEquals(g:d, l)
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
