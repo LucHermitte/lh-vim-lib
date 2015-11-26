@@ -244,6 +244,21 @@ function! s:Test_possible_values_list_dict()
   AssertEquals (lh#list#possible_values(list, 'k2'), ['a', 'b', 'c', 15, 42, 8])
 endfunction
 
+function! s:Test_possible_values_list_dict2()
+  let list =
+        \ [ { 'k1': 0, 'k2': 'a'}
+        \ , { 'k1': 1, 'k2': 'b'}
+        \ , { 'k1': 2, 'k2': 42}
+        \ , 'foobar'
+        \ , { 'k1': 4, 'k2': 15}
+        \ , { 'k1': 5, 'k2': 'c'}
+        \ , { 'k1': 6, 'k2': 'c'}
+        \ , { 'k1': 7, 'k2': 8}
+        \ ]
+  AssertEquals (lh#list#possible_values(list, 'k1'), [0,1,2,4,5,6,7])
+  AssertEquals (lh#list#possible_values(list, 'k2'), ['a', 'b', 'c', 15, 42, 8])
+endfunction
+
 "------------------------------------------------------------------------
 " lh#list#get() {{{2
 " Function: s:Test_get_list() {{{3

@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.15
+" Version:      3.3.16
 " Created:      17th Apr 2007
-" Last Update:  24th Nov 2015
+" Last Update:  26th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -506,9 +506,12 @@ function! lh#list#possible_values(list, ...) abort
     let default = a:0 == 2 ? a:2 : lh#option#unset()
     let dRes = {}
     for e in a:list
-      let v = get(e, a:1, default)
-      let dRes[string(v)] = v
-      unlet v
+      if type(e) == type({}) || type(e) == type([])
+	let v = get(e, a:1, default)
+	let dRes[string(v)] = v
+        unlet v
+      endif
+      unlet e
     endfor
     " this hack regarding using values and not keys permits to not alter the
     " type of the elements
