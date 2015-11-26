@@ -337,6 +337,23 @@ function! s:Te0st_map_on_dict() abort
   AssertEquals (lh#list#get(l1, 'k2'), ['1foo', '1foo', '2foo', '1foo', '2foo', '1foo', '1foo', '1foo'])
 endfunction
 
+"------------------------------------------------------------------------
+" Function: s:Test_flat_extend() {{{3
+function! s:Test_flat_extend() abort
+  let list = [1,2,3]
+
+  AssertEquals(lh#list#flat_extend(copy(list), 5), [1,2,3,5])
+  AssertEquals(lh#list#flat_extend(copy(list), [5,6]), [1,2,3,5,6])
+endfunction
+
+"------------------------------------------------------------------------
+" Function: s:Test_push_if_new() {{{3
+function! s:Test_push_if_new() abort
+  let list = [1,2,3]
+
+  AssertEquals(lh#list#push_if_new(copy(list), 5), [1,2,3,5])
+  AssertEquals(lh#list#push_if_new(copy(list), 2), [1,2,3])
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

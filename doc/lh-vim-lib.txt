@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.15)
-                        For Vim version 7+      Last change: 24th Nov 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.16)
+                        For Vim version 7+      Last change: 26th Nov 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -64,6 +64,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#copy_if()|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
+- |lh#list#flat_extend()|
 - |lh#list#get()|
 - |lh#list#intersect()|
 - |lh#list#lower_bound()| and |lh#list#upper_bound()|
@@ -73,6 +74,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#matches()|
 - |lh#list#not_found()|
 - |lh#list#possible_values()|
+- |lh#list#push_if_new()|
 - |lh#list#remove()|
 - |lh#list#sort()|
 - |lh#list#subset()|
@@ -979,6 +981,37 @@ Example: >
     :let masks = [ 1, 0, 0, 1, 0, 1, 0, 1]
     :echo lh#list#masks(l, masks)
     [ 1, 48, 5, 6 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#flat_extend()*            {{{3
+lh#list#flat_extend(list, rhs)~
+@param[in,out] {list} |List| to extend
+@param[in]     {rhs}  Element to insert, flattened,  into the list
+@return        The {list}
+Extends a {list} with another, or add elements into a list depending on the
+{rhs} parameter
+
+Examples: >
+
+  let list = [1,2,3]
+
+  AssertEquals(lh#list#flat_extend(copy(list), 5), [1,2,3,5])
+  AssertEquals(lh#list#flat_extend(copy(list), [5,6]), [1,2,3,5,6])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#push_if_new()*            {{{3
+lh#list#push_if_new(list, value)~
+@param[in,out] {list} |List| to extend
+@param[in]     {rhs}  Element to insert, if new.
+@return        The {list}
+Adds an element into a list, if not already present
+
+Examples: >
+
+  let list = [1,2,3]
+
+  AssertEquals(lh#list#push_if_new(copy(list), 5), [1,2,3,5])
+  AssertEquals(lh#list#push_if_new(copy(list), 2), [1,2,3])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#remove()*                 {{{3

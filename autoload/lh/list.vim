@@ -540,6 +540,15 @@ function! lh#list#map_on(list, index, action) abort
   return map(a:list, 'lh#list#_apply_on(v:val, a:index, a:action)')
 endfunction
 
+" Function: lh#list#flat_extend(list, rhs) {{{3
+function! lh#list#flat_extend(list, rhs) abort
+  if type(a:rhs) == type([])
+    return extend(a:list, a:rhs)
+  else
+    return add(a:list, a:rhs)
+  endif
+endfunction
+
 " # Private {{{2
 " Function: lh#list#_regular_cmp(lhs, rhs) {{{3
 " Up to vim version 7.4.411

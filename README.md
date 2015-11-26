@@ -97,6 +97,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                            |
 | `lh#list#equal_range()`     | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
 | `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                                    |
+| `lh#list#flat_extend()`     | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter             |
 | `lh#list#get()`             | Returns a list with the elements of index/key in a list of lists/dictionaries (<=> map get(key/idx) list)         |
 | `lh#list#intersect()`       | Intersection of two lists                                                                                         |
 | `lh#list#lower_bound()`     | See C++ [`std::lower_bound`](http://en.cppreference.com/w/cpp/algorithm/lower_bound)                              |
