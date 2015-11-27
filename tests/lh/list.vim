@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.15
+" Version:      3.3.18
 " Created:	19th Nov 2008
-" Last Update:  24th Nov 2015
+" Last Update:  27th Nov 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -169,6 +169,16 @@ function! s:Test_accumulate_multiple()
   " This test will fail because it seems :for each loop cannot iterate on
   " heterogeneous containers
 endfunction
+"------------------------------------------------------------------------
+" Function: s:Test_accu_dicts() {{{3
+function! s:Test_accu_dicts() abort
+  let l = [ {"k1": 1}, { "k2":2, "k3": 3}, {"k4": 4}]
+  let e =  {"k1": 1,  "k2":2, "k3": 3, "k4": 4}
+
+  AssertEquals(e, lh#list#accumulate2(l, {}, 'extend(v:1_, v:2_)'))
+endfunction
+
+
 
 "------------------------------------------------------------------------
 " Copy_if
