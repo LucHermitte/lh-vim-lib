@@ -955,6 +955,16 @@ Examples: >
    720
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#flatten()*                {{{3
+lh#list#flatten({list})~
+@param[in] {list} to flatten
+@return    list flattened
+This function flattens a list >
+
+  let l = [ [[[0]]], 1, 2, [3,4], [5, [6]]]
+  AssertEquals(lh#list#flatten(l), range(7))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#sort()*                   {{{3
 lh#list#sort({list})~
 This function is an encapsulation of |sort()| that fixes the bug where

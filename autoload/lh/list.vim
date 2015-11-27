@@ -173,6 +173,20 @@ function! lh#list#accumulate2(input, init, ...) abort
   return res
 endfunction
 
+" Function: lh#list#flatten(list) {{{3
+function! lh#list#flatten(list) abort
+  let res = []
+  for e in a:list
+    if type(e) == type([])
+      let res += lh#list#flatten(e)
+    else
+      let res += [e]
+    endif
+    unlet e
+  endfor
+  return res
+endfunction
+
 " Function: lh#list#match_re(list, to_be_matched [, idx]) {{{3
 " Search first regex that match the parameter
 function! lh#list#match_re(list, to_be_matched, ...) abort

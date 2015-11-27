@@ -384,6 +384,14 @@ function! s:Test_for_each_call() abort
     call cleanup.finalize()
   endtry
 endfunction
+
+"------------------------------------------------------------------------
+" Function: s:Test_flatten() {{{3
+function! s:Test_flatten() abort
+  let l = [ [[[0]]], 1, 2, [3,4], [5, [6]]]
+
+  AssertEquals(lh#list#flatten(l), range(7))
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
