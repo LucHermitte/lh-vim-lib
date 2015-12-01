@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.0
-let s:k_version = '3.3.0'
+" Version:      3.3.17
+let s:k_version = '3.3.17'
 " Created:      11th Mar 2015
-" Last Update:  19th Apr 2015
+" Last Update:  01st Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -96,6 +96,26 @@ function! lh#vcs#decode_github_url(url) abort
   endfor
   let repo = matchlist(a:url, '^\%(\(ssh\)://\|https\=://\|git://\|git@\)\=\zs\(\%(\1\.\)\='.domain_pattern.'\)[/:]\(.\{-}\)/\(.\{-\}\)\ze\%(\.git\)\=$')
   return !empty(repo) ? lh#list#subset(repo, [1, 3,4]) : []
+endfunction
+
+" Function: lh#vcs#as_http(...) {{{3
+function! lh#vcs#as_http(...) abort
+  let url = ''
+  try
+    let url = call('lh#vcs#get_url', a:000)
+    if lh#vcs#is_git()
+      let repo = lh#vcs#decode_github_url(url)
+      if !empty(repo)
+        return 'http://github.com/'.repo[1].'/'.repo[2]
+      endif
+    endif
+  catch /.*/
+  endtry
+  if !empty(url)
+    return url
+  else
+    return get(g:, 'url', lh#marker#txt('repo_url'))
+  endif
 endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
