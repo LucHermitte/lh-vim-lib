@@ -63,8 +63,8 @@ function! lh#askvim#exe(command) abort
     " Always restore everything
     let res = @a
     let @a = save_a
-    return res
   endtry
+  return res
 endfunction
 
 
