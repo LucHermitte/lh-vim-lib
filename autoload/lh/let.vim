@@ -1,17 +1,17 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/let.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.6
+"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
+" Version:      3.3.17
+let s:k_version = 3317
 " Created:      10th Sep 2012
-" Last Update:  $Date$
+" Last Update:  01st Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
-" 
+"
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -21,7 +21,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 1
 function! lh#let#version()
   return s:k_version
 endfunction
@@ -48,8 +47,8 @@ endfunction
 " ## Exported functions {{{1
 " Function: lh#let#if_undef(var, value) {{{3
 function! lh#let#if_undef(var, value) abort
-  try 
-    let [all, dict, key ; dummy] = matchlist(a:var, '^\(.\{-}\)\%(\.\([^.]\+\)\)\=$')
+  try
+    let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
     " echomsg a:var." --> dict=".dict." --- key=".key
     if !empty(key)
       " Dictionaries
@@ -74,6 +73,7 @@ endfunction
 " ## Internal functions {{{1
 
 "------------------------------------------------------------------------
+" }}}1
 let &cpo=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:
