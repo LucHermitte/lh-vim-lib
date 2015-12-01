@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.16
+" Version:      3.3.17
 " Created:      17th Apr 2007
-" Last Update:  26th Nov 2015
+" Last Update:  01st Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.17
+"       (*) ENH: lh#list#possible_values() will accept things like
+"           [1, 'toto', function('has'), {'join': 5}, {'join': 42}]
 "       v3.3.16
 "       (*) New functions
 "           - lh#list#for_each_call()
@@ -533,13 +536,13 @@ function! lh#list#possible_values(list, ...) abort
   elseif a:0 == 1
     let default = a:0 == 2 ? a:2 : lh#option#unset()
     let dRes = {}
-    for e in a:list
-      if type(e) == type({}) || type(e) == type([])
-	let v = get(e, a:1, default)
+    for E in a:list
+      if type(E) == type({}) || type(E) == type([])
+	let v = get(E, a:1, default)
 	let dRes[string(v)] = v
         unlet v
       endif
-      unlet e
+      unlet E
     endfor
     " this hack regarding using values and not keys permits to not alter the
     " type of the elements
