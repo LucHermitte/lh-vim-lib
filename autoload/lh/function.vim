@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.15
+" Version:      3.3.20
 " Created:      03rd Nov 2008
 "------------------------------------------------------------------------
 " Description:
@@ -16,6 +16,7 @@
 "
 "------------------------------------------------------------------------
 " History:
+"       v3.3.20: Explicit error msg w/ lh#function#execute
 "       v3.3.15: lh#function#execute(string) supports now v:val as well.
 "       v3.3.11: Bug fix: pass tests
 "       v3.2.9:  Bug fix when &isk is messed up in lh#function#execute()
@@ -45,7 +46,7 @@ function! lh#function#debug(expr)
 endfunction
 
 " # Function: s:Join(arguments...) {{{2
-function! s:Join(args)
+function! s:Join(args) abort
   let res = ''
   if len(a:args) > 0
     let res = string(a:args[0])
@@ -153,6 +154,8 @@ function! lh#function#execute(Fn, ...) abort
       " escape the '[' from the expression part as [z-a] is not a valid range,
       " even if your text as nothing to do with a range
       throw "Cannot execute the expression: ".expr ."\nWith a:000=".string(a:000)
+            \ ."\n-> ".v:exception
+            \ ."\n-> ".v:throwpoint
     endtry
   endif
 endfunction
