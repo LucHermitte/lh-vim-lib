@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.17
+" Version:      3.3.20
 " Created:      17th Apr 2007
-" Last Update:  01st Dec 2015
+" Last Update:  03rd Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,9 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.3.20
+"       (*) ENH: lh#list#sort(['1', ...], 'N') to sort list of strings encoding
+"           numbers.
 "       v3.3.17
 "       (*) ENH: lh#list#possible_values() will accept things like
 "           [1, 'toto', function('has'), {'join': 5}, {'join': 42}]
@@ -393,6 +396,7 @@ endfunction
 " Behaviours
 " - default: string cmp
 " - 'n' -> number comp
+" - 'N' -> number comp, but on strings
 let s:k_has_num_cmp = has("patch-7.4-341")
 let s:k_has_fixed_str_cmp = has("patch-7.4-411")
 " For testing purposes...
@@ -401,6 +405,11 @@ let s:k_has_fixed_str_cmp = has("patch-7.4-411")
 function! lh#list#sort(list,...) abort
   let args = [a:list] + a:000
   if len(args) > 1
+    if args[1] == 'N'
+      let args[0] = map(a:list, 'eval(v:val)')
+      let args[1] = 'n'
+      let was_sorting_numbers_as_strings = 1
+    endif
     if !s:k_has_num_cmp && args[1]=='n'
       let args[1] = 'lh#list#_regular_cmp'
     elseif !s:k_has_fixed_str_cmp && args[1]==''
@@ -411,7 +420,11 @@ function! lh#list#sort(list,...) abort
       let args += ['lh#list#_str_cmp']
     endif
   endif
-  return call('sort', args)
+  let res = call('sort', args)
+  if exists('was_sorting_numbers_as_strings')
+    call map(res, 'string(v:val)')
+  endif
+  return res
 endfunction
 
 " Function: lh#list#unique_sort(list [, func]) {{{3

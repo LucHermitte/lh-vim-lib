@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.16)
-                        For Vim version 7+      Last change: 26th Nov 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.3.20)
+                        For Vim version 7+      Last change: 03rd Dec 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -221,7 +221,7 @@ lost most of its interrest.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#common#rand()*                {{{3
 lh#common#rand({max})~
-@return a random number in [0..max[.
+@return a random number in `[0..max[`.
 @requires vim to be compiled with |+python| feature.
 
                                                 *lh#fmt#printf()*                {{{3
@@ -451,20 +451,20 @@ lh#event#register_for_one_execution_at({event}, {cmd}, {group})~
 Registers a command to be executed once (and only once) when {event} is
 triggered on the current file.
 
-@param {event}  Event that will trigger the execution of {cmd}|autocmd-events|
+@param {event} Event that will trigger the execution of {cmd}|autocmd-events|
 @param   {cmd} |expression-command| to execute
 @param {group} |autocmd-groups| under which the internal autocommand will be
-                registered.
+               registered.
 @todo possibility to specify the file pattern
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#exception#callstack()*      {{{3
 lh#exception#callstack({throwpoint})~
 Decodes the {throwpoint} and return a list of dictionaries made of:
-- "script": name of the file where the exception comes from
-- "pos": abolute line number in the script where the exception has been issued
-- "fname": name of the function where the exception has been issued
-- "offset": Relative line number from the function first line where the
+- "`script`": name of the file where the exception comes from
+- "`pos`"   : abolute line number in the script where the exception has been issued
+- "`fname`" : name of the function where the exception has been issued
+- "`offset`": Relative line number from the function first line where the
   exception....
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -493,8 +493,8 @@ FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
 
 This sub-library helps defining functors-like variables, and execute them.
 
-NB: C++ developpers may be already familiar with boost.bind
-(/std(::tr1)::bind) function that inspired by feature.
+NB: C++ developpers may be already familiar with `boost.bind`
+(/`std(::tr1)::bind`) function that inspired by feature.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                       *lhvl#functor*              {{{3
@@ -538,7 +538,7 @@ will echo: >
    >:let func = lh#function#bind('Print', 'v:3_', 42, 'v:2_', 'v:1_')
    >:echo lh#function#execute(func, 1, 'two', [3])
    [3] ## 42 ## 'two' ## 1
-< NB: if exists('*'.func_name) is false, then the string is considered to be
+< NB: if `exists('*'.func_name)` is false, then the string is considered to be
   an expression that will be evaluated as specified in the next use case.
 
 * Binding an expression:~
@@ -591,13 +591,13 @@ Push a new value into the stack.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#pop()*                  {{{3
 lh#stack#pop({stack})~
-@pre !empty({stack})
+@pre `!empty({stack})`
 Removes a value from the stack and returns it.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#top()*                  {{{3
 lh#stack#top({stack})~
-@pre !empty({stack})
+@pre `!empty({stack})`
 Returns the top value of the stack.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -658,10 +658,10 @@ lh#list#Match({list},{pattern}[, {start-pos}])  (*deprecated*)~
 lh#list#match({list},{pattern}[, {start-pos}])~
 @param      {list} |List|
 @param   {pattern} |expr-string|
-@param {start-pos}  First index to check
-@return             The lowest index, >= {start-pos}, in |List| {list} where
-                    the item matches {pattern}.
-@return             -1 if no item matches {pattern}.
+@param {start-pos} First index to check
+@return            The lowest index, >= {start-pos}, in |List| {list} where
+                   the item matches {pattern}.
+@return            -1 if no item matches {pattern}.
 @see |index()|, |match()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -669,18 +669,18 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 lh#list#match({list},{pattern}[, {start-pos}])~
 @param      {list} |List|
 @param   {pattern} |expr-string|
-@param {start-pos}  First index to check
-@return             The |List| of indices, >= {start-pos}, in |List| {list} where
-                    the item matches {pattern}.
-@return             [] if no item matches {pattern}.
+@param {start-pos} First index to check
+@return            The |List| of indices, >= {start-pos}, in |List| {list} where
+                   the item matches {pattern}.
+@return            [] if no item matches {pattern}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*               {{{3
 lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
 lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
-@param             {list} |List|
+@param             {list}  |List|
 @param      {*-predicate}  Predicate to evaluate
-@param {pred-parameters}] |List| of Parameters to bind to special arguments in
+@param {pred-parameters}]  |List| of Parameters to bind to special arguments in
                            the {predicate}.
 @param         {start-pos} First index to check
 @return                    The lowest index, >= {start-pos}, in |List| {list}
@@ -692,7 +692,7 @@ The {string-predicate} recognizes some special arguments:
 - |v:val| is substituted with the current element being evaluated in the list
 - *v:1_* *v:2_* , ..., are substituted with the i-th elements from
   {pred-parameters}.
-  NB: the "v:\d\+_" are 1-indexed while {pred-parameters} is indeed seen as
+  NB: the "`v:\d\+_`" are 1-indexed while {pred-parameters} is indeed seen as
   0-indexed by Vim.
   This particular feature permits to pass any type of variable to the
   predicate: a |expr-string|, a |List|, a |Dictionary|, ...
@@ -710,7 +710,7 @@ rewritten as: >
     :let i = lh#list#find_if(l, 'v:1_>12  && v:1_<42 && v:1_%2==0')
     :echo l[i]
     28
-NB: Expect the Find_if() version to be replaced with the find_if() one.
+NB: Expect the `Find_if()` version to be replaced with the `find_if()` one.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                         *lh#list#lower_bound()* *lh#list#upper_bound()*           {{{3
@@ -726,7 +726,7 @@ lh#list#equal_range({list}, {value} [, {first}][, {last}])~
         such as the index is <= first {value} occurrence, in lower_bound case
         such as the index is > last {value} occurrence, in upper_bound case
 @return -1 if no item matches {pattern}.
-@return the pair [lower_bound(), upper_bound()] in equal_range() case
+@return the pair `[lower_bound(), upper_bound()]` in `equal_range()` case
 @see C++ STL eponym algorithms.
 
 
@@ -742,16 +742,16 @@ lh#list#unique_sort({list} [, {cmp}])~
 lh#list#unique_sort2({list} [, {cmp}])~
 @param[in] {list} |List| to sort
 @param      {cmp} |Funcref| or function name that acts as a compare predicate.
-                   It seems to be required in order to not compare number with
-                   a lexicographic order (with vim 7.1-156)
-@return            A new |List| sorted with no element repeated
+                  It seems to be required in order to not compare number with
+                  a lexicographic order (with vim 7.1-156)
+@return           A new |List| sorted with no element repeated
 @todo support an optional {equal} predicate to use in the /unique/ making
 process.
 
 The difference between the two functions is the following:
-- unique_sort() stores all the elements in a |Dictionary|, then sort the values
+- `unique_sort()` stores all the elements in a |Dictionary|, then sort the values
   stored in the dictionary ;
-- unique_sort2() sorts all the elements from the initial |List|, and then
+- `unique_sort2()` sorts all the elements from the initial |List|, and then
   keeps only the elements that appear once.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -761,7 +761,7 @@ lh#list#Transform({input},{output},{action})~
 @param[out] {output} Output |List| where the transformed elements will be
                      appended.
 @param      {action} Stringified action to apply on each element from {input}.
-                     The string "v:val" will always be replaced with the
+                     The string "`v:val`" will always be replaced with the
                      element currently transformed.
 @return {output}
 
@@ -774,7 +774,7 @@ lh#list#transform({input},{output},{action})~
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the transformed elements will be
                      appended.
-@param      {action}|lhvl#functor| action to apply on each element from
+@param      {action} |lhvl#functor| action to apply on each element from
                      {input}.
 @return              {output}
 
@@ -797,8 +797,8 @@ lh#list#transform_if({input},{output},{action},{predicate})~
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#chain_transform()*       {{{3
 lh#list#chain_transform({input},{actions})~
-@param[in]   {input}  Input |List| to transform
-@param[out] {output}  Output |List| where the transformed elements will be
+@param[in]    {input} Input |List| to transform
+@param[out]  {output} Output |List| where the transformed elements will be
                       appended.
 @param      {actions} |lhvl#functor| actions to apply on each element from
                       {input}.
@@ -966,10 +966,27 @@ This function flattens a list >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#sort()*                   {{{3
-lh#list#sort({list})~
+lh#list#sort({list} [{options}])~
 This function is an encapsulation of |sort()| that fixes the bug where
-"foo bar" is sorted before "foo".
+"`foo bar`" is sorted before "`foo`".
 This bug has been fixed in vim version 7.4.411.
+
+It takes the same parameters plus `'N'` option in order to sort numbers
+represented as strings. >
+
+    :let l = [ '1', '5', '48', '25', '5', '28', '6']
+
+    " standard behaviour: do nothing
+    AssertEquals(sort(copy(l), 'n'), l)
+
+    " lh#list#sort() behaviour: sort as if it was a list of number.
+    " the expected result is still list of strings
+    :let expected = [ '1', '5', '5', '6', '25', '28', '48']
+    let res = lh#list#sort(l, 'N')
+    AssertEquals!(res, expected)
+    " Assert sorted in place
+    AssertIs(l, res)
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#subset()*                 {{{3
@@ -991,7 +1008,7 @@ Example: >
 lh#list#rotate({list}, {rot})~
 @param[in] {list} Input |List| to rotate
 @param[in] {rot}  Number of elements to rotate.
-@pre {rot} must belong to [-len({list}), +len({list})]
+@pre {rot} must belong to `[-len({list}), +len({list})]`
 >
     :echo lh#list#rotate([1,2,3,4,5], 1)
     [2, 3, 4, 5, 1]
@@ -1052,7 +1069,7 @@ Examples: >
                                                *lh#list#push_if_new()*            {{{3
 lh#list#push_if_new(list, value)~
 @param[in,out] {list} |List| to extend
-@param[in]     {rhs}  Element to insert, if new.
+@param[in]      {rhs} Element to insert, if new.
 @return        The {list}
 Adds an element into a list, if not already present
 
@@ -1068,8 +1085,8 @@ Examples: >
 lh#list#remove({input},{indices})~
 Returns a subset slice of the {input} list trimmed of elements.
 
-@param[in,out] {input}   Input |List| from which  element will be removed
-@param[in]     {indices}|List| of indices to remove
+@param[in,out]   {input} |List| from which  element will be removed
+@param[in]     {indices} |List| of indices to remove
 @return a |List| of the elements from {input} not indexed by the {indices}
 @pre {indices} MUST be sorted
 
@@ -1209,8 +1226,8 @@ GRAPHS RELATED FUNCTIONS                              *lhvl#graph*      {{{2
 lh#graph#tsort#depth({dag}, {start-nodes})~
 lh#graph#tsort#breadth({dag}, {start-nodes})~
 These two functions implement a topological sort on the Direct Acyclic Graph.
-- depth() is a recursive implementation of a depth-first search.
-- breadth() is a non recursive implementation of a breadth-first search.
+- `depth()` is a recursive implementation of a depth-first search.
+- `breadth()` is a non recursive implementation of a breadth-first search.
 
 @param {dag} is a direct acyclic graph defined either:
              - as a |Dictionnary| that associates to each node, the |List| of
@@ -1220,7 +1237,7 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
                takes care of not calling this function more than once for each
                given node.
 @param {start-nodes} is a |List| of start nodes with no incoming edge
-@throw "Tsort: cyclic graph detected:" if {dag} is not a DAG.
+@throw "`Tsort: cyclic graph detected:`" if {dag} is not a DAG.
 @see http://en.wikipedia.org/wiki/Topological_sort
 @since Version 2.1.0
 @test tests/lh/topological-sort.vim
@@ -1236,16 +1253,16 @@ Returns the depth of a directory name.
 
 @param {dirname}  Pathname to simplify
 @return the depth of the simplified directory name, i.e.
-        lh#path#depth("bar/b2/../../foo/") returns 1
+        `lh#path#depth("bar/b2/../../foo/")` returns 1
 
 @todo However, it is not able to return depth of negative paths like
-      "../../foo/". I still need to decide whether the function should return
+      "`../../foo/`". I still need to decide whether the function should return
       -1 or 3.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                  *lh#path#dirname()*              {{{3
 lh#path#dirname({dirname})~
-Ensures the returned directory name ends with a '/' or a '\'.
+Ensures the returned directory name ends with a '`/`' or a '`\`'.
 
 @todo On windows, it should take 'shellslash' into account to decide the
       character to append.
@@ -1263,10 +1280,10 @@ Under Windows boxes, it will build the new path according to the value of
 forward slashes. According to {quote-char}, quote characters may be added around
 the returned pathname.
 
-For instance, paths like "c:\Program Files/alongpath/some\ spaces/foo" will be
-changed into:
+For instance, paths like "`c:\Program Files/alongpath/some\ spaces/foo`" will be
+changed into: >
     c:\Program Files\alongpath\some spaces\foo   + {quote-char} around
-or  c:/Program\ Files/alongpath/some\ spaces/foo + {quote-char} around
+ or c:/Program\ Files/alongpath/some\ spaces/foo + {quote-char} around
 according to {shellslash} value.
 
 Internal considerations~
@@ -1278,11 +1295,11 @@ Internal considerations~
         2- 'shellslash' if win16, win32, dos16 or dos32
                     and if |SystemDetected()| != "msdos"
         3- 1 if |SystemDetected()| == "unix"
-    if {quote-char}=="" && !{shellslash} && |SystemDetected()|=="msdos"
-        if 'shell' == "command.com" => {quote-char} <- ''
+    if {quote-char}=="" && !{shellslash} && |SystemDetected()|=="`msdos`"
+        if 'shell' == "`command.com`" => {quote-char} <- ''
         else                        => {quote-char} <- '"'
 
-Note: If you are using "command.com" (and not cmd.exe which is available on
+Note: If you are using "`command.com`" (and not cmd.exe which is available on
 MsWindows NT series), you may run into troubles if the {a:pathname} contains
 spaces.
 
@@ -1305,10 +1322,10 @@ Simplifies a path by getting rid of useless '../' and './'.
 @return the simplified pathname
 
 This function works like |simplify()|, except that it also strips the leading
-"./".
+"`./`".
 
 Note: when vim is compiled for unix, it seems unable to |simplify()| paths
-containing "..\". (It likelly works this way when vim is compiled without
+containing "`..\`". (It likelly works this way when vim is compiled without
 'shellslash' support)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1345,7 +1362,7 @@ lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
 lh#path#strip_start({pathname}, {pathslist})~
 @param[in] {pathname}  name to simplify
 @param[in] {pathslist} list of pathname (can be a |string| of pathnames
-                       separated by ",", of a |List|).
+                       separated by "`,`", of a |List|).
 
 Strips {pathname} from any path from {pathslist}.
 
@@ -1454,11 +1471,11 @@ e.g.: >
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#to_regex()*              {{{3
 lh#path#to_regex({pathname})~
-Transforms the {pathname} to separate each node-name by the string '[/\\]'
+Transforms the {pathname} to separate each node-name by the string '`[/\\]`'
 
 The rationale behind this function is to build system independant regex
 pattern to use on pathnames as sometimes pathnames are built by appending
-'/stuff/like/this' without taking 'shellslash' into account.
+'`/stuff/like/this`' without taking 'shellslash' into account.
 
 e.g.: >
  echo lh#path#to_regex('/home/luc/').'\(vimfiles\|.vim\)'
@@ -1484,18 +1501,18 @@ This function defines a |menu| entry that will be associated to a
 |global-variable| whose values can be seen in, and updated, from the menu.
 
 {Data} is a |Dictionary| whose keys are:
-- "variable": name of the |global-variable| to bind to the menu entry
+- "`variable`": name of the |global-variable| to bind to the menu entry
   Mandatory.
-- "values": default associated value.
+- "`values`": default associated value.
   Optional.
-- "menu": describes where the menu entry must be placed (|Dictionary|)
-    - "priority": complete priority of the entry (see |sub-menu-priority|)
-    - "name": complete name of the entry -- ampersand (&) can be used to define
+- "`menu`": describes where the menu entry must be placed (|Dictionary|)
+    - "`priority`": complete priority of the entry (see |sub-menu-priority|)
+    - "`name`": complete name of the entry -- ampersand (&) can be used to define
       shortcut keys
   Mandatory.
-- "hook": |function| to call, or command to |:execute| when the value of the
+- "`hook`": |function| to call, or command to |:execute| when the value of the
   variable is toggled through toggle-menu ; default: none.
-- "actions": list of functions to call, or commands to execute when the value
+- "`actions`": list of functions to call, or commands to execute when the value
   of the variable is toggled through toggle-menu. There shall be one action
   per possible value when defined ; default: empty list
 
@@ -1515,7 +1532,7 @@ Examples:
             definition of a string menu item thanks to
             |lh#menu#def_string_item()|.
 @param {text-value}
-            :Set directly sets the variable to the value associated to
+            `:Set` directly sets the variable to the value associated to
             {text-value}.
 
 This command supports autocompletion on the {variable-name}.
@@ -1531,26 +1548,26 @@ global variable can be seen as an enumerate whose value can be cyclically
 updated through a menu.
 
 {Data} is a |Dictionary| whose keys are:
-- "variable": name of the |global-variable| to bind to the menu entry
+- "`variable`": name of the |global-variable| to bind to the menu entry
   Mandatory.
-- "values": associated values of string or integers (|List|)
+- "`values`": associated values of string or integers (|List|)
   Mandatory.
-- "menu": describes where the menu entry must be placed (|Dictionary|)
-    - "priority": complete priority of the entry (see |sub-menu-priority|)
-    - "name": complete name of the entry -- ampersand (&) can be used to define
+- "`menu`": describes where the menu entry must be placed (|Dictionary|)
+    - "`priority`": complete priority of the entry (see |sub-menu-priority|)
+    - "`name`": complete name of the entry -- ampersand (&) can be used to define
       shortcut keys
   Mandatory.
-- "idx_crt_value": index of the current value for the option (|expr-number|)
+- "`idx_crt_value`": index of the current value for the option (|expr-number|)
   This is also an internal variable that will be automatically updated to
-  keep the index of the current value of the "variable" in "values".
+  keep the index of the current value of the "`variable`" in "`values`".
   Optional ; default value is 1, or the associated index of the initial value
-  of the variable (in "values") before the function call.
-- "texts": texts to display according to the variable value (|List|)
-  Optional, "values" will be used by default. This option is to be used to
+  of the variable (in "`values`") before the function call.
+- "`texts`": texts to display according to the variable value (|List|)
+  Optional, "`values`" will be used by default. This option is to be used to
   distinguish the short encoded value, from the long self explanatory name.
-- "hook": |function| to call, or command to |:execute| when the value of the
+- "`hook`": |function| to call, or command to |:execute| when the value of the
   variable is toggled through toggle-menu ; default: none.
-- "actions": list of functions to call, or commands to execute when the value
+- "`actions`": list of functions to call, or commands to execute when the value
   of the variable is toggled through toggle-menu. There shall be one action
   per possible value when defined ; default: empty list
 
@@ -1566,11 +1583,11 @@ Examples:
                                                             *lhvl-:Toggle*
 :Toggle {variable-name} [{text-value}]~
 @param {variable-name}
-            must be a |global-variable| name used as "variable" in the
+            must be a |global-variable| name used as "`variable`" in the
             definition of a toggable menu item thanks to
             |lh#menu#def_toggle_item()|.
 @param {text-value}
-            when specified, :Toggle directly sets the variable to the value
+            when specified, `:Toggle` directly sets the variable to the value
             associated to {text-value}.
 
 This command supports autocompletion on the {variable-name}, and on
@@ -1580,7 +1597,7 @@ This command supports autocompletion on the {variable-name}, and on
                                                       *lh#menu#text()*            {{{3
 lh#menu#text({text})~
 @param[in] {text} Text to send to |:menu| commands
-@return a text to be used in menus where "\" and spaces have been escaped.
+@return a text to be used in menus where "`\`" and spaces have been escaped.
 
 This helper function transforms a regular text into a text that can be
 directly used with |:menu| commands.
@@ -1602,7 +1619,7 @@ Creates a menu entry and its associated mappings for several modes at once.
                             associated mapping will be a |map-<buffer>|, and
                             the menu will be available to the current buffer
                             only. See |[gb]:want_buffermenu_or_global_disable|
-                            When "<buffer>" is set, the call to lh#menu#make()
+                            When "<buffer>" is set, the call to `lh#menu#make()`
                             must be done in the buffer-zone from a |ftplugin|,
                             or from a |local_vimrc|.
 @param[in] {action}         Action to execute when {key-binding} is typed, or
@@ -1677,7 +1694,7 @@ Examples:
 Mappings & menus inserting text~
 lh#menu#IVN_make(<priority>, {text}, {key}, {IM-action}, {VM-action}, {NM-action} [, {nore-IM}, {nore-VM}, {nore-NM}])~
 
-lh#menu#IVN_MenuMake() accepts three different actions for the three modes:
+`lh#menu#IVN_MenuMake()` accepts three different actions for the three modes:
 INSERT, VISUAL and NORMAL. The mappings defined will be relative to the
 current buffer -- this function is addressed to ftplugins writers. The last
 arguments specify whether the inner mappings and abbreviations embedded within
@@ -1702,7 +1719,7 @@ is added after the closing bracket -- cf. my bracketing system. In VISUAL
 mode, the curly brackets are added around the visual area. In NORMAL mode, the
 area is considered to be the current word.
 
-The second call binds for the three modes: ]ei to:
+The second call binds for the three modes: `]ei` to:
 >
       \begin{itemize}
           \item
@@ -1756,7 +1773,7 @@ lh#menu#is_in_visual_mode()~
 @return a boolean that tells whether the {action} used in
 |lh#menu#is_in_visual_mode()| has been invoked from the VISUAL-mode.
 
-NB: this function deprecates the test on @v.
+NB: this function deprecates the test on `@v`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                    *lh#menu#map_all()*            {{{3
@@ -1764,7 +1781,7 @@ lh#menu#map_all({map-type}[, {map-args...}])~
 This function is a helper function that defines several mappings at once as
 |:amenu| would do.
 
-@param {map-type}     String of the form "[aincv]*(nore)?map" that tells the
+@param {map-type}     String of the form "`[aincv]*(nore)?map`" that tells the
                       mode on which mappings should be defined, and whether
                       the mappings shall be |:noremap|.
 @param {map-args...}  Rest of the parameters that defines the mapping
@@ -1803,7 +1820,7 @@ lh#buffer#get_nr()~
 If no such file is known to vim, a buffer will be locally created.
 
 This function is required to assign a new buffer number to be used in qflist,
-after the filenames have been fixed -- see BTW's s:FixCTestOutput().
+after the filenames have been fixed -- see BTW's `s:FixCTestOutput()`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#buffer#list()*                {{{3
@@ -1840,7 +1857,7 @@ windows if none match.
 
 If {filename} is opened in a window, jump to this window.
 Otherwise, execute {cmd} with {filename} as a parameter. Typical values for
-the command will be "sp" or "vsp". (see |:split|, |:vsplit|).
+the command will be "`sp`" or "`vsp`". (see |:split|, |:vsplit|).
 
 N.B.: While it is not the rationale behind this function, other commands that
 does not open the buffer may be used in the {cmd} parameter.
@@ -1862,7 +1879,7 @@ Split-opens a new scratch buffer.
                              *lhvl-dialog*      *lh#buffer#dialog#*               {{{3
 Functions for building interactive dialogs~
 Unlike other |lh-vim-lib| functions which can be used independently from each
-others, all the lh#buffer#dialog#*() functions constitute a coherent framework
+others, all the `lh#buffer#dialog#*()` functions constitute a coherent framework
 to define interactive dialogs.
 
 For the moment it only supports the selection of one or several items in a
@@ -1926,7 +1943,7 @@ Regarding the callback function: *lhvl-dialog-select-callback*
 - The number 0, when in the list, means "aborted". In that case, the
   callback function is expected to call |lh#buffer#dialog#quit()| that will
   terminate the scratch buffer (with |:quit|), and jump back to where we were
-  when #new was called, and display a little "Abort" message.
+  when `#new` was called, and display a little "Abort" message.
 - We can terminate the dialog with just :quit if we don't need to jump
   back anywhere. For instance, lh-tags callback function first
   terminates the dialog, then jumps to the file where the selected tag
@@ -1991,9 +2008,9 @@ lh#syntax#name_at_mark({mark}[,{trans}])~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
        *lh#syntax#Skip()* *lh#syntax#SkipAt()* *lh#syntax#SkipAtMark()*           {{{3
-lh#syntax#Skip()  (*deprecated*)~
+lh#syntax#Skip()                (*deprecated*)~
 lh#syntax#SkipAt({lnum},{col})  (*deprecated*)~
-lh#syntax#SkipAtMark({mark})  (*deprecated*)~
+lh#syntax#SkipAtMark({mark})    (*deprecated*)~
        *lh#syntax#skip()* *lh#syntax#skip_at()* *lh#syntax#skip_at_mark()*
 lh#syntax#skip()~
 lh#syntax#skip_at({lnum},{col})~
@@ -2047,11 +2064,11 @@ Note: At this time, I don't manage old Macintosh OSes or any other OS.
 
 Detection algorithm ~
 The criteria used to detect the system are:
-- first: 'shell' =~ "sh" -> the shell Vim is started with (cf. |SHELL|) looks
+- first: 'shell' =~ "`sh`" -> the shell Vim is started with (cf. |SHELL|) looks
   like an Unix shell, then the system is recognized as an "unix" system -- even
   if Vim was started from Cygwin on a Microsoft platform.
-- then: has('win16') or win32 or win64 or dos16 or dos32 -> the system is
-  recognized as an "msdos" (ersatz) system.
+- then: `has('win16')` or `win32` or `win64` or `dos16` or `dos32` -> the system is
+  recognized as an "`msdos`" (ersatz) system.
 - otherwise: an error message is raised -> contact me in order to enhance the
   plugin and support other configurations.
 
@@ -2063,8 +2080,8 @@ Note: This old feature has been moved to lh-vim-lib from |system-utils|.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#os#OnDOSWindows*                {{{3
 lh#os#OnDOSWindows()~
-This function returns whether any of has('win16'), win32, win64, dos16, dos32,
-or os2 is true.
+This function returns whether any of `has('win16')`, `win32,` `win64,` `dos16,` `dos32,`
+or `os2` is true.
 
 Note: This old feature has been moved to lh-vim-lib from |system-utils|.
 

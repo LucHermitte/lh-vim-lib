@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.18
+" Version:      3.3.20
 " Created:	19th Nov 2008
-" Last Update:  27th Nov 2015
+" Last Update:  03rd Dec 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -60,9 +60,15 @@ UTIgnore Test_find_if_double_bind
 function! s:Test_sort_num()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let expected = [ 1, 5, 5, 6, 25, 28, 48]
-    :let s = lh#list#sort(l, 'n')
     " Comment string(s)
-    Assert s == expected
+    AssertEquals(lh#list#sort(l, 'n'), expected)
+
+    :let l = [ '1', '5', '48', '25', '5', '28', '6']
+    :let expected = [ '1', '5', '5', '6', '25', '28', '48']
+    let res = lh#list#sort(l, 'N')
+    AssertEquals!(res, expected)
+    " Assert sorted in place
+    AssertIs(l, res)
 endfunction
 
 function! s:Test_sort_num_as_str()
