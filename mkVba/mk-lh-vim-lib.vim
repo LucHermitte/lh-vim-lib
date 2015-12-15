@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.20
-let s:version = '3.3.20'
+" Version:	3.4.0
+let s:version = '3.4.0'
 " Created:	06th Nov 2007
-" Last Update:  04th Dec 2015
+" Last Update:  15th Dec 2015
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -47,6 +47,7 @@ autoload/lh/option.vim
 autoload/lh/path.vim
 autoload/lh/position.vim
 autoload/lh/stack.vim
+autoload/lh/string.vim
 autoload/lh/syntax.vim
 autoload/lh/vcs.vim
 autoload/lh/visual.vim

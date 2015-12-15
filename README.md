@@ -17,7 +17,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
   * [Miscellaneous functions](#miscellaneous-functions)
   * [System related functions](#system-related-functions)
-  * [Lists related functions](#lists-related-functions)
+  * [Lists and dictionaries related functions](#lists-and-dictionaries-related-functions)
   * [Stacks related functions](#stacks-related-functions)
   * [Graphs related functions](#graphs-related-functions)
   * [Paths related functions](#paths-related-functions)
@@ -67,6 +67,8 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#position#char_at()`                     | Obtains the character at a given pair of coordinates                                                                                                                     |
 | `lh#position#extract(pos1,pos2)`            | Obtains the text between two positions                                                                                                                                   |
 | `lh#position#is_before()`                   | Tells if a position in a buffer is before another one                                                                                                                    |
+| `lh#string#matches()`                       | Extracts a list of all matches in a string                                                                                                                               |
+| `lh#string#trim()`                          | Trim a string                                                                                                                                                            |
 | `lh#vcs#get_type(...)`                      | Returns the type of the versioning system the file is under                                                                                                              |
 | `lh#vcs#as_http(...)`                       | Returns the url of the repo the parameter is under, or `g:url` if none is found. Enforce the rsult in the form http://, if possible                                      |
 | `lh#vcs#decode_github_url(url)`             | Extract user name and repo name from a github url                                                                                                                        |
@@ -91,7 +93,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#cpu_number()`               | Returns the number of processors on the machine                                    |
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
 
-### Lists and dictionary related functions
+### Lists and dictionaries related functions
 | Function                    | Purpose                                                                                                           |
 |:----------------------------|:------------------------------------------------------------------------------------------------------------------|
 | `lh#dict#add_new()`         | Adds elements from the second dictionary if they are not set yet in the first                                     |

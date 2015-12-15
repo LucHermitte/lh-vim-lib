@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.3.20)
-                        For Vim version 7+      Last change: 03rd Dec 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.4.0)
+                        For Vim version 7+      Last change: 15th Dec 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -82,6 +82,9 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+String related functions:                               |lhvl#string|
+- |lh#string#matches()|
+- |lh#string#trim()|
 Graphs related functions:                               |lhvl#graph|
 - |lh#graph#tsort#depth()|
 - |lh#graph#tsort#breadth()|
@@ -577,6 +580,29 @@ The evaluation is meant to be done with |eval()|.
    >:let call = lh#function#prepare('Print', [1,2,"foo"])
    >:echo eval(call)
    1 ## 2 ## 'foo'
+
+
+------------------------------------------------------------------------------
+STRINGS RELATED FUNCTIONS                               *lhvl#list*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#matches()*             {{{3
+lh#string#matches(string, pattern)~
+@param    {string} |expr-string|
+@param   {pattern} |expr-string|
+@return            A |List| of all substrings that match {pattern} in {string}
+@return            An empty list if there is no match
+
+Example: >
+   let matches = lh#string#matches('sqjg %1 msqkg ml %2 mihs m%43%8', '%\zs\d\+')
+   let expected= ['1', '2', '43', '8']
+   AssertEquals(matches, expected)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#trim()*                {{{3
+lh#string#trim(string)~
+@param    {string} |expr-string|
+@return            {string} trimmed of spaces
 
 
 ------------------------------------------------------------------------------
