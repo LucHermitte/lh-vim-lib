@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.20
+" Version:      3.4.0
 " Created:      17th Apr 2007
-" Last Update:  03rd Dec 2015
+" Last Update:  15th Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -16,6 +16,8 @@
 "       Drop it into {rtp}/autoload/lh/
 "       Vim 7+ required.
 " History:
+"       v3.4.0
+"       (*) BUG: in lh#list#find_if when predicate is not a string
 "       v3.3.20
 "       (*) ENH: lh#list#sort(['1', ...], 'N') to sort list of strings encoding
 "           numbers.
@@ -280,8 +282,12 @@ function! lh#list#find_if(list, predicate, ...) abort
   endif
 
   " The search loop
-  while idx != len(a:list)
+  if type(a:predicate) == type('string')
     let predicate = substitute(a:predicate, 'v:val', 'v:1_', 'g')
+  else
+    let predicate = a:predicate
+  endif
+  while idx != len(a:list)
     let res = lh#function#execute(predicate, a:list[idx])
     if res | return idx | endif
     let idx += 1
