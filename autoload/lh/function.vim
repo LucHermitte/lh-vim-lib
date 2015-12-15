@@ -4,8 +4,9 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.20
+" Version:      3.4.0
 " Created:      03rd Nov 2008
+" Last Update:  15th Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -16,6 +17,7 @@
 "
 "------------------------------------------------------------------------
 " History:
+"       v3.4.0:  ENH: lh#function#bind supports composition
 "       v3.3.20: Explicit error msg w/ lh#function#execute
 "       v3.3.15: lh#function#execute(string) supports now v:val as well.
 "       v3.3.11: Bug fix: pass tests
@@ -108,15 +110,16 @@ endfunction
 
 " # Function: s:Execute(arguments...) {{{2
 function! s:Execute(args) dict abort
+  let args = has_key(self, 'args') ? s:DoBindList(self.args, a:args) : a:args
   if type(self.function) == type(function('exists'))
-    let args = s:DoBindList(self.args, a:args)
+    " let args = s:DoBindList(self.args, a:args)
     " echomsg '##'.string(self.function).'('.join(args, ',').')'
     let res = eval(string(self.function).'('.s:Join(args).')')
   elseif type(self.function) == type('string')
-    let expr = s:DoBindString(self.function, 'a:args')
+    let expr = s:DoBindString(self.function, 'args')
     let res = eval(expr)
   elseif type(self.function) == type({})
-    return self.function.execute(a:args)
+    return self.function.execute(args)
   else
     throw "lh#functor#execute: unpected function type: ".type(self.function)
   endif
@@ -173,7 +176,7 @@ function! lh#function#bind(Fn, ...) abort
     " TASSERT has_key(a:Fn, 'execute')
     " TASSERT has_key(a:Fn, 'args')
     let Fn = a:Fn.function
-    let N = len(a:Fn.args)
+    let N = has_key(a:Fn, 'args') ? len(a:Fn.args) : 0
     if N != 0 " args to rebind
       let i = 0
       let t_args = [] " necessary to avoid type changes
@@ -198,20 +201,23 @@ function! lh#function#bind(Fn, ...) abort
       " echo eval(string(s:DoBindString(Fn, string(args))))
       let Fn = (s:DoBindEvaluatedString(Fn, args))
     endif
-    let args = a:Fn.args
+    let args = get(a:Fn, 'args', [])
   else
     let Fn = a:Fn
   endif
 
   let binded_fn = {
         \ 'function': Fn,
-        \ 'args':     args,
         \ 'execute':  function('s:Execute')
         \}
+  if !empty(args)
+    " Special case: when bind is used abusivelly
+    let binded_fn.args = args
+  endif
   return binded_fn
 endfunction
 
-" }}1
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
