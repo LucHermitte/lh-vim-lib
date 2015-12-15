@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.20
+" Version:      3.4.0
 " Created:	19th Nov 2008
-" Last Update:  03rd Dec 2015
+" Last Update:  15th Dec 2015
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -38,6 +38,16 @@ endfunction
 function! s:Test_Find_If_functor_predicate()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let i = lh#list#find_if(l, 'v:1_>12  && v:1_<42 && v:1_%2==0')
+    " echo i . '/' . len(l)
+    Assert i == 5
+    Assert l[i] == 28
+    " :echo l[i]
+endfunction
+
+function! s:Test_Find_If_param_functor_predicate()
+    :let l = [ 1, 5, 48, 25, 5, 28, 6]
+    let f = lh#function#bind('v:1_>v:2_  && v:1_<42 && v:1_%2==0', 'v:1_', 12)
+    :let i = lh#list#find_if(l, f)
     " echo i . '/' . len(l)
     Assert i == 5
     Assert l[i] == 28
