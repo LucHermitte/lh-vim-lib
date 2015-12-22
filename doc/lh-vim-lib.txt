@@ -583,7 +583,7 @@ The evaluation is meant to be done with |eval()|.
 
 
 ------------------------------------------------------------------------------
-STRINGS RELATED FUNCTIONS                               *lhvl#list*     {{{2
+STRINGS RELATED FUNCTIONS                               *lhvl#string*    {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#matches()*             {{{3
