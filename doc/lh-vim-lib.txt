@@ -970,6 +970,10 @@ Examples: >
    :echo lh#list#accumulate2(llist, [])
    [1, 2, 5, 6, 3, 4]
 
+   :let strings = [ 'foo', 'bar', 'toto' ]
+   :echo lh#list#accumulate2(strings, 0, 'v:1_ + strlen(v:2_)')
+   10
+
    :echo lh#list#accumulate2(llist, [], 'v:2_ + v:1_')
    [3, 4, 5, 6, 1, 2]
 
