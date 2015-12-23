@@ -144,9 +144,14 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         \.restore('&completefunc')
         \.restore('&complete')
         \.restore('&omnifunc')
+        \.restore('&completeopt')
         \.register('au! '.augroup)
         \.register('call self.logger.log("finalized! (".getline(".").")")')
   set complete=
+  " TODO: actually, remove most options but preview
+  set completeopt-=menu
+  set completeopt-=longest
+  set completeopt+=menuone
   let b:complete_data.startcol        = a:startcol
   let b:complete_data.all_matches     = map(copy(a:matches), 'type(v:val)==type({}) ? v:val : {"word": v:val}')
   let b:complete_data.matches         = {'words': [], 'refresh': 'always'}
@@ -279,12 +284,12 @@ function! lh#icomplete#func(findstart, base) abort
   return b:complete_data.complete(a:findstart, a:base)
 endfunction
 
-if 0
+if 1
   let entries = [
-	\ {'word': 'un', 'menu': 1},
-	\ {'word': 'deux', 'menu': 2},
-	\ {'word': 'trois', 'menu': 3},
-	\ {'word': 'trentre-deux', 'menu': 32},
+	\ {'word': 'un', 'menu': 1, 'kind': 's', 'info': ' '},
+	\ {'word': 'deux', 'menu': 2, 'kind': 's', 'info': 'takes a parameter'},
+	\ {'word': 'trois', 'menu': 3, 'info': ''},
+	\ {'word': 'trentre-deux', 'menu': 32, 'info': ''},
 	\ 'unité'
 	\ ]
   inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, 'lh#common#warning_msg("nominal: ".v:val)')<cr><c-x><c-O><c-p>
