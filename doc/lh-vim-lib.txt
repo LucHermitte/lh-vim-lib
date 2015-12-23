@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.4.0)
-                        For Vim version 7+      Last change: 15th Dec 2015
+*lh-vim-lib.txt*        Vim common libraries (v3.5.0)
+                        For Vim version 7+      Last change: 23rd Dec 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -41,6 +41,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
+- |lh#log#new()|
+- |lh#log#none()|
 - |lh#on#exit()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
@@ -236,6 +238,65 @@ Unlike |printf()|, this function takes positional parameters, i.e. >
   AssertEquals(lh#fmt#printf("foo %1 bar", 42), "foo 42 bar")
   AssertEquals(lh#fmt#printf("foo %1 bar %2", 42, "toto"), "foo 42 bar toto")
   AssertEquals(lh#fmt#printf("foo %2 bar %1", 42, "toto"), "foo toto bar 42")
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#new()*                    {{{3
+lh#log#new({where}, {kind})~
+@param {where} Specifies where the list buffer shall appear ("vert", "lefta",
+               "abo" -- see |:vert|, |:lefta|, |:abo|)
+@param  {kind} Kind of list to fill:
+               - "qf":  |quickfix|-list
+               - "loc": |location-list|
+@returns a logger object that provides
+ - `log({msg})` -- adds a message to the qf/loclist (see |quickfix|)
+ - `reset()`    -- reset the qf/loclist; and returns `self`
+ - `clear()`    -- clears the qf/loclist
+ - `open()`     -- opens the qf/loclist
+
+@note In order to obtain the name of the calling function, an exception is
+thrown and the backtrace is analysed.
+In order to work, this trick requires:
+- a reasonable callstack size (past a point, vim shortens the names returned
+  by |v:throwpoint|
+- named functions ; i.e. |anonymous-function|s (i.e. functions defined on
+  dictionaries and not attached to them) will have their names mangled
+  (actually it'll be a number) and |lh#exception#callstack()| won't be able to
+  decode them.  i.e.: >
+     function s:foo() dict abort
+        logger.log("here I am");
+     endfunction
+     let dict.foo = function('s:foo')
+<  will correctly fill the quicklist/loclist, but >
+     function dict.foo() abort
+        logger.log("here I am");
+     endfunction
+<  won't
+
+@todo I may support log levels in the future
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#none()*                   {{{3
+lh#log#none()~
+@return a logger that does nothing.
+It provides the following no-op functions
+ - `log({msg})` -- no-op
+ - `reset()`    -- no-op that still returns `self`
+
+Typical use: >
+    let s:verbose = 0
+    if !exists('s:logger')
+      let s:logger = lh#log#none()
+    endif
+    function! lh#icomplete#verbose(...)
+      if a:0 > 0
+        let s:verbose = a:1
+        let s:logger = lh#log#new('vert', 'loc')
+      else
+        let s:logger = lh#log#none()
+      endif
+      return s:verbose
+    endfunction
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3

@@ -55,6 +55,8 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#leader#get_local()`                     | Returns the current value of `g:maplocalleader`, or `'\\'` if unset                                                                                                      |
 | `lh#leader#set_local_if_unset()`            | Sets a new value to `g:maplocalleader`, if and only if this variable wasn't already set                                                                                  |
 | `lh#let#let_if_undef()`                     | Defines a vim variable (with ` :let`) on the condition the variable does not exist yet                                                                                   |
+| `lh#log#new()`                              | Returns a new logger object                                                                                                                                              |
+| `lh#log#none()`                             | Returns a new, inactive, logger object                                                                                                                                   |
 | `lh#on#exit()`                              | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions                                                    |
 | `lh#option#add()`                           | Adds new values to a vim option -- and avoid the values being listed more than once                                                                                      |
 | `lh#option#get(name [,default [, scope]])`  | Fetches the value of a user defined option, that may be _empty_. `default` is returned if the option does not exists. Default value for `default` is `g:lh#option#unset` |
@@ -70,9 +72,9 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#string#matches()`                       | Extracts a list of all matches in a string                                                                                                                               |
 | `lh#string#trim()`                          | Trim a string                                                                                                                                                            |
 | `lh#vcs#get_type(...)`                      | Returns the type of the versioning system the file is under                                                                                                              |
-| `lh#vcs#as_http(...)`                       | Returns the url of the repo the parameter is under, or `g:url` if none is found. Enforce the rsult in the form http://, if possible                                      |
-| `lh#vcs#decode_github_url(url)`             | Extract user name and repo name from a github url                                                                                                                        |
-| `lh#vcs#get_url(...)`                       | Returns the url of the repo the parameter is under, or `g:url` if none is found                                                                                          |
+| `lh#vcs#as_http(...)`                       | Returns the url of the repository the parameter is under, or `g:url` if none is found. Enforce the result in the form http://, if possible                               |
+| `lh#vcs#decode_github_url(url)`             | Extract user name and repository name from a github url                                                                                                                  |
+| `lh#vcs#get_url(...)`                       | Returns the url of the repository the parameter is under, or `g:url` if none is found                                                                                    |
 | `lh#vcs#is_git(...)`                        | Tells whether the file is under a git repository                                                                                                                         |
 | `lh#vcs#is_svn(...)`                        | Tells whether the file is under a svn repository                                                                                                                         |
 | `lh#visual#cut()`                           | Cut and returns the visually selected text                                                                                                                               |
@@ -82,16 +84,16 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
-| Function                           | Purpose                                                                            |
-|------------------------------------|------------------------------------------------------------------------------------|
-| `lh#env#expand_all()`              | Expands environment variables found in strings                                     |
-| `lh#os#has_unix_layer_installed()` | Tells whether the enduser has declared a unix layer installed (on a Windows box)   |
-| `lh#os#OnDOSWindows()`             | Tells whether the current vim is a native windows flavour of gvim                  |
-| `lh#os#sys_cd()`                   | Build a portable string to use to change directoy when executing external commands |
-| `lh#os#chomp(text)`                | Like Perl `chomp`, remove the trailing character produced by `system()` calls      |
-| `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(command))`                                             |
-| `lh#os#cpu_number()`               | Returns the number of processors on the machine                                    |
-| `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                         |
+| Function                           | Purpose                                                                             |
+|------------------------------------|-------------------------------------------------------------------------------------|
+| `lh#env#expand_all()`              | Expands environment variables found in strings                                      |
+| `lh#os#has_unix_layer_installed()` | Tells whether the enduser has declared a unix layer installed (on a Windows box)    |
+| `lh#os#OnDOSWindows()`             | Tells whether the current vim is a native windows flavour of gvim                   |
+| `lh#os#sys_cd()`                   | Build a portable string to use to change directory when executing external commands |
+| `lh#os#chomp(text)`                | Like Perl `chomp`, remove the trailing character produced by `system()` calls       |
+| `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(command))`                                              |
+| `lh#os#cpu_number()`               | Returns the number of processors on the machine                                     |
+| `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                          |
 
 ### Lists and dictionaries related functions
 | Function                    | Purpose                                                                                                           |
