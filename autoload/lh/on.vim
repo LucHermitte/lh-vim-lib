@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib/>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.9.
-let s:k_version = 339
+" Version:      3.5.0.
+let s:k_version = 350
 " Created:      15th Jan 2015
-" Last Update:  09th Nov 2015
+" Last Update:  23rd Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "
@@ -78,7 +78,7 @@ endfunction
 function! lh#on#exit()
   let res = {'actions':[] }
 
-  function! res.finalize() dict
+  function! res.finalize() dict abort " {{{4
     for Action in self.actions
       if type(Action) == type(function('has'))
         call Action()
@@ -87,7 +87,7 @@ function! lh#on#exit()
       endif
     endfor
   endfunction
-  function! res.restore(varname) dict
+  function! res.restore(varname) dict abort " {{{4
     if stridx(a:varname, '~')!=-1 || exists(a:varname)
       let action = 'let '.a:varname.'='.string(eval(a:varname))
     else
@@ -97,7 +97,7 @@ function! lh#on#exit()
 
     return self
   endfunction
-  function! res.restore_option(varname, ...) dict
+  function! res.restore_option(varname, ...) dict abort " {{{4
     let scopes = a:0 > 0 ? a:1 : 'wbg'
     let actions = []
     let lScopes = split(scopes, '\s*')
@@ -116,11 +116,22 @@ function! lh#on#exit()
     let self.actions += actions
     return self
   endfunction
-  function! res.register(action) dict
+  function! res.register(action) dict abort " {{{4
     let self.actions += [a:action]
     return self
   endfunction
 
+  function! res.restore_buffer_mapping(key, mode) dict abort " {{{4
+    let keybinding = maparg(a:key, a:mode, 0, 1)
+    if get(keybinding, 'buffer', 0)
+      let self.actions += [ 'silent! call lh#mapping#define('.string(keybinding).')']
+    else
+      let self.actions += [ 'silent! '.a:mode.'unmap <buffer> '.a:key ]
+    endif
+    return self
+  endfunction
+
+  " return {{{4
   return res
 endfunction
 

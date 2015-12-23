@@ -44,11 +44,6 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#log#new()|
 - |lh#log#none()|
 - |lh#on#exit()|
-- |lh#option#get()|
-- |lh#option#get_non_empty()|
-- |lh#option#getbufvar()|
-- |lh#option#is_set()|
-- |lh#option#is_unset()|
 - |lh#position#char_at()|
 - |lh#position#char_at_mark()|
 - |lh#position#char_at_pos()|
@@ -56,6 +51,12 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#is_before()|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
+Options related functions:                              |lhvl#option|
+- |lh#option#get()|
+- |lh#option#get_non_empty()|
+- |lh#option#getbufvar()|
+- |lh#option#is_set()|
+- |lh#option#is_unset()|
 Functors related functions:                             |lhvl#function|
 - |lh#function#bind()|
 - |lh#function#execute()|
@@ -303,6 +304,12 @@ Typical use: >
 lh#on#exit()~
 This function will register action to be executed at the end on a scope, and
 more precisally in a |:finally| section.
+It permits to do the following things:
+- `restore()`                restores a |variable| or a vim |option|.
+- `restore_option()`         restores a |lhvl#option|
+- `register()`               registers a |command| to execute.
+- `restore_buffer_mapping()` restores a |map-<buffer>|
+
 e.g. >
 
    " Here let suppose g:foo exists, but not g:bar
@@ -319,85 +326,6 @@ e.g. >
       call cleanup.finalize()
     endtry
     " Then g:foo and g:bar are restored, and "The END" has been echoed
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#option#Get()*                 {{{3
-lh#option#Get({name},{default}[,{scopes}])  (*deprecated*)~
-                                                *lh#option#get()*
-lh#option#get({name}[,{default}[,{scopes}]])~
-@param {name}       Name of the option to fetch
-@param {default}    Default value in case the option is not defined.
-                    Its default value is |g:lh#option#unset|.
-@param {scopes}     Vim scopes in which the options must be searched,
-                    default="bg".
-@return             b:{name} if it exists, or g:{name} if it exists, or
-                    {default} otherwise.
-@see                For development oriented options, |lh-dev| provides a
-                    dedicated function: |lh#dev#option#get()|.
-
-This function fetches the value of an user defined option (not Vim |options|).
-The option can be either a |global-variable|, a |buffer-variable|, or even
-a|window-variable|.
-
-The order of the variables checked can be specified through the optional
-argument {scopes}. By default, buffer-local options have the priority over
-global options.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                              *lh#option#GetNonEmpty()*           {{{3
-lh#option#GetNonEmpty({name},{default}[,{scopes}])  (*deprecated*)~
-                                              *lh#option#get_non_empty()*
-lh#option#get_non_empty({name}[,{default}[,{scopes}]])~
-@param {name}       Name of the option to fetch
-@param {default}    Default value in case the option is not defined, nor empty
-                    Its default value is |g:lh#option#unset|.
-@param {scopes}     Vim scopes in which the options must be searched,
-                    default="bg".
-@return b:{name}    If it exists, of g:{name} if it exists, or {default}
-                    otherwise.
-
-This function works exactly like |lh#option#get()| except that a defined
-variable with an empty value will be ignored as well.
-An |expr-string| will be considered empty if its |strlen()| is 0, an
-|expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
-is 0.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#option#getbufvar()*           {{{3
-lh#option#getbufvar({expr}, {name}[,{default}])~
-This function encapsulates  |getbufvar| >
-    getbufvar(expr, name, g:lh#option#unset)
-
-Unlike the direct call of the previous expression, this function ensures
-|g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins
-doesn't apply to variables, only to functions)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#option#is_set()*              {{{3
-                                                *lh#option#is_unset()*
-lh#option#is_set({expr})~
-lh#option#is_unset({expr})~
-@return whether expr is defferent (/resp identical) to |g:lh#option#unset|.
-This function will permit to test whether an option is set or not: >
-    silent! unlet g:foobar
-    Assert lh#option#is_unset(lh#option#get('foobar'))
-    let g:foobar = 1
-    Assert lh#option#is_set(lh#option#get('foobar'))
-
-    silent! unlet b:foobar
-    Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
-    let b:foobar = 1
-    Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
-
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#option#unset()*
-                                                *g:lh#option#unset*
-lh#option#unset()~
-@return the value |g:lh#option#unset|, that can be tested with
-|lh#option#is_set()|and |lh#option#is_unset()|.
-@note Never use |g:lh#option#unset| from your plugins but |lh#option#unset()|
-as it will get lazily loaded on need.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#leader#get()*                {{{3
@@ -532,7 +460,7 @@ Decodes the {throwpoint} and return a list of dictionaries made of:
   exception....
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                               *lh#float#max()*     *lh#float#min()*              {{{3
+                               *lh#float#max()*     *lh#float#min()*             {{{3
                                *lh#float#arg_max()* *lh#float#arg_min()*
 lh#float#min({list})~
 lh#float#arg_min({list})~
@@ -553,6 +481,89 @@ Tells whether the corresponding filetype correspond to a script filetype (sh,
 python, ruby, perl).
 
 ------------------------------------------------------------------------------
+OPTIONS RELATED FUNCTIONS                             *lhvl#option*     {{{2
+This sub-library helps fetching option values for plugins.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#Get()*                 {{{3
+lh#option#Get({name},{default}[,{scopes}])  (*deprecated*)~
+                                                *lh#option#get()*
+lh#option#get({name}[,{default}[,{scopes}]])~
+@param {name}       Name of the option to fetch
+@param {default}    Default value in case the option is not defined.
+                    Its default value is |g:lh#option#unset|.
+@param {scopes}     Vim scopes in which the options must be searched,
+                    default="bg".
+@return             b:{name} if it exists, or g:{name} if it exists, or
+                    {default} otherwise.
+@see                For development oriented options, |lh-dev| provides a
+                    dedicated function: |lh#dev#option#get()|.
+
+This function fetches the value of an user defined option (not Vim |options|).
+The option can be either a |global-variable|, a |buffer-variable|, or even
+a|window-variable|.
+
+The order of the variables checked can be specified through the optional
+argument {scopes}. By default, buffer-local options have the priority over
+global options.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#option#GetNonEmpty()*         {{{3
+lh#option#GetNonEmpty({name},{default}[,{scopes}])  (*deprecated*)~
+                                              *lh#option#get_non_empty()*
+lh#option#get_non_empty({name}[,{default}[,{scopes}]])~
+@param {name}       Name of the option to fetch
+@param {default}    Default value in case the option is not defined, nor empty
+                    Its default value is |g:lh#option#unset|.
+@param {scopes}     Vim scopes in which the options must be searched,
+                    default="bg".
+@return b:{name}    If it exists, of g:{name} if it exists, or {default}
+                    otherwise.
+
+This function works exactly like |lh#option#get()| except that a defined
+variable with an empty value will be ignored as well.
+An |expr-string| will be considered empty if its |strlen()| is 0, an
+|expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
+is 0.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#getbufvar()*           {{{3
+lh#option#getbufvar({expr}, {name}[,{default}])~
+This function encapsulates  |getbufvar| >
+    getbufvar(expr, name, g:lh#option#unset)
+
+Unlike the direct call of the previous expression, this function ensures
+|g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins
+doesn't apply to variables, only to functions)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#is_set()*              {{{3
+                                                *lh#option#is_unset()*
+lh#option#is_set({expr})~
+lh#option#is_unset({expr})~
+@return whether expr is defferent (/resp identical) to |g:lh#option#unset|.
+This function will permit to test whether an option is set or not: >
+    silent! unlet g:foobar
+    Assert lh#option#is_unset(lh#option#get('foobar'))
+    let g:foobar = 1
+    Assert lh#option#is_set(lh#option#get('foobar'))
+
+    silent! unlet b:foobar
+    Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
+    let b:foobar = 1
+    Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#unset()*
+                                                *g:lh#option#unset*
+lh#option#unset()~
+@return the value |g:lh#option#unset|, that can be tested with
+|lh#option#is_set()|and |lh#option#is_unset()|.
+@note Never use |g:lh#option#unset| from your plugins but |lh#option#unset()|
+as it will get lazily loaded on need.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
 
 This sub-library helps defining functors-like variables, and execute them.
@@ -644,7 +655,7 @@ The evaluation is meant to be done with |eval()|.
 
 
 ------------------------------------------------------------------------------
-STRINGS RELATED FUNCTIONS                               *lhvl#string*    {{{2
+STRINGS RELATED FUNCTIONS                             *lhvl#string*     {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#matches()*             {{{3
