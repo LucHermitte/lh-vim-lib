@@ -51,9 +51,8 @@ endfunction
 " # Create new log object {{{2
 
 " Function: lh#log#new(where, kind) {{{3
-" TODO: add verbose levels
 " - where: "vert"/""
-" - kind:  "qf"/bufnr for loclist
+" - kind:  "qf"/"loc" for loclist
 " NOTE: In order to obtain the name of the calling function, an exception is
 " thrown and the backtrace is analysed.
 " In order to work, this trick requires:
@@ -72,7 +71,7 @@ endfunction
 "         logger.log("here I am");
 "      endfunction
 "   won't
-"
+" TODO: add verbose levels
 function! lh#log#new(where, kind) abort
   let log = { 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where}
 
