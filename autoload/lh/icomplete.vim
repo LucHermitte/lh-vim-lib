@@ -5,7 +5,7 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:	3.5.0
-let s:version = '3.5.0
+let s:version = '3.5.0'
 " Created:      03rd Jan 2011
 " Last Update:  16th Nov 2015
 "------------------------------------------------------------------------
@@ -135,9 +135,9 @@ function! lh#icomplete#_register_hook2(Hook)
 endfunction
 
 "------------------------------------------------------------------------
-" ## Smart completion
-" Function: lh#icomplete#new(startcol, matches, Hook) {{{3
-function! lh#icomplete#new(startcol, matches, Hook) abort
+" ## Smart completion {{{2
+" Function: lh#icomplete#new(startcol, matches, hook) {{{3
+function! lh#icomplete#new(startcol, matches, hook) abort
   silent! unlet b:complete_data
   let augroup = 'IComplete'.bufnr('%').'Done'
   let b:complete_data = lh#on#exit()
@@ -150,7 +150,7 @@ function! lh#icomplete#new(startcol, matches, Hook) abort
   let b:complete_data.startcol        = a:startcol
   let b:complete_data.all_matches     = map(copy(a:matches), 'type(v:val)==type({}) ? v:val : {"word": v:val}')
   let b:complete_data.matches         = {'words': [], 'refresh': 'always'}
-  let b:complete_data.Hook            = a:Hook
+  let b:complete_data.hook            = a:hook
   let b:complete_data.cursor_pos      = []
   let b:complete_data.last_content    = [line('.'), getline('.')]
   let b:complete_data.no_more_matches = 0
@@ -247,7 +247,11 @@ function! lh#icomplete#new(startcol, matches, Hook) abort
   let b:complete_data.get_completions = function('s:get_completions')
 
   function! s:conclude() abort dict " {{{4
-    call s:logger.log("Successful selection of <".getline('.')[self.startcol : col('.')-1].">")
+    let selection = getline('.')[self.startcol : col('.')-1]
+    call s:logger.log("Successful selection of <".selection.">")
+    if !empty(self.hook)
+      call lh#function#execute(self.hook, selection)
+    endif
     " call self.hook()
     call self.finalize()
   endfunction
@@ -283,7 +287,7 @@ if 0
 	\ {'word': 'trentre-deux', 'menu': 32},
 	\ 'unité'
 	\ ]
-  inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, '')<cr><c-x><c-O><c-p>
+  inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, 'lh#common#warning_msg("nominal: ".v:val)')<cr><c-x><c-O><c-p>
 endif
 
 " }}}1
