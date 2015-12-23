@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.10
-let s:version = '3.3.10'
+" Version:	3.5.0
+let s:version = '3.5.0
 " Created:      03rd Jan 2011
 " Last Update:  16th Nov 2015
 "------------------------------------------------------------------------
@@ -17,6 +17,7 @@ let s:version = '3.3.10'
 "       Drop this file into {rtp}/autoload/lh
 "       Requires Vim7+
 " History:
+"       v3.5.0 : Smarter completion function added
 "       v3.3.10: Fix conflict with lh-brackets
 "       v3.0.0 : GPLv3
 " 	v2.2.4 : first version
@@ -274,60 +275,17 @@ function! lh#icomplete#func(findstart, base) abort
   return b:complete_data.complete(a:findstart, a:base)
 endfunction
 
-let entries = [
-      \ {'word': 'un', 'menu': 1},
-      \ {'word': 'deux', 'menu': 2},
-      \ {'word': 'trois', 'menu': 3},
-      \ {'word': 'trentre-deux', 'menu': 32},
-      \ 'unité'
-      \ ]
-inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, '')<cr><c-x><c-O><c-p>
+if 0
+  let entries = [
+	\ {'word': 'un', 'menu': 1},
+	\ {'word': 'deux', 'menu': 2},
+	\ {'word': 'trois', 'menu': 3},
+	\ {'word': 'trentre-deux', 'menu': 32},
+	\ 'unité'
+	\ ]
+  inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, '')<cr><c-x><c-O><c-p>
+endif
 
-finish
-
-" Function: lh#icomplete#ecm(startcol, base) {{{3
-function! lh#icomplete#ecm(findstart, base) abort
-  if a:findstart
-    let l = getline('.')
-    let startcol = match(l[0:col('.')-1], '\v\S+$')
-    if startcol == -1
-      let startcol = col('.')-1
-    endif
-    " let g:debug+= ["findstart(".a:base.") -> ".(startcol)]
-    return startcol
-  else
-    " let g:debug += ["matching(".a:base.")"]
-    let words = ['un', 'deux', 'trois', 'trente-deux', 'unité']
-    let matching = filter(words, 'v:val =~ join(split(a:base, ".\\zs"), ".*")')
-    " return { 'words' : words}
-    return { 'words' : words, 'refresh' : 'always'}
-  endif
-endfunction
-set completefunc=lh#icomplete#func
-
-:inoremap µ <c-x><c-u><c-p>
-aug mytest
-  au!
-  au CursorMovedI <buffer> echom 'moveed' | call feedkeys("\<C-x>\<C-u>\<c-p>", 'n')
-aug end
-
-fun! CompleteMonths(findstart, base)
-  if a:findstart
-    " locate the start of the word
-    let line = getline('.')
-    let start = col('.') - 1
-    while start > 0 && line[start - 1] =~ '\a'
-      let start -= 1
-    endwhile
-    return start
-  else
-    " find months matching with "a:base"
-    let res = split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec")
-    call filter(res, 'v:val =~ "^".a:base')
-    return { 'words' : res, 'refresh' : 'always'}
-  endif
-endfun
-" set completefunc=CompleteMonths
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
