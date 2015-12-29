@@ -2202,7 +2202,7 @@ This is a shortcut to: >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#os#sys_cd()*                    {{{3
-lh#os#system({command)})~
+lh#os#sys_cd({command)})~
 This function is a wrapper that returns (as a string) the name of the program
 to use according to its associated task (change directory).
 
