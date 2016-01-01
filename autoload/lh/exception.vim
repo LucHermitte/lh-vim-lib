@@ -2,10 +2,10 @@
 " File:         autoload/lh/exception.vim                         {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.3.16.
-let s:k_version = '3316'
+" Version:      3.5.0
+let s:k_version = '3500'
 " Created:      18th Nov 2015
-" Last Update:  25th Nov 2015
+" Last Update:  01st Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -67,7 +67,7 @@ function! lh#exception#callstack(throwpoint) abort
     if !empty(func_data)
       let definition = split(lh#askvim#exe('verbose function '.func_data[1]), "\n")
       let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
-      let script = substitute(script, '^\~', $HOME, '')
+      let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
       let fname  = substitute(func_data[1], '<SNR>\d\+_', 's:', '')
       if filereadable(script)
         if !has_key(dScripts, script)
