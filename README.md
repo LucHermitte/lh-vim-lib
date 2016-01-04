@@ -295,6 +295,6 @@ Bundle 'LucHermitte/lh-vim-lib'
   * [genutils](http://www.vim.org/scripts/script.php?script_id=197)
   * [pathogen](http://www.vim.org/scripts/script.php?script_id=2332)
   * [Tom Link's tlib](http://www.vim.org/scripts/script.php?script_id=1863)
-  * [theonevimlib](http://github.com/MarcWeber/theonevimlib/tree/master), initiated by Marc Weber
+  * [theonevimlib](http://www.vim.org/scripts/script.php?script_id=1963), initiated by Marc Weber
   * [anwolib](http://www.vim.org/scripts/script.php?script_id=3800), by Andy Wokula
   * [l9](http://www.vim.org/scripts/script.php?script_id=3252), by Takeshi NISHIDA
