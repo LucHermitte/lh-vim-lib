@@ -260,7 +260,7 @@ function, or a plain text UI function (defined by vim, or emulated)
 | `CONFIRM()` | Similar to `confirm()`                                                                                                                      |
 | `IF()`      | Acts as the ternary operator                                                                                                                |
 | `INPUT()`   | Calls `inputdialog()` or `input()`                                                                                                          |
-| `SWITCH()`  | Â«Â»                                                                                                                                    |
+| `SWITCH()`  | Â«Â»                                                                                                                                        |
 | `WHICH()`   | Wrapper around functions like `CONFIRM()` or `COMBO()` that returns the text of the selected item instead of the index of the selected item |
 
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
