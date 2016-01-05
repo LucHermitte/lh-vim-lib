@@ -136,6 +136,14 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Smart completion {{{2
+" Example:
+" see mu-template autoload/lh/mut.vim
+" TODO:
+" - permit to choose between completion and omnicompletion
+" - support options like:
+"   - characters used to cycle
+"   - autoclose preview window
+"   - ...
 " Function: lh#icomplete#new(startcol, matches, hook) {{{3
 function! lh#icomplete#new(startcol, matches, hook) abort
   silent! unlet b:complete_data
@@ -161,16 +169,25 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   let b:complete_data.no_more_matches = 0
   let b:complete_data.logger          = s:logger.reset()
 
-  " keybindings {{{4
+  if has('patch-7.4-314')
+    " Neutralize messages like "Match 1 of 7"/"Back at original"
+    call b:complete_data
+        \.restore('&shortmess')
+    set shortmess+=c
+  endif
+
+  " Keybindings {{{4
   call b:complete_data
         \.restore_buffer_mapping('<cr>', 'i')
         \.restore_buffer_mapping('<c-y>', 'i')
         \.restore_buffer_mapping('<esc>', 'i')
         \.restore_buffer_mapping('<tab>', 'i')
+        \.restore_buffer_mapping('<s-tab>', 'i')
   inoremap <buffer> <silent> <cr>  <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
   inoremap <buffer> <silent> <c-y> <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
-  " Unlike usual <tab> behaviour, this time, <tab> inserts the next match
-  inoremap <buffer> <silent> <tab> <down><c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
+  " Unlike usual <tab> behaviour, this time, <tab> cycle through the matches
+  inoremap <buffer> <silent> <tab> <down>
+  inoremap <buffer> <silent> <s-tab> <up>
   " <c-o><Nop> doesn't work as expected...
   " To stay in INSERT-mode:
   " inoremap <silent> <esc> <c-e><c-o>:<cr>
@@ -187,6 +204,14 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     au CursorMovedI <buffer> call b:complete_data.cursor_moved()
   augroup END
 
+  function! s:start_completion() abort dict "{{{4
+    " <c-x><c-o>: start omni completion
+    " <c-p>       remove the first completion item
+    " <down>      but do select the first completion item
+    silent! call feedkeys( "\<C-X>\<C-O>\<C-P>\<Down>", 'n' )
+  endfunction
+  let b:complete_data.start_completion = function('s:start_completion')
+
   function! s:cursor_moved() abort dict "{{{4
     if self.no_more_matches
       call self.finalize()
@@ -197,7 +222,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
       return
     endif
     call s:logger.log(lh#fmt#printf('cursor moved %1 and text has changed -> relaunch completion', string(getpos('.'))))
-    call feedkeys( "\<C-X>\<C-O>\<C-P>", 'n' )
+    call self.start_completion()
   endfunction
   let b:complete_data.cursor_moved = function('s:cursor_moved')
 
@@ -267,6 +292,9 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         " \.restore('b:complete_data')
   " set completefunc=lh#icomplete#func
   set omnifunc=lh#icomplete#func
+
+  " Return {{{4
+  return b:complete_data
 endfunction
 
 " Function: lh#icomplete#new_on(pattern, matches, hook) {{{3
@@ -276,7 +304,7 @@ function! lh#icomplete#new_on(pattern, matches, hook) abort
   if startcol == -1
     let startcol = col('.')-1
   endif
-  call lh#icomplete#new(startcol, a:matches, a:hook)
+  return lh#icomplete#new(startcol, a:matches, a:hook)
 endfunction
 
 " Function: lh#icomplete#func(startcol, base) {{{3
@@ -284,7 +312,7 @@ function! lh#icomplete#func(findstart, base) abort
   return b:complete_data.complete(a:findstart, a:base)
 endfunction
 
-if 1
+if 0
   let entries = [
 	\ {'word': 'un', 'menu': 1, 'kind': 's', 'info': ' '},
 	\ {'word': 'deux', 'menu': 2, 'kind': 's', 'info': 'takes a parameter'},
