@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v3.5.0)
-                        For Vim version 7+      Last change: 23rd Dec 2015
+                        For Vim version 7+      Last change: 05th Jan 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -151,8 +151,11 @@ OS/System related functions:                            |lhvl#os|
 - |lh#os#cpu_number()|
 - |lh#os#cpu_cores_number()|
 Completion related functions                            |lhvl#completion|
+- |lh#icomplete#new()|
+- |lh#icomplete#new_on()|
+- |lh#icomplete#run()|
 
-
+------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
 - |LetIfUndef|
 }}}2
@@ -2239,15 +2242,59 @@ It will use /proc/cpuinfo when it exists.
 ------------------------------------------------------------------------------
 COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#icomplete#new()*                {{{3
+                                              *lh#icomplete#new_on()*
+lh#icomplete#new(startcol, matches, Hook)~
+lh#icomplete#new_on(pattern, matches, Hook)~
+Prepares an |omni-completion| menu on the text starting at {startcol} or that
+matches {pattern} just before the cursor.
+The items displayed in the menu comes from the {matches}.
+When completion succeeds, the {Hook} |lhvl-functor| is called with the
+selected item as parameter.
+
+In order to start the menu, execute *start_completion()* on the |Dict| object
+returned by these functions.
+NB: I may automate the start in the future.
+
+For more information on:
+- {startcol}, see |complete-functions|
+- {matches}, see |complete-items|
+
+So far, no special handling of the |preview-window| is done.
+
+When in completion, the following keybindings are made in complement of
+|popupmenu-keys|:
+<CR>  behaves as CTRL-Y: Accept the currently selected match and stop completion
+<ESC> behaves as CTRL-E: End completion, go back to what was there before
+                         selecting a match (what was typed or longest common string)
+<Tab>/<S-Tab>            Cycles to the next/previous match
+
+Example: >
+  let entries = [
+	\ {'word': 'un', 'menu': 1, 'kind': 's', 'info': ' '},
+	\ {'word': 'deux', 'menu': 2, 'kind': 's', 'info': 'takes a parameter'},
+	\ {'word': 'trois', 'menu': 3, 'info': ''},
+	\ {'word': 'trentre-deux', 'menu': 32, 'info': ''},
+	\ 'unité'
+	\ ]
+  inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, 'lh#common#warning_msg("nominal: ".v:val)').start_completion()<cr>
+
+
+See also |mu-template| autoload/lh/mut.vim.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#icomplete#run()*                {{{3
 lh#icomplete#run(startcol, matches, Hook)~
+@deprecated Prefer |lh#icomplete#new()| and |lh#icomplete#new_on()|.
 Runs |complete()| and registers the {Hook} to be executed when the user
 selects one entry in the menu.
+
 
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2015 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2016 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
