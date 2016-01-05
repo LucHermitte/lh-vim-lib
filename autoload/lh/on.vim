@@ -88,7 +88,7 @@ function! lh#on#exit()
     endfor
   endfunction
   function! res.restore(varname) dict abort " {{{4
-    if stridx(a:varname, '~')!=-1 || exists(a:varname)
+    if a:varname =~ '[~@]' || exists(a:varname)
       let action = 'let '.a:varname.'='.string(eval(a:varname))
     else
       let action = 'unlet '.a:varname
