@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.11
+" Version:      3.6.0
 " Created:      17th Apr 2007
-" Last Update:  18th Nov 2015
+" Last Update:  06th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -67,6 +67,21 @@ function! lh#askvim#exe(command) abort
   return res
 endfunction
 
+
+" Function: lh#askvim#scriptnames() {{{3
+function! lh#askvim#scriptnames() abort
+  let scripts = split(lh#askvim#exe('scriptnames'), "\n")
+  let s:scripts = map(copy(scripts), 'split(v:val, "\\v:=\\s+")')
+  return s:scripts
+endfunction
+
+" Function: lh#askvim#scriptname(id) {{{3
+function! lh#askvim#scriptname(id) abort
+  if !exists('s:scripts') || len(s:scripts) < eval(a:id)
+    call lh#askvim#scriptnames()
+  endif
+  return s:scripts[a:id-1][1]
+endfunction
 
 " Function: lh#askvim#menu(menuid) {{{3
 function! s:AskOneMenu(menuact, res) abort

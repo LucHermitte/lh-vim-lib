@@ -27,6 +27,8 @@ FUNCTIONS                                    *lhvl-functions*     {{{1
                                                                         {{{2Functions list~
 Miscellanous functions:                                 |lhvl#misc|
 - |lh#askvim#exe()|
+- |lh#askvim#scriptnames()|
+- |lh#askvim#scriptname()|
 - |lh#common#check_deps()|
 - |lh#common#echomsg_multilines()|
 - |lh#common#error_msg()|
@@ -187,7 +189,7 @@ This function displays an error message in a |confirm()| box if gvim is being
 used, or as a standard vim error message through |:echoerr| otherwise.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#common#WarningMsg()*           {{{3
+                                                 *lh#common#WarningMsg()*          {{{3
 lh#common#WarningMsg({text}) (*deprecated*)~
                                               *lh#common#warning_msg()*
 lh#common#warning_msg({text})~
@@ -233,7 +235,7 @@ lh#common#rand({max})~
 @return a random number in `[0..max[`.
 @requires vim to be compiled with |+python| feature.
 
-                                                *lh#fmt#printf()*                {{{3
+                                                *lh#fmt#printf()*                 {{{3
 lh#fmt#printf({format}, {args}...)~
 @return a formatted string
 Unlike |printf()|, this function takes positional parameters, i.e. >
@@ -331,7 +333,7 @@ e.g. >
     " Then g:foo and g:bar are restored, and "The END" has been echoed
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#leader#get()*                {{{3
+                                                *lh#leader#get()*                 {{{3
                                                 *lh#leader#get_local()*
 lh#leader#get([default='\'])~
 lh#leader#get_local([default='\'])~
@@ -339,7 +341,7 @@ Returns the value of g:|mapleader| (/resp g:|maplocalleader|), or the default
 value otherwise. The default value for the {default} value (sic) for the leader is '\'.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#leader#set_local_if_unset()* {{{3
+                                                *lh#leader#set_local_if_unset()*  {{{3
 lh#leader#set_local_is_unset(value)~
 Sets g:|maplocalleader| to {value}, if and only if it isn't already set
 
@@ -358,6 +360,18 @@ Some information aren't directly accessible (yet) through vim API
 redirecting the result of these commands.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#askvim#scriptnames()*         {{{3
+lh#askvim#scriptnames()~
+@return |:scriptnames| result as a list of [script_id, name] arrays.
+@internal `s:scripts` variables is updated
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#askvim#scriptname()*          {{{3
+lh#askvim#scriptname(id)~
+@return the name of the script associate to {id}.
+@internal Lazily updates `s:scripts`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#menu()*                {{{3
 lh#askvim#menu({menuid},{modes})~
 @param {menuid}     Menu identifier.
@@ -371,7 +385,7 @@ Vim.
 The format of the result being ?to be stabilized?
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#position#IsBefore()*           {{{3
+                                               *lh#position#IsBefore()*          {{{3
 lh#position#IsBefore({lhs_pos},{rhs_pos})  (*deprecated*)~
                                                *lh#position#is_before()*
 lh#position#is_before({lhs_pos},{rhs_pos})~
@@ -379,26 +393,26 @@ lh#position#is_before({lhs_pos},{rhs_pos})~
 @return             Whether {lhs_pos} is before {rhs_pos}
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                             *lh#position#char_at()*              {{{3
+                                             *lh#position#char_at()*           {{{3
 lh#position#char_at({lig}, {col}~
 @return             The character at a given position.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                             *lh#position#CharAtMark()*           {{{3
+                                             *lh#position#CharAtMark()*        {{{3
 lh#position#CharAtMark({mark})  (*deprecated*)~
                                              *lh#position#char_at_mark()*
 lh#position#char_at_mark({mark})~
 @return             The character at a given |mark|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                              *lh#position#CharAtPos()*           {{{3
+                                              *lh#position#CharAtPos()*         {{{3
 lh#position#CharAtPos({pos})  (*deprecated*)~
-                                              *lh#position#char_at_pos()*         {{{3
+                                              *lh#position#char_at_pos()*       {{{3
 lh#position#char_at_pos({pos})~
 @return             The character at a position (see |getpos()|).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                             *lh#position#extract()*            {{{3
+                                             *lh#position#extract()*           {{{3
 lh#position#extract({pos1}, {pos2})~
 @return             The string between the two positions (see |getpos()|).
 
@@ -453,7 +467,7 @@ triggered on the current file.
 @todo possibility to specify the file pattern
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#exception#callstack()*      {{{3
+                                                *lh#exception#callstack()*        {{{3
 lh#exception#callstack({throwpoint})~
 Decodes the {throwpoint} and return a list of dictionaries made of:
 - "`script`": name of the file where the exception comes from
