@@ -508,7 +508,7 @@ function! lh#path#vimfiles()
   let HOME = exists('$LUCHOME') ? $LUCHOME : $HOME
   let expected_win = HOME . '/vimfiles'
   let expected_nix = HOME . '/.vim'
-  let what =  lh#path#to_regex($HOME.'/').'\(vimfiles\|.vim\)'
+  let what =  lh#path#to_regex(HOME.'/').'\(vimfiles\|.vim\)'
   " Comment what
   let z = lh#path#find(&rtp,what)
   return z
