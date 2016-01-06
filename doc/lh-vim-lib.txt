@@ -43,8 +43,6 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
-- |lh#log#new()|
-- |lh#log#none()|
 - |lh#on#exit()|
 - |lh#position#char_at()|
 - |lh#position#char_at_mark()|
@@ -156,6 +154,9 @@ Completion related functions                            |lhvl#completion|
 - |lh#icomplete#new()|
 - |lh#icomplete#new_on()|
 - |lh#icomplete#run()|
+Log related functions                                   |lhvl#log|
+- |lh#log#new()|
+- |lh#log#none()|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
@@ -244,65 +245,6 @@ Unlike |printf()|, this function takes positional parameters, i.e. >
   AssertEquals(lh#fmt#printf("foo %1 bar", 42), "foo 42 bar")
   AssertEquals(lh#fmt#printf("foo %1 bar %2", 42, "toto"), "foo 42 bar toto")
   AssertEquals(lh#fmt#printf("foo %2 bar %1", 42, "toto"), "foo toto bar 42")
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#log#new()*                    {{{3
-lh#log#new({where}, {kind})~
-@param {where} Specifies where the list buffer shall appear ("vert", "lefta",
-               "abo" -- see |:vert|, |:lefta|, |:abo|)
-@param  {kind} Kind of list to fill:
-               - "qf":  |quickfix|-list
-               - "loc": |location-list|
-@returns a logger object that provides
- - `log({msg})` -- adds a message to the qf/loclist (see |quickfix|)
- - `reset()`    -- reset the qf/loclist; and returns `self`
- - `clear()`    -- clears the qf/loclist
- - `open()`     -- opens the qf/loclist
-
-@note In order to obtain the name of the calling function, an exception is
-thrown and the backtrace is analysed.
-In order to work, this trick requires:
-- a reasonable callstack size (past a point, vim shortens the names returned
-  by |v:throwpoint|
-- named functions ; i.e. |anonymous-function|s (i.e. functions defined on
-  dictionaries and not attached to them) will have their names mangled
-  (actually it'll be a number) and |lh#exception#callstack()| won't be able to
-  decode them.  i.e.: >
-     function s:foo() dict abort
-        logger.log("here I am");
-     endfunction
-     let dict.foo = function('s:foo')
-<  will correctly fill the quicklist/loclist, but >
-     function dict.foo() abort
-        logger.log("here I am");
-     endfunction
-<  won't
-
-@todo I may support log levels in the future
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#log#none()*                   {{{3
-lh#log#none()~
-@return a logger that does nothing.
-It provides the following no-op functions
- - `log({msg})` -- no-op
- - `reset()`    -- no-op that still returns `self`
-
-Typical use: >
-    let s:verbose = 0
-    if !exists('s:logger')
-      let s:logger = lh#log#none()
-    endif
-    function! lh#icomplete#verbose(...)
-      if a:0 > 0
-        let s:verbose = a:1
-        let s:logger = lh#log#new('vert', 'loc')
-      else
-        let s:logger = lh#log#none()
-      endif
-      return s:verbose
-    endfunction
-
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3
@@ -2304,7 +2246,139 @@ lh#icomplete#run(startcol, matches, Hook)~
 Runs |complete()| and registers the {Hook} to be executed when the user
 selects one entry in the menu.
 
+------------------------------------------------------------------------------
+LOG RELATED FUNCTIONS                                 *lhvl#log*        {{{2
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lhvl-global-logger*              {{{3
+lh-vim-lib provides a global logger since version 3.6.0.
+By default, it'll echo everything with |:echomsg| (through |lh#log#echomsg|).
+
+The logging policy can be set thanks to |lh#log#set_logger()|.
+In plugins, logging can be done directly thanks to |lh#log#this()|, or though
+an encapsulation, see below.
+
+This logger doesn't support log level directly. Instead, the recommended way
+to use it is to have logging helper functions in each plugins (autoload
+plugins, or plain plugins, ftplugins, ...)  and to have these functions test a
+plugin related verbose option to decide whether they log anything or not.
+I use |mu-template| skeletons for vim plugins to automatically define these
+functions in my plugins.
+
+It looks like this: >
+    " # Debug
+    let s:verbose = get(s:, 'verbose', 0)
+    function! lh#icomplete#verbose(...)
+      if a:0 > 0
+        let s:verbose = a:1
+      endif
+      return s:verbose
+    endfunction
+
+    function! s:Log(...)
+      call call('lh#log#this', a:000)
+    endfunction
+
+    function! s:Verbose(...)
+      if s:verbose
+        call call('s:Log', a:000)
+      endif
+    endfunction
+
+
+Thus, if I want to trace what is done in my icomplete autoload plugin, I call >
+    call lh#icomplete#verbose(1)
+
+If I want to disable completely all logs, I can execute: >
+    :call lh#log#set_logger('none')
+
+If I prefer to see my traces on the right side, and in a |quickfix-window| in
+order to trace the files + line numbers along with the message to log, I'll
+execute >
+    :call lh#log#set_logger('qf', 'vert')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#set_logger()*             {{{3
+lh#log#set_logger(kind [, options])~
+Sets the global logger.
+@param[in] {kind} Depending on {kind}, the global logger becomes:
+  - `"none"`    -> |lh#log#none()| and won't ever log anything
+  - `"echomsg"` -> |lh#log#echomsg()| and log with |:echomsg|
+  - `"qf"`      -> |lh#log#new()| and log in |quickfix-window|
+                Takes another parameter that tells {where} the window is opened.
+  - `"log`      -> |lh#log#new()| and log in |location-list-window|
+                Takes another parameter that tells {where} the window is opened.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#this()*                   {{{3
+lh#log#this({format}, {args}...)~
+Logs the formatted message with the global logger.
+The message to log is prepared with |lh#fmt#printf()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#new()*                    {{{3
+lh#log#new({where}, {kind})~
+@param {where} Specifies where the list buffer shall appear ("vert", "lefta",
+               "abo" -- see |:vert|, |:lefta|, |:abo|)
+@param  {kind} Kind of list to fill:
+               - "qf":  |quickfix|-list
+               - "loc": |location-list|
+@returns a logger object that provides
+ - `log({msg})` -- adds a message to the qf/loclist (see |quickfix|)
+ - `reset()`    -- reset the qf/loclist; and returns `self`
+ - `clear()`    -- clears the qf/loclist
+ - `open()`     -- opens the qf/loclist
+It's isn't meant to be used directly. See |lhvl-global-logger|.
+
+@note In order to obtain the name of the calling function, an exception is
+thrown and the backtrace is analysed.
+In order to work, this trick requires:
+- A reasonable callstack size (past a point, vim shortens the names returned
+  by |v:throwpoint|.
+- Named functions ; i.e. |anonymous-function|s (i.e. functions defined on
+  dictionaries and not attached to them) will have their names mangled
+  (actually it'll be a number) and |lh#exception#callstack()| won't be able to
+  decode them.  i.e.: >
+     function s:foo() dict abort
+        logger.log("here I am");
+     endfunction
+     let dict.foo = function('s:foo')
+<  will correctly fill the quicklist/loclist, but >
+     function dict.foo() abort
+        logger.log("here I am");
+     endfunction
+<  won't.
+- Calls to the logging internal function can be wrapped into other functions.
+  However finding the depth between the function that do actually log and the
+  user function that wants to log, I had to adopt a convention: any function
+  with a name that contains `log` or `verbose` (which ever the case) will be
+  ignored.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#echomsg*                  {{{3
+lh#log#echomsg()~
+@return a logger that prints messages with |:echomsg|
+It provides the following no-op functions
+ - `log({msg})` -- display message with |:echomsg|
+ - `reset()`    -- no-op that still returns `self`
+It's isn't meant to be used directly. See |lhvl-global-logger|.
+
+Typical use, see |lh#log#set_logger()|: >
+    call lh#log#set_logger('none')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#none()*                   {{{3
+lh#log#none()~
+@return a logger that does nothing.
+It provides the following no-op functions
+ - `log({msg})` -- no-op
+ - `reset()`    -- no-op that still returns `self`
+It's isn't meant to be used directly. See |lhvl-global-logger|.
+
+Typical use, see |lh#log#set_logger()|: >
+    call lh#log#set_logger('none')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================

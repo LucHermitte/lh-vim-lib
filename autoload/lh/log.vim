@@ -2,10 +2,10 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.5.0.
-let s:k_version = '350'
+" Version:      3.6.0.
+let s:k_version = '360'
 " Created:      23rd Dec 2015
-" Last Update:  23rd Dec 2015
+" Last Update:  06th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -51,8 +51,9 @@ endfunction
 " # Create new log object {{{2
 
 " Function: lh#log#new(where, kind) {{{3
+" DOC: {{{4
 " - where: "vert"/""
-" - kind:  "qf"/"loc" for loclist
+" - kind:  "qf" / "loc" for loclist
 " NOTE: In order to obtain the name of the calling function, an exception is
 " thrown and the backtrace is analysed.
 " In order to work, this trick requires:
@@ -72,6 +73,7 @@ endfunction
 "      endfunction
 "   won't
 " TODO: add verbose levels
+" }}}4
 function! lh#log#new(where, kind) abort
   let log = { 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where}
 
@@ -108,9 +110,15 @@ function! lh#log#new(where, kind) abort
       throw "dummy"
     catch /.*/
       let bt = lh#exception#callstack(v:throwpoint)
-      if len(bt) > 1
-        let data.filename = bt[1].script
-        let data.lnum     = bt[1].pos
+      let g:bt = bt
+      " Find the right level.
+      " 0 is the current function
+      " And every other level maned s:log or s:verbose shall be ignored as
+      " well.
+      let idx = lh#list#find_if(bt, 'v:val.fname !~? "\\vlog|verbose"', 1)
+      if idx > 0
+        let data.filename = bt[idx].script
+        let data.lnum     = bt[idx].pos
       endif
     endtry
     call self._add(data)
@@ -147,6 +155,55 @@ function! lh#log#none() abort
   return log
 endfunction
 "------------------------------------------------------------------------
+" Function: lh#log#echomsg() {{{3
+" @return a log object that prints errors with ":echomsg"
+function! lh#log#echomsg() abort
+  let log = {}
+  function! log.log(...) dict
+    echomsg string(a:000)
+  endfunction
+  function! log.reset() dict
+    return self
+  endfunction
+  return log
+endfunction
+"------------------------------------------------------------------------
+" # Global logger {{{2
+" Function: lh#log#set_logger(kind) {{{3
+" Supported kinds:
+" - "none": traces are dumped
+" - "echomsg": default
+" - "qf" / "loc" (quickfix/loclist)
+function! lh#log#set_logger(kind, ...) abort
+  if a:kind ==? "none"
+    let s:logger = lh#log#none()
+  elseif a:kind ==? "echomsg"
+    let s:logger = lh#log#echomsg()
+  elseif a:kind =~? '\vqf|loc'
+    let s:logger = lh#log#new(a:1, a:kind)
+  else
+    throw "Invalid logger required"
+  endif
+  return s:logger
+endfunction
+
+let s:logger = lh#log#echomsg()
+
+" Function: lh#log#this(format, params) {{{3
+function! lh#log#this(fmt, ...)
+  " Data in qf format need a special handling
+  if type(a:fmt) == type({})
+  else
+    let msg = call('lh#fmt#printf', [a:fmt] + a:000)
+    call s:logger.log(msg)
+  endif
+endfunction
+
+" Function: lh#log#clear() {{{3
+function! lh#log#clear() abort
+  return s:logger.reset()
+endfunction
+
 " ## Internal functions {{{1
 
 "------------------------------------------------------------------------
