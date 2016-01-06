@@ -2,10 +2,10 @@
 " File:         autoload/lh/exception.vim                         {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.5.0
-let s:k_version = '3500'
+" Version:      3.6.0
+let s:k_version = '3600'
 " Created:      18th Nov 2015
-" Last Update:  01st Jan 2016
+" Last Update:  06th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -51,6 +51,14 @@ endfunction
 " # Call Stack decoding {{{2
 
 " Function: lh#exception#callstack(throwpoint) {{{3
+" Return a list of:
+" - "script": filename of the vimscript where the function is defined
+" - "pos":    absolute line number in this script file
+" - "fname":  function name
+" - "fstart": line where the function is defined in the script
+" - "offset": offset, from the start of the function, of the line where the
+"             exception was thrown
+let g:stacks = []
 function! lh#exception#callstack(throwpoint) abort
   let stack = split(a:throwpoint, '\.\.')
   call reverse(stack)
@@ -65,10 +73,16 @@ function! lh#exception#callstack(throwpoint) abort
       let func_data = matchlist(sFunc, '\(\k\+\), \%(line\|ligne\) \(\d\+\)')
     endif
     if !empty(func_data)
-      let definition = split(lh#askvim#exe('verbose function '.func_data[1]), "\n")
-      let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
+      let fname = func_data[1]
+      if fname =~ '\v(\<SNR\>|^)\d+_'
+        let script_id = matchstr(fname,  '\v(\<SNR\>|^)\zs\d+\ze_')
+        let fname  = substitute(fname, '\v(\<SNR\>|^)\d+_', 's:', '')
+        let script = lh#askvim#scriptname(script_id)
+      else
+        let definition = split(lh#askvim#exe('verbose function '.func_data[1]), "\n")
+        let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
+      endif
       let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
-      let fname  = substitute(func_data[1], '<SNR>\d\+_', 's:', '')
       if filereadable(script)
         if !has_key(dScripts, script)
           let dScripts[script] = reverse(readfile(script))
@@ -81,6 +95,7 @@ function! lh#exception#callstack(throwpoint) abort
       endif
     endif
   endfor
+  let g:stacks += [a:throwpoint]
   return function_stack
 endfunction
 
