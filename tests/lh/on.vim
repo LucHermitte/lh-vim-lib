@@ -100,28 +100,32 @@ endfunction
 " Likelly to fail with vimrunner
 " Function: s:Test_throw_finalize() {{{3
 function! s:Test_throw_finalize_msg() abort
-  silent! unlet g:foobar
-  let cleanup = lh#on#exit()
-        \.register('throw "Error"')
-        \.restore('g:foobar')
-  let g:foobar = 1
-  call lh#log#set_logger('none')
-  call cleanup.finalize()
-  Assert !exists('g:foobar')
+  if !exists('*VimrunnerEvaluateCommandOutput')
+    silent! unlet g:foobar
+    let cleanup = lh#on#exit()
+          \.register('throw "Error"')
+          \.restore('g:foobar')
+    let g:foobar = 1
+    call lh#log#set_logger('none')
+    call cleanup.finalize()
+    Assert !exists('g:foobar')
+  endif
 endfunction
 
 function! s:Test_throw_finalize() abort
-  silent! unlet g:foobar
-  let cleanup = lh#on#exit()
-        \.register('throw "Error"')
-        \.restore('g:foobar')
-  let g:foobar = 1
-  call lh#log#set_logger('qf', 'vert')
-  call cleanup.finalize()
-  let msgs = getqflist()
-  AssertEquals(msgs[0].text, 'Error')
-  AssertMatches(bufname(msgs[0].bufnr), 'autoload/lh/on.vim')
-  Assert !exists('g:foobar')
+  if !exists('*VimrunnerEvaluateCommandOutput')
+    silent! unlet g:foobar
+    let cleanup = lh#on#exit()
+          \.register('throw "Error"')
+          \.restore('g:foobar')
+    let g:foobar = 1
+    call lh#log#set_logger('qf', 'vert')
+    call cleanup.finalize()
+    let msgs = getqflist()
+    AssertEquals(msgs[0].text, 'Error')
+    AssertMatches(bufname(msgs[0].bufnr), 'autoload/lh/on.vim')
+    Assert !exists('g:foobar')
+  endif
 endfunction
 
 " }}}1
