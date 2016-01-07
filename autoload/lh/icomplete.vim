@@ -39,27 +39,25 @@ function! lh#icomplete#version()
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
-if !exists('s:logger')
-  let s:logger = lh#log#none()
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#icomplete#verbose(...)
   if a:0 > 0
     let s:verbose = a:1
-    let s:logger = lh#log#new('vert', 'loc')
-  else
-    let s:logger = lh#log#none()
   endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#icomplete#debug(expr)
+function! lh#icomplete#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -154,7 +152,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         \.restore('&omnifunc')
         \.restore('&completeopt')
         \.register('au! '.augroup)
-        \.register('call self.logger.log("finalized! (".getline(".").")")')
+        \.register('call s:Verbose("finalized! (".getline(".").")")')
   set complete=
   " TODO: actually, remove most options but preview
   set completeopt-=menu
@@ -167,7 +165,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   let b:complete_data.cursor_pos      = []
   let b:complete_data.last_content    = [line('.'), getline('.')]
   let b:complete_data.no_more_matches = 0
-  let b:complete_data.logger          = s:logger.reset()
+  call lh#log#clear()
 
   if has('patch-7.4-314')
     " Neutralize messages like "Match 1 of 7"/"Back at original"
@@ -218,10 +216,10 @@ function! lh#icomplete#new(startcol, matches, hook) abort
       return
     endif
     if !self.has_text_changed_since_last_move()
-      call s:logger.log(lh#fmt#printf("cursor %1 just moved (text hasn't changed)", string(getpos('.'))))
+      call s:Verbose("cursor %1 just moved (text hasn't changed)", string(getpos('.')))
       return
     endif
-    call s:logger.log(lh#fmt#printf('cursor moved %1 and text has changed -> relaunch completion', string(getpos('.'))))
+    call s:Verbose('cursor moved %1 and text has changed -> relaunch completion', string(getpos('.')))
     call self.start_completion()
   endfunction
   let b:complete_data.cursor_moved = function('s:cursor_moved')
@@ -232,11 +230,11 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     try
       if l != self.last_content[0]  " moved vertically
         let self.no_more_matches = 1
-        call s:logger.log("Vertical move => stop")
+        call s:Verbose("Vertical move => stop")
         return 0
         " We shall leave complete mode now!
       endif
-      call s:logger.log(lh#fmt#printf("line was: %1, and becomes: %2; has_changed?%3", self.last_content[1], line, line != self.last_content[1]))
+      call s:Verbose("line was: %1, and becomes: %2; has_changed?%3", self.last_content[1], line, line != self.last_content[1])
       return line != self.last_content[1] " text changed
     finally
       let self.last_content = [l, line]
@@ -245,15 +243,15 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   let b:complete_data.has_text_changed_since_last_move = function('s:has_text_changed_since_last_move')
 
   function! s:complete(findstart, base) abort dict "{{{4
-    call s:logger.log(lh#fmt#printf('findstart?%1 -> %2', a:findstart, a:base))
+    call s:Verbose('findstart?%1 -> %2', a:findstart, a:base)
     if a:findstart
       if self.no_more_matches
-        call s:logger.log("no more matches -> -3")
+        call s:Verbose("no more matches -> -3")
         return -3
         call self.finalize()
       endif
       if self.cursor_pos == getcurpos()
-        call s:logger.log("cursor hasn't moved -> -2")
+        call s:Verbose("cursor hasn't moved -> -2")
         return -2
       endif
       let self.cursor_pos = getcurpos()
@@ -267,9 +265,9 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   function! s:get_completions(base) abort dict "{{{4
     let matching = filter(copy(self.all_matches), 'v:val.word =~ join(split(a:base, ".\\zs"), ".*")')
     let self.matches.words = matching
-    call s:logger.log(lh#fmt#printf("'%1' matches: %2", a:base, string(self.matches)))
+    call s:Verbose("'%1' matches: %2", a:base, string(self.matches))
     if empty(self.matches.words)
-      call s:logger.log("No more matches...")
+      call s:Verbose("No more matches...")
       let self.no_more_matches = 1
     endif
     return self.matches
@@ -278,7 +276,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
 
   function! s:conclude() abort dict " {{{4
     let selection = getline('.')[self.startcol : col('.')-1]
-    call s:logger.log("Successful selection of <".selection.">")
+    call s:Verbose("Successful selection of <".selection.">")
     if !empty(self.hook)
       call lh#function#execute(self.hook, selection)
     endif
