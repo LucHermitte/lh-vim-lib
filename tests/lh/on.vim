@@ -19,11 +19,14 @@ let s:k_version = '350'
 UTSuite [lh-vim-lib] Testing lh/on.vim
 
 runtime autoload/lh/on.vim
+runtime autoload/lh/log.vim
+runtime autoload/lh/exception.vim
 
 let s:cpo_save=&cpo
 set cpo&vim
 
 "------------------------------------------------------------------------
+" Non throwing finalization {{{2
 " TODO: test
 " - &isk
 " - &l:isk
@@ -92,6 +95,36 @@ function! s:Test_restore_buffer_option_was_buffer() abort
   " Test where there was a buffer mapping
 endfunction
 
+"------------------------------------------------------------------------
+" Throwing finalization {{{2
+" Likelly to fail with vimrunner
+" Function: s:Test_throw_finalize() {{{3
+function! s:Test_throw_finalize_msg() abort
+  silent! unlet g:foobar
+  let cleanup = lh#on#exit()
+        \.register('throw "Error"')
+        \.restore('g:foobar')
+  let g:foobar = 1
+  call lh#log#set_logger('none')
+  call cleanup.finalize()
+  Assert !exists('g:foobar')
+endfunction
+
+function! s:Test_throw_finalize() abort
+  silent! unlet g:foobar
+  let cleanup = lh#on#exit()
+        \.register('throw "Error"')
+        \.restore('g:foobar')
+  let g:foobar = 1
+  call lh#log#set_logger('qf', 'vert')
+  call cleanup.finalize()
+  let msgs = getqflist()
+  AssertEquals(msgs[0].text, 'Error')
+  AssertMatches(bufname(msgs[0].bufnr), 'autoload/lh/on.vim')
+  Assert !exists('g:foobar')
+endfunction
+
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

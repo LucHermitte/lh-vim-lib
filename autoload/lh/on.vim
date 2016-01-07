@@ -1,7 +1,7 @@
 "=============================================================================
 " File:         autoload/lh/on.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      3.5.0.
@@ -51,21 +51,23 @@ function! lh#on#version()
 endfunction
 
 " # Debug   {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#on#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#on#debug(expr)
+function! lh#on#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -78,15 +80,8 @@ endfunction
 function! lh#on#exit()
   let res = {'actions':[] }
 
-  function! res.finalize() dict abort " {{{4
-    for Action in self.actions
-      if type(Action) == type(function('has'))
-        call Action()
-      else
-        exe Action
-      endif
-    endfor
-  endfunction
+  let res.finalize = function(s:getSNR('finalize'))
+
   function! res.restore(varname) dict abort " {{{4
     if a:varname =~ '[~@]' || exists(a:varname)
       let action = 'let '.a:varname.'='.string(eval(a:varname))
@@ -137,6 +132,40 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+
+" # finalizer methods {{{2
+function! s:finalize() dict " {{{4
+  " This function shall not fail!
+  for Action in self.actions
+    try
+      if type(Action) == type(function('has'))
+        call Action()
+      else
+        exe Action
+      endif
+    catch /.*/
+      let bt = lh#exception#callstack(v:throwpoint)
+      if !empty(bt)
+        let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here", "lnum": v:val.pos}')
+        let data[0].text = v:exception
+        call s:Log(data)
+      else
+        call s:Log(v:exception)
+      endif
+    finally
+      unlet Action
+    endtry
+  endfor
+endfunction
+
+" # misc functions {{{2
+" s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

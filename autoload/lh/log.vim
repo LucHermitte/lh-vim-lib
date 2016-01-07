@@ -110,7 +110,6 @@ function! lh#log#new(where, kind) abort
       throw "dummy"
     catch /.*/
       let bt = lh#exception#callstack(v:throwpoint)
-      let g:bt = bt
       " Find the right level.
       " 0 is the current function
       " And every other level maned s:log or s:verbose shall be ignored as
@@ -124,6 +123,11 @@ function! lh#log#new(where, kind) abort
     call self._add(data)
   endfunction
 
+  " log_trace {{{4
+  function! s:log_trace(msg) abort dict
+    call self._add(a:msg)
+  endfunction
+
   " reset {{{4
   function! s:reset() dict abort
     call self.clear()
@@ -132,11 +136,12 @@ function! lh#log#new(where, kind) abort
   endfunction
 
   " register methods {{{4
-  let log.open  = function('s:open')
-  let log._add  = function('s:add_'.a:kind)
-  let log.clear = function('s:clear_'.a:kind)
-  let log.log   = function('s:log')
-  let log.reset = function('s:reset')
+  let log.open      = function('s:open')
+  let log._add      = function('s:add_'.a:kind)
+  let log.clear     = function('s:clear_'.a:kind)
+  let log.log       = function('s:log')
+  let log.log_trace = function('s:log_trace')
+  let log.reset     = function('s:reset')
 
   " open the window {{{4
   call log.reset()
@@ -159,8 +164,11 @@ endfunction
 " @return a log object that prints errors with ":echomsg"
 function! lh#log#echomsg() abort
   let log = {}
-  function! log.log(...) dict
-    echomsg string(a:000)
+  function! log.log(msg) dict
+    let msg = type(a:msg) == type([]) || type(a:msg) == type({})
+          \ ?  string(a:msg)
+          \ : a:msg
+    echomsg msg
   endfunction
   function! log.reset() dict
     return self
@@ -192,7 +200,18 @@ let s:logger = lh#log#echomsg()
 " Function: lh#log#this(format, params) {{{3
 function! lh#log#this(fmt, ...)
   " Data in qf format need a special handling
-  if type(a:fmt) == type({})
+  if type(a:fmt) == type([])
+    for msg in a:fmt
+      call call('lh#log#this', [msg]+a:000)
+    endfor
+  elseif type(a:fmt) == type({}) && has_key(a:fmt, 'lnum')
+    " dictionaries that aren't quickfix item are errors
+    if has_key(s:logger, 'log_trace')
+      call s:logger.log_trace(a:fmt)
+    else
+      let msg = lh#fmt#printf("%1:%2: %3", a:fmt.filename, a:fmt.lnum, a:fmt.text)
+      call s:logger.log(msg)
+    endif
   else
     let msg = call('lh#fmt#printf', [a:fmt] + a:000)
     call s:logger.log(msg)
