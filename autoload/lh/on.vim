@@ -144,14 +144,7 @@ function! s:finalize() dict " {{{4
         exe Action
       endif
     catch /.*/
-      let bt = lh#exception#callstack(v:throwpoint)
-      if !empty(bt)
-        let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here", "lnum": v:val.pos}')
-        let data[0].text = v:exception
-        call s:Log(data)
-      else
-        call s:Log(v:exception)
-      endif
+      call lh#log#exception()
     finally
       unlet Action
     endtry

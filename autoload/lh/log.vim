@@ -197,6 +197,11 @@ endfunction
 
 let s:logger = lh#log#echomsg()
 
+" Function: lh#log#clear() {{{3
+function! lh#log#clear() abort
+  return s:logger.reset()
+endfunction
+
 " Function: lh#log#this(format, params) {{{3
 function! lh#log#this(fmt, ...)
   " Data in qf format need a special handling
@@ -218,9 +223,18 @@ function! lh#log#this(fmt, ...)
   endif
 endfunction
 
-" Function: lh#log#clear() {{{3
-function! lh#log#clear() abort
-  return s:logger.reset()
+" Function: lh#log#exception([exception [,throwpoint]]) {{{3
+function! lh#log#exception(...) abort
+  let exception  = a:0 > 0 ? a:2 : v:exception
+  let throwpoint = a:0 > 1 ? a:2 : v:throwpoint
+  let bt = lh#exception#callstack(throwpoint)
+  if !empty(bt)
+    let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here", "lnum": v:val.pos}')
+    let data[0].text = v:exception
+    call lh#log#this(data)
+  else
+    call lh#log#this(exception)
+  endif
 endfunction
 
 " ## Internal functions {{{1

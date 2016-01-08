@@ -2316,6 +2316,13 @@ Logs the formatted message with the global logger.
 The message to log is prepared with |lh#fmt#printf()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#log#exception()*              {{{3
+lh#log#exception([{exception} [, {throwpoint}]])~
+Logs the {exception} with the global logger.
+If the global logger logs to the quickfix-window or to a location-list window,
+the callstack will also be logged.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#log#new()*                    {{{3
 lh#log#new({where}, {kind})~
 @param {where} Specifies where the list buffer shall appear ("vert", "lefta",
