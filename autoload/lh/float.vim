@@ -1,25 +1,16 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/float.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
 " Created:      16th Nov 2010
-" Last Update:  $Date$
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |expr-float| numbers
-" 
-"------------------------------------------------------------------------
-" Installation:
-"       Drop this file into {rtp}/autoload/lh
-"       Requires Vim7+
-" History:     
-"       v2.0.0: first version
-"       v3.0.0: GPLv3
-" TODO:
 " }}}1
 "=============================================================================
 
@@ -28,25 +19,28 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 300
 function! lh#float#version()
   return s:k_version
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#float#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#float#debug(expr)
+function! lh#float#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -114,6 +108,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

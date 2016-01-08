@@ -1,24 +1,25 @@
 "=============================================================================
 " File:		autoload/lh/common.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.17
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:k_version = 361
 " Created:	07th Oct 2006
-" Last Update:	$Date$ (08th Feb 2008)
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	
+" Description:
 " 	Some common functions for:
 " 	- displaying error messages
 " 	- checking dependencies
-" 
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" 	with ruby enabled for lh#common#rand()
-" History:	
+" Requirements:
+" 	ruby enabled for lh#common#rand()
+" History:
+"       v3.6.1
+"       - ENH: Use new logging framework
 "       v3.1.17
 "       - Fix lh#common#echomsg_multilines() to accept lists
 "       v3.0.1
@@ -61,7 +62,7 @@ function! lh#common#error_msg(text)
     echoerr a:text
     " echohl None
   endif
-endfunction 
+endfunction
 function! lh#common#ErrorMsg(text)
   return lh#common#error_msg(a:text)
 endfunction
@@ -72,7 +73,7 @@ function! lh#common#warning_msg(text)
   " echomsg a:text
   call lh#common#echomsg_multilines(a:text)
   echohl None
-endfunction 
+endfunction
 function! lh#common#WarningMsg(text)
   return lh#common#warning_msg(a:text)
 endfunction

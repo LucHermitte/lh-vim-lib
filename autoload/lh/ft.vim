@@ -1,13 +1,13 @@
 "=============================================================================
 " File:         autoload/lh/ft.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.3.3
-let s:k_version = 3330
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 3601
 " Created:      28th Jan 2014
-" Last Update:  24th Sep 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       library functions related to filetype manipulations
@@ -26,19 +26,23 @@ function! lh#ft#version()
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#ft#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#ft#debug(expr)
+function! lh#ft#debug(expr) abort
   return eval(a:expr)
 endfunction
 

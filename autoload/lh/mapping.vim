@@ -1,23 +1,16 @@
 "=============================================================================
 " File:         autoload/lh/map.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://github.com/LucHermitte>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.3.10
-let s:version = '3.3.10'
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:version = '3.6.01'
 " Created:      01st Mar 2013
-" Last Update:  16th Nov 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
-"
-"------------------------------------------------------------------------
-" Installation:
-"       Drop this file into {rtp}/autoload/lh
-"       Requires Vim7+
-" History:      «history»
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -31,19 +24,23 @@ function! lh#mapping#version()
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#mapping#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#mapping#debug(expr)
+function! lh#mapping#debug(expr) abort
   return eval(a:expr)
 endfunction
 

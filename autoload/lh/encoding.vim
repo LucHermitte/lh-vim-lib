@@ -1,42 +1,69 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/encoding.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:k_version = 361
 " Created:	21st Feb 2008
-" Last Update:	$Date$
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	
+" Description:
 " 	Defines functions that help managing various encodings
-" 
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	
+" History:
+"       v3.6.1
+"       (*) ENH: Use new logging framework
 "       v3.0.0:
 "       (*) GPLv3
 " 	v2.2.2:
 " 	(*) new mb_strings functions: strlen, strpart, at
 " 	v2.0.7:
 " 	(*) lh#encoding#Iconv() copied from map-tools
-" TODO:		«missing features»
 " }}}1
 "=============================================================================
 
 let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
-" Exported functions {{{2
-" Function: lh#encoding#iconv(expr, from, to)  " {{{3
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#encoding#version()
+  return s:k_version
+endfunction
+
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#encoding#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
+  endif
+endfunction
+
+function! lh#encoding#debug(expr) abort
+  return eval(a:expr)
+endfunction
+
+
+"------------------------------------------------------------------------
+" ## Exported functions {{{1
+" Function: lh#encoding#iconv(expr, from, to)  " {{{2
 " Unlike |iconv()|, this wrapper returns {expr} when we know no convertion can
 " be acheived.
 function! lh#encoding#iconv(expr, from, to)
   " call Dfunc("s:ICONV(".a:expr.','.a:from.','.a:to.')')
-  if has('multi_byte') && 
+  if has('multi_byte') &&
 	\ ( has('iconv') || has('iconv/dyn') ||
 	\ ((a:from=~'latin1\|utf-8') && (a:to=~'latin1\|utf-8')))
     " call confirm('encoding: '.&enc."\nto:".a:to, "&Ok", 1)
@@ -50,7 +77,7 @@ function! lh#encoding#iconv(expr, from, to)
 endfunction
 
 
-" Function: lh#encoding#at(mb_string, i) " {{{3
+" Function: lh#encoding#at(mb_string, i) " {{{2
 " @return i-th character in a mb_string
 " @parem mb_string multi-bytes string
 " @param i 0-indexed position
@@ -58,7 +85,7 @@ function! lh#encoding#at(mb_string, i)
   return matchstr(a:mb_string, '.', 0, a:i+1)
 endfunction
 
-" Function: lh#encoding#strpart(mb_string, pos, length) " {{{3
+" Function: lh#encoding#strpart(mb_string, pos, length) " {{{2
 " @return {length} extracted characters from {position} in multi-bytes string.
 " @parem mb_string multi-bytes string
 " @param p 0-indexed position
@@ -67,11 +94,13 @@ function! lh#encoding#strpart(mb_string, p, l)
   return matchstr(a:mb_string, '.\{'.a:l.'}', 0, a:p+1)
 endfunction
 
-" Function: lh#encoding#strlen(mb_string) " {{{3
+" Function: lh#encoding#strlen(mb_string) " {{{2
 " @return the length of the multi-bytes string.
 function! lh#encoding#strlen(mb_string)
   return strlen(substitute(a:mb_string, '.', 'a', 'g'))
 endfunction
+
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

@@ -1,26 +1,17 @@
 "=============================================================================
 " File:		autoload/lh/syntax.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://github.com/LucHermitte>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-"
-" Version:	3.1.18
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:k_version = 361
 " Created:	05th Sep 2007
-" Last Update:	03rd Nov 2015
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
 " Description:	«description»
 "
 "------------------------------------------------------------------------
-" Installation:
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	«history»
-" 	v1.0.0:
-" 		Creation ;
-" 		Functions moved from lhVimSpell
-"       v3.0.0: GPLv3
-"       v3.1.0: lh#syntax#is_a_comment()
 " TODO:
 " 	function, to inject "contained", see lhVimSpell approach
 " }}}1
@@ -31,22 +22,36 @@
 let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
-" ## Functions {{{1
-" # Debug {{{2
-function! lh#syntax#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#syntax#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#syntax#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#syntax#debug(expr)
+function! lh#syntax#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+
+"=============================================================================
+" ## Functions {{{1
 " # Public {{{2
 " Functions: Show name of the syntax kind of a character {{{3
 function! lh#syntax#name_at(l,c, ...)

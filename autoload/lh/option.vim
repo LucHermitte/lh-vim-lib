@@ -3,15 +3,19 @@
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.2.12
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
 " Created:      24th Jul 2004
-" Last Update:  10th Apr 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
-" History:
+"
+" History: {{{2
+"       v3.6.1
+"       (*) ENH: Use new logging framework
 "       v3.2.12
 "       (*) New functions: lh#option#getbufvar(), lh#option#is_set(),
 "           lh#option#unset()
@@ -37,28 +41,40 @@
 " }}}1
 "=============================================================================
 
-
-"=============================================================================
 let s:cpo_save=&cpo
 set cpo&vim
 
 "------------------------------------------------------------------------
-" ## Functions {{{1
-" # Debug {{{2
-function! lh#option#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#option#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#option#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#option#debug(expr)
+function! lh#option#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+
+"=============================================================================
+" ## Functions {{{1
 " # Public {{{2
 
 " Function: lh#option#unset() {{{3

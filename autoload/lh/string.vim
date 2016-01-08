@@ -25,7 +25,7 @@ endfunction
 
 " # Debug   {{{2
 let s:verbose = get(s:, 'verbose', 0)
-function! lh#path#verbose(...)
+function! lh#string#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
@@ -40,7 +40,7 @@ function! s:Verbose(...)
   endif
 endfunction
 
-function! lh#on#debug(expr) abort
+function! lh#string#debug(expr) abort
   return eval(a:expr)
 endfunction
 

@@ -1,12 +1,13 @@
 "=============================================================================
 " File:         autoload/lh/function.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://github.com/LucHermitte>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.4.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
 " Created:      03rd Nov 2008
-" Last Update:  15th Dec 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -17,6 +18,7 @@
 "
 "------------------------------------------------------------------------
 " History:
+"       v3.6.1:  ENH: Use new logging framework
 "       v3.4.0:  ENH: lh#function#bind supports composition
 "       v3.3.20: Explicit error msg w/ lh#function#execute
 "       v3.3.15: lh#function#execute(string) supports now v:val as well.
@@ -31,22 +33,36 @@ let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
 
-" ## Functions {{{1
-" # Debug {{{2
-function! lh#function#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#function#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#function#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#function#debug(expr)
+function! lh#function#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+
+"=============================================================================
+" ## Functions {{{1
 " # Function: s:Join(arguments...) {{{2
 function! s:Join(args) abort
   let res = ''

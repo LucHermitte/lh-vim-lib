@@ -13,8 +13,6 @@ let s:k_version = '3.6.01'
 "       Formatting functions
 "
 "------------------------------------------------------------------------
-" TODO:
-"       Support named fields
 " }}}1
 "=============================================================================
 
@@ -28,24 +26,25 @@ function! lh#fmt#version()
 endfunction
 
 " # Debug   {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#fmt#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#fmt#debug(expr)
+function! lh#fmt#debug(expr) abort
   return eval(a:expr)
 endfunction
-
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
@@ -54,6 +53,7 @@ endfunction
 " TODO:
 " - support precision/width/fill
 " - %%1 that would expand into %1
+" - support named fields
 function! lh#fmt#printf(format, ...) abort
   let args = map(copy(a:000), 'lh#string#as(v:val)')
   let res = substitute(a:format, '\v\%(\d+)', '\=args[submatch(1)-1]', 'g')

@@ -1,40 +1,38 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/menu.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/menu.vim                               {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.5
-" Created:	13th Oct 2006
-" Last Update:	$Date$ (07th Dec 2010)
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
+" Created:      13th Oct 2006
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	
-" 	Defines the global function lh#menu#def_menu
-" 	Aimed at (ft)plugin writers.
-" 
+" Description:
+"       Defines the global function lh#menu#def_menu
+"       Aimed at (ft)plugin writers.
+"
 "------------------------------------------------------------------------
-" Installation:	
-" 	Drop this file into {rtp}/autoload/lh/
-" 	Requires Vim 7+
-" History:	
-" 	v2.0.0:	Moving to vim7
-" 	v2.0.1:	:Toggle echoes the new value
-" 	v2.2.0: Support environment variables
-" 	        Only one :Toggle command is defined.
-" 	v2.2.3: :Toggle can directly set the final value
-" 	       (prefer this way of proceeding to update the menu to the new
-" 	       value)
-" 	       :Toggle suports auto-completion on possible values
-" 	v2.2.6: Toggle menus are silent, but not the actions executed
+" History: {{{2
+"       v2.0.0: Moving to vim7
+"       v2.0.1: :Toggle echoes the new value
+"       v2.2.0: Support environment variables
+"               Only one :Toggle command is defined.
+"       v2.2.3: :Toggle can directly set the final value
+"              (prefer this way of proceeding to update the menu to the new
+"              value)
+"              :Toggle suports auto-completion on possible values
+"       v2.2.6: Toggle menus are silent, but not the actions executed
 "       v3.0.0: GPLv3
 "       v3.1.2: Enhancements for string options, required by BTW 0.2.0
 "       v3.1.3: BugFix for CMake options, required by BTW 0.2.1
-" TODO:		
-" 	* Should the argument to :Toggle be simplified to use the variable name
-" 	instead ? May be a banged :Toggle! could work on the real variable
-" 	name, and on the real value.
-" 	* show all possible values in a sub menu (on demand)
+"       v3.6.1  ENH: Use new logging framework
+" TODO: {{{2
+"       * Should the argument to :Toggle be simplified to use the variable name
+"       instead ? May be a banged :Toggle! could work on the real variable
+"       name, and on the real value.
+"       * show all possible values in a sub menu (on demand)
 "
 " Notes:
 " .hook cannot be used to execute a toggle action. Use .actions instead.
@@ -57,31 +55,36 @@ if !exists('s:set_string_commands')
 endif
 
 "------------------------------------------------------------------------
-" ## Functions {{{1
+" ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 315
 function! lh#menu#version()
   return s:k_version
 endfunction
 
-" # Debug   {{{2
-let s:verbose = 0
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#menu#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#menu#debug(expr)
+function! lh#menu#debug(expr) abort
   return eval(a:expr)
 endfunction
 
 
+"=============================================================================
+" ## Functions {{{1
 "------------------------------------------------------------------------
 " # Common stuff       {{{2
 " Function: lh#menu#text({text})                             {{{3
@@ -134,7 +137,7 @@ endfunction
 " Sets the global variable associated to the menu item according to the item's
 " current value.
 function! s:Set(Data) abort
-  try 
+  try
     let value = a:Data.values[a:Data.idx_crt_value]
     let variable = a:Data.variable
     if variable[0] == '$' " environment variabmes
@@ -169,7 +172,7 @@ endfunction
 
 " Function: s:MenuKey({Data})                              {{{3
 " @return the table name from which the current value name (to display in the
-" menu) must be fetched. 
+" menu) must be fetched.
 " Priority is given to the optional "texts" table over the madatory "values" table.
 function! s:MenuKey(Data)
   if has_key(a:Data, "texts")
@@ -186,7 +189,7 @@ endfunction
 function! s:SetTextValue(Data, text)
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
-  " Fetch the old current value 
+  " Fetch the old current value
   let old = s:Fetch(a:Data, labels_key)
   let new_idx = s:SearchText(a:Data, a:text)
   if -1 == new_idx
@@ -194,7 +197,7 @@ function! s:SetTextValue(Data, text)
   endif
   if a:Data.idx_crt_value == new_idx
     " value unchanged => abort
-    return 
+    return
   endif
 
   " Remove the entry from the menu
@@ -217,7 +220,7 @@ endfunction
 function! s:NextValue(Data)
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
-  " Fetch the old current value 
+  " Fetch the old current value
   let old = s:Fetch(a:Data, labels_key)
 
   " Remove the entry from the menu
@@ -260,8 +263,8 @@ endfunction
 function! s:UpdateMenu(Menu, text, command)
   if has('gui_running')
     let cmd = 'nnoremenu <silent> '.a:Menu.priority.' '.
-	  \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
-	  \ ' :'.s:k_Toggle_cmd.' '.a:command."\<cr>"
+          \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
+          \ ' :'.s:k_Toggle_cmd.' '.a:command."\<cr>"
     silent! exe cmd
   endif
 endfunction
@@ -310,9 +313,9 @@ function! lh#menu#def_toggle_item(Data)
   " Name of the auto-matically generated toggle command
   let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
   " Lazy definition of the command
-  if 2 != exists(':'.s:k_Toggle_cmd) 
+  if 2 != exists(':'.s:k_Toggle_cmd)
     exe 'command! -nargs=+ -complete=custom,lh#menu#_toggle_complete '
-	  \ . s:k_Toggle_cmd . ' :call s:Toggle(<f-args>)'
+          \ . s:k_Toggle_cmd . ' :call s:Toggle(<f-args>)'
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
   let s:toggle_commands[cmdName] = eval('s:Data'.id)
@@ -346,7 +349,7 @@ function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos)
     let nb_args -= 1
   endif
   " echomsg "nb args: ". nb_args
-  if nb_args < 2 
+  if nb_args < 2
     return join(keys(s:toggle_commands),"\n")
   elseif nb_args == 2
     let variable = cmdline[1]
@@ -406,11 +409,11 @@ endfunction
 function! s:VarSetTextValue(Data, text)
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
-  " Fetch the old current value 
+  " Fetch the old current value
   let old = s:VarFetch(a:Data, labels_key)
   if old == a:text
     " value unchanged => abort
-    return 
+    return
   endif
 
   " Remove the entry from the menu
@@ -435,8 +438,8 @@ endfunction
 function! s:VarUpdateMenu(Menu, text, command)
   if has('gui_running')
     let cmd = 'nnoremenu '.a:Menu.priority.' '.
-	  \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
-	  \ ' :'.s:k_Set_cmd.' '.a:command.' '
+          \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
+          \ ' :'.s:k_Set_cmd.' '.a:command.' '
     silent! exe cmd
   endif
 endfunction
@@ -464,9 +467,9 @@ function! lh#menu#def_string_item(Data)
   " Name of the auto-matically generated command
   let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
   " Lazy definition of the command
-  if 2 != exists(':'.s:k_Set_cmd) 
+  if 2 != exists(':'.s:k_Set_cmd)
     exe 'command! -nargs=1 -complete=custom,lh#menu#_string_complete '
-	  \ . s:k_Set_cmd . ' :call s:SetVariableFromCommand(<f-args>)'
+          \ . s:k_Set_cmd . ' :call s:SetVariableFromCommand(<f-args>)'
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
   let s:set_string_commands[cmdName] = eval('s:Data'.id)
@@ -501,7 +504,7 @@ function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos)
     let nb_args -= 1
   endif
   " echomsg "nb args: ". nb_args
-  if nb_args < 2 
+  if nb_args < 2
     return join(keys(s:set_string_commands),"\n")
   else
     return ''
@@ -525,9 +528,9 @@ endfunction
 
 " Function: lh#menu#_CMD_and_clear_v({cmd})                 {{{3
 " Internal function that executes the command and then clears the @v buffer
-" todo: save and restore @v, 
+" todo: save and restore @v,
 function! lh#menu#_CMD_and_clear_v(cmd)
-  try 
+  try
     let s:is_in_visual_mode = 1
     exe a:cmd
   finally
@@ -543,14 +546,14 @@ function! s:Build_CMD(prefix, cmd)
   endif
   if     a:prefix[0] == "i"  | return ' ' . <SID>CTRL_O(a:cmd)
   elseif a:prefix[0] == "n"  | return ' ' . a:cmd
-  elseif a:prefix[0] == "v" 
+  elseif a:prefix[0] == "v"
     if match(a:cmd, ":VCall") == 0
       return substitute(a:cmd, ':VCall', ' :call', ''). "\<cr>gV"
       " gV exit select-mode if we where in it!
     else
       return
-	    \ " \"vy\<C-C>:call lh#menu#_CMD_and_clear_v('" . 
-	    \ substitute(a:cmd, "<CR>$", '', '') ."')\<cr>"
+            \ " \"vy\<C-C>:call lh#menu#_CMD_and_clear_v('" .
+            \ substitute(a:cmd, "<CR>$", '', '') ."')\<cr>"
     endif
   elseif a:prefix[0] == "c"  | return " \<C-C>" . a:cmd
   else                       | return ' ' . a:cmd
@@ -588,17 +591,17 @@ function! lh#menu#make(prefix, code, text, binding, ...)
   let nore   = (match(a:prefix, '[aincv]*nore') != -1) ? "nore" : ""
   let prefix = matchstr(substitute(a:prefix, nore, '', ''), '[aincv]*')
   let b = (a:1 == "<buffer>") ? 1 : 0
-  let i = b + 1 
+  let i = b + 1
   let cmd = a:{i}
   let i += 1
   while i <= a:0
     let cmd .=  ' ' . a:{i}
     let i += 1
   endwhile
-  let build_cmd = nore . "menu <silent> " . a:code . ' ' . lh#menu#text(a:text) 
+  let build_cmd = nore . "menu <silent> " . a:code . ' ' . lh#menu#text(a:text)
   if strlen(a:binding) != 0
-    let build_cmd .=  '<tab>' . 
-	  \ substitute(lh#menu#text(a:binding), '&', '\0\0', 'g')
+    let build_cmd .=  '<tab>' .
+          \ substitute(lh#menu#text(a:binding), '&', '\0\0', 'g')
     if prefix == 'i' && exists('*IMAP')
       if b != 0
         call IMAP(a:binding, cmd, &ft)
@@ -625,9 +628,9 @@ endfunction
 " If <buffermenu.vim> is installed and the menu should be local, then the
 " apropriate string is returned.
 function! s:BMenu(b)
-  let res = (a:b && exists(':Bmenu') 
-	\     && (1 == lh#option#get("want_buffermenu_or_global_disable", 1, "bg"))
-	\) ? 'B' : ''
+  let res = (a:b && exists(':Bmenu')
+        \     && (1 == lh#option#get("want_buffermenu_or_global_disable", 1, "bg"))
+        \) ? 'B' : ''
   " call confirm("BMenu(".a:b.")=".res, '&Ok', 1)
   return res
 endfunction
@@ -638,7 +641,7 @@ function! lh#menu#IVN_make(code, text, binding, i_cmd, v_cmd, n_cmd, ...)
   let nore_i = (a:0 > 0) ? ((a:1 != 0) ? 'nore' : '') : ''
   let nore_v = (a:0 > 1) ? ((a:2 != 0) ? 'nore' : '') : ''
   let nore_n = (a:0 > 2) ? ((a:3 != 0) ? 'nore' : '') : ''
-  " 
+  "
   call lh#menu#make('i'.nore_i,a:code,a:text, a:binding, '<buffer>', a:i_cmd)
   call lh#menu#make('v'.nore_v,a:code,a:text, a:binding, '<buffer>', a:v_cmd)
   if strlen(a:n_cmd) != 0

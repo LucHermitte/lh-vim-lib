@@ -1,31 +1,52 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/visual.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:k_version = 361
 " Created:	08th Sep 2008
-" Last Update:	$Date$
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
 " 	Helpers functions releated to the visual mode
-" 
-"------------------------------------------------------------------------
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	
-"       v3.0.0: GPLv3
-" 	v2.2.5: lh#visual#cut()
-" 	v2.0.6: First appearance
-" TODO:		«missing features»
+"
 " }}}1
 "=============================================================================
 
 let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
-" Functions {{{1
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#visual#version()
+  return s:k_version
+endfunction
+
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#visual#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
+  endif
+endfunction
+
+function! lh#visual#debug(expr) abort
+  return eval(a:expr)
+endfunction
+
+
+"=============================================================================
+" ## Functions {{{1
 
 " Function: lh#visual#selection()                              {{{3
 " @return the text currently selected

@@ -1,20 +1,15 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/tsort.vim                        {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/tsort.vim                        {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
-" Created:	21st Apr 2008
-" Last Update:	$Date$
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
+" Created:      21st Apr 2008
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	Library functions for Topological Sort
-" 
-"------------------------------------------------------------------------
-" 	Drop the file into {rtp}/autoload/lh/graph
-" History:	«history»
-" TODO:		«missing features»
+" Description:  Library functions for Topological Sort
 " }}}1
 "=============================================================================
 
@@ -22,20 +17,35 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 "------------------------------------------------------------------------
-" ## Debug {{{1
-function! lh#graph#tsort#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#graph#tsort#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#graph#tsort#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#graph#tsort#debug(expr)
+function! lh#graph#tsort#debug(expr) abort
   return eval(a:expr)
 endfunction
+
+
+"=============================================================================
 
 "------------------------------------------------------------------------
 "## Helper functions                         {{{1
@@ -65,16 +75,16 @@ endfunction
 "# s:PrepareDAG(dag)                         {{{2
 function! s:PrepareDAG(dag)
   if type(a:dag) == type(function('has_key'))
-    let dag = { 
-	  \ 'successors': function('s:Successors_lazy'),
-	  \ 'fetch'     : a:dag,
-	  \ 'table' 	: {}
-	  \}
+    let dag = {
+          \ 'successors': function('s:Successors_lazy'),
+          \ 'fetch'     : a:dag,
+          \ 'table'     : {}
+          \}
   else
-    let dag = { 
-	  \ 'successors': function('s:Successors_fully_defined'),
-	  \ 'table' 	: deepcopy(a:dag)
-	  \}
+    let dag = {
+          \ 'successors': function('s:Successors_fully_defined'),
+          \ 'table'     : deepcopy(a:dag)
+          \}
   endif
   return dag
 endfunction
@@ -112,7 +122,7 @@ function! s:RecursiveDTSort(dag, start_nodes, results, visited_nodes)
   endfor
 endfunction
 
-function! s:Visited(node) dict 
+function! s:Visited(node) dict
   return has_key(self, a:node) ? self[a:node] : 0
 endfunction
 
@@ -134,7 +144,7 @@ function! lh#graph#tsort#breadth(dag, start_nodes)
       let m = s:RemoveEdgeFrom(dag, node)
       " echomsg "graph loose ".node."->".m
       if !s:HasIncomingEgde(dag, m)
-	" echomsg "queue <- ".m
+        " echomsg "queue <- ".m
         call add(queue, m)
       endif
     endwhile

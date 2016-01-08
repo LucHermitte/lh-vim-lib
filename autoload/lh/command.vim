@@ -1,27 +1,18 @@
 "=============================================================================
-" $Id$
-" File:		autoload/lh/command.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         autoload/lh/command.vim                               {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.0.0
-" Created:	08th Jan 2007
-" Last Update:	$Date$ (08th Jan 2007)
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
+" Created:      08th Jan 2007
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	
-" 	Helpers to define commands that:
-" 	- support subcommands
-" 	- support autocompletion
-" 
-"------------------------------------------------------------------------
-" Installation:	
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:	
-"       v3.0.0: GPLv3
-" 	v2.0.0: Code moved from other plugins
-" TODO:		«missing features»
+" Description:
+"       Helpers to define commands that:
+"       - support subcommands
+"       - support autocompletion
 " }}}1
 "=============================================================================
 
@@ -30,18 +21,30 @@
 let s:cpo_save=&cpo
 set cpo&vim
 
-" ## Debug {{{1
-function! lh#command#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#command#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#command#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#command#debug(expr)
+function! lh#command#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -55,7 +58,7 @@ endfunction
 function! lh#command#Fargs2String(aList)
   if empty(a:aList) | return '' | endif
 
-  let quote_char = a:aList[0][0] 
+  let quote_char = a:aList[0][0]
   let res = a:aList[0]
   call remove(a:aList, 0)
   if quote_char !~ '["'."']"
@@ -63,7 +66,7 @@ function! lh#command#Fargs2String(aList)
   endif
   " else
   let end_string = '[^\\]\%(\\\\\)*'.quote_char.'$'
-  while !empty(a:aList) && res !~ end_string 
+  while !empty(a:aList) && res !~ end_string
     let res .= ' ' . a:aList[0]
     call remove(a:aList, 0)
   endwhile
@@ -99,8 +102,8 @@ function! lh#command#complete(ArgLead, CmdLine, CursorPos)
   let pos = strlen(tmp)
   if 0
     call confirm( "AL = ". a:ArgLead."\nCL = ". a:CmdLine."\nCP = ".a:CursorPos
-	  \ . "\ntmp = ".tmp."\npos = ".pos
-	  \, '&Ok', 1)
+          \ . "\ntmp = ".tmp."\npos = ".pos
+          \, '&Ok', 1)
   endif
 
   if     2 == pos
@@ -118,8 +121,8 @@ function! lh#command#complete(ArgLead, CmdLine, CursorPos)
       " let files = files . globpath(&rtp, 'compiler/BT/*')
       let files = s:FindFilter('*')
       let files = substitute(files,
-	    \ '\(^\|\n\).\{-}compiler[\\/]BTW[-_\\/]\(.\{-}\)\.vim\>\ze\%(\n\|$\)',
-	    \ '\1\2', 'g')
+            \ '\(^\|\n\).\{-}compiler[\\/]BTW[-_\\/]\(.\{-}\)\.vim\>\ze\%(\n\|$\)',
+            \ '\1\2', 'g')
       return files
     elseif -1 != match(a:CmdLine, '^BTW\s\+remove\%(local\)\=')
       " Removes a filter

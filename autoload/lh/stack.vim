@@ -1,12 +1,13 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/stack.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      3.2.3
-let s:k_version = 323
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 361
 " Created:      20th Sep 2014
-" Last Update:  $Date$
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functionto implement the stack ADT
@@ -23,21 +24,23 @@ function! lh#stack#version()
 endfunction
 
 " # Debug   {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#stack#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#stack#debug(expr)
+function! lh#stack#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -149,7 +152,7 @@ function! lh#stack#new_list(nb)
   function! s.nb_stacks() dict
     return len(self.stacks)
   endfunction
-  
+
   call s.expand(a:nb)
   return s
 endfunction

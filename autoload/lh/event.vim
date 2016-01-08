@@ -1,25 +1,16 @@
 "=============================================================================
-" $Id$
 " File:		autoload/lh/event.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.8
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:	3.6.1
+let s:k_version = 361
 " Created:	15th Feb 2008
-" Last Update:	$Date$
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
-" Description:	
+" Description:
 " 	Function to help manage vim |autocommand-events|
-" 
-"------------------------------------------------------------------------
-" Installation:
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:
-" 	v2.0.6: Creation
-"       v3.0.0: GPLv3
-" TODO:		
 " }}}1
 "=============================================================================
 
@@ -27,29 +18,44 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 "------------------------------------------------------------------------
-" ## Functions {{{1
-" # Debug {{{2
-function! lh#event#verbose(level)
-  let s:verbose = a:level
+" ## Misc Functions     {{{1
+" # Version {{{2
+function! lh#event#version()
+  return s:k_version
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+" # Debug {{{2
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#event#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
+endfunction
+
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#event#debug(expr)
+function! lh#event#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+
+"=============================================================================
+" ## Functions {{{1
 "------------------------------------------------------------------------
 " # Event Registration {{{2
 function! s:RegisteredOnce(cmd, group)
+  call s:Verbose('Registered event group=%1, executing: %2', a:group, a:cmd)
   " We can't delete the current augroup autocommand => increment a counter
-  if !exists('s:'.a:group) || s:{a:group} == 0 
+  if !exists('s:'.a:group) || s:{a:group} == 0
     let s:{a:group} = 1
-    try 
+    try
       exe a:cmd
     finally
       " But we can clean the group
@@ -67,10 +73,12 @@ function! lh#event#register_for_one_execution_at(event, cmd, group)
   au!
   exe 'au '.a:event.' '.expand('%:p').' call s:RegisteredOnce('.string(a:cmd).','.string(group).')'
   augroup END
+  call s:Verbose('au '.a:event.' '.expand('%:p').' call s:RegisteredOnce('.string(a:cmd).','.string(group).')')
 endfunction
 function! lh#event#RegisterForOneExecutionAt(event, cmd, group)
   return lh#event#register_for_one_execution_at(a:event, a:cmd, a:group)
 endfunction
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

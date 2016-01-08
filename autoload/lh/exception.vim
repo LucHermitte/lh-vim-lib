@@ -1,18 +1,16 @@
 "=============================================================================
 " File:         autoload/lh/exception.vim                         {{{1
-" Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.6.0
-let s:k_version = '3600'
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = '3601'
 " Created:      18th Nov 2015
 " Last Update:  06th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
-"
-"------------------------------------------------------------------------
-" History:      «history»
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 

@@ -1,21 +1,20 @@
 "=============================================================================
 " File:		autoload/lh/buffer.vim                               {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib>
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	3.3.8
-let s:k_version = '338'
+" Version:	3.6.1
+let s:k_version = '361'
 " Created:	23rd Jan 2007
-" Last Update:	18th Apr 2015
+" Last Update:	08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
 "
 "------------------------------------------------------------------------
-" Installation:
-" 	Drop it into {rtp}/autoload/lh/
-" 	Vim 7+ required.
-" History:
+" History: {{{2
 "	v1.0.0 First Version
 " 	(*) Functions moved from searchInRuntimeTime
 " 	v2.2.0
@@ -38,6 +37,8 @@ let s:k_version = '338'
 "       v3.3.8
 "       (*) All :split goes through lh#window#create_window_with() is order to
 "       workaround E36
+"       v3.6.1
+"       (*) ENH: Use new logging framework
 " }}}1
 "=============================================================================
 
@@ -54,22 +55,28 @@ function! lh#buffer#version()
 endfunction
 
 " # Debug {{{2
-function! lh#buffer#verbose(level)
-  let s:verbose = a:level
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#buffer#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
+  if s:verbose
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#buffer#debug(expr)
+function! lh#buffer#debug(expr) abort
   return eval(a:expr)
 endfunction
 
 "------------------------------------------------------------------------
-" # Public {{{2
+" # Public {{{1
 
 " Function: lh#buffer#find({filename}) {{{3
 " If {filename} is opened in a window, jump to this window, otherwise return -1
@@ -141,7 +148,7 @@ endfunction
 " Ex: wipeout empty buffers listed
 "  -> echo 'bw'.join(lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_))'), ' ')
 
-" # Private {{{2
+" # Private {{{1
 " Function: lh#buffer#_loaded_buf_do(args) {{{3
 function! lh#buffer#_loaded_buf_do(args)
   let buffers = lh#buffer#list('bufloaded')

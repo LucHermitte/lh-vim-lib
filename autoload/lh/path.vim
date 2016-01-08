@@ -3,11 +3,11 @@
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.3.11
-let s:k_version = 3311
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 3601
 " Created:      23rd Jan 2007
-" Last Update:  19th Nov 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -90,6 +90,8 @@ let s:k_version = 3311
 "       (*) Steal functions from system-tools
 "       v3.3.11
 "       (*) Fix lh#path#to_relative() and lh#path#depth()
+"       v3.6.1
+"       (*) ENH: Use new logging framework
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -109,23 +111,26 @@ function! lh#path#version()
 endfunction
 
 " # Debug {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#path#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#path#debug(expr)
+function! lh#path#debug(expr) abort
   return eval(a:expr)
 endfunction
+
 
 "=============================================================================
 " ## Exported functions {{{1

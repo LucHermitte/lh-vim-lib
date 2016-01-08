@@ -3,11 +3,11 @@
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/lh-brackets/License.md>
-" Version:      3.3.17
-let s:k_version = 3317
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1
+let s:k_version = 3601
 " Created:      10th Sep 2012
-" Last Update:  01st Dec 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -26,19 +26,23 @@ function! lh#let#version()
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#let#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#let#debug(expr)
+function! lh#let#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -55,12 +59,14 @@ function! lh#let#if_undef(var, value) abort
       let dict2 = lh#let#if_undef(dict, string({}))
       if !has_key(dict2, key)
         let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
       endif
       return dict2[key]
     else
       " other variables
       if !exists(a:var)
         let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        call s:Verbose("let %1 = %2", a:var, {a:var})
       endif
       return {a:var}
     endif

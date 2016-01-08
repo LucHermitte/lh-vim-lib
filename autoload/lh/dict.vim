@@ -1,18 +1,16 @@
 "=============================================================================
 " File:         autoload/lh/dict.vim                              {{{1
-" Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.3.20.
-let s:k_version = '3320'
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1.
+let s:k_version = '3601'
 " Created:      26th Nov 2015
-" Last Update:  02nd Dec 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
-"
-"------------------------------------------------------------------------
-" History:      «history»
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -26,24 +24,25 @@ function! lh#dict#version()
 endfunction
 
 " # Debug   {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#dict#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#dict#debug(expr)
+function! lh#dict#debug(expr) abort
   return eval(a:expr)
 endfunction
-
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1

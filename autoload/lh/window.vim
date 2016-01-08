@@ -1,11 +1,13 @@
 "=============================================================================
 " File:         autoload/lh/window.vim                            {{{1
-" Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.3.8.
-let s:k_version = '338'
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1.
+let s:k_version = '361'
 " Created:      29th Oct 2015
-" Last Update:
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.
@@ -22,21 +24,23 @@ function! lh#window#version()
 endfunction
 
 " # Debug   {{{2
-if !exists('s:verbose')
-  let s:verbose = 0
-endif
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#window#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(...)
+  call call('lh#log#this', a:000)
+endfunction
+
+function! s:Verbose(...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log', a:000)
   endif
 endfunction
 
-function! lh#window#debug(expr)
+function! lh#window#debug(expr) abort
   return eval(a:expr)
 endfunction
 
