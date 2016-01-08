@@ -1,18 +1,20 @@
 "=============================================================================
 " File:         autoload/lh/fmt.vim                               {{{1
-" Author:       Luc Hermitte <EMAIL:hermitte {at} gmail {dot} com>
-"		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.3.14.
-let s:k_version = '3.3.14'
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
+" Version:      3.6.1.
+let s:k_version = '3.6.01'
 " Created:      20th Nov 2015
-" Last Update:  20th Nov 2015
+" Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Formatting functions
 "
 "------------------------------------------------------------------------
-" History:      «history»
-" TODO:         «missing features»
+" TODO:
+"       Support named fields
 " }}}1
 "=============================================================================
 
@@ -53,7 +55,8 @@ endfunction
 " - support precision/width/fill
 " - %%1 that would expand into %1
 function! lh#fmt#printf(format, ...) abort
-  let res = substitute(a:format, '\v\%(\d+)', '\=a:000[submatch(1)-1]', 'g')
+  let args = map(copy(a:000), 'lh#string#as(v:val)')
+  let res = substitute(a:format, '\v\%(\d+)', '\=args[submatch(1)-1]', 'g')
   return res
 endfunction
 
