@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 3601
+" Version:      3.6.2
+let s:k_version = 3602
 " Created:      23rd Jan 2007
-" Last Update:  08th Jan 2016
+" Last Update:  14th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -92,6 +92,8 @@ let s:k_version = 3601
 "       (*) Fix lh#path#to_relative() and lh#path#depth()
 "       v3.6.1
 "       (*) ENH: Use new logging framework
+"       v3.6.2
+"       (*) BUG: Support comma-separated lists in lh#path#munge()
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -630,11 +632,16 @@ endfunction
 
 " Function: lh#path#munge(pathlist, path) {{{3
 function! lh#path#munge(pathlist, path)
-  " if filereadable(a:path) || isdirectory(a:path)
-  if ! empty(glob(a:path))
-    call lh#list#push_if_new(a:pathlist, a:path)
+  if type(a:pathlist) == type('str')
+    let pathlist = split(a:pathlist, ',')
+    return join(lh#path#munge(pathlist, a:path), ',')
+  else
+    " if filereadable(a:path) || isdirectory(a:path)
+    if ! empty(glob(a:path))
+      call lh#list#push_if_new(a:pathlist, a:path)
+    endif
+    return a:pathlist
   endif
-  return a:pathlist
 endfunction
 " }}}1
 "=============================================================================
