@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1.
-let s:k_version = '3601'
+" Version:      3.6.2.
+let s:k_version = '3602'
 " Created:      08th Dec 2015
-" Last Update:  08th Jan 2016
+" Last Update:  17th Jan 2016
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -79,6 +79,20 @@ function! lh#string#as(val) abort
     return string(a:val)
   endif
   return a:val
+endfunction
+
+" # Compatibility {{{2
+" Function: lh#string#strwidth(string) {{{3
+" Get the display width of the string.
+" @version 3.6.2
+function! lh#string#strwidth(string)
+  " Use the built-in if it exists.
+  if exists("*strwidth")
+    return strwidth(string)
+  endif
+
+  " Implementation pulled from Greg Sexton's gitv plugin.
+  return len(split(a:string,'\zs'))
 endfunction
 
 "------------------------------------------------------------------------
