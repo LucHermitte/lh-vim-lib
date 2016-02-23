@@ -1,13 +1,12 @@
 "=============================================================================
-" $Id$
 " File:         plugin/let.vim                                    {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.1.1
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
+" Version:      3.7.0
 " Created:      31st May 2010
-" Last Update:  $Date$
+" Last Update:  23rd Feb 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -39,6 +38,9 @@ set cpo&vim
 "------------------------------------------------------------------------
 " Commands and Mappings {{{1
 command! -nargs=+ LetIfUndef call lh#let#if_undef(<f-args>)
+
+command! -nargs=+ -complete=customlist,lh#let#_push_options_complete
+      \ PushOptions call lh#let#_push_options(<f-args>)
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------
 " Functions {{{1

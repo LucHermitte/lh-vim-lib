@@ -4,14 +4,16 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 3601
+" Version:      3.7.0
+let s:k_version = 3700
 " Created:      10th Sep 2012
-" Last Update:  08th Jan 2016
+" Last Update:  23rd Feb 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
 "
+" TODO:
+"       Add PopOption
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -49,6 +51,8 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+"
+" # LetIfUndef {{{2
 " Function: lh#let#if_undef(var, value) {{{3
 function! lh#let#if_undef(var, value) abort
   try
@@ -75,8 +79,88 @@ function! lh#let#if_undef(var, value) abort
   endtry
 endfunction
 
+
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+" # PushOptions {{{2
+"
+" Function: lh#let#_push_options(variable, ...) {{{3
+function! lh#let#_push_options(variable, ...) abort
+  let var = lh#let#if_undef(a:variable, '[]')
+  for val in a:000
+    call lh#list#push_if_new(var, val)
+  endfor
+  return var
+endfunction
+
+" Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
+function! lh#let#_list_all_list_variables_in_scope(scope) abort
+  let vars = map(keys({a:scope}), 'a:scope.v:val')
+  " Keep only lists and dictionaries
+  call filter(vars, 'type({v:val}) == type([]) || type({v:val}) == type({})')
+  return vars
+endfunction
+
+" Function: lh#let#_list_variables(lead) {{{3
+function! lh#let#_list_variables(lead) abort
+  if empty(a:lead)
+    " No variable specified yet
+    let vars
+          \ = lh#let#_list_all_list_variables_in_scope('g:')
+          \ + lh#let#_list_all_list_variables_in_scope('b:')
+          \ + lh#let#_list_all_list_variables_in_scope('w:')
+          \ + lh#let#_list_all_list_variables_in_scope('t:')
+  elseif stridx(a:lead, '.') >= 0
+    " Dictionary
+    let [all, dict, key ; trail] = matchlist(a:lead, '\v(.*)\.(.*)')
+    let vars = keys({dict})
+    call filter(vars, 'type({dict}[v:val]) == type([]) || type({dict}[v:val]) == type({})')
+    call map(vars, 'v:val. (type({dict}[v:val])==type({})?".":"")')
+    call map(vars, 'dict.".".v:val')
+    return vars
+  else
+    " Simple variables
+    if         (len(a:lead) == 1 && a:lead    =~ '[gbwt]')
+          \ || (len(a:lead) > 1  && a:lead[1] == ':')
+      let scope = a:lead[0]
+      let filter_scope = ''
+    else
+      let scope = 'g'
+      let filter_scope = 'g:'
+    endif
+    let vars = lh#let#_list_all_list_variables_in_scope(scope.':')
+    call filter(vars, 'v:val =~ "^".filter_scope.a:lead')
+  endif
+  " Add dot to identified dictionaries
+  call map(vars, 'v:val. (type({v:val})==type({})?".":"")')
+  return vars
+endfunction
+
+" Function: lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) {{{3
+call lh#let#if_undef('g:acceptable_options_for', '{}')
+
+function! lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) abort
+  let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
+  let pos = strlen(tmp)
+
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3)', a:ArgLead, a:CmdLine, a:CursorPos)
+
+  if     2 == pos
+    " First argument: a variable name
+    return lh#let#_list_variables(a:ArgLead)
+  elseif pos >= 3
+    " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
+    " name
+    let args = split(a:CmdLine, '\s\+')
+    let varname = args[1]
+    call s:Verbose('complete: varname=%1', varname)
+    " Other arguments: acceptable values
+    let acceptable_values = get(g:acceptable_options_for, varname, [])
+    let crt_val = '\v^'.join(exists(varname)? eval(varname) : [], '|').'$'
+    let acceptable_values = filter(copy(acceptable_values), 'v:val !~ crt_val')
+    return acceptable_values
+  endif
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1

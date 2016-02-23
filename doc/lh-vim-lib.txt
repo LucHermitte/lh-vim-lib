@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.5.0)
-                        For Vim version 7+      Last change: 05th Jan 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.7.0)
+                        For Vim version 7+      Last change: 23rd Feb 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -161,6 +161,7 @@ Log related functions                                   |lhvl#log|
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
 - |LetIfUndef|
+- |PushOptions|
 }}}2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
