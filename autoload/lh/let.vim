@@ -4,16 +4,13 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.7.0
-let s:k_version = 3700
+" Version:      3.7.1
+let s:k_version = 3701
 " Created:      10th Sep 2012
 " Last Update:  23rd Feb 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
-"
-" TODO:
-"       Add PopOption
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -93,6 +90,12 @@ function! lh#let#_push_options(variable, ...) abort
   return var
 endfunction
 
+" Function: lh#let#_pop_options(variable, ...) {{{3
+function! lh#let#_pop_options(variable, ...) abort
+  let options = '\v^'.join(a:000, '|').'$'
+  return filter(eval(a:variable), 'v:val !~ options')
+endfunction
+
 " Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
 function! lh#let#_list_all_list_variables_in_scope(scope) abort
   let vars = map(keys({a:scope}), 'a:scope.v:val')
@@ -154,6 +157,32 @@ function! lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) abort
     let args = split(a:CmdLine, '\s\+')
     let varname = args[1]
     call s:Verbose('complete: varname=%1', varname)
+    " Other arguments: acceptable values
+    let acceptable_values = get(g:acceptable_options_for, varname, [])
+    let crt_val = '\v^'.join(exists(varname)? eval(varname) : [], '|').'$'
+    let acceptable_values = filter(copy(acceptable_values), 'v:val !~ crt_val')
+    return acceptable_values
+  endif
+endfunction
+
+" Function: lh#let#_pop_options_complete(ArgLead, CmdLine, CursorPos) {{{3
+function! lh#let#_pop_options_complete(ArgLead, CmdLine, CursorPos) abort
+  let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
+  let pos = strlen(tmp)
+
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3)', a:ArgLead, a:CmdLine, a:CursorPos)
+
+  if     2 == pos
+    " First argument: a variable name
+    return lh#let#_list_variables(a:ArgLead)
+  elseif pos >= 3
+    " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
+    " name
+    let args = split(a:CmdLine, '\s\+')
+    let varname = args[1]
+    call s:Verbose('complete: varname=%1', varname)
+    return eval(varname)
+
     " Other arguments: acceptable values
     let acceptable_values = get(g:acceptable_options_for, varname, [])
     let crt_val = '\v^'.join(exists(varname)? eval(varname) : [], '|').'$'

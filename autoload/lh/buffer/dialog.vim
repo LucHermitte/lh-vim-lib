@@ -66,7 +66,7 @@ function! s:Verbose(...)
   endif
 endfunction
 
-function! lh#buffer#dialogebug(expr) abort
+function! lh#buffer#dialog#debug(expr) abort
   return eval(a:expr)
 endfunction
 

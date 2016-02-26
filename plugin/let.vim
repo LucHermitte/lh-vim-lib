@@ -4,7 +4,7 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      3.7.0
+" Version:      3.7.1
 " Created:      31st May 2010
 " Last Update:  23rd Feb 2016
 "------------------------------------------------------------------------
@@ -20,6 +20,7 @@
 " 	v3.0.0: GPLv3
 " 	v3.0.1: :LetIfUndef works with dictionaries as well
 " 	        function moved to its own autoload plugin
+" 	v3.7.*: +:PushOption :PopOption
 " TODO: 
 " }}}1
 "=============================================================================
@@ -41,6 +42,8 @@ command! -nargs=+ LetIfUndef call lh#let#if_undef(<f-args>)
 
 command! -nargs=+ -complete=customlist,lh#let#_push_options_complete
       \ PushOptions call lh#let#_push_options(<f-args>)
+command! -nargs=+ -complete=customlist,lh#let#_pop_options_complete
+      \ PopOptions call lh#let#_pop_options(<f-args>)
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------
 " Functions {{{1

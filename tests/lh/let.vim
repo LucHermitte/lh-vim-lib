@@ -4,7 +4,7 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      3.7.0
+" Version:      3.7.1
 " Created:      10th Sep 2012
 " Last Update:  23rd Feb 2016
 "------------------------------------------------------------------------
@@ -60,13 +60,16 @@ function! s:Test_push_option_list() abort
   Assert !exists('g:dummy_test')
 
   PushOptions g:dummy_test un
-  Assert g:dummy_test == ['un']
+  AssertEqual (g:dummy_test, ['un'])
   PushOptions g:dummy_test deux
-  Assert g:dummy_test == ['un', 'deux']
+  AssertEqual (g:dummy_test, ['un', 'deux'])
   PushOptions g:dummy_test un
-  Assert g:dummy_test == ['un', 'deux']
+  AssertEqual (g:dummy_test, ['un', 'deux'])
   PushOptions g:dummy_test trois un quatre
-  Assert g:dummy_test == ['un', 'deux', 'trois', 'quatre']
+  AssertEqual (g:dummy_test, ['un', 'deux', 'trois', 'quatre'])
+
+  PopOptions g:dummy_test deux quatre
+  AssertEqual (g:dummy_test, ['un', 'trois'])
 endfunction
 
 "------------------------------------------------------------------------
@@ -76,13 +79,16 @@ function! s:Test_push_option_dict() abort
   Assert !exists('g:dummy_test')
 
   PushOptions g:dummy_test.titi un
-  Assert g:dummy_test.titi == ['un']
+  AssertEqual (g:dummy_test.titi, ['un'])
   PushOptions g:dummy_test.titi deux
-  Assert g:dummy_test.titi == ['un', 'deux']
+  AssertEqual (g:dummy_test.titi, ['un', 'deux'])
   PushOptions g:dummy_test.titi un
-  Assert g:dummy_test.titi == ['un', 'deux']
+  AssertEqual (g:dummy_test.titi, ['un', 'deux'])
   PushOptions g:dummy_test.titi trois un quatre
-  Assert g:dummy_test.titi == ['un', 'deux', 'trois', 'quatre']
+  AssertEqual (g:dummy_test.titi, ['un', 'deux', 'trois', 'quatre'])
+
+  PopOptions g:dummy_test.titi deux quatre
+  AssertEqual (g:dummy_test.titi, ['un', 'trois'])
 endfunction
 
 "------------------------------------------------------------------------
