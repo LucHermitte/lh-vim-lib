@@ -299,6 +299,11 @@ flavor LucHermitte/lh-vim-lib
 Bundle 'LucHermitte/lh-vim-lib'
 ```
 
+## Credits
+  * Luc Hermitte, maintainer
+  * Troy Curtis Jr, for portability functions, and many tests/issues he raised
+  * Many other I've forgotten :(
+
 ## Some other VimL libraries
   * [genutils](http://www.vim.org/scripts/script.php?script_id=197)
   * [pathogen](http://www.vim.org/scripts/script.php?script_id=2332)

@@ -40,9 +40,12 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
 - |lh#fmt#printf()|
+- |lh#float#min()|, |lh#float#max()|,
+  |lh#float#arg_min()|, |lh#float#arg_max()|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
+- |lh#math#abs()|
 - |lh#on#exit()|
 - |lh#position#char_at()|
 - |lh#position#char_at_mark()|
@@ -247,6 +250,15 @@ Unlike |printf()|, this function takes positional parameters, i.e. >
   AssertEquals(lh#fmt#printf("foo %1 bar", 42), "foo 42 bar")
   AssertEquals(lh#fmt#printf("foo %1 bar %2", 42, "toto"), "foo 42 bar toto")
   AssertEquals(lh#fmt#printf("foo %2 bar %1", 42, "toto"), "foo toto bar 42")
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#math#abs()*                   {{{3
+lh#math#abs(val)~
+@returns the absolute value of the number {val}.
+@author Troy Curtis Jr
+
+The purpose of the function is to emulate |abs()| on vim version where it
+isn't defined.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3
@@ -2230,12 +2242,12 @@ When in completion, the following keybindings are made in complement of
 
 Example: >
   let entries = [
-	\ {'word': 'un', 'menu': 1, 'kind': 's', 'info': ' '},
-	\ {'word': 'deux', 'menu': 2, 'kind': 's', 'info': 'takes a parameter'},
-	\ {'word': 'trois', 'menu': 3, 'info': ''},
-	\ {'word': 'trentre-deux', 'menu': 32, 'info': ''},
-	\ 'unité'
-	\ ]
+        \ {'word': 'un', 'menu': 1, 'kind': 's', 'info': ' '},
+        \ {'word': 'deux', 'menu': 2, 'kind': 's', 'info': 'takes a parameter'},
+        \ {'word': 'trois', 'menu': 3, 'info': ''},
+        \ {'word': 'trentre-deux', 'menu': 32, 'info': ''},
+        \ 'unité'
+        \ ]
   inoremap <silent> <buffer> µ <c-o>:call lh#icomplete#new_on('\w', entries, 'lh#common#warning_msg("nominal: ".v:val)').start_completion()<cr>
 
 
