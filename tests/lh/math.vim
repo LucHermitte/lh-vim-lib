@@ -16,7 +16,7 @@ let s:k_version = '380'
 " }}}1
 "=============================================================================
 
-UTSuite [math] Testing lh/math.vim
+UTSuite [lh-vim-lib] Testing lh/math.vim
 
 runtime autoload/lh/math.vim
 

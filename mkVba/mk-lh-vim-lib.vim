@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	3.8.0
-let s:version = '3.8.0'
+" Version:	3.8.1
+let s:version = '3.8.1'
 " Created:	06th Nov 2007
-" Last Update:  29th Feb 2016
+" Last Update:  01st Mar 2016
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -61,6 +61,7 @@ plugin/lhvl.vim
 plugin/ui-functions.vim
 plugin/words_tools.vim
 tests/lh/UT-fixpath.vim
+tests/lh/encoding.vim
 tests/lh/function.vim
 tests/lh/list.vim
 tests/lh/math.vim
