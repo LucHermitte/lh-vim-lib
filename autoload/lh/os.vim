@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.8.1
+let s:k_version = 381
 " Created:      10th Apr 2012
-" Last Update:  08th Jan 2016
+" Last Update:  13th Apr 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -192,6 +192,7 @@ endfunction
 
 " Function: s:SystemCmd(cmdName) {{{2
 function! s:SystemCmd(cmdName)
+  call lh#os#system_detected()
   " @todo add some checkings
   return s:{a:cmdName}
 endfunction
