@@ -1,13 +1,12 @@
 "=============================================================================
-" $Id$
 " File:		plugin/lhvl.vim                                   {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.1.12
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
+" Version:	3.8.2
 " Created:	27th Apr 2010
-" Last Update:	$Date$
+" Last Update:	03rd May 2016
 "------------------------------------------------------------------------
 " Description:	
 "       Non-function resources from lh-vim-lib
@@ -20,6 +19,7 @@
 "       v3.0.0   GPLv3
 "       v3.1.6   New command: LoadedBufDo
 "       v3.1.12  New command: CleanEmptyBuffers
+"       v3.8.2   New command: LHLod
 " TODO:		«missing features»
 " }}}1
 "=============================================================================
@@ -42,6 +42,9 @@ command! PopSearch :call histdel('search', -1)| let @/=histget('search',-1)
 
 command! -nargs=1 LoadedBufDo       call lh#buffer#_loaded_buf_do(<q-args>)
 command! -nargs=0 CleanEmptyBuffers call lh#buffer#_clean_empty_buffers()
+
+command! -nargs=+ -complete=customlist,lh#log#_set_logger_complete LHLog 
+      \ call lh#log#set_logger(<q-args>, '')
 
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------

@@ -2,10 +2,10 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.6.0.
-let s:k_version = '360'
+" Version:      3.8.2.
+let s:k_version = '382'
 " Created:      23rd Dec 2015
-" Last Update:  06th Jan 2016
+" Last Update:  03rd May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -238,6 +238,12 @@ function! lh#log#exception(...) abort
 endfunction
 
 " ## Internal functions {{{1
+
+" # Command completion for LHLog
+" Function: lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) {{{3
+function! lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) abort
+  return [ 'none', 'echomsg', 'qf', 'loc']
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1

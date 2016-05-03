@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.7.1)
-                        For Vim version 7+      Last change: 23rd Feb 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.8.2)
+                        For Vim version 7+      Last change: 03rd May 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -158,6 +158,7 @@ Completion related functions                            |lhvl#completion|
 - |lh#icomplete#new_on()|
 - |lh#icomplete#run()|
 Log related functions                                   |lhvl#log|
+- |:LHLog|, |lh#log#set_logger()|
 - |lh#log#new()|
 - |lh#log#none()|
 
@@ -2322,6 +2323,15 @@ Sets the global logger.
                 Takes another parameter that tells {where} the window is opened.
   - `"log`      -> |lh#log#new()| and log in |location-list-window|
                 Takes another parameter that tells {where} the window is opened.
+
+
+                                                *:LHLog*                          {{{3
+:LHLog {kind}~
+Sets the global logger.
+This command is simply a helper command that'll execute
+|lh#log#set_logger()||. It presents the advantage to support completion: i.e.
+no need to remember all possible parameter values. However, the {options}
+cannot be passed (for now).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#log#this()*                   {{{3
