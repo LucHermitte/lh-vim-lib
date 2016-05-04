@@ -2,10 +2,10 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.8.2.
-let s:k_version = '382'
+" Version:      3.8.3.
+let s:k_version = '383'
 " Created:      23rd Dec 2015
-" Last Update:  03rd May 2016
+" Last Update:  04th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -98,9 +98,11 @@ function! lh#log#new(where, kind) abort
   " clear {{{4
   function! s:clear_loc() abort dict
     call setloclist(self.winnr, [])
+    lclose
   endfunction
   function! s:clear_qf() abort dict
     call setqflist([])
+    cclose
   endfunction
 
   " log {{{4
@@ -195,6 +197,11 @@ function! lh#log#set_logger(kind, ...) abort
   return s:logger
 endfunction
 
+" Function: lh#log#get() {{{3
+function! lh#log#get() abort
+  return s:logger
+endfunction
+
 let s:logger = lh#log#echomsg()
 
 " Function: lh#log#clear() {{{3
@@ -239,10 +246,21 @@ endfunction
 
 " ## Internal functions {{{1
 
-" # Command completion for LHLog
+" # LHLog support functions {{{2
+" Function: lh#log#_log(cmd) {{{3
+function! lh#log#_log(cmd) abort
+  if a:cmd == 'clear' 
+    call lh#log#clear()
+  else
+    call lh#log#set_logger(a:cmd, '')
+  endif
+  
+endfunction
+
 " Function: lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) {{{3
+let s:k_lhlog_cmds = [ 'none', 'echomsg', 'qf', 'loc', 'clear']
 function! lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) abort
-  return [ 'none', 'echomsg', 'qf', 'loc']
+  return filter(copy(s:k_lhlog_cmds), 'v:val =~ "^".a:ArgLead.".*"')
 endfunction
 
 "------------------------------------------------------------------------

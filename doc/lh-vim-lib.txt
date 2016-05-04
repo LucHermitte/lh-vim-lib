@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.8.2)
-                        For Vim version 7+      Last change: 03rd May 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.8.3)
+                        For Vim version 7+      Last change: 04th May 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -2328,6 +2328,8 @@ Sets the global logger.
                                                 *:LHLog*                          {{{3
 :LHLog {kind}~
 Sets the global logger.
+@param {kind} any of `"none"`, `"echomsg"`, `"qf"`, `"log"`, and `"clear"`
+
 This command is simply a helper command that'll execute
 |lh#log#set_logger()||. It presents the advantage to support completion: i.e.
 no need to remember all possible parameter values. However, the {options}
