@@ -133,7 +133,7 @@ function! lh#icomplete#_register_hook2(Hook)
 endfunction
 
 "------------------------------------------------------------------------
-" ## Smart completion {{{2
+" ## Smart completion {{{1
 " Example:
 " see mu-template autoload/lh/mut.vim
 " TODO:
@@ -142,7 +142,7 @@ endfunction
 "   - characters used to cycle
 "   - autoclose preview window
 "   - ...
-" Function: lh#icomplete#new(startcol, matches, hook) {{{3
+" Function: lh#icomplete#new(startcol, matches, hook) {{{2
 function! lh#icomplete#new(startcol, matches, hook) abort
   silent! unlet b:complete_data
   let augroup = 'IComplete'.bufnr('%').'Done'
@@ -174,7 +174,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     set shortmess+=c
   endif
 
-  " Keybindings {{{4
+  " Keybindings {{{3
   call b:complete_data
         \.restore_buffer_mapping('<cr>', 'i')
         \.restore_buffer_mapping('<c-y>', 'i')
@@ -193,7 +193,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   inoremap <buffer> <silent> <esc> <c-e><esc>
   " TODO: see to have <Left>, <Right>, <Home>, <End> abort
 
-  " Group {{{4
+  " Group {{{3
   exe 'augroup '.augroup
     au!
     " Emulate InsertCharPost
@@ -202,7 +202,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     au CursorMovedI <buffer> call b:complete_data.cursor_moved()
   augroup END
 
-  function! s:start_completion() abort dict "{{{4
+  function! s:start_completion() abort dict "{{{3
     " <c-x><c-o>: start omni completion
     " <c-p>       remove the first completion item
     " <down>      but do select the first completion item
@@ -210,7 +210,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   endfunction
   let b:complete_data.start_completion = function('s:start_completion')
 
-  function! s:cursor_moved() abort dict "{{{4
+  function! s:cursor_moved() abort dict "{{{3
     if self.no_more_matches
       call self.finalize()
       return
@@ -224,7 +224,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   endfunction
   let b:complete_data.cursor_moved = function('s:cursor_moved')
 
-  function! s:has_text_changed_since_last_move() abort dict "{{{4
+  function! s:has_text_changed_since_last_move() abort dict "{{{3
     let l = line('.')
     let line = getline('.')
     try
@@ -242,7 +242,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   endfunction
   let b:complete_data.has_text_changed_since_last_move = function('s:has_text_changed_since_last_move')
 
-  function! s:complete(findstart, base) abort dict "{{{4
+  function! s:complete(findstart, base) abort dict "{{{3
     call s:Verbose('findstart?%1 -> %2', a:findstart, a:base)
     if a:findstart
       if self.no_more_matches
@@ -262,7 +262,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   endfunction
   let b:complete_data.complete = function('s:complete')
 
-  function! s:get_completions(base) abort dict "{{{4
+  function! s:get_completions(base) abort dict "{{{3
     let matching = filter(copy(self.all_matches), 'v:val.word =~ join(split(a:base, ".\\zs"), ".*")')
     let self.matches.words = matching
     call s:Verbose("'%1' matches: %2", a:base, string(self.matches))
@@ -274,28 +274,27 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   endfunction
   let b:complete_data.get_completions = function('s:get_completions')
 
-  function! s:conclude() abort dict " {{{4
+  function! s:conclude() abort dict " {{{3
     let selection = getline('.')[self.startcol : col('.')-1]
     call s:Verbose("Successful selection of <".selection.">")
     if !empty(self.hook)
       call lh#function#execute(self.hook, selection)
     endif
-    " call self.hook()
     call self.finalize()
   endfunction
   let b:complete_data.conclude = function('s:conclude')
 
-  " Register {{{4
+  " Register {{{3
   " call b:complete_data
         " \.restore('b:complete_data')
   " set completefunc=lh#icomplete#func
   set omnifunc=lh#icomplete#func
 
-  " Return {{{4
+  " Return {{{3
   return b:complete_data
 endfunction "}}}4
 
-" Function: lh#icomplete#new_on(pattern, matches, hook) {{{3
+" Function: lh#icomplete#new_on(pattern, matches, hook) {{{2
 function! lh#icomplete#new_on(pattern, matches, hook) abort
   let l = getline('.')
   let startcol = match(l[0:col('.')-1], '\v'.a:pattern.'+$')
@@ -305,7 +304,7 @@ function! lh#icomplete#new_on(pattern, matches, hook) abort
   return lh#icomplete#new(startcol, a:matches, a:hook)
 endfunction
 
-" Function: lh#icomplete#func(startcol, base) {{{3
+" Function: lh#icomplete#func(startcol, base) {{{2
 function! lh#icomplete#func(findstart, base) abort
   return b:complete_data.complete(a:findstart, a:base)
 endfunction
