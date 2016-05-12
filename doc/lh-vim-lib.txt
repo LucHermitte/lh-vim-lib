@@ -89,7 +89,9 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
 String related functions:                               |lhvl#string|
+- |lh#string#as()|
 - |lh#string#matches()|
+- |lh#string#substitute_unless()|
 - |lh#string#trim()|
 Graphs related functions:                               |lhvl#graph|
 - |lh#graph#tsort#depth()|
@@ -632,6 +634,16 @@ The evaluation is meant to be done with |eval()|.
 STRINGS RELATED FUNCTIONS                             *lhvl#string*     {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#as()*                  {{{3
+lh#string#as(val)~
+@param    {val} any value/expression.
+@return the {val} as a string. Unlike |string()| function, this one doesn't
+add quotes around strings.
+
+@note if {val} is a |Dict| that has a field named `"_to_string"`, this field
+will be used and called a member function whose result will be returned.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#matches()*             {{{3
 lh#string#matches(string, pattern)~
 @param    {string} |expr-string|
@@ -643,6 +655,20 @@ Example: >
    let matches = lh#string#matches('sqjg %1 msqkg ml %2 mihs m%43%8', '%\zs\d\+')
    let expected= ['1', '2', '43', '8']
    AssertEquals(matches, expected)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#substitute_unless()*   {{{3
+lh#string#substitute_unless(string, pat, char)~
+@param    {string} |expr-string|
+@param       {pat} |regexp|
+@param      {char} character (any string will do though)
+
+This is somehow the equivalent of >
+    substitute(string, '[^{pat}]', char', 'g')
+except |substitute()| doesn't accept this syntax to replace patterns that
+don't match.
+Note that the pattern will be applied on each character independently of the
+others.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#trim()*                {{{3

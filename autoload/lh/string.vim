@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1.
-let s:k_version = '3601'
+" Version:      3.9.0.
+let s:k_version = '3900'
 " Created:      08th Dec 2015
-" Last Update:  08th Jan 2016
+" Last Update:  12th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -79,6 +79,15 @@ function! lh#string#as(val) abort
     return string(a:val)
   endif
   return a:val
+endfunction
+
+" # Substitutions {{{2
+" Function: lh#string#substitute_unless(string, pat, text) {{{3
+" @version 3.9.0
+function! lh#string#substitute_unless(string, pat, char) abort
+  let s = split(a:string, '\zs\ze')
+  call map(s, 'v:val =~ a:pat ? v:val : a:char')
+  return join(s, '')
 endfunction
 
 "------------------------------------------------------------------------
