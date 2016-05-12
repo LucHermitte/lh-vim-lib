@@ -5,10 +5,10 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	3.6.1
-let s:k_version = '361'
+" Version:	3.9.0
+let s:k_version = '390'
 " Created:	23rd Jan 2007
-" Last Update:	08th Jan 2016
+" Last Update:	12th May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -39,6 +39,8 @@ let s:k_version = '361'
 "       workaround E36
 "       v3.6.1
 "       (*) ENH: Use new logging framework
+"       v3.9.0
+"       (*) ENH: lh#buffer#scratch() returns its bufnr()
 " }}}1
 "=============================================================================
 
@@ -111,6 +113,7 @@ function! lh#buffer#scratch(bname, where)
     throw "Can't open a buffer named '".a:bname."'!"
   endtry
   setlocal bt=nofile bh=wipe nobl noswf ro
+  return bufnr('%')
 endfunction
 function! lh#buffer#Scratch(bname, where)
   return lh#buffer#scratch(a:bname, a:where)

@@ -1978,6 +1978,7 @@ Split-opens a new scratch buffer.
 
 @param {bname} Name for the new scratch buffer
 @param {where} Where the new scratch buffer will be opened ('', or 'v')
+@return The buffer number of the new scratch buffer.
 @post          The buffer has the following properties set:
                    'bt'=nofile, 'bh'=wipe, 'nobl', 'noswf', 'ro'
 
