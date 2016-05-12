@@ -231,6 +231,8 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#window#split()`              | Forces to open a new split, ignoring E36                                                                                         |
 | `lh#window#new()`                | Forces to open a new window, ignoring E36                                                                                        |
 | `lh#window#create_window_with()` | Forces to create a new split, with any split related command, ignoring E36                                                       |
+| `lh#window#getid()`              | Emulates recent `win_getid()` function                                                                                           |
+| `lh#window#gotoid()`             | Emulates recent `win_gotoid()` function                                                                                          |
 
 
 ### Syntax related functions

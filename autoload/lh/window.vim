@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1.
-let s:k_version = '361'
+" Version:      3.9.0.
+let s:k_version = '390'
 " Created:      29th Oct 2015
-" Last Update:  08th Jan 2016
+" Last Update:  12th May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.
@@ -71,6 +71,52 @@ endfunction
 function! lh#window#new(bufname) abort
   call call('lh#window#create_window_with',[join(['new']+a:000, ' ')])
 endfunction
+
+" # Window Id {{{2
+" Function: lh#window#getid() {{{3
+" @since version 3.9.0
+let s:has_win_getid = exists('*win_getid') 
+if s:has_win_getid
+  function! lh#window#getid(...) abort
+    return call('win_getid', a:000)
+  endfunction
+else
+  " Emulated version, the id will be attributed on-the-fly
+  " TODO: accept a tab parameter
+  let s:last_id = get(s:, 'last_id', 0)
+  function! lh#window#getid(...) abort
+    let nr = a:0 == 1 ? a:1 : winnr()
+    let id = getwinvar(nr, 'id', lh#option#unset())
+    if lh#option#is_unset(id)
+      let s:last_id += 1
+      call setwinvar(nr, 'id', s:last_id)
+      return s:last_id
+    endif
+    return id
+  endfunction
+endif
+
+" Function: lh#window#gotoid(id) {{{3
+" @since version 3.9.0
+if s:has_win_getid
+  function! lh#window#gotoid(id) abort
+    call win_gotoid(a:id)
+  endfunction
+else
+  " Emulated version, id will be searched in all windows in all tabs
+  function! lh#window#gotoid(id) abort
+    for tabnr in range(1, tabpagenr('$'))
+      for winnr in range(1, tabpagewinnr(tabnr, '$'))
+        if gettabwinvar(tabnr, winnr, 'id') == a:id
+          exe 'tabnext '.tabnr
+          exe winnr.'wincmd w'
+          return [tabnr, winnr]
+        endif
+      endfor
+    endfor
+    throw "No window found of id ".a:id
+  endfunction
+endif
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1

@@ -2107,6 +2107,36 @@ Encapsulations over |lh#window#create_window_with()|.
 The first tries to execute `:new {bufname}`;
 The second tries to execute `:split {options}`
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#window#getid()*               {{{3
+                                                *lh#window#gotoid()*
+lh#window#getid([{win}])~
+Encapsulation over vim recent function |win_getid()|.
+An emulation is provided for older versions of vim.
+This function associates (on-the-fly) a unique window-id to a |window| know from
+its window number, and return the associated window-id.
+
+Notes:
+- While window numbers may change as windows get reorganized, window ids are
+  stable and never change.
+- The emulation injects a *w:id* variable into each window for which an id is
+  requested.
+- The emulation doesn't emulate yet the second optional {tab} argument of
+  |win_getid()|.
+
+Function meant to be used along with |lh#window#gotoid()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#window#gotoid()*              {{{3
+lh#window#gotoid({id})~
+Encapsulation over vim recent function |win_gotoid()|.
+An emulation is provided for older versions of vim.
+This function jumps to the window that has the window id {id}.
+
+Note: While window numbers may change as windows get reorganized, window ids
+are stable and never change.
+Function meant to be used along with |lh#window#getid()|.
+
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
 
