@@ -138,6 +138,10 @@ Buffers related functions:                              |lhvl#buffer|
     - |lh#buffer#dialog#select()|
     - |lh#buffer#dialog#quit()|
     - |lh#buffer#dialog#update()|
+Windows related functions:                              |lhvl#window|
+- |lh#window#create_window_with()|
+- |lh#window#new()|
+- |lh#window#split()|
 Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#name_at()|
 - |lh#syntax#name_at_mark()|
@@ -2080,6 +2084,27 @@ years of evolution), and it is a little bit cumbersome.
   in the end.
 - and of course, it requires many other functions from |lh-vim-lib|, but
   nothing else.
+
+------------------------------------------------------------------------------
+WINDOWS RELATED FUNCTIONS                             *lhvl#window*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#window#create_window_with()*  {{{3
+lh#window#create_window_with(cmd)~
+@param {cmd} |window| creation |command|
+This function tries to create a new window with the window creation command
+passed, typically |:new|, |:split|, |:vsplit|, etc.
+If the creation fails because of |E36|, it will be attempted again, and once
+only, after increasing by one the current windows size.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#window#new()*                 {{{3
+                                                *lh#window#split()*
+lh#window#new({bufname})~
+lh#window#split([{options}])~
+Encapsulations over |lh#window#create_window_with()|.
+The first tries to execute `:new {bufname}`;
+The second tries to execute `:split {options}`
 
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
