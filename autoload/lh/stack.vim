@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.9.0
+let s:k_version = 390
 " Created:      20th Sep 2014
-" Last Update:  08th Jan 2016
+" Last Update:  13th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functionto implement the stack ADT
@@ -62,6 +62,12 @@ function! lh#stack#top(stack) abort
   return a:stack[-1]
 endfunction
 
+" Function: lh#stack#top_or(stack, default) {{{3
+" @since version 3.9.0
+function! lh#stack#top_or(stack, default) abort
+  return empty(a:stack) ? a:default : a:stack[-1]
+endfunction
+
 " Function: lh#stack#pop(stack) {{{3
 function! lh#stack#pop(stack)
   if empty(a:stack)
@@ -81,6 +87,10 @@ function! lh#stack#new(...)
   endfunction
   function! s.top() dict abort
     return lh#stack#top(self.values)
+  endfunction
+  function! s.top_or(default) dict abort
+    " @since version 3.9.0
+    return lh#stack#top_or(self.values, a:default)
   endfunction
   function! s.pop() dict abort
     return lh#stack#pop(self.values)

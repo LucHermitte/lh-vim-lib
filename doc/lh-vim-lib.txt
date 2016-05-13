@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v3.8.3)
-                        For Vim version 7+      Last change: 04th May 2016
+                        For Vim version 7+      Last change: 13th May 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -88,6 +88,16 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+Stack related functions:                                |lhvl#stack|
+- |lh#stack#push()|
+- |lh#stack#pop()|
+- |lh#stack#top()|
+- |lh#stack#top_or()|
+- |lh#stack#new()|, |lh#stack#new_list()|
+    - |lh#stack-push()|
+    - |lh#stack-pop()|
+    - |lh#stack-top()|
+    - |lh#stack-top_or()|
 String related functions:                               |lhvl#string|
 - |lh#string#as()|
 - |lh#string#matches()|
@@ -700,12 +710,26 @@ Removes a value from the stack and returns it.
                                                 *lh#stack#top()*                  {{{3
 lh#stack#top({stack})~
 @pre `!empty({stack})`
+@see |lh#stack#top_or()|
 Returns the top value of the stack.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#stack#top_or()*               {{{3
+lh#stack#top_or({stack}, {default})~
+@see |lh#stack#top_or()|
+Returns the top value of the stack, or the {default} value if the stack is
+empty.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#stack#new()*                  {{{3
-lh#stack#new({[values]})~
+lh#stack#new([{values}])~
 Returns a new stack object on which the usual methods can be called:
+- `empty()`           returns if empty     *lh#stack-empty*
+- `len()`             returns nb elements  *lh#stack-len*
+- `push({value})`                          *lh#stack-push* ,    see |lh#stack#push()|
+- `pop()`                                  *lh#stack-pop* ,     see |lh#stack#pop()|
+- `pop_or({default})`                      *lh#stack-pop_or* ,  see |lh#stack#pop_or()|
+- `top()`                                  *lh#stack-top* ,     see |lh#stack#top()|
 NB: the {values} parameter is optional.
 >
    let s = lh#stack#new([12, 42])
@@ -725,7 +749,7 @@ NB: the {values} parameter is optional.
                                                 *lh#stack#new_list()*             {{{3
 lh#stack#new_list({nb_stacks})~
 Returns a new object that implements a list a stacks.
-The usual operations can be called on the indexed stacks
+The usual operations can be called on the indexed stacks. See |lh#stack#new()|.
 NB: the {values} parameter is optional.
 >
    let s = lh#stack#new_list(10)
