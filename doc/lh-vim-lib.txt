@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.8.3)
-                        For Vim version 7+      Last change: 13th May 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.9.1)
+                        For Vim version 7+      Last change: 18th May 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
