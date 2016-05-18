@@ -1,15 +1,15 @@
 "=============================================================================
-" File:		autoload/lh/position.vim                               {{{1
+" File:         autoload/lh/position.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	3.6.1
-let s:k_version = 361
-" Created:	05th Sep 2007
-" Last Update:	08th Jan 2016
+" Version:      3.9.1
+let s:k_version = 391
+" Created:      05th Sep 2007
+" Last Update:  18th May 2016
 "------------------------------------------------------------------------
-" Description:	«description»
+" Description:  «description»
 " }}}1
 "=============================================================================
 
@@ -51,16 +51,16 @@ endfunction
 " Function: lh#position#is_before {{{3
 " @param[in] positions as those returned from |getpos()|
 " @return whether lhs_pos is before rhs_pos
-function! lh#position#is_before(lhs_pos, rhs_pos)
+function! lh#position#is_before(lhs_pos, rhs_pos) abort
   if a:lhs_pos[0] != a:rhs_pos[0]
     throw "Positions from incompatible buffers can't be ordered"
   endif
   "1 test lines
   "2 test cols
   let before
-	\ = (a:lhs_pos[1] == a:rhs_pos[1])
-	\ ? (a:lhs_pos[2] < a:rhs_pos[2])
-	\ : (a:lhs_pos[1] < a:rhs_pos[1])
+        \ = (a:lhs_pos[1] == a:rhs_pos[1])
+        \ ? (a:lhs_pos[2] < a:rhs_pos[2])
+        \ : (a:lhs_pos[1] < a:rhs_pos[1])
   return before
 endfunction
 function! lh#position#IsBefore(lhs_pos, rhs_pos)
@@ -70,7 +70,7 @@ endfunction
 
 " Function: lh#position#char_at_mark {{{3
 " @return the character at a given mark (|mark|)
-function! lh#position#char_at_mark(mark)
+function! lh#position#char_at_mark(mark) abort
   let c = getline(a:mark)[col(a:mark)-1]
   return c
 endfunction
@@ -80,11 +80,11 @@ endfunction
 
 " Function: lh#position#char_at_pos {{{3
 " @return the character at a given position (|getpos()|)
-function! lh#position#char_at_pos(pos)
+function! lh#position#char_at_pos(pos) abort
   let c = getline(a:pos[1])[(a:pos[2])-1]
   return c
 endfunction
-function! lh#position#CharAtPos(pos)
+function! lh#position#CharAtPos(pos) abort
   return  lh#position#char_at_pos(a:pos)
 endfunction
 
@@ -99,7 +99,7 @@ endfunction
 function! lh#position#extract(pos1, pos2) abort
   let lines = getline(a:pos1[0], a:pos2[0])
   let lines[-1] = lines[-1][:a:pos2[1]-2]
-  let lines[0]  = lines[0][a:pos1[1] : ]
+  let lines[0]  = lines[0][a:pos1[1]-1 : ]
   return join(lines, "\n")
 endfunction
 
