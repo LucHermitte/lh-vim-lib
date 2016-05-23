@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.9.0.
-let s:k_version = '390'
+" Version:      3.10.1.
+let s:k_version = '3101'
 " Created:      29th Oct 2015
-" Last Update:  12th May 2016
+" Last Update:  23rd May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.
@@ -75,25 +75,40 @@ endfunction
 " # Window Id {{{2
 " Function: lh#window#getid() {{{3
 " @since version 3.9.0
-let s:has_win_getid = exists('*win_getid') 
+let s:has_win_getid = exists('*win_getid')
 if s:has_win_getid
   function! lh#window#getid(...) abort
     return call('win_getid', a:000)
   endfunction
 else
+  let s:does_getwinvar_support_default = lh#askvim#is_valid_call('getwinvar(1, "shouldnotexist", -1)')
   " Emulated version, the id will be attributed on-the-fly
   " TODO: accept a tab parameter
   let s:last_id = get(s:, 'last_id', 0)
-  function! lh#window#getid(...) abort
-    let nr = a:0 == 1 ? a:1 : winnr()
-    let id = getwinvar(nr, 'id', lh#option#unset())
-    if lh#option#is_unset(id)
-      let s:last_id += 1
-      call setwinvar(nr, 'id', s:last_id)
-      return s:last_id
-    endif
-    return id
-  endfunction
+  " TODO: check patch-number!
+  if s:does_getwinvar_support_default
+    function! lh#window#getid(...) abort
+      let nr = a:0 == 1 ? a:1 : winnr()
+      let id = getwinvar(nr, 'id', lh#option#unset())
+      if lh#option#is_unset(id)
+        let s:last_id += 1
+        call setwinvar(nr, 'id', s:last_id)
+        return s:last_id
+      endif
+      return id
+    endfunction
+  else
+    function! lh#window#getid(...) abort
+      let nr = a:0 == 1 ? a:1 : winnr()
+      let id = getwinvar(nr, 'id')
+      if empty(id)
+        let s:last_id += 1
+        call setwinvar(nr, 'id', s:last_id)
+        return s:last_id
+      endif
+      return id
+    endfunction
+  endif
 endif
 
 " Function: lh#window#gotoid(id) {{{3

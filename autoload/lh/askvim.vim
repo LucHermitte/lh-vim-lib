@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.10.1
+let s:k_version = 3101
 " Created:      17th Apr 2007
-" Last Update:  06th Jan 2016
+" Last Update:  23rd May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -160,6 +160,17 @@ function! lh#askvim#menu(menuid, modes) abort
   endwhile
   return res
 endfunction
+
+" Function: lh#askvim#is_valid_call(fcall) {{{3
+function! lh#askvim#is_valid_call(fcall) abort
+  try
+    call eval(a:fcall)
+    return 1
+  catch /.*/
+    return 0
+  endtry
+endfunction
+
 " Functions }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
