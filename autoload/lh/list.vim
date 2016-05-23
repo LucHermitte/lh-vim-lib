@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.10.0
+let s:k_version = 3100
 " Created:      17th Apr 2007
 " Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
@@ -14,6 +14,8 @@ let s:k_version = 361
 "
 "------------------------------------------------------------------------
 " History: {{{2
+"       v3.10.0
+"       (*) ENH: Add lh#list#concurrent_for()
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.4.0
@@ -82,7 +84,6 @@ let s:k_version = 361
 
 let s:cpo_save=&cpo
 set cpo&vim
-
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
@@ -377,7 +378,7 @@ function! lh#list#equal_range(list, val, ...) abort
 
   let len = last - first
   while len > 0
-    let half = len / 2
+    let half = len /  2
     let middle = first + half
     if a:list[middle] < a:val
       let first = middle + 1
@@ -570,8 +571,8 @@ function! lh#list#possible_values(list, ...) abort
     let dRes = {}
     for E in a:list
       if type(E) == type({}) || type(E) == type([])
-	let v = get(E, a:1, default)
-	let dRes[string(v)] = v
+        let v = get(E, a:1, default)
+        let dRes[string(v)] = v
         unlet v
       endif
       unlet E
@@ -614,6 +615,62 @@ function! lh#list#for_each_call(list, action) abort
   catch /.*/
     throw "lh#list#for_each_call: ".v:exception." in ``".action."''"
   endtry
+endfunction
+
+" Function: lh#list#concurrent_for(in1, in2, out1, out2, out_com, [Cmp]) {{{3
+" @since Version 3.10.0
+function! lh#list#concurrent_for(in1, in2, out1, out2, out_com, ...) abort
+  " because of 'N' predicate
+  let was_sorting_numbers_as_strings = 0
+  let in1 = a:in1
+  let in2 = a:in2
+  " detect the right predicate
+  if a:0 == 0
+    let Cmp = function('lh#list#_str_cmp')
+  else
+    if a:1 == 'N' 
+      let was_sorting_numbers_as_strings = 1
+      let in1 = map(copy(a:in1), 'eval(v:val)')
+      let in2 = map(copy(a:in2), 'eval(v:val)')
+      let Cmp = function('lh#list#_regular_cmp')
+    elseif a:1 == 'n'
+      let Cmp = function('lh#list#_regular_cmp')
+    else
+      let Cmd = a:1
+    endif
+  endif
+  " because let out+=[...] is forbidden
+  let out1 = a:out1
+  let out2 = a:out2
+  let out_com = a:out_com
+  let nb1 = len(in1)
+  let nb2 = len(in2)
+  let i1 = 0
+  let i2 = 0
+  while i1 < nb1 && i2 < nb2
+    let cmp = Cmp(in1[i1], in2[i2])
+    if cmp == -1
+      let out1 += [in1[i1]]
+      let i1 += 1
+    elseif cmp == 1
+      let out2 += [in2[i2]]
+      let i2 += 1
+    else
+      let out_com += [in1[i1]]
+      let i1 += 1
+      let i2 += 1
+    endif
+  endwhile
+  call extend(out1, in1[i1:])
+  call extend(out2, in2[i2:])
+  if was_sorting_numbers_as_strings
+    " revert numbers to strings
+    call map(out1, 'string(v:val)')
+    call map(out2, 'string(v:val)')
+    call map(out_com, 'string(v:val)')
+  endif
+  " echomsg len(a:in1) . " - " .len(a:in2)
+  " echomsg len(out1) . " - " .len(out2) . " - " . len(out_com)
 endfunction
 
 " # Private {{{2

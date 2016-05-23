@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.9.1)
-                        For Vim version 7+      Last change: 18th May 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.10.0)
+                        For Vim version 7+      Last change: 23rd May 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -67,6 +67,7 @@ Functors related functions:                             |lhvl#function|
 Lists related functions:                                |lhvl#list|
 - |lh#list#accumulate()|
 - |lh#list#chain_transform()|
+- |lh#list#concurrent_for()|
 - |lh#list#copy_if()|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
@@ -1235,13 +1236,41 @@ Returns the elements present in both input lists.
 @param[in] {list2} |List|
 @return a |List| of the elements in both {list1} and {list2}, the elements are
 kepts in the same order as in {list1}
-@note the algorithm is in O(len({list1})*len({list2}))
+@complexity O(len({list1})*len({list2}))
+@see also |lh#list#concurrent_for()| which will have a linear complexity of
+O(len({list1})+len({list2})).
 
 Example: >
     :let l1 = [ 1, 25, 7, 48, 26, 5, 28, 6]
     :let l2 = [ 3, 8, 7, 25, 6 ]
     :echo lh#list#intersect(l1, l2)
     [ 25, 7, 6 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#list#concurrent_for()*        {{{3
+lh#list#concurrent_for({input1}, {intpu2}, {output1}, {output2}, {output0}[, {cmp}])~
+@param[in]  {input1}   First input |List|
+@param[in]  {input2}   Second input |List|
+@param[out] {output1} First output |List|
+@param[out] {output2} Second output |List|
+@param[out] {output0} Third output |List|
+@param[in]  {cmp}      Comparison predicate, or 'n', 'N', nothing (see |lh#list#sort()|)
+@pre {input1} and {input2} are expected to be sorted according to {cmp}.
+@post {outpu1}, {output2} and {output0} will be sorted according to {cmp}.
+@post len({input1})+len({input2}) == len({output1})+len({output2})+len({output3})
+@complexity O(len({input1})+len({input2}))
+@Return    nothing
+
+This function performs a concurrent for. the two input will be parsed in
+ascending order. Elements only present in {input1} will be strored into
+{output1}, elements only present in {input2} will be stored into {output2}.
+Elements present in both will be stored into {output0}.
+
+C++ `std::set_symetric_difference()` can be emulated with >
+    lh#list#concurrent_for(in1, in2, out, out, [], predicate)
+
+C++ `std::set_intersection()` can be emulated with >
+    lh#list#concurrent_for(in1, in2, [], [], out, predicate)
 
 ------------------------------------------------------------------------------
                                                *lh#list#get()*                    {{{3

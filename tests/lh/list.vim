@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.4.0
+" Version:      3.10.0
 " Created:	19th Nov 2008
-" Last Update:  15th Dec 2015
+" Last Update:  23rd May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -226,6 +226,61 @@ function! s:Test_intersect()
     :let s = lh#list#intersect(l1, l2)
     " Comment string(s)
     AssertEquals (s ,  expected)
+endfunction
+
+" linear intersect {{{2
+" numbers {{{3
+function! s:Test_linear_intersect_numbers()
+    :let l1 = [ 1, 25, 7, 48, 26, 5, 28, 6]
+    :let l2 = [ 3, 8, 7, 25, 6 ]
+    :let expected = [ 25, 7, 6 ]
+    :call lh#list#sort(l1, 'n')
+    :call lh#list#sort(l2, 'n')
+    :call lh#list#sort(expected, 'n')
+    :let o1 = []
+    :let o2 = []
+    :let s = []
+    :call lh#list#concurrent_for(l1, l2, o1, o2, s, 'n')
+    " Comment string(s)
+    AssertEquals (s ,  expected)
+    AssertEquals (o1 , [1, 5, 26, 28, 48])
+    AssertEquals (o2 , [3, 8])
+endfunction
+
+" string as numbers {{{3
+function! s:Test_linear_intersect_numbers_as_strings()
+    :let l1 = [ '1', '25', '7', '48', '26', '5', '28', '6']
+    :let l2 = [ '3', '8', '7', '25', '6' ]
+    :let expected = [ '25', '7', '6' ]
+    :call lh#list#sort(l1, 'N')
+    :call lh#list#sort(l2, 'N')
+    :call lh#list#sort(expected, 'N')
+    :let o1 = []
+    :let o2 = []
+    :let s = []
+    :call lh#list#concurrent_for(l1, l2, o1, o2, s, 'N')
+    " Comment string(s)
+    AssertEquals (s ,  expected)
+    AssertEquals (o1 , ['1', '5', '26', '28', '48'])
+    AssertEquals (o2 , ['3', '8'])
+endfunction
+
+" strings {{{3
+function! s:Test_linear_intersect_strings()
+    :let l1 = [ '1', '25', '7', '48', '26', '5', '28', '6']
+    :let l2 = [ '3', '8', '7', '25', '6' ]
+    :let expected = [ '25', '7', '6' ]
+    :call lh#list#sort(l1)
+    :call lh#list#sort(l2)
+    :call lh#list#sort(expected)
+    :let o1 = []
+    :let o2 = []
+    :let s = []
+    :call lh#list#concurrent_for(l1, l2, o1, o2, s)
+    " Comment string(s)
+    AssertEquals (s ,  expected)
+    AssertEquals (o1 , ['1', '26', '28', '48', '5'])
+    AssertEquals (o2 , ['3', '8'])
 endfunction
 
 "------------------------------------------------------------------------
