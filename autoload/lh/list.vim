@@ -636,7 +636,7 @@ function! lh#list#concurrent_for(in1, in2, out1, out2, out_com, ...) abort
     elseif a:1 == 'n'
       let Cmp = function('lh#list#_regular_cmp')
     else
-      let Cmd = a:1
+      let Cmp = a:1
     endif
   endif
   " because let out+=[...] is forbidden
