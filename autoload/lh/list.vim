@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.0
-let s:k_version = 3100
+" Version:      3.10.1
+let s:k_version = 3101
 " Created:      17th Apr 2007
 " Last Update:  08th Jan 2016
 "------------------------------------------------------------------------
@@ -661,8 +661,8 @@ function! lh#list#concurrent_for(in1, in2, out1, out2, out_com, ...) abort
       let i2 += 1
     endif
   endwhile
-  call extend(out1, in1[i1:])
-  call extend(out2, in2[i2:])
+  call extend(out1, in1[i1 :])
+  call extend(out2, in2[i2 :])
   if was_sorting_numbers_as_strings
     " revert numbers to strings
     call map(out1, 'string(v:val)')
