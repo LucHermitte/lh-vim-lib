@@ -5,8 +5,8 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	3.9.0
-let s:k_version = '390'
+" Version:	3.10.0
+let s:k_version = '3100'
 " Created:	23rd Jan 2007
 " Last Update:	12th May 2016
 "------------------------------------------------------------------------
@@ -78,9 +78,9 @@ function! lh#buffer#debug(expr) abort
 endfunction
 
 "------------------------------------------------------------------------
-" # Public {{{1
+" ## Public {{{1
 
-" Function: lh#buffer#find({filename}) {{{3
+" Function: lh#buffer#find({filename}) {{{2
 " If {filename} is opened in a window, jump to this window, otherwise return -1
 " Moved from searchInRuntimeTime.vim
 function! lh#buffer#find(filename)
@@ -93,7 +93,7 @@ function! lh#buffer#Find(filename)
   return lh#buffer#find(a:filename)
 endfunction
 
-" Function: lh#buffer#jump({filename},{cmd}) {{{3
+" Function: lh#buffer#jump({filename},{cmd}) {{{2
 function! lh#buffer#jump(filename, cmd)
   let b = lh#buffer#find(a:filename)
   if b != -1 | return b | endif
@@ -104,7 +104,7 @@ function! lh#buffer#Jump(filename, cmd)
   return lh#buffer#jump(a:filename, a:cmd)
 endfunction
 
-" Function: lh#buffer#scratch({bname},{where}) {{{3
+" Function: lh#buffer#scratch({bname},{where}) {{{2
 function! lh#buffer#scratch(bname, where)
   try
     set modifiable
@@ -119,7 +119,7 @@ function! lh#buffer#Scratch(bname, where)
   return lh#buffer#scratch(a:bname, a:where)
 endfunction
 
-" Function: lh#buffer#get_nr({bname}) {{{3
+" Function: lh#buffer#get_nr({bname}) {{{2
 " Returns the buffer number associated to a buffername/filename.
 " If no such file is known to vim, a buffer will be locally created
 " This function is required to assign a new buffer number to be used in qflist,
@@ -138,7 +138,7 @@ function! lh#buffer#get_nr(bname)
   return nr
 endfunction
 
-" Function: lh#buffer#list() {{{3
+" Function: lh#buffer#list() {{{2
 function! lh#buffer#list(...)
   let which = a:0 == 0 ? 'buflisted' : a:1
   let all = range(1, bufnr('$'))
@@ -151,8 +151,8 @@ endfunction
 " Ex: wipeout empty buffers listed
 "  -> echo 'bw'.join(lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_))'), ' ')
 
-" # Private {{{1
-" Function: lh#buffer#_loaded_buf_do(args) {{{3
+" ## Private {{{1
+" Function: lh#buffer#_loaded_buf_do(args) {{{2
 function! lh#buffer#_loaded_buf_do(args)
   let buffers = lh#buffer#list('bufloaded')
   for b in buffers
@@ -161,7 +161,7 @@ function! lh#buffer#_loaded_buf_do(args)
   endfor
 endfunction
 
-" Function: lh#buffer#_clean_empty_buffers() {{{3
+" Function: lh#buffer#_clean_empty_buffers() {{{2
 function! lh#buffer#_clean_empty_buffers()
   let buffers = lh#list#copy_if(range(0, bufnr('$')), [], 'buflisted(v:1_) && empty(bufname(v:1_)) && bufwinnr(v:1_)<0')
   if !empty(buffers)
@@ -169,6 +169,7 @@ function! lh#buffer#_clean_empty_buffers()
   endif
 endfunction
 
+"}}}1
 "=============================================================================
 let &cpo=s:cpo_save
 "=============================================================================
