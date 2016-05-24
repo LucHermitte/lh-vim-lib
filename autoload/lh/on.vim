@@ -167,7 +167,7 @@ function! lh#on#_unlet(varname) abort
   " Avoid `silent!` as it messes Vim client-server mode and as a consequence
   " rspecs tests
   " Note: vim options, and environment variables cannot be unset
-  call assert_true(!empty(a:varname))
+  " call assert_true(!empty(a:varname))
   if a:varname[0] == '$'
     " Cannot use {a:varname} syntax with environment variables
     if exists(a:varname)
