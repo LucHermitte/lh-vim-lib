@@ -19,8 +19,10 @@ runtime autoload/lh/function.vim
 
 let s:cpo_save=&cpo
 set cpo&vim
+
+" ## Test {{{1
 "------------------------------------------------------------------------
-function! Test(...)
+function! Test(...) " {{{2
   let nb = len(a:000)
   " echo "test(".nb.':' .join(a:000, ' -- ')')'
   let i =0
@@ -30,35 +32,44 @@ function! Test(...)
   endwhile
 endfunction
 
-function! Print(...)
+function! Print(...) " {{{2
   let res = lh#list#accumulate([1,2,'foo'], 'string', 'join(v:1_, " ## ")')
   return res
 endfunction
 
-function! Id(...)
+function! Id(...) " {{{2
   return copy(a:000)
 endfunction
 
-function! s:TestId()
-  let r = Id(1, 'string', [0], [[1]], {'ffo':42}, function('exists'), 1.2)
+function! s:TestId() " {{{2
+  if has('float')
+    let v12 = 1.2
+  else
+    let v12 = 12
+  endif
+  let r = Id(1, 'string', [0], [[1]], {'ffo': 42}, function('exists'), v12)
   AssertEquals! (len(r), 7)
-  Assert! should#be#number (r[0])
-  Assert! should#be#string (r[1])
-  Assert! should#be#list   (r[2])
-  Assert! should#be#list   (r[3])
-  Assert! should#be#dict   (r[4])
-  Assert! should#be#funcref(r[5])
-  Assert! should#be#float  (r[6])
+  AssertEquals!(should#be#number (r[0]), 1)
+  AssertEquals!(should#be#string (r[1]), 1)
+  AssertEquals!(should#be#list   (r[2]), 1)
+  AssertEquals!(should#be#list   (r[3]), 1)
+  AssertEquals!(should#be#dict   (r[4]), 1)
+  AssertEquals!(should#be#funcref(r[5]), 1)
+  if has('float')
+    AssertEquals!(should#be#float(r[6]), 1)
+  endif
   AssertEquals(r[0], 1)
   AssertEquals(r[1], 'string')
   AssertEquals(r[2], [0])
   AssertEquals(r[3], [[1]])
   AssertEquals(r[4].ffo,  42)
   AssertEquals(r[5], function('exists'))
-  AssertEquals(r[6], 1.2)
+  if has('float')
+    AssertEquals(r[6], 1.2)
+  endif
 endfunction
 
-function! s:Test_bind()
+function! s:Test_bind() " {{{2
   " lh#function#bind + lh#function#execute
   let rev4 = lh#function#bind(function('Id'), 'v:4_', 42, 'v:3_', 'v:2_', 'v:1_')
   let r = lh#function#execute(rev4, 1,'two','three', [4,5])
@@ -76,7 +87,7 @@ function! s:Test_bind()
   AssertEquals(r[4], 1)
 endfunction
 
-function! s:Test_bind_compound_vars()
+function! s:Test_bind_compound_vars() " {{{2
   " lh#function#bind + lh#function#execute
   let rev4 = lh#function#bind(function('Id'), 'v:4_', 'v:1_ . v:2_', 'v:3_', 'v:2_', 'v:1_')
   let r = lh#function#execute(rev4, 1,'two','three', [4,5])
@@ -95,7 +106,7 @@ function! s:Test_bind_compound_vars()
 endfunction
 
 
-function! s:Test_execute_func_string_name()
+function! s:Test_execute_func_string_name() " {{{2
   " function name as string
   let r = lh#function#execute('Id', 1,'two',3)
   AssertEquals! (len(r), 3)
@@ -107,7 +118,7 @@ function! s:Test_execute_func_string_name()
   AssertEquals(r[2], 3)
 endfunction
 
-function! s:Test_execute_string_expr()
+function! s:Test_execute_string_expr() " {{{2
   " exp as binded-string
   let r = lh#function#execute('Id(12,len(v:2_).v:2_, 42, v:3_, v:1_)', 1,'two',3)
   AssertEquals! (len(r), 5)
@@ -123,7 +134,7 @@ function! s:Test_execute_string_expr()
   AssertEquals(r[4], 1)
 endfunction
 
-function! s:Test_execute_func()
+function! s:Test_execute_func() " {{{2
   " calling a function() + bind
   let r = lh#function#execute(function('Id'), 1,'two','v:1_',['a',42])
   AssertEquals! (len(r), 4)
@@ -137,7 +148,7 @@ function! s:Test_execute_func()
   AssertEquals(r[3], ['a', 42])
 endfunction
 "------------------------------------------------------------------------
-function! s:Test_bind_func_string_name_AND_execute()
+function! s:Test_bind_func_string_name_AND_execute() " {{{2
   " function name as string
   let rev3 = lh#function#bind('Id', 'v:3_', 12, 'v:2_', 'v:1_')
   let r = lh#function#execute(rev3, 1,'two',3)
@@ -153,7 +164,7 @@ function! s:Test_bind_func_string_name_AND_execute()
   AssertEquals(r[3], 1)
 endfunction
 
-function! s:Test_bind_string_expr_AND_execute()
+function! s:Test_bind_string_expr_AND_execute() " {{{2
 " expressions as string
   let rev3 = lh#function#bind('Id(12,len(v:2_).v:2_, 42, v:3_, v:1_)')
   let r = lh#function#execute(rev3, 1,'two',3)
@@ -170,7 +181,7 @@ function! s:Test_bind_string_expr_AND_execute()
   AssertEquals(r[4], 1)
 endfunction
 
-function! s:Test_double_bind_func_name()
+function! s:Test_double_bind_func_name() " {{{2
   let f1 = lh#function#bind('Id', 1, 2, 'v:1_', 4, 'v:2_')
   " Comment "f1=".string(f1)
   let r = lh#function#execute(f1, 3, 5)
@@ -196,7 +207,7 @@ function! s:Test_double_bind_func_name()
   endwhile
 endfunction
 
-function! s:Test_double_bind_func()
+function! s:Test_double_bind_func() " {{{2
   let f1 = lh#function#bind(function('Id'), 1, 2, 'v:1_', 4, 'v:2_')
   " Comment "f1=".string(f1)
   let r = lh#function#execute(f1, 3, 5)
@@ -221,7 +232,7 @@ function! s:Test_double_bind_func()
   endwhile
 endfunction
 
-function! s:Test_double_bind_func_cplx()
+function! s:Test_double_bind_func_cplx() " {{{2
   let g:bar = "bar"
   let f1 = lh#function#bind(function('Id'), 1, 2, 'v:1_', 4, 'v:2_', 'v:3_', 'v:4_', 'v:5_', 'v:6_', 'v:7_')
   " Comment "2bcpl# f1=".string(f1)
@@ -245,7 +256,7 @@ function! s:Test_double_bind_func_cplx()
   " Comment "2bcpl# ".string(r)
 endfunction
 
-function! s:Test_double_bind_expr()
+function! s:Test_double_bind_expr() " {{{2
   let f1 = lh#function#bind('Id(1, 2, v:1_, v:3_, v:2_)')
   " Comment "2be# f1=".string(f1)
   let r = lh#function#execute(f1, 3, 5, 4)
@@ -285,8 +296,8 @@ endfunction
 " '"foo"'
 " v:1_
 
+" }}}1
 "------------------------------------------------------------------------
-
 let &cpo=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:
