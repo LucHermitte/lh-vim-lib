@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.5.0.
-let s:k_version = 350
+" Version:      3.10.2.
+let s:k_version = 3102
 " Created:      15th Jan 2015
-" Last Update:  23rd Dec 2015
+" Last Update:  24th May 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -83,12 +83,12 @@ function! lh#on#exit()
   let res.finalize = function(s:getSNR('finalize'))
 
   function! res.restore(varname) dict abort " {{{4
+    " unlet if always required in case the type changes
+    let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
     if a:varname =~ '[~@]' || exists(a:varname)
       let action = 'let '.a:varname.'='.string(eval(a:varname))
-    else
-      let action = 'unlet '.a:varname
+      let self.actions += [action]
     endif
-    let self.actions += [action]
 
     return self
   endfunction
@@ -98,15 +98,16 @@ function! lh#on#exit()
     let lScopes = split(scopes, '\s*')
     for scope in lScopes
       let varname = scope . ':' . a:varname
+      let actions += ['call lh#on#_unlet('.string(varname).')']
       if stridx(varname, '~')!=-1 || exists(varname)
         let action = 'let '.varname.'='.string(eval(varname))
         let actions += [action]
-        break
+        " break
       endif
     endfor
-    if empty(actions)
-      let actions = map(lScopes, '":silent! unlet ".v:val.":".a:varname')
-    endif
+    " if empty(actions)
+      " let actions = map(lScopes, '":silent! unlet ".v:val.":".a:varname')
+    " endif
 
     let self.actions += actions
     return self
@@ -140,10 +141,11 @@ function! s:finalize() dict " {{{4
     try
       if type(Action) == type(function('has'))
         call Action()
-      else
+      elseif !empty(Action)
         exe Action
       endif
     catch /.*/
+      call lh#log#this('Error occured when running action (%1)', Action)
       call lh#log#exception()
     finally
       unlet Action
@@ -160,6 +162,23 @@ function! s:getSNR(...)
   return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
 
+" Function: lh#on#_unlet(varname) {{{3
+function! lh#on#_unlet(varname) abort
+  " Avoid `silent!` as it messes Vim client-server mode and as a consequence
+  " rspecs tests
+  " Note: vim options, and environment variables cannot be unset
+  call assert_true(!empty(a:varname))
+  if a:varname[0] == '$'
+    " Cannot use {a:varname} syntax with environment variables
+    if exists(a:varname)
+      exe "let ".a:varname." = ''"
+    endif
+  elseif exists(a:varname) && a:varname !~ '[&]'
+    unlet {a:varname}
+  endif
+endfunction
+
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
