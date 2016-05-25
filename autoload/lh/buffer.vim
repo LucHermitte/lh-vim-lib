@@ -5,10 +5,10 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	3.10.0
-let s:k_version = '3100'
+" Version:	3.10.3
+let s:k_version = '3103'
 " Created:	23rd Jan 2007
-" Last Update:	12th May 2016
+" Last Update:	25th May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -41,6 +41,8 @@ let s:k_version = '3100'
 "       (*) ENH: Use new logging framework
 "       v3.9.0
 "       (*) ENH: lh#buffer#scratch() returns its bufnr()
+"       v3.10.3
+"       (*) BUG: Work around a vim bug with winbufnr() within event context
 " }}}1
 "=============================================================================
 
@@ -85,7 +87,10 @@ endfunction
 " Moved from searchInRuntimeTime.vim
 function! lh#buffer#find(filename)
   let b = bufwinnr(a:filename)
-  if b == -1 | return b | endif
+  " Workaround a bug in event execution: we may a have a non null buffer, but
+  " with a name that doesn't match what is looked for.
+  " -> "|| bufname(winbufnr(b)) != a:filename"
+  if b == -1 || bufname(winbufnr(b)) != a:filename | return -1 | endif
   exe b.'wincmd w'
   return b
 endfunction
