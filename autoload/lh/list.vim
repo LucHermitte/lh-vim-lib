@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.1
-let s:k_version = 3101
+" Version:      3.10.3
+let s:k_version = 3103
 " Created:      17th Apr 2007
-" Last Update:  08th Jan 2016
+" Last Update:  25th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
 "
 "------------------------------------------------------------------------
 " History: {{{2
+"       v3.10.3
+"       (*) ENH: Add lh#list#zip(), lh#list#zip_as_dict()
 "       v3.10.0
 "       (*) ENH: Add lh#list#concurrent_for()
 "       v3.6.1
@@ -628,7 +630,7 @@ function! lh#list#concurrent_for(in1, in2, out1, out2, out_com, ...) abort
   if a:0 == 0
     let Cmp = function('lh#list#_str_cmp')
   else
-    if a:1 == 'N' 
+    if a:1 == 'N'
       let was_sorting_numbers_as_strings = 1
       let in1 = map(copy(a:in1), 'eval(v:val)')
       let in2 = map(copy(a:in2), 'eval(v:val)')
@@ -717,6 +719,32 @@ function! lh#list#_apply_on(list, index, action) abort
   let out = lh#function#execute(a:action, in)
   let a:list[a:index] = out
   return a:list
+endfunction
+
+" Function: lh#list#zip(l1, l2) {{{3
+function! lh#list#zip(l1, l2) abort
+  if len(a:l1) != len(a:l2)
+    throw "Zip operation cannot be performed on lists of different sizes"
+  endif
+  let res = []
+  let idx = range(0, len(a:l1)-1)
+  for i in idx
+    let res += [ a:l1[i], a:l2[i] ]
+  endfor
+  return res
+endfunction
+
+" Function: lh#list#zip_as_dict(l1, l2) {{{3
+function! lh#list#zip_as_dict(l1, l2) abort
+  if len(a:l1) != len(a:l2)
+    throw "Zip operation cannot be performed on lists of different sizes"
+  endif
+  let res = {}
+  let idx = range(0, len(a:l1)-1)
+  for i in idx
+    let res[a:l1[i]] = a:l2[i]
+  endfor
+  return res
 endfunction
 
 " Functions }}}1

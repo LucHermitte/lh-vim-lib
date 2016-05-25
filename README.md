@@ -138,6 +138,8 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#unique_sort()`     | Sorts the elements of a list, and makes sure they are all unique                                                  |
 | `lh#list#unique_sort2()`    | Another implementation of `unique_sort`                                                                           |
 | `lh#list#upper_bound()`     | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                              |
+| `lh#list#zip()`             | Zip two lists into one list.                                                                                      |
+| `lh#list#zip_as_dict()`     | Zip two lists into a dictionary                                                                                   |
 
 
 ### Stacks related functions

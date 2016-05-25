@@ -89,6 +89,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
+- |lh#list#zip()|, and |lh#list#zip_as_dict()|
 Stack related functions:                                |lhvl#stack|
 - |lh#stack#push()|
 - |lh#stack#pop()|
@@ -779,7 +780,7 @@ Other functions are also provded:
 LISTS RELATED FUNCTIONS                               *lhvl#list*       {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#Match()*                 {{{3
+                                                *lh#list#Match()*                  {{{3
 lh#list#Match({list},{pattern}[, {start-pos}])  (*deprecated*)~
                                                 *lh#list#match()*
 lh#list#match({list},{pattern}[, {start-pos}])~
@@ -792,7 +793,7 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 @see |index()|, |match()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#matches()*               {{{3
+                                                *lh#list#matches()*                {{{3
 lh#list#match({list},{pattern}[, {start-pos}])~
 @param      {list} |List|
 @param   {pattern} |expr-string|
@@ -858,7 +859,7 @@ lh#list#equal_range({list}, {value} [, {first}][, {last}])~
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#not_found()*             {{{3
+                                                *lh#list#not_found()*              {{{3
 lh#list#not_found({range})~
 Returns whether the {range} is empty. This function can be used to check
 |lh#list#equal_range()| functions results
@@ -882,7 +883,7 @@ The difference between the two functions is the following:
   keeps only the elements that appear once.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#Transform()*             {{{3
+                                                *lh#list#Transform()*              {{{3
 lh#list#Transform({input},{output},{action})~
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the transformed elements will be
@@ -896,7 +897,7 @@ This function is actually returning >
     extend(a:output, map(copy(a:input), a:action))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#transform()*             {{{3
+                                                *lh#list#transform()*              {{{3
 lh#list#transform({input},{output},{action})~
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the transformed elements will be
@@ -910,7 +911,7 @@ This function is equivalent to (|lh#list#Transform()|) >
 except the action is not a string but a |lhvl#functor|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                              *lh#list#transform_if()*            {{{3
+                                              *lh#list#transform_if()*           {{{3
 lh#list#transform_if({input},{output},{action},{predicate})~
 @param[in]   {input} Input |List| to transform
 @param[out] {output} Output |List| where the transformed elements will be
@@ -922,7 +923,7 @@ lh#list#transform_if({input},{output},{action},{predicate})~
 @return              {output}
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#chain_transform()*       {{{3
+                                                *lh#list#chain_transform()*        {{{3
 lh#list#chain_transform({input},{actions})~
 @param[in]    {input} Input |List| to transform
 @param[out]  {output} Output |List| where the transformed elements will be
@@ -943,7 +944,7 @@ Example: >
    :AssertEquals (strftime('%H:%M:%S', res), '02:43:11')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#for_each_call()*         {{{3
+                                                *lh#list#for_each_call()*          {{{3
 lh#list#for_each_call({list}, {action})~
 @param[in] {list}    |List|
 @param[in] {action}  |function| to call of each elements of the {list}
@@ -965,7 +966,7 @@ Examples: >
     VimL: call lh#list#for_each_call(s:parents_data[1], "lh#mut#_add_post_expand_callback(\"lh#dev#import#add(v:val)\")")
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#map_on()*                {{{3
+                                                *lh#list#map_on()*                 {{{3
 lh#list#map_on({list}, {index}|{key}, {action})~
 @param[in] {list}    |List| of |List|s, or |List| of |Dict|s
 @param[in] {index}   Index to be used to extract values in the inner |List|s.
@@ -1118,7 +1119,6 @@ represented as strings. >
     " Assert sorted in place
     AssertIs(l, res)
 
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#subset()*                 {{{3
 lh#list#subset({input},{indices})~
@@ -1247,7 +1247,7 @@ Example: >
     [ 25, 7, 6 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#list#concurrent_for()*        {{{3
+                                                *lh#list#concurrent_for()*         {{{3
 lh#list#concurrent_for({input1}, {intpu2}, {output1}, {output2}, {output0}[, {cmp}])~
 @param[in]  {input1}   First input |List|
 @param[in]  {input2}   Second input |List|
@@ -1272,7 +1272,7 @@ C++ `std::set_symetric_difference()` can be emulated with >
 C++ `std::set_intersection()` can be emulated with >
     lh#list#concurrent_for(in1, in2, [], [], out, predicate)
 
-------------------------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#get()*                    {{{3
 lh#list#get(list [, key|index [, default_when_absent])~
 
@@ -1320,7 +1320,7 @@ Examples: >
     AssertEquals (lh#list#get(list, 'k1'), range(8))
     AssertEquals (lh#list#get(list, 'k2'), ['a', 'b', 42, 'a', 15, 'c', 'c', 8])
 
-------------------------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#possible_values()*        {{{3
 lh#list#possible_values(list [, key|index [, default_when_absent])~
 
@@ -1375,6 +1375,28 @@ Examples: >
           \ ]
     AssertEquals (lh#list#possible_values(list, 'k1'), range(8))
     AssertEquals (lh#list#possible_values(list, 'k2'), ['a', 'b', 'c', 15, 42, 8])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#zip*                      {{{3
+lh#list#zip({list1}, {list2})~
+@pre both lists shall have the same size.
+Zip two |List|s into one. >
+
+  let l1 = ['a', 'b', 'c']
+  let l2 = [1, 2, 3]
+  AssertEquals(lh#list#zip(l1, l2), ['a', 1, 'b', 2, 'c', 3])
+  AssertThrows(lh#list#zip([1], [1,2]))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#zip_as_dict*              {{{3
+lh#list#zip_as_dict({list1}, {list2})~
+@pre both lists shall have the same size.
+Zip two |List|s into a |Dictionary|. >
+
+  let l1 = ['a', 'b', 'c']
+  let l2 = [1, 2, 3]
+  AssertEquals(lh#list#zip_as_dict(l1, l2), {'a': 1, 'b': 2, 'c': 3})
+  AssertThrows(lh#list#zip_as_dict([1], [1,2]))
 
 ------------------------------------------------------------------------------
 GRAPHS RELATED FUNCTIONS                              *lhvl#graph*      {{{2
