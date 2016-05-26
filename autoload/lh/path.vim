@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.2
-let s:k_version = 3602
+" Version:      3.10.4
+let s:k_version = 31006
 " Created:      23rd Jan 2007
-" Last Update:  14th Jan 2016
+" Last Update:  26th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -206,7 +206,7 @@ endfunction
 " Function: lh#path#simplify({pathname}, [make_relative_to_pwd=true]) {{{3
 " Like |simplify()|, but also strip the leading './'
 " It seems unable to simplify '..\' when compiled without +shellslash
-function! lh#path#simplify(pathname, ...)
+function! lh#path#simplify(pathname, ...) abort
   let make_relative_to_pwd = a:0 == 0 || a:1 == 1
   let pathname = simplify(a:pathname)
   let pathname = substitute(pathname, '^\%(\.[/\\]\)\+', '', '')
@@ -223,13 +223,13 @@ endfunction
 
 " Function: lh#path#split(pathname) {{{3
 " Split pathname parts: "/home/me/foo/bar" -> [ "home", "me", "foo", "bar" ]
-function! lh#path#split(pathname)
+function! lh#path#split(pathname) abort
   let parts = split(a:pathname, '[/\\]')
   return parts
 endfunction
 
 " Function: lh#path#join(pathparts, {path_separator}) {{{3
-function! lh#path#join(pathparts, ...)
+function! lh#path#join(pathparts, ...) abort
   let sep
         \ = (a:0) == 0                       ? '/'
         \ : type(a:1)==type(0) && (a:1) == 0 ? '/'
@@ -241,7 +241,7 @@ endfunction
 
 " Function: lh#path#common({pathnames}) {{{3
 " Find the common leading path between all pathnames
-function! lh#path#common(pathnames)
+function! lh#path#common(pathnames) abort
   " assert(len(pathnames)) > 1
   let common = a:pathnames[0]
   let lCommon = lh#path#split(common)
@@ -274,7 +274,7 @@ endfunction
 
 " Function: lh#path#strip_common({pathnames}) {{{3
 " Find the common leading path between all pathnames, and strip it
-function! lh#path#strip_common(pathnames)
+function! lh#path#strip_common(pathnames) abort
   " assert(len(pathnames)) > 1
   let common = lh#path#common(a:pathnames)
   let common = lh#path#to_dirname(common)
@@ -293,7 +293,7 @@ function! lh#path#StripCommon(pathnames)
 endfunction
 
 " Function: lh#path#is_absolute_path({path}) {{{3
-function! lh#path#is_absolute_path(path)
+function! lh#path#is_absolute_path(path) abort
   return a:path =~ '^/'
         \ . '\|^[a-zA-Z]:[/\\]'
         \ . '\|^[/\\]\{2}'
@@ -306,7 +306,7 @@ function! lh#path#IsAbsolutePath(path)
 endfunction
 
 " Function: lh#path#is_url({path}) {{{3
-function! lh#path#is_url(path)
+function! lh#path#is_url(path) abort
   " todo: support UNC paths and other urls
   return a:path =~ '^\%(https\=\|s\=ftp\|dav\|fetch\|file\|rcp\|rsynch\|scp\)://'
 endfunction
@@ -315,7 +315,7 @@ function! lh#path#IsURL(path)
 endfunction
 
 " Function: lh#path#select_one({pathnames},{prompt}) {{{3
-function! lh#path#select_one(pathnames, prompt)
+function! lh#path#select_one(pathnames, prompt) abort
   if len(a:pathnames) > 1
     let simpl_pathnames = deepcopy(a:pathnames)
     let simpl_pathnames = lh#path#strip_common(simpl_pathnames)
@@ -347,18 +347,18 @@ endfunction
 " - ":p:." turns getcwd().'/./foo' into "foo"
 " - ":~:." turns getcwd().'/./foo' into "./foo"
 " Hence lh#path#simplify() executed at the end.
-function! lh#path#to_relative(pathname)
+function! lh#path#to_relative(pathname) abort
   " let newpath = fnamemodify(a:pathname, ':p:.')
   let newpath = fnamemodify(a:pathname, ':~:.')
   let newpath = lh#path#simplify(newpath)
   return newpath
 endfunction
-function! lh#path#ToRelative(pathname)
+function! lh#path#ToRelative(pathname) abort
   return lh#path#to_relative(a:pathname)
 endfunction
 
 " Function: lh#path#to_dirname({dirname}) {{{3
-function! lh#path#to_dirname(dirname)
+function! lh#path#to_dirname(dirname) abort
   let dirname = a:dirname . (empty(a:dirname) || a:dirname[-1:] =~ '[/\\]'
         \ ? '' : lh#path#shellslash())
   return dirname
@@ -366,7 +366,7 @@ endfunction
 
 " Function: lh#path#depth({dirname}) {{{3
 " todo: make a choice about "negative" paths like "../../foo"
-function! lh#path#depth(dirname)
+function! lh#path#depth(dirname) abort
   if empty(a:dirname) | return 0 | endif
   let dirname = lh#path#to_dirname(a:dirname)
   let dirname = lh#path#simplify(dirname)
@@ -382,7 +382,7 @@ endfunction
 " @param two directories
 " @return a directories delta that ends with a '/' (may depends on
 " &shellslash)
-function! lh#path#relative_to(from, to)
+function! lh#path#relative_to(from, to) abort
   " let from = fnamemodify(a:from, ':p')
   " let to   = fnamemodify(a:to  , ':p')
   let from = lh#path#to_dirname(a:from)
@@ -401,7 +401,7 @@ function! lh#path#relative_to(from, to)
 endfunction
 
 " Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
-function! s:GlobAsList(pathslist, expr,  mustSort)
+function! s:GlobAsList(pathslist, expr,  mustSort) abort
   let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
   let sResult = globpath(pathslist, a:expr)
   let lResult = split(sResult, '\n')
@@ -414,7 +414,7 @@ function! s:GlobAsList(pathslist, expr,  mustSort)
   return a:mustSort ? lh#list#unique_sort(lResult) : lResult
 endfunction
 
-function! lh#path#glob_as_list(pathslist, expr, ...)
+function! lh#path#glob_as_list(pathslist, expr, ...) abort
   let mustSort = (a:0 > 0) ? (a:1) : 0
   if type(a:expr) == type('string')
     return s:GlobAsList(a:pathslist, a:expr, mustSort)
@@ -432,12 +432,12 @@ function! lh#path#GlobAsList(pathslist, expr)
   return lh#path#glob_as_list(a:pathslist, a:expr)
 endfunction
 
-" Function: lh#path#strip_start({pathname}, {pathslist}) {{{3
+" Function: lh#path#strip_start({pathname}, {pathslist}) {{{3 abort
 " Strip occurrence of paths from {pathslist} in {pathname}
 " @param[in] {pathname} name to simplify
 " @param[in] {pathslist} list of pathname (can be a |string| of pathnames
 " separated by ",", of a |List|).
-function! lh#path#strip_start(pathname, pathslist)
+function! lh#path#strip_start(pathname, pathslist) abort
   if type(a:pathslist) == type('string')
     " let strip_re = escape(a:pathslist, '\\.')
     " let strip_re = '^' . substitute(strip_re, ',', '\\|^', 'g')
@@ -492,13 +492,13 @@ function! lh#path#StripStart(pathname, pathslist)
 endfunction
 
 " Function: lh#path#to_regex({pathname}) {{{3
-function! lh#path#to_regex(path)
+function! lh#path#to_regex(path) abort
   let regex = substitute(a:path, '[/\\]', '[/\\\\]', 'g')
   return regex
 endfunction
 
 " Function: lh#path#find({pathname}, {regex}) {{{3
-function! lh#path#find(paths, regex)
+function! lh#path#find(paths, regex) abort
   let paths = (type(a:paths) == type([]))
         \ ? (a:paths)
         \ : split(a:paths,',')
@@ -511,7 +511,7 @@ function! lh#path#find(paths, regex)
 endfunction
 
 " Function: lh#path#vimfiles() {{{3
-function! lh#path#vimfiles()
+function! lh#path#vimfiles() abort
   let HOME = exists('$LUCHOME') ? $LUCHOME : $HOME
   let expected_win = HOME . '/vimfiles'
   let expected_nix = HOME . '/.vim'
@@ -522,7 +522,7 @@ function! lh#path#vimfiles()
 endfunction
 
 " Function: lh#path#is_in(file, path) {{{3
-function! lh#path#is_in(file, path)
+function! lh#path#is_in(file, path) abort
   if stridx(a:file, a:path) == 0
     return 1
   else
@@ -533,7 +533,7 @@ endfunction
 
 " Function: lh#path#readlink(pathname) {{{3
 let s:has_readlink = 0
-function! lh#path#readlink(pathname)
+function! lh#path#readlink(pathname) abort
   if s:has_readlink || executable('readlink')
     let s:has_readlink = 1
     return lh#os#system('readlink -f '.shellescape(a:pathname))
@@ -543,7 +543,7 @@ function! lh#path#readlink(pathname)
 endfunction
 
 " Function: lh#path#add_path_if_exists(listname, path) {{{3
-function! lh#path#add_path_if_exists(listname, path)
+function! lh#path#add_path_if_exists(listname, path) abort
   let path = substitute(a:path, '[/\\]\*\*$', '', '')
   if isdirectory(path)
     let {a:listname} += [a:path]
@@ -551,14 +551,14 @@ function! lh#path#add_path_if_exists(listname, path)
 endfunction
 
 " Function: lh#path#shellslash() {{{3
-function! lh#path#shellslash()
+function! lh#path#shellslash() abort
   return exists('+shellslash') && !&ssl ? '\' : '/'
 endfunction
 
 " Function: lh#path#find_in_parents(paths, kinds, last_valid_path) {{{3
 " @param {last_valid_path} will likelly contain a REGEX pattern aimed at
 " identifying things like $HOME
-function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
+function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path) abort
   if a:path =~ '^\(//\|\\\\\)$'
     " The root path (/) is not a place where to store files like _vimrc_local
     call s:Verbose('Stop recursion in UNC invalid root path: '.a:path)
@@ -631,7 +631,7 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path)
 endfunction
 
 " Function: lh#path#munge(pathlist, path) {{{3
-function! lh#path#munge(pathlist, path)
+function! lh#path#munge(pathlist, path) abort
   if type(a:pathlist) == type('str')
     let pathlist = split(a:pathlist, ',')
     return join(lh#path#munge(pathlist, a:path), ',')

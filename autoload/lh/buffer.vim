@@ -5,10 +5,10 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	3.10.3
-let s:k_version = '3103'
+" Version:	3.10.4
+let s:k_version = '3104'
 " Created:	23rd Jan 2007
-" Last Update:	25th May 2016
+" Last Update:	26th May 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -85,7 +85,7 @@ endfunction
 " Function: lh#buffer#find({filename}) {{{2
 " If {filename} is opened in a window, jump to this window, otherwise return -1
 " Moved from searchInRuntimeTime.vim
-function! lh#buffer#find(filename)
+function! lh#buffer#find(filename) abort
   let b = bufwinnr(a:filename)
   " Workaround a bug in event execution: we may a have a non null buffer, but
   " with a name that doesn't match what is looked for.
@@ -94,23 +94,23 @@ function! lh#buffer#find(filename)
   exe b.'wincmd w'
   return b
 endfunction
-function! lh#buffer#Find(filename)
+function! lh#buffer#Find(filename) abort
   return lh#buffer#find(a:filename)
 endfunction
 
 " Function: lh#buffer#jump({filename},{cmd}) {{{2
-function! lh#buffer#jump(filename, cmd)
+function! lh#buffer#jump(filename, cmd) abort
   let b = lh#buffer#find(a:filename)
   if b != -1 | return b | endif
   call lh#window#create_window_with(a:cmd . ' ' . a:filename)
   return winnr()
 endfunction
-function! lh#buffer#Jump(filename, cmd)
+function! lh#buffer#Jump(filename, cmd) abort
   return lh#buffer#jump(a:filename, a:cmd)
 endfunction
 
 " Function: lh#buffer#scratch({bname},{where}) {{{2
-function! lh#buffer#scratch(bname, where)
+function! lh#buffer#scratch(bname, where) abort
   try
     set modifiable
     call lh#window#create_window_with(a:where.' sp '.escape(substitute(a:bname, '\*', '...', 'g'), '#%'))
@@ -120,7 +120,7 @@ function! lh#buffer#scratch(bname, where)
   setlocal bt=nofile bh=wipe nobl noswf ro
   return bufnr('%')
 endfunction
-function! lh#buffer#Scratch(bname, where)
+function! lh#buffer#Scratch(bname, where) abort
   return lh#buffer#scratch(a:bname, a:where)
 endfunction
 
@@ -132,7 +132,7 @@ endfunction
 "
 " Bug: this function clears syntax highlighting in some buffers if we :sp when
 " bufname() != a:bname
-function! lh#buffer#get_nr(bname)
+function! lh#buffer#get_nr(bname) abort
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
   if -1 == nr  || bufname(nr) != a:bname
@@ -144,7 +144,7 @@ function! lh#buffer#get_nr(bname)
 endfunction
 
 " Function: lh#buffer#list() {{{2
-function! lh#buffer#list(...)
+function! lh#buffer#list(...) abort
   let which = a:0 == 0 ? 'buflisted' : a:1
   let all = range(1, bufnr('$'))
   " let res = lh#list#transform_if(all, [], 'v:1_', 'buflisted')
@@ -158,7 +158,7 @@ endfunction
 
 " ## Private {{{1
 " Function: lh#buffer#_loaded_buf_do(args) {{{2
-function! lh#buffer#_loaded_buf_do(args)
+function! lh#buffer#_loaded_buf_do(args) abort
   let buffers = lh#buffer#list('bufloaded')
   for b in buffers
     exe 'b '.b
