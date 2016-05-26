@@ -94,6 +94,8 @@ let s:k_version = 31006
 "       (*) ENH: Use new logging framework
 "       v3.6.2
 "       (*) BUG: Support comma-separated lists in lh#path#munge()
+"       v3.10.4
+"       (*) PERF: Optimize lh#path#glob_as_list()
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -401,16 +403,25 @@ function! lh#path#relative_to(from, to) abort
 endfunction
 
 " Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
+if has("patch-7.4-279")
+  function! s:DoGlobPath(pathslist, expr) abort
+    return globpath(a:pathslist, a:expr, 1, 1)
+  endfunction
+else
+  function! s:DoGlobPath(pathslist, expr) abort
+    let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
+    let sResult = globpath(pathslist, a:expr, 1)
+    let lResult = split(sResult, '\n')
+    return lResult
+  endfunction
+endif
+
 function! s:GlobAsList(pathslist, expr,  mustSort) abort
-  let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
-  let sResult = globpath(pathslist, a:expr)
-  let lResult = split(sResult, '\n')
+  let lResult = s:DoGlobPath(a:pathslist, a:expr)
   " workaround a non feature of wildignore: it does not ignore directories
-  for ignored_pattern in split(&wildignore,',')
-    if stridx(ignored_pattern,'/') != -1
-      call filter(lResult, 'v:val !~ '.string(ignored_pattern))
-    endif
-  endfor
+  let ignored_directories = filter(split(&wildignore, ','), 'stridx(v:val, "/")!=-1')
+  let ignored_directories_pat = '\v'.join(ignored_directories, '|')
+  call filter(lResult, 'v:val !~ ignored_directories_pat')
   return a:mustSort ? lh#list#unique_sort(lResult) : lResult
 endfunction
 
