@@ -5,9 +5,9 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Version:      3.10.4
-let s:k_version = 31006
+let s:k_version = 31004
 " Created:      23rd Jan 2007
-" Last Update:  26th May 2016
+" Last Update:  27th May 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -420,8 +420,10 @@ function! s:GlobAsList(pathslist, expr,  mustSort) abort
   let lResult = s:DoGlobPath(a:pathslist, a:expr)
   " workaround a non feature of wildignore: it does not ignore directories
   let ignored_directories = filter(split(&wildignore, ','), 'stridx(v:val, "/")!=-1')
-  let ignored_directories_pat = '\v'.join(ignored_directories, '|')
-  call filter(lResult, 'v:val !~ ignored_directories_pat')
+  if !empty(ignored_directories)
+    let ignored_directories_pat = '\v'.join(ignored_directories, '|')
+    call filter(lResult, 'v:val !~ ignored_directories_pat')
+  endif
   return a:mustSort ? lh#list#unique_sort(lResult) : lResult
 endfunction
 
