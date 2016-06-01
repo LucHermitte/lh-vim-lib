@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.8.1
-let s:k_version = 381
+" Version:      3.10.4
+let s:k_version = 3104
 " Created:      10th Apr 2012
-" Last Update:  13th Apr 2016
+" Last Update:  01st Jun 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -80,6 +80,7 @@ endfunction
 " Function: lh#os#system(cmd) {{{3
 " @return the comp'ed result of system call
 function! lh#os#system(cmd)
+  call s:Verbose(a:cmd)
   return lh#os#chomp(system(a:cmd))
 endfunction
 
