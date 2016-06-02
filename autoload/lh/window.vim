@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.1.
-let s:k_version = '3101'
+" Version:      3.10.4.
+let s:k_version = '3104'
 " Created:      29th Oct 2015
-" Last Update:  23rd May 2016
+" Last Update:  02nd Jun 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.

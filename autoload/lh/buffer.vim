@@ -8,7 +8,7 @@
 " Version:	3.10.4
 let s:k_version = '3104'
 " Created:	23rd Jan 2007
-" Last Update:	26th May 2016
+" Last Update:	02nd Jun 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -136,7 +136,7 @@ function! lh#buffer#get_nr(bname) abort
   let nr = bufnr(a:bname)
   " nr may not always be -1 as it should => also test bname()
   if -1 == nr  || bufname(nr) != a:bname
-    call lh#window#create_window_with('sp '.fnameescape(a:bname))
+    call lh#window#create_window_with('silent sp '.fnameescape(a:bname))
     let nr = bufnr(a:bname)
     q
   endif
