@@ -1,16 +1,16 @@
 "=============================================================================
-" File:		tests/lh/path.vim                                      {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
+" File:         tests/lh/path.vim                                      {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:	3.2.11
-" Created:	28th May 2009
-" Last Update:	19th Nov 2015
+"		<URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/Licence.md>
+" Version:      3.2.11
+" Created:      28th May 2009
+" Last Update:  19th Nov 2015
 "------------------------------------------------------------------------
 " Description:
-" 	Tests for autoload/lh/path.vim
-" 	Run it with :UTRun % (see UT.vim)
+"       Tests for autoload/lh/path.vim
+"       Run it with :UTRun % (see UT.vim)
 "
 "------------------------------------------------------------------------
 " }}}1
@@ -111,16 +111,16 @@ endfunction
 function! s:Test_strip_start()
   let expected = 'template/bar.template'
   AssertEquals (lh#path#strip_start($HOME.'/.vim/template/bar.template',
-	\ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
-	\ , expected)
+        \ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
+        \ , expected)
 
   AssertEquals (lh#path#strip_start($HOME.'/vimfiles/template/bar.template',
-	\ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
-	\ , expected)
+        \ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
+        \ , expected)
 
   AssertEquals (lh#path#strip_start('/usr/local/share/vim/template/bar.template',
-	\ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
-	\ , expected)
+        \ [ $HOME.'/.vim', $HOME.'/vimfiles', '/usr/local/share/vim' ])
+        \ , expected)
 endfunction
 
 function! s:Test_IsAbsolutePath()
