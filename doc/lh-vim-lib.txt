@@ -2184,7 +2184,6 @@ The second tries to execute `:split {options}`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#window#getid()*               {{{3
-                                                *lh#window#gotoid()*
 lh#window#getid([{win}])~
 Encapsulation over vim recent function |win_getid()|.
 An emulation is provided for older versions of vim.
