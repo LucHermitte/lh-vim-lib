@@ -1,10 +1,10 @@
 "=============================================================================
 " File:         plugin/ui-functions.vim                                  {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
-"               <URL:http://code.google.com/p/lh-vim/wiki/License>
-" Version:      3.2.14
+"               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
+" Version:      3.3.21
 " Created:      18th nov 2002
 " Last Update:  18th Apr 2015
 "------------------------------------------------------------------------
@@ -22,26 +22,28 @@
 "------------------------------------------------------------------------
 " Installation: Drop this into one of your {rtp}/plugin/ directories.
 " History:      {{{2
-"    v0.01 Initial Version
+"    v3.3.21
+"       (*) Add highlight to CONFIRM()
+"    v3.0.0  GPLv3
+"    v2.2.6
+"       (*) CONFIRM() and WHICH() accept lists of {choices}
+"    v2.2.0
+"       (*) menu to switch the ui_type
+"    v0.06
+"       (*) :s/echoerr/throw/ => vim7 only
+"    v0.05
+"       (*) In vim7e, inputdialog() returns a trailing '\n'. INPUT() strips the
+"           NL character.
+"    v0.04
+"       (*) New function: WHICH()
+"    v0.03
+"       (*) Small bug fix with INPUT()
 "    v0.02
 "       (*) Code "factorisations"
 "       (*) Help on <F1> enhanced.
 "       (*) Small changes regarding the parameter accepted
 "       (*) Function SWITCH
-"    v0.03
-"       (*) Small bug fix with INPUT()
-"    v0.04
-"       (*) New function: WHICH()
-"    v0.05
-"       (*) In vim7e, inputdialog() returns a trailing '\n'. INPUT() strips the
-"           NL character.
-"    v0.06
-"       (*) :s/echoerr/throw/ => vim7 only
-"    v2.2.0
-"       (*) menu to switch the ui_type
-"    v2.2.6
-"       (*) CONFIRM() and WHICH() accept lists of {choices}
-"    v3.0.0  GPLv3
+"    v0.01 Initial Version
 "
 " TODO:         {{{2
 "       (*) Modernize the code to Vim7 Lists and dicts
@@ -387,6 +389,8 @@ function! s:confirm_text(box, text, ...)
         \ guifg=Black guibg=LightYellow
   :hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
         \ guifg=DarkRed guibg=LightGray
+  :hi User7 term=inverse,bold cterm=inverse,bold ctermfg=LightCyan
+        \ guifg=Black guibg=LightCyan
   " }}}5
 
   " 3.2- Interactive loop                {{{4
@@ -409,7 +413,11 @@ function! s:confirm_text(box, text, ...)
       redraw!
     endif
     " Echo the current selection
-    echo "\r". a:text.' '.substitute(choice_{i}, '&', '', '')
+    echohl Question
+    echon "\r". a:text
+    echohl ModeMsg
+    echon  ' '.substitute(choice_{i}, '&', '', '')
+    echohl None
     " Wait the user to hit a key
     let key=getchar()
     let complType=nr2char(key)
