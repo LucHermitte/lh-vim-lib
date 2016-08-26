@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.10.0)
-                        For Vim version 7+      Last change: 23rd May 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.11.0)
+                        For Vim version 7+      Last change: 26th Aug 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -58,6 +58,7 @@ Options related functions:                              |lhvl#option|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
 - |lh#option#getbufvar()|
+- |lh#option#getbufglobvar()|
 - |lh#option#is_set()|
 - |lh#option#is_unset()|
 Functors related functions:                             |lhvl#function|
@@ -523,6 +524,22 @@ is 0.
 lh#option#getbufvar({expr}, {name}[,{default}])~
 This function encapsulates  |getbufvar| >
     getbufvar(expr, name, g:lh#option#unset)
+
+Unlike the direct call of the previous expression, this function ensures
+|g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins
+doesn't apply to variables, only to functions).
+See also |lh#option#getbufglobvar()|.
+
+                                                *lh#option#getbufglobvar()*       {{{3
+lh#option#getbufglobvar({expr}, {name}[,{default}])~
+This function is a crossover between |lh#option#getbufvar()| and
+|lh#option#get()|. The later searches in the current buffer for a given
+buffer-local variable. Sometimes, we want to search into another well known
+buffer without having to change the current buffer, and still search in the
+global variables.
+
+This function encapsulates  |getbufvar| >
+    getbufvar(expr, name, get(g:, name, g:lh#option#unset))
 
 Unlike the direct call of the previous expression, this function ensures
 |g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins

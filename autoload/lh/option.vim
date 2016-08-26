@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.11.0
+let s:k_version = 3110
 " Created:      24th Jul 2004
-" Last Update:  08th Jan 2016
+" Last Update:  26th Aug 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -157,6 +157,18 @@ endfunction
 function! lh#option#getbufvar(buf, name,...)
   let def = a:0 == 0 ? g:lh#option#unset : a:1
   return getbufvar(a:buf, a:name, def)
+endfunction
+
+" Function: lh#option#getbufglobvar(expr, name [, default]) {{{3
+function! lh#option#getbufglobvar(expr, name, ...) abort
+  return getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
+
+  let res = call('lh#option#getbufvar', [a:expr, a:name, g:lh#option#unset])
+  if lh#option#is_unset(res)
+    let def = a:0 == 0 ? g:lh#option#unset : a:1
+    return get(g:, a:name, def)
+  endif
+  return res
 endfunction
 
 " Function: lh#option#add(name, values)                       {{{3
