@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = '3.6.01'
+" Version:      3.12.0
+let s:k_version = '3.12.0'
 " Created:      11th Mar 2015
-" Last Update:  08th Jan 2016
+" Last Update:  31st Aug 2016
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -48,18 +48,32 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 
+" # VCS root detection {{{2
+
+" Function: lh#vcs#get_svn_root([path]) {{{3
+function! lh#vcs#get_svn_root() abort
+  let path = a:0 == 0 ? expand('%:p:h') : a:1
+  return finddir('.svn', path. ';')
+endfunction
+
+" Function: lh#vcs#get_git_root([path]) {{{3
+function! lh#vcs#get_git_root() abort
+  let path = a:0 == 0 ? expand('%:p:h') : a:1
+  return finddir('.git', path. ';')
+endfunction
+
 " # VCS kind detection {{{2
 
 " Function: lh#vcs#is_svn([path]) {{{3
 function! lh#vcs#is_svn(...) abort
   let path = a:0 == 0 ? expand('%:p:h') : a:1
-  return !empty(finddir('.svn', path. ';'))
+  return !empty(lh#vcs#get_svn_root(path))
 endfunction
 
 " Function: lh#vcs#is_git([path]) {{{3
 function! lh#vcs#is_git(...) abort
   let path = a:0 == 0 ? expand('%:p:h') : a:1
-  return !empty(finddir('.git', path. ';'))
+  return !empty(lh#vcs#get_git_root(path))
 endfunction
 
 " Function: lh#vcs#get_type([path]) {{{3
@@ -67,8 +81,8 @@ function! lh#vcs#get_type(...) abort
   let path = a:0 == 0 ? expand('%:p:h') : a:1
   let kind
         \ = exists('*VCSCommandGetVCSType') ?  substitute(VCSCommandGetVCSType(path), '.', '\l&', 'g')
-        \ : lh#vcs#_is_svn(path)            ? 'svn'
-        \ : lh#vcs#_is_git(path)            ? 'git'
+        \ : lh#vcs#is_svn(path)             ? 'svn'
+        \ : lh#vcs#is_git(path)             ? 'git'
         \ :                                   'unknown'
   return kind
 endfunction
