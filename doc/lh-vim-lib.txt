@@ -180,6 +180,15 @@ Log related functions                                   |lhvl#log|
 - |:LHLog|, |lh#log#set_logger()|
 - |lh#log#new()|
 - |lh#log#none()|
+Version Control System functions                        |lhvl#vcs|
+- |lh#vcs#get_svn_root()|
+- |lh#vcs#get_git_root()|
+- |lh#vcs#is_svn()|
+- |lh#vcs#is_git()|
+- |lh#vcs#get_type()|
+- |lh#vcs#get_url()|
+- |lh#vcs#decode_github_url()|
+- |lh#vcs#as_http()|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
@@ -572,7 +581,7 @@ lh#option#unset()~
 @note Never use |g:lh#option#unset| from your plugins but |lh#option#unset()|
 as it will get lazily loaded on need.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------------------------
 FUNCTORS RELATED FUNCTIONS                            *lhvl#function*   {{{2
 
 This sub-library helps defining functors-like variables, and execute them.
@@ -708,7 +717,6 @@ others.
 lh#string#trim(string)~
 @param    {string} |expr-string|
 @return            {string} trimmed of spaces
-
 
 ------------------------------------------------------------------------------
 STACKS RELATED FUNCTIONS                              *lhvl#stack*      {{{2
@@ -1440,7 +1448,6 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
 @since Version 2.1.0
 @test tests/lh/topological-sort.vim
 
-
 ------------------------------------------------------------------------------
 PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
 
@@ -1988,7 +1995,6 @@ This function is a helper function that defines several mappings at once as
 The action to execute will be corrected depending on the current mode. See
 |lh#menu#make()_modes| for more details.
 
-
 ------------------------------------------------------------------------------
 COMMANDS RELATED FUNCTIONS                            *lhvl#command*    {{{2
 
@@ -2006,7 +2012,6 @@ lh#command#Fargs2String({aList})~
                                             *lh#command#complete()*               {{{3
 lh#command#complete({argLead}, {cmdLine}, {cursorPos})~
 Under developpement
-
 
 ------------------------------------------------------------------------------
 BUFFERS RELATED FUNCTIONS                             *lhvl#buffer*     {{{2
@@ -2584,7 +2589,69 @@ It's isn't meant to be used directly. See |lhvl-global-logger|.
 Typical use, see |lh#log#set_logger()|: >
     call lh#log#set_logger('none')
 
+------------------------------------------------------------------------------
+VERSION CONTROL SYSTEM RELATED FUNCTIONS              *lhvl#vcs*        {{{2
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#as_http()*               {{{3
+lh#vcs#as_http([dirname])~
+@param[in] {dirname} repository dirname, defaults to `expand(%:p:h)`.
+@return the url associated to the {dirname} expressed in http form. 
+@warning Only github is supported right now.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#decode_github_url()*     {{{3
+lh#vcs#decode_github_url(url)~
+@param[in] {url} of a github repository
+@return a |List| made of:
+- `"ssh"`  if detected in the url
+- github username name
+- project name
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#get_git_root()*          {{{3
+lh#vcs#get_git_root([path])~
+Searches for a up-directory from {path} that contains a `.svn/` subdirectory.
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return the matching directory name, or an empty string.
+@version 3.12.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#get_svn_root()*          {{{3
+lh#vcs#get_svn_root([path])~
+Searches for a up-directory from {path} that contains a `.svn/` subdirectory.
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return the matching directory name, or an empty string.
+@warning This won't work well with older subversion clients that put a `.svn/`
+directory into each directory checked out.
+@version 3.12.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#get_type()*              {{{3
+lh#vcs#get_type([path])~
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return the type of VCS detected. Uses |VCSCommand| routines if installed.
+Otherwise, only `git` and `svn` are recognized.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#get_url()*               {{{3
+lh#vcs#get_url([path])~
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return the `remore.origin` url associated to the repository.
+@warning Only git repositories are supported at the moment.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#is_git()*                {{{3
+lh#vcs#is_git([path])~
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return whether the {path} belongs to a git repository.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#vcs#is_svn()*                {{{3
+lh#vcs#is_svn([path])~
+@param[in] {path} repository dirname, defaults to `expand(%:p:h)`.
+@return whether the {path} belongs to a svn repository.
+
 ------------------------------------------------------------------------------
                                                                      }}}1
 ==============================================================================
