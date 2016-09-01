@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.12.0
-let s:k_version = '3.12.0'
+" Version:      3.12.1
+let s:k_version = '3.12.1'
 " Created:      11th Mar 2015
-" Last Update:  31st Aug 2016
+" Last Update:  01st Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -51,13 +51,13 @@ endfunction
 " # VCS root detection {{{2
 
 " Function: lh#vcs#get_svn_root([path]) {{{3
-function! lh#vcs#get_svn_root() abort
+function! lh#vcs#get_svn_root(...) abort
   let path = a:0 == 0 ? expand('%:p:h') : a:1
   return finddir('.svn', path. ';')
 endfunction
 
 " Function: lh#vcs#get_git_root([path]) {{{3
-function! lh#vcs#get_git_root() abort
+function! lh#vcs#get_git_root(...) abort
   let path = a:0 == 0 ? expand('%:p:h') : a:1
   return finddir('.git', path. ';')
 endfunction
