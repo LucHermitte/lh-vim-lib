@@ -379,7 +379,7 @@ The format of the result being ?to be stabilized?
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#async#queue()*                {{{3
-lh#async#queue(command, option)~
+lh#async#queue(job)~
 This function is a wrapper around recent |job_start()|. As such it requires a
 recent version of Vim without any bugs in the job related part.
 I require v7.4-1980 at least.
@@ -394,11 +394,14 @@ All jobs are started through the |'shell'| in order to support
 Under Windows it's ran with `[&shell, &shellcmdflag, command]`
 Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
 
-@param {command} Command executed
-@param {options} Options passed to |job_start()|.
+@param {job} |Dict| that contains:
+            - options for |job_start()|
+            - `'cmd'`: command to execute
+            - `'txt'`: optional description of what is executed for |airline|
 @todo            Support for |job_stop()|
 @todo            Support multiple queues -> `lh#async#new_queue()`
 
+Active queues and bakground job will be presented in |airline-section|`_b`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#position#IsBefore()*          {{{3
