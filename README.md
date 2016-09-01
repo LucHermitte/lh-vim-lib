@@ -109,6 +109,8 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | Function                    | Purpose                                                                                                           |
 |:----------------------------|:------------------------------------------------------------------------------------------------------------------|
 | `lh#dict#add_new()`         | Adds elements from the second dictionary if they are not set yet in the first                                     |
+| `lh#dict#key()`             | Expects the dictionary to have only one element (throw otherwise) and returns it                                  |
+| `lh#dict#subset()`          | Builds a subset dictionary of a dict                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                                   |

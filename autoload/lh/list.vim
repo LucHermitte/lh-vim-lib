@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.3
-let s:k_version = 3103
+" Version:      3.13.1
+let s:k_version = 3131
 " Created:      17th Apr 2007
-" Last Update:  25th May 2016
+" Last Update:  01st Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -503,7 +503,8 @@ endfunction
 function! lh#list#subset(list, indices) abort
   let result=[]
   for e in a:indices
-    call add(result, a:list[e])
+    " call add(result, a:list[e])
+    call add(result, get(a:list, e))
   endfor
   return result
 endfunction

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1.
-let s:k_version = '3601'
+" Version:      3.13.1.
+let s:k_version = '31301'
 " Created:      26th Nov 2015
-" Last Update:  08th Jan 2016
+" Last Update:  01st Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -69,6 +69,18 @@ function! lh#dict#key(one_key_dict) abort
   return it[0]
 endfunction
 
+" Function: lh#dict#subset(dict, keys) {{{3
+function! lh#dict#subset(dict, keys) abort
+  let result={}
+  for e in a:keys
+    let Val = get(a:dict, e, lh#option#unset())
+    if lh#option#is_set(Val)
+      let result[e] = Val
+    endif
+    unlet Val
+  endfor
+  return result
+endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 

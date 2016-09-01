@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.13.0)
+*lh-vim-lib.txt*        Vim common libraries (v3.13.1)
                         For Vim version 7+      Last change: 01st Sep 2016
 
                         By Luc Hermitte
@@ -92,6 +92,10 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#transform_if()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
 - |lh#list#zip()|, and |lh#list#zip_as_dict()|
+Dicts related functions:                                |lhvl#dict|
+- |lh#dict#add_new()|
+- |lh#dict#key()|
+- |lh#dict#subset()|
 Stack related functions:                                |lhvl#stack|
 - |lh#stack#push()|
 - |lh#stack#pop()|
@@ -1187,6 +1191,21 @@ Example: >
     [ 1, 5, 6, 48 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#subset()*                 {{{3
+lh#dict#subset({input},{keys})~
+Returns a subset slice of the {input} dict.
+
+@param[in] {input}  Input |Dict| from which elements will be extracted
+@param[in] {keys}   |List| of keys to extract
+@return a |Dict| of the elements from {input} indexed by the {keys}.
+
+Example: >
+    :let d = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5}
+    :let keys = [ 'a', 'c', 'd']
+    :echo s = lh#dict#subset(d, keys)
+    {'a':1, 'c':3, 'd':4}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#rotate()*                 {{{3
 lh#list#rotate({list}, {rot})~
 @param[in] {list} Input |List| to rotate
@@ -1247,6 +1266,13 @@ Examples: >
                                        \ {'k1': 1, 'k2': 2, 'k3': 'trois', 'k4': 'quatre'})
   AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k1': 'un'}),
                                        \ {'k1': 1, 'k2': 2, 'k3': 'trois'})
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#key()*                    {{{3
+lh#dict#key(one_key_dict)~
+@param[in]     {one_key_dict} Dictionary to test
+@return        The first element of the dictionary
+@throw         An exception if the dictionaru has more than one element.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#push_if_new()*            {{{3

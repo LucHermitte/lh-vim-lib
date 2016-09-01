@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.10.0
+" Version:      3.13.1
 " Created:	19th Nov 2008
 " Last Update:  23rd May 2016
 "------------------------------------------------------------------------
@@ -21,6 +21,7 @@ set cpo&vim
 " # Dependencies {{{1
 runtime autoload/lh/function.vim
 runtime autoload/lh/list.vim
+runtime autoload/lh/dict.vim
 
 " # Tests {{{1
 "------------------------------------------------------------------------
@@ -208,11 +209,20 @@ endfunction
 
 "------------------------------------------------------------------------
 " subset {{{2
-function! s:Test_subset()
+function! s:Test_subset_list()
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
     :let indices = [ 0, 5, 7, 3 ]
     :let expected = [ 1, 5, 6, 48 ]
     :let s = lh#list#subset(l, indices)
+    " Comment string(s)
+    AssertEquals (s ,  expected)
+endfunction
+
+function! s:Test_subset_dict()
+    :let d = {'a':1, 'b':2, 'c':3, 'd':4, 'e':5}
+    :let keys = [ 'a', 'c', 'd']
+    :let expected = {'a':1, 'c':3, 'd':4}
+    :let s = lh#dict#subset(d, keys)
     " Comment string(s)
     AssertEquals (s ,  expected)
 endfunction
