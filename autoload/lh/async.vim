@@ -57,8 +57,8 @@ endif
 " # Job queue {{{2
 
 " Function: lh#async#queue(job) {{{3
-function! lh#async#queue(cmd, args) abort
-  call s:job_queue.push_or_start(a:cmd, a:args) 
+function! lh#async#queue(job) abort
+  call s:job_queue.push_or_start(a:job) 
 endfunction
 
 " Function: lh#async#do_clear_queue() {{{3
@@ -85,8 +85,18 @@ function! s:is_empty() dict abort                  " {{{3
   return empty(self.list)
 endfunction
 
-function! s:push_or_start(cmd, args) dict abort    " {{{3
-  let self.list += [ {'cmd': a:cmd, 'args': a:args} ]
+function! s:push_or_start(job) dict abort    " {{{3
+  let job_args = lh#dict#subset(a:job, [
+        \ 'close_cb', 'in_cb', 'out_cb', 'err_cb', 'exit_cb', 'callback',
+        \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit', 
+        \ 'in_mode', 'out_mode', 'err_mode',
+        \ 'term', 'channel',
+        \ 'in_io', 'in_top', 'in_bot', 'in_name', 'in_buf',
+        \ 'out_io', 'out_top', 'out_bot', 'out_name', 'out_buf', 'out_modiiable',
+        \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modiiable',
+        \ 'block_write'
+        \ ])
+  let self.list += [ extend(copy(a:job), {'args': job_args}) ]
   call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
   if len(self.list) == 1
     " There was nothing, the new job is to be started
@@ -140,6 +150,8 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
     if !s:job_queue.is_empty()
       call s:job_queue.start_next()
     endif
+    " And get sure airline is refreshed
+    redrawstatus
   endtry
 endfunction
 
@@ -156,6 +168,12 @@ let s:job_queue.start_next    = function('s:start_next')
 "   call s:Verbose('TestCb(%1)', a:000)
 " endfunction
 " call lh#async#queue('sleep 1', {'close_cb':function('TestCb')})
+
+" # accessors {{{2
+" Function: lh#async#_get_jobs() {{{3
+function! lh#async#_get_jobs() abort
+  return s:job_queue.list
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1
