@@ -2,10 +2,10 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.8.3.
-let s:k_version = '383'
+" Version:      3.13.0.
+let s:k_version = '3130'
 " Created:      23rd Dec 2015
-" Last Update:  04th May 2016
+" Last Update:  01st Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -114,9 +114,9 @@ function! lh#log#new(where, kind) abort
       let bt = lh#exception#callstack(v:throwpoint)
       " Find the right level.
       " 0 is the current function
-      " And every other level maned s:log or s:verbose shall be ignored as
+      " And every other level named s:log or s:verbose or callstack shall be ignored as
       " well.
-      let idx = lh#list#find_if(bt, 'v:val.fname !~? "\\vlog|verbose"', 1)
+      let idx = lh#list#find_if(bt, 'v:val.fname !~? "\\vlog|verbose|callstack"', 1)
       if idx > 0
         let data.filename = bt[idx].script
         let data.lnum     = bt[idx].pos
@@ -202,6 +202,7 @@ function! lh#log#get() abort
   return s:logger
 endfunction
 
+" let s:logger = get(s:, 'logger', lh#log#echomsg())
 let s:logger = lh#log#echomsg()
 
 " Function: lh#log#clear() {{{3
@@ -232,11 +233,13 @@ endfunction
 
 " Function: lh#log#exception([exception [,throwpoint]]) {{{3
 function! lh#log#exception(...) abort
-  let exception  = a:0 > 0 ? a:2 : v:exception
+  let exception  = a:0 > 0 ? a:1 : v:exception
   let throwpoint = a:0 > 1 ? a:2 : v:throwpoint
   let bt = lh#exception#callstack(throwpoint)
+  let g:bt = bt
   if !empty(bt)
-    let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here", "lnum": v:val.pos}')
+    " TODO: ignore function from this plugin!
+    let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").")", "lnum": v:val.pos}')
     let data[0].text = v:exception
     call lh#log#this(data)
   else
@@ -244,17 +247,26 @@ function! lh#log#exception(...) abort
   endif
 endfunction
 
+" Function: lh#log#callstack(msg) {{{3
+" @since Version 3.13.0
+function! lh#log#callstack(msg) abort
+  try
+    throw a:msg
+  catch /.*/
+    call lh#log#exception()
+  endtry
+endfunction
+
 " ## Internal functions {{{1
 
 " # LHLog support functions {{{2
 " Function: lh#log#_log(cmd) {{{3
 function! lh#log#_log(cmd) abort
-  if a:cmd == 'clear' 
+  if a:cmd == 'clear'
     call lh#log#clear()
   else
     call lh#log#set_logger(a:cmd, '')
   endif
-  
 endfunction
 
 " Function: lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) {{{3
