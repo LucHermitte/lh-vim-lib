@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	3.13.0
-let s:version = '3.13.0'
+" Version:	3.13.1
+let s:version = '3.13.1'
 " Created:	06th Nov 2007
-" Last Update:  01st Sep 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -23,7 +23,9 @@ finish
 README.md
 License.md
 addon-info.json
+autoload/airline/extensions/async.vim
 autoload/lh/askvim.vim
+autoload/lh/async.vim
 autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
 autoload/lh/command.vim
