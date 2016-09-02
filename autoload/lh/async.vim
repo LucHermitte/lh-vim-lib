@@ -2,10 +2,10 @@
 " File:         autoload/lh/async.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.13.0.
-let s:k_version = '3130'
+" Version:      3.13.3.
+let s:k_version = '3133'
 " Created:      01st Sep 2016
-" Last Update:  01st Sep 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -48,7 +48,7 @@ endfunction
 
 " # Requirements {{{2
 let s:has_jobs = exists('*job_start') && has("patch-7.4.1980")
-if ! s:has_jobs 
+if ! s:has_jobs
   finish
 endif
 
@@ -58,7 +58,7 @@ endif
 
 " Function: lh#async#queue(job) {{{3
 function! lh#async#queue(job) abort
-  call s:job_queue.push_or_start(a:job) 
+  call s:job_queue.push_or_start(a:job)
 endfunction
 
 " Function: lh#async#do_clear_queue() {{{3
@@ -88,7 +88,7 @@ endfunction
 function! s:push_or_start(job) dict abort    " {{{3
   let job_args = lh#dict#subset(a:job, [
         \ 'close_cb', 'in_cb', 'out_cb', 'err_cb', 'exit_cb', 'callback',
-        \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit', 
+        \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit',
         \ 'in_mode', 'out_mode', 'err_mode',
         \ 'term', 'channel',
         \ 'in_io', 'in_top', 'in_bot', 'in_name', 'in_buf',
@@ -109,18 +109,18 @@ function! s:start_next() dict abort                " {{{3
   let job = self.list[0]
   try
     let success = 0
-    call s:Verbose('Starting next job: %1', job)
     let args = job.args
-    let args.close_cb = get(args, 'close_cb', function('s:default_close_cb'))
-    let Close_cb = args.close_cb
-    
+    call s:Verbose('Starting next job: %1', job)
+    let Close_cb = get(args, 'close_cb', function('s:default_close_cb'))
+    let args.close_cb = function('s:close_cb', [Close_cb])
+
     if lh#os#OnDOSWindows() && &shell =~ 'cmd'
       let cmd = &shell . ' ' . &shellcmdflag . ' '.job.cmd
     else
       let cmd = [&shell, &shellcmdflag, job.cmd]
     endif
-    let job.job = job_start(cmd, {'close_cb': function('s:close_cb', [Close_cb])})
-    if job_info(job.job).status == 'fail' 
+    let job.job = job_start(cmd, args)
+    if job_info(job.job).status == 'fail'
       throw "Starting `".(job.cmd)."` failed!"
     endif
     let success = 1
@@ -133,7 +133,7 @@ function! s:start_next() dict abort                " {{{3
   endtry
 endfunction
 
-function! s:default_close_cb(channel)              " {{{3
+function! s:default_close_cb(channel, ...)         " {{{3
   call s:Verbose('Job finished (default handler)')
 endfunction
 
@@ -142,9 +142,7 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
   let job = remove(s:job_queue.list, 0)
   try
     call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
-    " if !empty(a:user_close_cb)
-      call call(a:user_close_cb, [a:channel])
-    " endif
+    call call(a:user_close_cb, [a:channel, job_info(job.job)])
   finally
     " Be sure, we always launch the next job
     if !s:job_queue.is_empty()
