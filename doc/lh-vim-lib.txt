@@ -1890,6 +1890,13 @@ Creates a menu entry and its associated mappings for several modes at once.
 @param[in] {menu-priority} |sub-menu-priority| for the new menu entry
 @param[in] {menu-text}      Name of the new menu entry
 @param[in] {key-binding}    Sequence of keys to execute the associated action
+                            If empty, no mapping will be done.
+                            It can be a key to help fill a menu reminder, and
+                            yet not define a mapping, it that case it takes
+                            the attributes:
+            - `'binding'`: what {key-binding} would have contained otherwise
+            - `'modes'`:   (not yet implemented)
+            - `'action'`:  (not yet implemented)
 @param[in] "<buffer>"       If the string "<buffer>" is provided, then the
                             associated mapping will be a |map-<buffer>|, and
                             the menu will be available to the current buffer
@@ -1899,7 +1906,6 @@ Creates a menu entry and its associated mappings for several modes at once.
                             or from a |local_vimrc|.
 @param[in] {action}         Action to execute when {key-binding} is typed, or
                             when the menu entry is selected.
-@todo support select ('s') and visual-not-select ('x') modes
 
 First example:~
 The following call will add the menu "LaTeX.Run LaTeX once <C-L><C-O>", with

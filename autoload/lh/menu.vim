@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      3.13.2
+let s:k_version = 313.2
 " Created:      13th Oct 2006
-" Last Update:  08th Jan 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -588,37 +588,38 @@ endfunction
 " Function: lh#menu#make({prefix},{code},{text},{binding},...) {{{3
 " Build the menu and map its associated binding to all the modes required
 function! lh#menu#make(prefix, code, text, binding, ...)
-  let nore   = (match(a:prefix, '[aincv]*nore') != -1) ? "nore" : ""
-  let prefix = matchstr(substitute(a:prefix, nore, '', ''), '[aincv]*')
-  let b = (a:1 == "<buffer>") ? 1 : 0
-  let i = b + 1
-  let cmd = a:{i}
-  let i += 1
-  while i <= a:0
-    let cmd .=  ' ' . a:{i}
-    let i += 1
-  endwhile
-  let build_cmd = nore . "menu <silent> " . a:code . ' ' . lh#menu#text(a:text)
-  if strlen(a:binding) != 0
+  let nore    = (match(a:prefix, '[aincvsx]*nore') != -1) ? "nore" : ""
+  let prefix  = matchstr(substitute(a:prefix, nore, '', ''), '[aincvsx]*')
+  let b       = (a:1 == '<buffer>') ? 1 : 0
+  let cmd = join(a:000[b : ], ' ')
+  let build_cmd = nore . 'menu <silent> ' . a:code . ' ' . lh#menu#text(a:text)
+  if type(a:binding) == type({})
+    let binding = get(a:binding, 'binding', '')
+    " TODO: Support action
+    let no_mapping = has_key(a:binding, 'action')
+  else
+    let binding = a:binding
+    let no_mapping = empty(binding)
+  endif
+  if !empty(binding)
     let build_cmd .=  '<tab>' .
-          \ substitute(lh#menu#text(a:binding), '&', '\0\0', 'g')
+          \ substitute(lh#menu#text(binding), '&', '\0\0', 'g')
+  endif
+  if !empty(binding)
     if prefix == 'i' && exists('*IMAP')
       if b != 0
-        call IMAP(a:binding, cmd, &ft)
+        call IMAP(binding, cmd, &ft)
       else
-        call IMAP(a:binding, cmd)
+        call IMAP(binding, cmd)
       endif
     else
-      if b != 0
-        call lh#menu#map_all(prefix.nore."map", ' <buffer> '.a:binding, cmd)
-      else
-        call lh#menu#map_all(prefix.nore."map", a:binding, cmd)
-      endif
+      let sBuffer = (a:1 == '<buffer>') ? ' <buffer> ' : ''
+      call lh#menu#map_all(prefix.nore.'map', sBuffer.binding, cmd)
     endif
   endif
   if has("gui_running") && has ('menu')
     while strlen(prefix)
-      execute <SID>BMenu(b).prefix[0].build_cmd.<SID>Build_CMD(prefix[0],cmd)
+      execute s:BMenu(b) . prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd)
       let prefix = strpart(prefix, 1)
     endwhile
   endif
