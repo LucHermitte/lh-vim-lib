@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.1
-let s:k_version = 3131
+" Version:      3.13.2
+let s:k_version = 3132
 " Created:      17th Apr 2007
-" Last Update:  01st Sep 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
 "
 "------------------------------------------------------------------------
 " History: {{{2
+"       v3.13.2
+"       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
 "       (*) ENH: Add lh#list#zip(), lh#list#zip_as_dict()
 "       v3.10.0
@@ -558,8 +560,7 @@ endfunction
 
 " Function: lh#list#push_if_new(list, value) {{{3
 function! lh#list#push_if_new(list, value) abort
-  let matching = filter(copy(a:list), 'v:val == a:value')
-  if empty(matching)
+  if index(a:list, a:value) < 0
     call add (a:list, a:value)
   endif
   return a:list
