@@ -4,8 +4,8 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	3.13.1
-let s:version = '3.13.1'
+" Version:	3.13.2
+let s:version = '3.13.2'
 " Created:	06th Nov 2007
 " Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------

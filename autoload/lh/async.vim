@@ -2,8 +2,8 @@
 " File:         autoload/lh/async.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.13.3.
-let s:k_version = '3133'
+" Version:      3.13.2.
+let s:k_version = '3132'
 " Created:      01st Sep 2016
 " Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
@@ -110,6 +110,9 @@ function! s:start_next() dict abort                " {{{3
   try
     let success = 0
     let args = job.args
+    if has_key(job, 'before_start_cb')
+      call job.before_start_cb()
+    endif
     call s:Verbose('Starting next job: %1', job)
     let Close_cb = get(args, 'close_cb', function('s:default_close_cb'))
     let args.close_cb = function('s:close_cb', [Close_cb])

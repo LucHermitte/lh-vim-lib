@@ -381,14 +381,15 @@ The format of the result being ?to be stabilized?
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#async#queue()*                {{{3
 lh#async#queue(job)~
-This function is a wrapper around recent |job_start()|. As such it requires a
-recent version of Vim without any bugs in the job related part.
-I require v7.4-1980 at least.
+This function is a wrapper around recent |job_start()| function. As such it
+requires a recent version of Vim without any bugs in the |+job| related part.
+I've chosen to require v7.4-1980 at least.
 
-It implements a queue of jobs to run. Only one job can be ran simultaneously.
-When a job has finished, the next one is started.
-So far it has been designed to register a |close_cb|. There is one provided by
-default that won't do any thing.
+This function implements a queue of jobs to run. Only one job can be ran
+simultaneously. When a job has finished, the next one is started.
+So far it has been designed to register a |close_cb|, and it has been used
+also with a |callback|. There is one default callback provided for |close_cb|
+that won't do any thing.
 
 All jobs are started through the |'shell'| in order to support
 `cd dirname && cmd` and more complex things.
@@ -396,11 +397,15 @@ Under Windows it's ran with `[&shell, &shellcmdflag, command]`
 Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
 
 @param {job} |Dict| that contains:
-            - options for |job_start()|
-            - `'cmd'`: command to execute
-            - `'txt'`: optional description of what is executed for |airline|
-@todo            Support for |job_stop()|
-@todo            Support multiple queues -> `lh#async#new_queue()`
+  - options for |job_start()|
+  - `'cmd'`: command to execute
+  - `'txt'`: optional description of what is executed for |airline|
+  - `'before_starting_cb'`: optional callback for a function to execute before
+    starting any new job. Indeed, things that must be executed before a job
+    starts shall not be executed before the previous job has ended. This
+    callback helps to delay operations written in |VimL|.
+@todo Support for |job_stop()|
+@todo Support multiple queues -> `lh#async#new_queue()`
 
 Active queues and bakground job will be presented in |airline-section|`_b`.
 
