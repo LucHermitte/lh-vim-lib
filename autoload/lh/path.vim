@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.4
-let s:k_version = 31004
+" Version:      3.13.2
+let s:k_version = 31302
 " Created:      23rd Jan 2007
-" Last Update:  27th May 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -96,6 +96,8 @@ let s:k_version = 31004
 "       (*) BUG: Support comma-separated lists in lh#path#munge()
 "       v3.10.4
 "       (*) PERF: Optimize lh#path#glob_as_list()
+"       v3.13.2
+"       (*) ENH: Add `lh#path#remove_dir_mark()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -364,6 +366,11 @@ function! lh#path#to_dirname(dirname) abort
   let dirname = a:dirname . (empty(a:dirname) || a:dirname[-1:] =~ '[/\\]'
         \ ? '' : lh#path#shellslash())
   return dirname
+endfunction
+
+" Function: lh#path#remove_dir_mark(dirname) {{{3
+function! lh#path#remove_dir_mark(dirname) abort
+  return substitute(a:dirname, '\v.{-}\zs[/\\]$', '', '')
 endfunction
 
 " Function: lh#path#depth({dirname}) {{{3

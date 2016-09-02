@@ -4,9 +4,9 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "		<URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/Licence.md>
-" Version:      3.2.11
+" Version:      3.13.2
 " Created:      28th May 2009
-" Last Update:  19th Nov 2015
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Tests for autoload/lh/path.vim
@@ -226,6 +226,27 @@ function! s:Test_path_depth()
   AssertEquals(2, lh#path#depth('c:\toto/titi/'))
 " todo: make a choice about "negative" paths like "../../foo"
   AssertEquals(-1, lh#path#depth('../../foo'))
+endfunction
+
+function! s:Test_dirnames()
+  let sl = lh#path#shellslash()
+  AssertEquals('foo'.sl,          lh#path#to_dirname('foo'))
+  AssertEquals('foo/',            lh#path#to_dirname('foo/'))
+  AssertEquals('foo\',            lh#path#to_dirname('foo\'))
+  AssertEquals('bar'.sl.'foo'.sl, lh#path#to_dirname('bar'.sl.'foo'))
+  AssertEquals('bar/foo/',        lh#path#to_dirname('bar/foo/'))
+  AssertEquals('bar\foo\',        lh#path#to_dirname('bar\foo\'))
+
+  AssertEquals('foo',             lh#path#remove_dir_mark('foo'.sl))
+  AssertEquals('foo',             lh#path#remove_dir_mark('foo/'))
+  AssertEquals('foo',             lh#path#remove_dir_mark('foo\'))
+  AssertEquals('bar'.sl.'foo',    lh#path#remove_dir_mark('bar'.sl.'foo'.sl))
+  AssertEquals('bar/foo',         lh#path#remove_dir_mark('bar/foo/'))
+  AssertEquals('bar\foo',         lh#path#remove_dir_mark('bar\foo\'))
+
+  AssertEquals('',                lh#path#remove_dir_mark(''))
+  " The behaviour of the following call may change in the future.
+  AssertEquals('',                lh#path#remove_dir_mark(sl))
 endfunction
 
 "------------------------------------------------------------------------

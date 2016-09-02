@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.13.1)
-                        For Vim version 7+      Last change: 01st Sep 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.13.2)
+                        For Vim version 7+      Last change: 02nd Sep 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -124,6 +124,7 @@ Paths related functions:                                |lhvl#path|
 - |lh#path#is_url()|
 - |lh#path#readlink()|
 - |lh#path#relative_to()|
+- |lh#path#remove_dir_mark()|
 - |lh#path#select_one()|
 - |lh#path#simplify()|
 - |lh#path#strip_common()|
@@ -1527,6 +1528,11 @@ Ensures the returned directory name ends with a '`/`' or a '`\`'.
 
 @todo On windows, it should take 'shellslash' into account to decide the
       character to append.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#path#remove_dir_mark()*         {{{3
+lh#path#remove_dir_mark({dirname})~
+Remove the trailing 'shellslash' character ('`/`' or a '`\`') from {dirname}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#fix()*                   {{{3

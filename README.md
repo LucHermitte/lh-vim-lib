@@ -187,6 +187,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#munge(pathlist, path)`              | Adds a path to a list on the condition the path isn't already present, and that it points to a valid node|
 | `lh#path#readlink(pathname)`                 | Returns `readlink` result on the pathname -- when the command is available on the system                 |
 | `lh#path#relative_to()`                      | Returns the relative offset to reference files in another directory                                      |
+| `lh#path#remove_dir_mark()`                  | Removes the trailing `/` or `\` in the path if any                                                       |
 | `lh#path#select_one()`                       | Asks the end-user to select one pathname                                                                 |
 | `lh#path#shellslash()`                       | Returns the shellslash character                                                                         |
 | `lh#path#simplify()`                         | Like `simplify()`, but also strips the leading `./`                                                      |
