@@ -38,6 +38,7 @@ autoload/lh/float.vim
 autoload/lh/fmt.vim
 autoload/lh/function.vim
 autoload/lh/graph/tsort.vim
+autoload/lh/has.vim
 autoload/lh/icomplete.vim
 autoload/lh/leader.vim
 autoload/lh/let.vim

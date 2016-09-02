@@ -47,7 +47,7 @@ function! airline#extensions#async#debug(expr) abort
 endfunction
 
 " # Requirements {{{2
-let s:has_jobs = exists('*job_start') && has("patch-7.4.1980")
+let s:has_jobs = lh#has#jobs()
 if ! s:has_jobs
   finish
 endif
@@ -97,7 +97,7 @@ function! airline#extensions#async#get_activity() abort
   else
     let txt = get(jobs[0], 'txt', lh#option#unset())
     if lh#option#is_set(txt)
-      let waiting = nb_jobs == 1 ? '' : ' + ' . (nb_jobs-1) 
+      let waiting = nb_jobs == 1 ? '' : ' + ' . (nb_jobs-1)
       return txt . waiting
     else
       return len(jobs)

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.11.0
-let s:k_version = 3110
+" Version:      3.13.2
+let s:k_version = 3132
 " Created:      24th Jul 2004
-" Last Update:  26th Aug 2016
+" Last Update:  02nd Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -76,6 +76,7 @@ endfunction
 "=============================================================================
 " ## Functions {{{1
 " # Public {{{2
+let s:has_default_in_getbufvar = lh#has#default_in_getbufvar()
 
 " Function: lh#option#unset() {{{3
 let g:lh#option#unset = {}
@@ -154,22 +155,48 @@ endfunction
 "   getbufvar(expr, name, g:lh#option#unset)
 " This function ensures g:lh#option#unset is known (the lazy-loading mecanism
 " of autoload plugins doesn't apply to variables, only to functions)
-function! lh#option#getbufvar(buf, name,...)
-  let def = a:0 == 0 ? g:lh#option#unset : a:1
-  return getbufvar(a:buf, a:name, def)
-endfunction
+if s:has_default_in_getbufvar
+  function! lh#option#getbufvar(buf, name,...)
+    let def = a:0 == 0 ? g:lh#option#unset : a:1
+    return getbufvar(a:buf, a:name, def)
+  endfunction
+else
+  function! lh#option#getbufvar(buf, name,...)
+    let res = getbufvar(a:buf, a:name)
+    if (type(res) == type('')) && empty(res)
+      " Check whether this is really empty, or whether the variable doesn't
+      " exist
+      try
+        let b = bufnr('%')
+        exe 'buf '.a:buf
+        if !exists('b:'.a:name)
+          let res = a:0 == 0 ? g:lh#option#unset : a:1
+        endif
+      finally
+        exe 'buf '.b
+      endtry
+    endif
+    return res
+  endfunction
+endif
 
 " Function: lh#option#getbufglobvar(expr, name [, default]) {{{3
-function! lh#option#getbufglobvar(expr, name, ...) abort
-  return getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
+if s:has_default_in_getbufvar
+  function! lh#option#getbufglobvar(expr, name, ...) abort
+    return getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
 
-  let res = call('lh#option#getbufvar', [a:expr, a:name, g:lh#option#unset])
-  if lh#option#is_unset(res)
-    let def = a:0 == 0 ? g:lh#option#unset : a:1
-    return get(g:, a:name, def)
-  endif
-  return res
-endfunction
+    let res = call('lh#option#getbufvar', [a:expr, a:name, g:lh#option#unset])
+    if lh#option#is_unset(res)
+      let def = a:0 == 0 ? g:lh#option#unset : a:1
+      return get(g:, a:name, def)
+    endif
+    return res
+  endfunction
+else
+  function! lh#option#getbufglobvar(expr, name, ...) abort
+    return lh#option#getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
+  endfunction
+endif
 
 " Function: lh#option#add(name, values)                       {{{3
 " Add fields to a vim option.

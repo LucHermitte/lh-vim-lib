@@ -47,7 +47,7 @@ function! lh#async#debug(expr) abort
 endfunction
 
 " # Requirements {{{2
-let s:has_jobs = exists('*job_start') && has("patch-7.4.1980")
+let s:has_jobs = lh#has#jobs()
 if ! s:has_jobs
   finish
 endif

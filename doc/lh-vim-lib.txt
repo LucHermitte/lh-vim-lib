@@ -43,6 +43,9 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#fmt#printf()|
 - |lh#float#min()|, |lh#float#max()|,
   |lh#float#arg_min()|, |lh#float#arg_max()|
+- *lh#has#partials()* returns whether |Partial|s are implemented
+- *lh#has#jobs()*     returns whether |+job|s are correctly implemented
+- *lh#has#default_in_getbufvar()* returns whether |getbufvar()| has 3 parameters
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
