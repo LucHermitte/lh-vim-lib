@@ -123,6 +123,7 @@ function! s:start_next() dict abort                " {{{3
       let cmd = [&shell, &shellcmdflag, job.cmd]
     endif
     let job.job = job_start(cmd, args)
+    call s:Verbose('job_start(%2) status: %1', job_info(job.job), cmd)
     if job_info(job.job).status == 'fail'
       throw "Starting `".(job.cmd)."` failed!"
     endif
