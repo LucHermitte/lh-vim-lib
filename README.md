@@ -142,6 +142,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#subset()`          | Builds a subset slice of a list                                                                                   |
 | `lh#list#transform()`       | Applies a transformation on each element from a list ; unlike `map()`, the input list is left unchanged           |
 | `lh#list#transform_if()`    | Applies a transformation on each element from a list that match the predicate                                     |
+| `lh#list#uniq()`            | Emulates `uniq()` when not defined, calls it otherwise                                                            |
 | `lh#list#unique_sort()`     | Sorts the elements of a list, and makes sure they are all unique                                                  |
 | `lh#list#unique_sort2()`    | Another implementation of `unique_sort`                                                                           |
 | `lh#list#upper_bound()`     | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                              |

@@ -93,6 +93,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#subset()|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
+- |lh#list#uniq()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
 - |lh#list#zip()|, and |lh#list#zip_as_dict()|
 Dicts related functions:                                |lhvl#dict|
@@ -933,7 +934,7 @@ Returns whether the {range} is empty. This function can be used to check
 |lh#list#equal_range()| functions results
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                   *lh#list#unique_sort()* *lh#list#unique_sort2()*               {{{3
+                                           *lh#list#uniq*                     {{{3
 lh#list#unique_sort({list} [, {cmp}])~
 lh#list#unique_sort2({list} [, {cmp}])~
 @param[in] {list} |List| to sort
@@ -949,6 +950,13 @@ The difference between the two functions is the following:
   stored in the dictionary ;
 - `unique_sort2()` sorts all the elements from the initial |List|, and then
   keeps only the elements that appear once.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                   *lh#list#unique_sort()* *lh#list#unique_sort2()*               {{{3
+lh#list#uniq({list})~
+@return Emulates |uniq()| when it doesn't exists. Or directly call it
+otherwise.
+@pre The emulation doesn't support all parameters supported by |uniq()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#Transform()*              {{{3

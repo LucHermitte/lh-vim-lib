@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.2
-let s:k_version = 3132
+" Version:      3.14.0
+let s:k_version = 3140
 " Created:      17th Apr 2007
-" Last Update:  02nd Sep 2016
+" Last Update:  06th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -487,20 +487,31 @@ function! lh#list#unique_sort2(list, ...) abort
   else
     call lh#list#sort(list)
   endif
-  if len(list) <= 1 | return list | endif
-  let result = [ list[0] ]
-  let last = list[0]
-  let i = 1
-  while i < len(list)
-    if last != list[i]
-      let last = list[i]
-      call add(result, last)
-    endif
-    let i += 1
-  endwhile
-  return result
+  return lh#list#uniq(list)
 endfunction
 
+" Function: lh#list#uniq(list) {{{3
+if exists('*uniq')
+  function! lh#list#uniq(...) abort
+    return call('uniq', a:000)
+  endfunction
+else
+  function! lh#list#uniq(list) abort
+    if len(a:list) <= 1 | return a:list | endif
+    let result = [ a:list[0] ]
+    let last = a:list[0]
+    let i = 1
+    let ll = len(a:list)
+    while i < ll
+      if last != a:list[i]
+        let last = a:list[i]
+        call add(result, last)
+      endif
+      let i += 1
+    endwhile
+    return result
+  endfunction
+endif
 " Function: lh#list#subset(list, indices) {{{3
 function! lh#list#subset(list, indices) abort
   let result=[]
