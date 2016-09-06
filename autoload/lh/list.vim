@@ -471,22 +471,13 @@ else
     endfor
     let result = []
     " echo join(values(dictionary),"\n")
-    if ( exists( 'a:1' ) )
-      let result = lh#list#sort( values( dictionary ), a:1 )
-    else
-      let result = lh#list#sort( values( dictionary ) )
-    endif
-    return result
+    return call('lh#list#sort', [values(dictionary)] + a:000)
   endfunction
 endif
 
 function! lh#list#unique_sort2(list, ...) abort
   let list = copy(a:list)
-  if ( exists( 'a:1' ) )
-    call lh#list#sort(list, a:1 )
-  else
-    call lh#list#sort(list)
-  endif
+  call call('lh#list#sort', [list] + a:000)
   return lh#list#uniq(list)
 endfunction
 
