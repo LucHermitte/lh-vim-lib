@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.13.2)
-                        For Vim version 7+      Last change: 02nd Sep 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.14.0)
+                        For Vim version 7+      Last change: 06th Sep 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -56,6 +56,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#char_at_pos()|
 - |lh#position#extract()|
 - |lh#position#is_before()|
+- |lh#time#bench()|
+- |lh#time#date()|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
 Options related functions:                              |lhvl#option|
@@ -444,6 +446,19 @@ lh#position#char_at_pos({pos})~
                                              *lh#position#extract()*           {{{3
 lh#position#extract({pos1}, {pos2})~
 @return             The string between the two positions (see |getpos()|).
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#time#bench()*                 {{{3
+lh#time#bench(Function[, args])~
+@return the time spent by the execution of `Function()`.
+@param[in] {Function} is expected to be something like a |function| --
+|lhvl-functor|s are not yet supported.
+@require |reltime()| support (hence, a recent Vim version)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#time#date()*                  {{{3
+lh#time#date()~
+@return the equivalent of `strftime('%D-th %b %Y)`
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#visual#selection()*           {{{3

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = '3601'
+" Version:      3.14.0
+let s:k_version = '31400'
 " Created:      01st Dec 2015
-" Last Update:  08th Jan 2016
+" Last Update:  06th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -47,6 +47,22 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+
+" # Bench {{{2
+" Function: lh#time#bench(F) {{{3
+if exists('*reltime')
+  function! lh#time#bench(F, ...) abort
+    let t0 = reltime()
+    let res = call(a:F, a:000)
+    let t = reltime()
+    return [res, reltimefloat(reltime(t0, t))]
+  endfunction
+else
+  function! lh#time#bench(F, ...) abort
+    let res = call(a:F, a:000)
+    return [res, 0]
+  endfunction
+endif
 
 " # Stamps {{{2
 " Function: lh#time#date() {{{3
