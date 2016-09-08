@@ -4,16 +4,19 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.2
-let s:k_version = 3132
+" Version:      4.0.0
+let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  02nd Sep 2016
+" Last Update:  08th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 "
 " History: {{{2
+"       v4.0.0
+"       (*) ENH: lh#option#get() functions evolve to support new `p:` project
+"       variables
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -100,14 +103,23 @@ endfunction
 " The order of the variables checked can be specified through the optional
 " argument {scope}
 function! lh#option#get(name,...)
-  let scope = (a:0 == 2) ? a:2 : 'bg'
+  let scope = (a:0 == 2) ? a:2 : 'bpg'
   let name = a:name
   let i = 0
   while i != strlen(scope)
+    if scope[i] == 'p'
+      let r = lh#project#_get(a:name)
+      if lh#option#is_set(r)
+        call s:Verbose('p:%1 found -> %2', a:name, r)
+        return r
+      endif
+    endif
     if exists(scope[i].':'.name)
       " \ && (0 != strlen({scope[i]}:{name}))
       " This syntax doesn't work with dictionaries -> !exe
       " return {scope[i]}:{name}
+      exe 'let value='.scope[i].':'.name
+      call s:Verbose('%1:%2 found -> %3', scope[i], a:name, value)
       exe 'return '.scope[i].':'.name
     endif
     let i += 1
@@ -138,6 +150,13 @@ function! lh#option#get_non_empty(name,...)
   let name = a:name
   let i = 0
   while i != strlen(scope)
+    if scope[i] == 'p'
+      let r = lh#project#_get(a:name)
+      if lh#option#is_set(r)
+        call s:Verbose('p:%1 found -> %2', a:name, r)
+        return r
+      endif
+    endif
     if exists(scope[i].':'.name) && !s:IsEmpty({scope[i]}:{name})
       return {scope[i]}:{name}
     endif

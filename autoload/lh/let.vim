@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.7.1
-let s:k_version = 3701
+" Version:      4.0.0
+let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  23rd Feb 2016
+" Last Update:  08th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -49,15 +49,44 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 "
-" # LetIfUndef {{{2
+" # Let* {{{2
+" Function: s:BuildPublicVariableName(var) {{{3
+function! s:BuildPublicVariableName(var)
+  if a:var =~ '^p:'
+    " It's a p:roject variable
+    let var = substitute(a:var, '^p:', lh#project#crt_bufvar_name().".variables.", '')
+  else
+    let var = a:var
+  endif
+  return var
+endfunction
+
+" Function: s:BuildPublicVariableNameAndValue(string|var, value) {{{3
+function! s:BuildPublicVariableNameAndValue(...)
+  if len(a:000) == 1
+    let [all, var, value ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
+    let value = string(eval(value))
+  else
+    let var = a:1
+    let value = a:2
+  endif
+  let var = s:BuildPublicVariableName(var)
+  return [var, value]
+endfunction
+
 " Function: lh#let#if_undef(var, value) {{{3
-function! lh#let#if_undef(var, value) abort
-  try
+" Syntax used to directly call the function
+" @param[in] var
+" @param[in] value
+" Syntax use by :LetIfUndef
+" @param[in] string: 'var = value'
+function! s:LetIfUndef(var, value) abort " {{{4
     let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
+    call s:Verbose('%1 --> dict=%2 --- key=%3', a:var, dict, key)
     " echomsg a:var." --> dict=".dict." --- key=".key
     if !empty(key)
       " Dictionaries
-      let dict2 = lh#let#if_undef(dict, string({}))
+      let dict2 = s:LetIfUndef(dict, string({}))
       if !has_key(dict2, key)
         let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
         call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
@@ -71,11 +100,52 @@ function! lh#let#if_undef(var, value) abort
       endif
       return {a:var}
     endif
+endfunction
+
+function! lh#let#if_undef(...) abort " {{{4
+  call s:Verbose('let_if_undef(%1)', a:000)
+  try
+    let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    return s:LetIfUndef(var, value)
   catch /.*/
-    echoerr "Cannot set ".a:var." to ".string(a:value).": ".(v:exception .' @ '. v:throwpoint)
+    echoerr "Cannot set ".var." to ".string(value).": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
+" Function: lh#let#to(var, value) {{{3
+" Syntax used to directly call the function
+" @param[in] var
+" @param[in] value
+" Syntax use by :LetIfUndef
+" @param[in] string: 'var = value'
+" Unline lh#let#if_undef, always reset the variable value!
+" @since v4.0.0
+function! s:LetTo(var, value) abort " {{{4
+  " Here, project variables have already been resolved.
+  let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
+  " echomsg a:var." --> dict=".dict." --- key=".key
+  if !empty(key)
+    " Dictionaries
+    let dict2 = s:LetIfUndef(dict, string({})) " Don't override the dict w/ s:LetTo()!
+    let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
+    return dict2[key]
+  else
+    " other variables
+    let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    call s:Verbose("let %1 = %2", a:var, {a:var})
+    return {a:var}
+  endif
+endfunction
+
+function! lh#let#to(...) abort " {{{4
+  try
+    let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    return s:LetTo(var, value)
+  catch /.*/
+    echoerr "Cannot set ".var." to ".string(value).": ".(v:exception .' @ '. v:throwpoint)
+  endtry
+endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
