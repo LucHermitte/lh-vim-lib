@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.1.
-let s:k_version = '31301'
+" Version:      4.0.0.0
+let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  01st Sep 2016
+" Last Update:  08th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -81,6 +81,27 @@ function! lh#dict#subset(dict, keys) abort
   endfor
   return result
 endfunction
+
+" Function: lh#dict#get_composed(dst, key[, def]) {{{3
+" @since v4.0.0
+function! lh#dict#get_composed(dst, key, ...) abort
+  try
+    let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.([^.]+))=$')
+    call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
+    if !has_key(a:dst, key)
+      call s:Verbose('Return default value: Key %1 not found in %2.', key, a:dst)
+      return get(a:, 1, lh#option#unset())
+    endif
+    if empty(subkey)
+      return a:dst[a:key]
+    else
+      return call('lh#dict#get_composed', [a:dst[key], subkey]+a:000)
+    endif
+  catch /.*/
+    echoerr "Cannot get ".a:key." in ".string(a:dst).": ".(v:exception .' @ '. v:throwpoint)
+  endtry
+endfunction
+
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
