@@ -52,7 +52,9 @@ endfunction
 " # Let* {{{2
 " Function: s:BuildPublicVariableName(var) {{{3
 function! s:BuildPublicVariableName(var)
-  if a:var =~ '^p:'
+  if a:var !~ '^[wbptg]:'
+    throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
+  elseif a:var =~ '^p:'
     " It's a p:roject variable
     let var = substitute(a:var, '^p:', lh#project#crt_bufvar_name().".variables.", '')
   else
@@ -68,7 +70,7 @@ function! s:BuildPublicVariableNameAndValue(...)
     let value = string(eval(value))
   else
     let var = a:1
-    let value = a:2
+    let value = string(a:2)
   endif
   let var = s:BuildPublicVariableName(var)
   return [var, value]
@@ -108,7 +110,7 @@ function! lh#let#if_undef(...) abort " {{{4
     let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
     return s:LetIfUndef(var, value)
   catch /.*/
-    echoerr "Cannot set ".var." to ".string(value).": ".(v:exception .' @ '. v:throwpoint)
+    echoerr "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
@@ -143,7 +145,41 @@ function! lh#let#to(...) abort " {{{4
     let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
     return s:LetTo(var, value)
   catch /.*/
-    echoerr "Cannot set ".var." to ".string(value).": ".(v:exception .' @ '. v:throwpoint)
+    echoerr "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+  endtry
+endfunction
+
+" Function: lh#let#unlet(var) {{{3
+function! s:Unlet(var) abort " {{{4
+  " Here, project variables have already been resolved.
+  let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
+  " echomsg a:var." --> dict=".dict." --- key=".key
+  if !empty(key)
+    " Dictionaries
+    if !has_key(dict, key)
+      return s:Unlet(dict[key])
+    endif
+    let dict2 = s:LetIfUndef(dict, string({})) " Don't override the dict w/ s:LetTo()!
+    let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
+    return dict2[key]
+  else
+    " other variables
+    unlet {a:var}
+    call s:Verbose("unlet %1", a:var)
+    return {a:var}
+  endif
+endfunction
+
+function! lh#let#unlet(var) abort " {{{4
+  try
+    let var = s:BuildPublicVariableName(a:var)
+    " The following doesn't work with dictionaries
+    " unlet {var}
+    exe 'unlet '.var
+    call s:Verbose("unlet %1", var)
+  catch /.*/
+    echoerr "Cannot unset ".a:var.": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
@@ -153,7 +189,7 @@ endfunction
 "
 " Function: lh#let#_push_options(variable, ...) {{{3
 function! lh#let#_push_options(variable, ...) abort
-  let var = lh#let#if_undef(a:variable, '[]')
+  let var = lh#let#if_undef(a:variable, [])
   for val in a:000
     call lh#list#push_if_new(var, val)
   endfor
@@ -210,7 +246,7 @@ function! lh#let#_list_variables(lead) abort
 endfunction
 
 " Function: lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) {{{3
-call lh#let#if_undef('g:acceptable_options_for', '{}')
+call lh#let#if_undef('g:acceptable_options_for', {})
 
 function! lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) abort
   let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')

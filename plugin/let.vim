@@ -43,6 +43,7 @@ set cpo&vim
 command! -nargs=+ LetIfUndef call lh#let#if_undef(<q-args>)
 " NB: I avoid plain `:Let`  by fear other plugin use the same command name
 command! -nargs=+ LetTo      call lh#let#to(<q-args>)
+command! -nargs=1 Unlet      call lh#let#unlet(<f-args>)
 
 command! -nargs=+ -complete=customlist,lh#let#_push_options_complete
       \ PushOptions call lh#let#_push_options(<f-args>)
@@ -52,7 +53,7 @@ command! -nargs=+ -complete=customlist,lh#let#_pop_options_complete
 "------------------------------------------------------------------------
 " Functions {{{1
 " Note: most functions are best placed into
-" autoload/«your-initials»/«let».vim
+" autoload/?your-initials?/?let?.vim
 " Keep here only the functions are are required when the plugin is loaded,
 " like functions that help building a vim-menu for this plugin.
 

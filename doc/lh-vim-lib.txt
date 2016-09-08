@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.14.1)
+*lh-vim-lib.txt*        Vim common libraries (v4.0.0)
                         For Vim version 7+      Last change: 08th Sep 2016
 
                         By Luc Hermitte
@@ -205,12 +205,19 @@ Version Control System functions                        |lhvl#vcs|
 - |lh#vcs#get_url()|
 - |lh#vcs#decode_github_url()|
 - |lh#vcs#as_http()|
+Variables helper functions                              |lhvl#variable|
+- |lh#let#if_undef()|
+- |lh#let#to()|
+- |lh#let#undef()|
+Project related functions                               |lhvl#project|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
-- |LetIfUndef|
-- |PushOptions|
-- |PopOptions|
+- |:LetIfUndef|
+- |:LetTo|
+- |:Unlet|
+- |:PushOptions|
+- |:PopOptions|
 }}}2
 ------------------------------------------------------------------------------
 MISCELLANOUS FUNCTIONS                                *lhvl#misc*       {{{2
@@ -2780,6 +2787,79 @@ lh#vcs#is_svn([path])~
 @return whether the {path} belongs to a svn repository.
 
 ------------------------------------------------------------------------------
+VARIABLES HELPERS                                     *lhvl#variables*  {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#let#if_undef()*  *:LetIfUndef* {{{3
+lh#let#if_undef({varname}, {value})~
+:LetIfUndef {varname} {value}~
+:LetIfUndef {varname} = {value}~
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+@param[in] {value}
+@warning the interface has changed with v4.0.0, {value} no longer need to be
+quoted.
+@return variable built
+lh#let#if_undef({assignment-string})~
+Flavour meant to be used internally by |:LetIfUndef|
+
+These function and command make sure the variable named {varname} exists. If
+it didn't exist before, it's assigned to {value}.
+The {varname} can be a |Dictionary| with all its fields.
+
+Examples: >
+    call lh#let#if_undef('g:dummy_test1', 42)
+    LetIfUndef g:dummy_test1 42
+    LetIfUndef g:dummy_test1 = 42
+
+    call lh#let#if_undef('g:dummy_test2', {'a':1, 'b':{'c':5}})
+    LetIfUndef g:dummy_test2.un.deux {'a':1, 'b':{'c':5}})
+    LetIfUndef g:dummy_test2.un.deux = {'a':1, 'b':{'c':5}})
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#let#to()*        *:LetTo*      {{{3
+lh#let#to({varname}, {value})~
+:LetTo {varname} {value}~
+:LetTo {varname} = {value}~
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+@param[in] {value} assigned, must no be quoted
+@return variable built
+lh#let#to({assignment-string})~
+Flavour meant to be used internally by |:LetTo|
+
+These function and command make sure the variable named {varname} exists and
+values {value}.
+The {varname} can be a |Dictionary| with all its fields.
+
+Examples: >
+    call lh#let#to('g:dummy_test1', 42)
+    LetTo g:dummy_test1 42
+    LetTo g:dummy_test1 = 42
+
+    call lh#let#to('g:dummy_test2', {'a':1, 'b':{'c':5}})
+    LetTo g:dummy_test2.un.deux {'a':1, 'b':{'c':5}})
+    LetTo g:dummy_test2.un.deux = {'a':1, 'b':{'c':5}})
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#let#unlet()*     *:Unlet*      {{{3
+lh#let#unlet({varname})~
+:Unlet {varname}~
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+
+These function and command make sure the variable named {varname} doesn't exists.
+The {varname} can be a |Dictionary| with all its fields. It that case, only
+the last field is removed.
+
+Examples: >
+    Unlet g:dummy_test1
+    " or
+    call lh#let#unlet('g:dummy_test1')
+
+    Unlet g:dummy_test1.un.deux
+    " or
+    call lh#let#unlet('g:dummy_test2.un.deux')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
                                                                      }}}1
 ==============================================================================
  (c) Luc Hermitte, 2001-2016 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1

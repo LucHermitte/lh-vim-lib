@@ -1,4 +1,4 @@
-﻿# lh-vim-lib [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+﻿# lh-vim-lib v4.0.0 [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
 
 ## Introduction
 
@@ -11,7 +11,8 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 **Important:
 
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
-- Since version 3.2.7, it's no longer hosted on google-code but on github**
+- Since version 3.2.7, it's no longer hosted on google-code but on github
+- Version 4.0.0 breaks `lh#let#if_undef()` interface.**
 
 ## Functions
 
@@ -62,7 +63,9 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#leader#get()`                              | Returns the current value of `g:mapleader`, or `'\\'` if unset                                                                                                           |
 | `lh#leader#get_local()`                        | Returns the current value of `g:maplocalleader`, or `'\\'` if unset                                                                                                      |
 | `lh#leader#set_local_if_unset()`               | Sets a new value to `g:maplocalleader`, if and only if this variable wasn't already set                                                                                  |
-| `lh#let#let_if_undef()`                        | Defines a vim variable (with ` :let`) on the condition the variable does not exist yet                                                                                   |
+| `lh#let#if_undef()`                            | Defines an extended vim variable (with ` :let`) on the condition the variable does not exist yet                                                                         |
+| `lh#let#to()`                                  | Defines an extended vim variable (with ` :let`) -- its previous value will be overridden                                                                                 |
+| `lh#let#unlet()`                               | Undefines an extended vim variable (with ` :unlet`)                                                                                                                      |
 | `lh#log#echomsg()`                             | Returns a new logger object, that logs with `:echomsg` (internal use)                                                                                                    |
 | `lh#log#new()`                                 | Returns a new logger object (internal use)                                                                                                                               |
 | `lh#log#none()`                                | Returns a new, inactive, logger object (internal use)                                                                                                                    |
