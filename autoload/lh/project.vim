@@ -42,7 +42,6 @@ let s:k_version = '4000'
 " History:
 " @since v4.0.0
 " TODO:
-" - Be able to change b:crt_project at vimrc level
 " - Be able to control which parent is filled with lh#let# functions
 " - Simplify new project creation
 " - remove deleted buffers
@@ -58,6 +57,8 @@ let s:k_version = '4000'
 
 let s:cpo_save=&cpo
 set cpo&vim
+
+let s:project_varname = get(g:, 'lh#project#varname', 'crt_project')
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
@@ -94,12 +95,12 @@ endfunction
 function! s:register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
   " if there is already a (different project), then inherit from it
-  let inherited = lh#option#getbufvar(bid, 'crt_project')
+  let inherited = lh#option#getbufvar(bid, s:project_varname)
   if  lh#option#is_set(inherited) && inherited isnot self
     call self.inherit(inherited)
     " and then ovveride with new value
   endif
-  call setbufvar(bid, 'crt_project', self)
+  call setbufvar(bid, s:project_varname, self)
   call lh#list#push_if_new(self.buffers, bid)
   " todo: register bid removing when bid is destroyed
 endfunction
@@ -165,8 +166,8 @@ endfunction
 " # Access {{{2
 " Function: lh#project#crt_bufvar_name() {{{3
 function! lh#project#crt_bufvar_name() abort
-  if exists('b:crt_project')
-    return 'b:crt_project'
+  if exists('b:'.s:project_varname)
+    return 'b:'.s:project_varname
   else
     throw "The current buffer doesn't belong to a project"
   endif
@@ -174,8 +175,8 @@ endfunction
 
 " Function: lh#project#_get(name) {{{3
 function! lh#project#_get(name) abort
-  if exists('b:crt_project')
-    return b:crt_project.get(a:name)
+  if exists('b:'.s:project_varname)
+    return b:{s:project_varname}.get(a:name)
   else
     return lh#option#unset()
   endif
