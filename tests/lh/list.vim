@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.13.1
+" Version:      3.14.1
 " Created:	19th Nov 2008
-" Last Update:  23rd May 2016
+" Last Update:  08th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -499,6 +499,17 @@ function! s:Test_zip_dict() abort
   let l2 = [1, 2, 3]
   AssertEquals(lh#list#zip_as_dict(l1, l2), {'a': 1, 'b': 2, 'c': 3})
   AssertThrows(lh#list#zip_as_dict([1], [1,2]))
+endfunction
+
+" Separate {{{2
+" Function: s:Test_separate() {{{3
+function! s:Test_separate() abort
+  let l = [ 1, 5, 48, 25, 5, 28, 6]
+  if has('lambda')
+    let [min, max] = lh#list#separate(l, {idx, val -> val <10})
+    AssertEquals(min, [1, 5, 5, 6])
+    AssertEquals(max, [48, 25, 28])
+  endif
 endfunction
 
 " }}}1

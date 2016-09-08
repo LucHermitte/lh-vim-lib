@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v3.14.0)
-                        For Vim version 7+      Last change: 06th Sep 2016
+*lh-vim-lib.txt*        Vim common libraries (v3.14.1)
+                        For Vim version 7+      Last change: 08th Sep 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -91,6 +91,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#possible_values()|
 - |lh#list#push_if_new()|
 - |lh#list#remove()|
+- |lh#list#separate()|
 - |lh#list#sort()|
 - |lh#list#subset()|
 - |lh#list#Transform()| and |lh#list#transform()|
@@ -1188,6 +1189,26 @@ This function flattens a list >
   AssertEquals(lh#list#flatten(l), range(7))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#separate()*               {{{3
+lh#dict#separate(list, pred)~
+@param[in] {list} |List| to filter
+@param[in] {pred} |Function| predicate  that takes two parameters (element index, and
+element value)
+@return        An array of two |List|s. The first contains the elements from
+               {list} that match the predicate, while the second contains
+               those that don't match.
+@since Version 3.14.1
+@see |filter()|
+
+Examples: >
+  let l = [ 1, 5, 48, 25, 5, 28, 6]
+  if has('lambda')
+    let [min, max] = lh#list#separate(l, {idx, val -> val <10})
+    AssertEquals(min, [1, 5, 5, 6])
+    AssertEquals(max, [48, 25, 28])
+  endif
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#sort()*                   {{{3
 lh#list#sort({list} [{options}])~
 This function is an encapsulation of |sort()| that fixes the bug where
@@ -1307,7 +1328,7 @@ Examples: >
 lh#dict#key(one_key_dict)~
 @param[in]     {one_key_dict} Dictionary to test
 @return        The first element of the dictionary
-@throw         An exception if the dictionaru has more than one element.
+@throw         An exception if the dictionary has more than one element.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#push_if_new()*            {{{3

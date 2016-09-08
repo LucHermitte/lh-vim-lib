@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.14.0
-let s:k_version = 3140
+" Version:      3.14.1
+let s:k_version = 3141
 " Created:      17th Apr 2007
-" Last Update:  06th Sep 2016
+" Last Update:  08th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -552,6 +552,7 @@ function! lh#list#intersect(list1, list2) abort
 endfunction
 
 " Function: lh#list#flat_extend(list, rhs) {{{3
+" @since v3.14.1
 function! lh#list#flat_extend(list, rhs) abort
   if type(a:rhs) == type([])
     return extend(a:list, a:rhs)
@@ -560,6 +561,26 @@ function! lh#list#flat_extend(list, rhs) abort
   endif
 endfunction
 
+" Function: lh#list#separate(list, Cond) {{{3
+function! lh#list#separate(list, Cond) abort
+  if 1 " seems a little bit faster
+    let yes = []
+    let no = []
+    let idx = 0
+    for e in a:list
+      if a:Cond(idx, e)
+        let yes += [e]
+      else
+        let no += [e]
+      endif
+      let idx += 1
+    endfor
+  else
+    let yes = filter(copy(a:list), a:Cond)
+    let no = filter(a:list, {idx, val -> !a:Cond(idx, val)})
+  endif
+  return [yes, no]
+endfunction
 " Function: lh#list#push_if_new(list, value) {{{3
 function! lh#list#push_if_new(list, value) abort
   if index(a:list, a:value) < 0
