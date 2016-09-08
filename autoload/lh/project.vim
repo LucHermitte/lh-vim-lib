@@ -42,15 +42,15 @@ let s:k_version = '4000'
 " History:
 " @since v4.0.0
 " TODO:
-" - Be able to control which parent is filled with lh#let# functions
-" - Simplify new project creation
-" - remove deleted buffers
-" - apply() to all buffers
-" - Have root path be official for BTW and lh-tags
+" - `:Unlet p:variable`
 " - Auto detect current project root path when there is yet no project?
+" - Simplify new project creation
+" - Automatically remove deleted buffers
+" - Have root path be official for BTW and lh-tags
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
+" - Be able to control which parent is filled with lh#let# functions
 " - Doc
 " }}}1
 "=============================================================================
@@ -128,6 +128,18 @@ function! s:get(varname) dict abort " {{{4
   return lh#option#unset()
 endfunction
 
+function! s:apply(action) dict abort " {{{4
+  " TODO: support lhvl-functors, functions, "v:val" stuff
+  for b in self.buffers
+    call a:Action(b)
+  endfor
+endfunction
+
+function! s:map(action) dict abort " {{{4
+  " TODO: support lhvl-functors, functions, "v:val" stuff
+  return map(copy(self.buffers), a:action)
+endfunction
+
 " Function: lh#project#new(params) {{{3
 " Typical use, in _vimrc_local.vim
 "   :call lh#project#define(s:, params)
@@ -149,6 +161,8 @@ function! lh#project#new(params) abort
   let project.register_buffer = function('s:register_buffer')
   let project.get             = function('s:get')
   let project.depth           = function('s:depth')
+  let project.apply           = function('s:apply')
+  let project.map             = function('s:map')
 
   " Let's automatically register the current buffer
   call project.register_buffer()
