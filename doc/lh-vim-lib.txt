@@ -2818,10 +2818,12 @@ VARIABLES HELPERS                                     *lhvl#variables*  {{{2
 lh#let#if_undef({varname}, {value})~
 :LetIfUndef {varname} {value}~
 :LetIfUndef {varname} = {value}~
-@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
+                     |g:|), or environment variable.
 @param[in] {value}
 @warning the interface has changed with v4.0.0, {value} no longer need to be
 quoted.
+@warning environment variable only support string and numeric values
 @return variable built
 lh#let#if_undef({assignment-string})~
 Flavour meant to be used internally by |:LetIfUndef|
@@ -2844,9 +2846,11 @@ Examples: >
 lh#let#to({varname}, {value})~
 :LetTo {varname} {value}~
 :LetTo {varname} = {value}~
-@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
+                     |g:|), or environment variable.
 @param[in] {value} assigned, must no be quoted
 @return variable built
+@warning environment variable only support string and numeric values
 lh#let#to({assignment-string})~
 Flavour meant to be used internally by |:LetTo|
 
@@ -2868,6 +2872,7 @@ Examples: >
 lh#let#unlet({varname})~
 :Unlet {varname}~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
+@pre Environment variables are not supported
 
 These function and command make sure the variable named {varname} doesn't exists.
 The {varname} can be a |Dictionary| with all its fields. It that case, only

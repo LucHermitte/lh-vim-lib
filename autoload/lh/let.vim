@@ -52,7 +52,7 @@ endfunction
 " # Let* {{{2
 " Function: s:BuildPublicVariableName(var) {{{3
 function! s:BuildPublicVariableName(var)
-  if a:var !~ '^[wbptg]:'
+  if a:var !~ '\v^[wbptg]:|\$'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^p:'
     " It's a p:roject variable
@@ -85,7 +85,6 @@ endfunction
 function! s:LetIfUndef(var, value) abort " {{{4
     let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
     call s:Verbose('%1 --> dict=%2 --- key=%3', a:var, dict, key)
-    " echomsg a:var." --> dict=".dict." --- key=".key
     if !empty(key)
       " Dictionaries
       let dict2 = s:LetIfUndef(dict, string({}))
@@ -97,10 +96,17 @@ function! s:LetIfUndef(var, value) abort " {{{4
     else
       " other variables
       if !exists(a:var)
-        let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
-        call s:Verbose("let %1 = %2", a:var, {a:var})
+        if a:var =~ '^\$'
+          " Environment variables are not supposed to receive anything but
+          " strings. And they don't support `let {var} = value`
+          exe 'let '.a:var.' = '.a:value
+        else
+          let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+          call s:Verbose("let %1 = %2", a:var, {a:var})
+        endif
       endif
-      return {a:var}
+      exe 'return '.a:var
+      " return {a:var} " syntax not supported with environment variables
     endif
 endfunction
 
@@ -132,6 +138,11 @@ function! s:LetTo(var, value) abort " {{{4
     let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
     call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
     return dict2[key]
+  elseif a:var =~ '^\$'
+    " Environment variables are not supposed to receive anything but
+    " strings. And they don't support `let {var} = value` syntax
+    exe 'let '.a:var.' = '.a:value
+    exe 'return '.a:var
   else
     " other variables
     let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)

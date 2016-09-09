@@ -21,6 +21,7 @@ UTSuite [lh-vim-lib] Testing LetIfUndef command
 let s:cpo_save=&cpo
 set cpo&vim
 
+" ## Dependencies {{{1
 if exists(':Reload')
   Reload plugin/let.vim
 else
@@ -90,6 +91,21 @@ function! s:Test_let_if_undef_variables_cmd() " {{{3
   AssertEquals(g:dummy_test, 'aaztest')
   LetIfUndef g:dummy_test [0]
   AssertEquals(g:dummy_test, 'aaztest')
+
+  " env = string {{{4
+  if 0
+    " Impossible to test as `unlet $VAR` isn't supported
+    silent! unlet $dummy_test
+    Assert !exists('$dummy_test')
+    LetIfUndef $dummy_test 'toto'
+    Assert exists('$dummy_test')
+    AssertEquals($dummy_test, 'toto')
+    AssertEquals(type($dummy_test), type(''))
+    LetIfUndef $dummy_test 0
+    AssertEquals($dummy_test, 'toto')
+    LetIfUndef $dummy_test 'foo'
+    AssertEquals($dummy_test, 'toto')
+  endif
 
   " Invalid Var name {{{4
   AssertThrow(lh#let#if_undef('y:dummy_test', 42))
@@ -362,6 +378,17 @@ function! s:Test_let_force_variables_cmd() " {{{3
   LetTo g:dummy_test [0]
   AssertEquals(g:dummy_test, [0])
 
+  " $env = string {{{4
+  let $dummy_test = ''
+  LetTo $dummy_test 'toto'
+  Assert exists('$dummy_test')
+  AssertEquals($dummy_test, 'toto')
+  AssertEquals(type($dummy_test), type(''))
+  LetTo $dummy_test 0
+  AssertEquals($dummy_test, 0)
+  LetTo $dummy_test 'foo'
+  AssertEquals($dummy_test, 'foo')
+
   " Invalid Var name {{{4
   AssertThrow(lh#let#to('y:dummy_test', 42))
   AssertThrow(lh#let#to('dummy_test', 42))
@@ -497,6 +524,18 @@ function! s:Test_let_force_variables_fn() " {{{3
   AssertEquals(g:dummy_test, 0)
   call lh#let#to('g:dummy_test', [0])
   AssertEquals(g:dummy_test, [0])
+
+  " $env = string {{{4
+  let $dummy_test = ''
+  Assert !exists('$dummy_test')
+  call lh#let#to('$dummy_test', 'toto')
+  Assert exists('$dummy_test')
+  AssertEquals($dummy_test, 'toto')
+  AssertEquals(type($dummy_test), type(''))
+  call lh#let#to('$dummy_test', 0)
+  AssertEquals($dummy_test, 0)
+  call lh#let#to('$dummy_test', 'foo')
+  AssertEquals($dummy_test, 'foo')
 
   " Invalid Var name {{{4
   AssertThrow(lh#let#to('y:dummy_test', 42))
