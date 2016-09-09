@@ -16,7 +16,8 @@ let s:k_version = 4000
 " History: {{{2
 "       v4.0.0
 "       (*) ENH: lh#option#get() functions evolve to support new `p:` project
-"       variables
+"           variables
+"       (*) BUG: `lh#option#getbufvar()` emulation for older vim version was failing.
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -203,6 +204,7 @@ else
         let b = bufnr('%')
         exe 'buf '.a:buf
         if !exists('b:'.a:name)
+          silent! unlet res
           let res = a:0 == 0 ? g:lh#option#unset : a:1
         endif
       finally
