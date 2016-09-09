@@ -41,6 +41,7 @@ function! s:Test_let_n_bind() " {{{2
     LetTo b:dummy = g:dummy
     Assert !lh#ref#is_bound(b:dummy)
 
+    silent! unlet b:dummy
     let b:dummy = lh#ref#bind('g:dummy')
     Assert lh#ref#is_bound(b:dummy)
     LetTo b:dummy = lh#ref#bind('g:dummy')
@@ -71,6 +72,7 @@ function! s:Test_values() " {{{2
     let g:dummy = [1, 2, 3, 4]
     AssertDiffer(lh#option#get('dummy'), g:dummy)
 
+    silent! unlet b:dummy
     let b:dummy = lh#ref#bind('g:dummy')
     Assert lh#ref#is_bound(b:dummy)
     AssertEqual(lh#option#get('dummy'), g:dummy)
@@ -87,6 +89,7 @@ function! s:Test_values() " {{{2
   endtry
 endfunction
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

@@ -117,7 +117,7 @@ function! lh#let#if_undef(...) abort " {{{4
     let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
     return s:LetIfUndef(var, value)
   catch /.*/
-    echoerr "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+    throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
@@ -158,7 +158,7 @@ function! lh#let#to(...) abort " {{{4
     let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
     return s:LetTo(var, value)
   catch /.*/
-    echoerr "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+    throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 
@@ -192,7 +192,7 @@ function! lh#let#unlet(var) abort " {{{4
     exe 'unlet '.var
     call s:Verbose("unlet %1", var)
   catch /.*/
-    echoerr "Cannot unset ".a:var.": ".(v:exception .' @ '. v:throwpoint)
+    throw "Cannot unset ".a:var.": ".(v:exception .' @ '. v:throwpoint)
   endtry
 endfunction
 

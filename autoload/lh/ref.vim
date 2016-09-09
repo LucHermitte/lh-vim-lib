@@ -57,7 +57,7 @@ function! lh#ref#bind(varname) abort
         \ { 'to': a:varname
         \ , 'type': s:bind
         \ }
-  let res.resolve = function('s:resolve')
+  let res.resolve = function(s:getSNR('resolve'))
   return res
 endfunction
 
@@ -75,6 +75,13 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+" s:getSNR([func_name]) {{{2
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1
