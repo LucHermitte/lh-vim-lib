@@ -109,6 +109,10 @@ function! s:Test_let_if_undef_dictionaries_cmd() " {{{3
   LetIfUndef g:dummy_test.un.deux 42
   AssertEquals(g:dummy_test.un.deux, 12)
 
+  AssertEquals(lh#dict#get_composed(g:dummy_test, 'un.deux'), 12)
+  AssertEquals(lh#dict#get_composed(g:dummy_test.un, 'deux'), 12)
+  Assert lh#option#is_unset(lh#dict#get_composed(g:dummy_test, 'un.trois'))
+
   " value = string {{{4
   silent! unlet g:dummy_test
   Assert !exists('g:dummy_test')

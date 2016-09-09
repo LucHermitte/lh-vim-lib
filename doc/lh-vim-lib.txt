@@ -101,6 +101,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#zip()|, and |lh#list#zip_as_dict()|
 Dicts related functions:                                |lhvl#dict|
 - |lh#dict#add_new()|
+- |lh#dict#get_composed()|
 - |lh#dict#key()|
 - |lh#dict#subset()|
 Stack related functions:                                |lhvl#stack|
@@ -1329,6 +1330,24 @@ Examples: >
                                        \ {'k1': 1, 'k2': 2, 'k3': 'trois', 'k4': 'quatre'})
   AssertEquals(lh#dict#add_new(copy(d1), {'k3': 'trois', 'k1': 'un'}),
                                        \ {'k1': 1, 'k2': 2, 'k3': 'trois'})
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#get_composed()*           {{{3
+lh#dict#get_composed(dict, keys [, default])~
+@param[in] {dict}    |Dict| to poke
+@param[in] {keys}    Composition of keys
+@param[in] {default} Default value return instead of |lh#option#unset()| in
+                     case the variable doesn't exist.
+@return `{dict}[keys]`
+
+Examples: >
+
+  LetTo g:foo.bar.team = 12
+
+  AssertEquals(lh#dict#get_composed(g:, 'foo.bar.team'), 12)
+  AssertEquals(lh#dict#get_composed(g:foo,  'bar.team'), 12)
+  AssertEquals(lh#dict#get_composed(g:foo.bar,  'team'), 12)
+  AssertThrows lh#dict#get_composed(g:foo, 'beer.team')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#dict#key()*                    {{{3
