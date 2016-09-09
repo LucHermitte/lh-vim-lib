@@ -42,7 +42,6 @@ let s:k_version = '4000'
 " History:
 " @since v4.0.0
 " TODO:
-" - `:Unlet p:variable`
 " - Auto detect current project root path when there is yet no project?
 " - Simplify new project creation
 " - Automatically remove deleted buffers
