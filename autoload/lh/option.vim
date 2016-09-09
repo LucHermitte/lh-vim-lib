@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  08th Sep 2016
+" Last Update:  09th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -120,7 +120,12 @@ function! lh#option#get(name,...)
       " return {scope[i]}:{name}
       exe 'let value='.scope[i].':'.name
       call s:Verbose('%1:%2 found -> %3', scope[i], a:name, value)
-      exe 'return '.scope[i].':'.name
+      if lh#ref#is_bound(value)
+        return value.resolve()
+      else
+        return value
+      endif
+      " exe 'return '.scope[i].':'.name
     endif
     let i += 1
   endwhile
@@ -157,8 +162,17 @@ function! lh#option#get_non_empty(name,...)
         return r
       endif
     endif
-    if exists(scope[i].':'.name) && !s:IsEmpty({scope[i]}:{name})
-      return {scope[i]}:{name}
+    if exists(scope[i].':'.name)
+      exe 'let value='.scope[i].':'.name
+      call s:Verbose('%1:%2 found -> %3', scope[i], a:name, value)
+      if !s:IsEmpty({scope[i]}:{name})
+        " return {scope[i]}:{name}
+        if lh#ref#is_bound(value)
+          return value.resolve()
+        else
+          return value
+        endif
+      endif
     endif
     let i += 1
   endwhile

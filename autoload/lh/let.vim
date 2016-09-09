@@ -67,7 +67,8 @@ endfunction
 function! s:BuildPublicVariableNameAndValue(...)
   if len(a:000) == 1
     let [all, var, value ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
-    let value = string(eval(value))
+    " string+eval loses references, and it doesn't seem required.
+    " let value = string(eval(value))
   else
     let var = a:1
     let value = string(a:2)

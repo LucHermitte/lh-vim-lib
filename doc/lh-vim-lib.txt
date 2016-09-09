@@ -67,6 +67,8 @@ Options related functions:                              |lhvl#option|
 - |lh#option#getbufglobvar()|
 - |lh#option#is_set()|
 - |lh#option#is_unset()|
+- |lh#ref#bind()|
+- |lh#ref#is_bound()|
 Functors related functions:                             |lhvl#function|
 - |lh#function#bind()|
 - |lh#function#execute()|
@@ -575,8 +577,9 @@ lh#option#get({name}[,{default}[,{scopes}]])~
                     dedicated function: |lh#dev#option#get()|.
 
 This function fetches the value of an user defined option (not Vim |options|).
-The option can be either a |global-variable|, a |buffer-variable|, or even
-a|window-variable|.
+The option can be of any variable kind between |g:|, |b:|, |w:|, |t:| or lh-vim-lib |p:|.
+If the option is bound to another variable, it'll be resolved to return the
+other variable value. See |lh#ref#bind()|.
 
 The order of the variables checked can be specified through the optional
 argument {scopes}. By default, buffer-local options have the priority over
@@ -643,6 +646,35 @@ This function will permit to test whether an option is set or not: >
     Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
     let b:foobar = 1
     Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#ref#bind()*                   {{{3
+lh#ref#bind(varname)~
+This function builds a reference to another variable.
+The long term objective is to be able to habe global preferences, and project
+specific preferences that either default to the global ones, or that can be
+overriden.
+A bound value shall be obtained with |lh#option#get()| and
+|lh#dev#option#get()| functions.
+
+*lh#ref#is_bound()* tells whether its parameter is the name of a variable bound to another.
+
+Example: >
+    let g:dummy = [1,2,3]
+
+    " What we don't want
+    let b:dummy = g:dummy
+    Assert ! lh#ref#is_bound(b:dummy)
+    AssertEqual(lh#option#get('dummy'), g:dummy)
+    let g:dummy = [1, 2, 3, 4]
+    AssertDiffer(lh#option#get('dummy'), g:dummy)
+
+    " What we want!
+    let b:dummy = lh#ref#bind('g:dummy')
+    Assert lh#ref#is_bound(b:dummy)
+    AssertEqual(lh#option#get('dummy'), g:dummy)
+    let g:dummy = [1, 2, 3, 4, 5]
+    AssertEqual(lh#option#get('dummy'), g:dummy)
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

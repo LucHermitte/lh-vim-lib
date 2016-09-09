@@ -52,6 +52,7 @@ autoload/lh/option.vim
 autoload/lh/path.vim
 autoload/lh/position.vim
 autoload/lh/project.vim
+autoload/lh/ref.vim
 autoload/lh/stack.vim
 autoload/lh/string.vim
 autoload/lh/syntax.vim
@@ -70,6 +71,7 @@ tests/lh/function.vim
 tests/lh/list.vim
 tests/lh/math.vim
 tests/lh/path.vim
+tests/lh/ref.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim
