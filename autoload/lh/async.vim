@@ -111,7 +111,9 @@ function! s:start_next() dict abort                " {{{3
     let success = 0
     let args = job.args
     if has_key(job, 'before_start_cb')
-      call job.before_start_cb()
+      call s:Verbose('Job has a before_start_cb: %1', job)
+      let res = job.before_start_cb()
+      call s:Verbose('before_start_cb result: %1 <-- %2', res, string(job.before_start_cb))
     endif
     call s:Verbose('Starting next job: %1', job)
     let Close_cb = get(args, 'close_cb', function('s:default_close_cb'))
@@ -125,6 +127,7 @@ function! s:start_next() dict abort                " {{{3
     let job.job = job_start(cmd, args)
     call s:Verbose('job_start(%2) status: %1', job_info(job.job), cmd)
     if job_info(job.job).status == 'fail'
+      call s:Verbose('AGAIN job_start(%2) status: %1', job_info(job.job), cmd)
       throw "Starting `".(job.cmd)."` failed!"
     endif
     let success = 1
