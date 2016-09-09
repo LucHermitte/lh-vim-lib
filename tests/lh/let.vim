@@ -527,7 +527,6 @@ function! s:Test_let_force_variables_fn() " {{{3
 
   " $env = string {{{4
   let $dummy_test = ''
-  Assert !exists('$dummy_test')
   call lh#let#to('$dummy_test', 'toto')
   Assert exists('$dummy_test')
   AssertEquals($dummy_test, 'toto')
