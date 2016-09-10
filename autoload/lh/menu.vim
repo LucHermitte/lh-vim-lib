@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.2
-let s:k_version = 313.2
+" Version:      4.0.0
+let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  02nd Sep 2016
+" Last Update:  10th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -28,6 +28,7 @@ let s:k_version = 313.2
 "       v3.1.2: Enhancements for string options, required by BTW 0.2.0
 "       v3.1.3: BugFix for CMake options, required by BTW 0.2.1
 "       v3.6.1  ENH: Use new logging framework
+"       v4.0.0  ENH: Extend to work with project p:variables
 " TODO: {{{2
 "       * Should the argument to :Toggle be simplified to use the variable name
 "       instead ? May be a banged :Toggle! could work on the real variable
@@ -142,6 +143,8 @@ function! s:Set(Data) abort
     let variable = a:Data.variable
     if variable[0] == '$' " environment variabmes
       exe "let ".variable." = ".string(value)
+    elseif variable[0:1] == 'p:' " environment variabmes
+      call lh#let#to(variable, value)
     else
       " the following syntax doesn't work with dictionaries => use :exe
       " let g:{variable} = value
@@ -234,7 +237,7 @@ function! s:NextValue(Data)
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo a:Data.variable.'='.value
+  echo a:Data.variable.'='.string(value)
 endfunction
 
 " Function: s:ClearMenu({Menu}, {text})                    {{{3
@@ -262,6 +265,7 @@ endfunction
 " @param[in] command       Toggle command to execute when the menu-item is selected
 function! s:UpdateMenu(Menu, text, command)
   if has('gui_running')
+    call s:Verbose('nnoremenu <silent> %1 %2<tab>(%3) :%4 %5<cr>', a:Menu.priority, a:Menu.name, a:text, s:k_Toggle_cmd, a:command)
     let cmd = 'nnoremenu <silent> '.a:Menu.priority.' '.
           \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
           \ ' :'.s:k_Toggle_cmd.' '.a:command."\<cr>"
@@ -343,7 +347,7 @@ endfunction
 
 function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos)
   let cmdline = split(a:CmdLine)
-  " echomsg "cmd line: " . string(cmdline)." # ". (a:CmdLine =~ ' $')
+  call s:Verbose('cmd line: %1 # %2',cmdline, a:CmdLine =~' $')
   let nb_args = len(cmdline)
   if (a:CmdLine !~ ' $')
     let nb_args -= 1
@@ -387,10 +391,13 @@ function! s:VarSet(Data, value)
   let value = a:value
   if variable[0] == '$' " environment variabmes
     exe "let ".variable." = ".string(value)
+  elseif variable[0:1] == 'p:'
+    call lh#let#to(variable, value)
   else
     " the following syntax doesn't work with dictionaries => use :exe
     " let g:{variable} = value
     exe 'let g:'.variable.' = '.string(value)
+    " tODO/FIXME: what about lh#let#to('g:'.variable, value) ?
   endif
   if has_key(a:Data, "hook")
     let l:Action = a:Data.hook
@@ -498,7 +505,7 @@ endfunction
 " Function: lh#menu#_string_complete(ArgLead, CmdLine, CursorPos) {{{3
 function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos)
   let cmdline = split(a:CmdLine)
-  " echomsg "cmd line: " . string(cmdline)." # ". (CmdLine =~ ' $')
+  call s:Verbose('cmd line: %1 # %2',cmdline, a:CmdLine =~' $')
   let nb_args = len(cmdline)
   if (a:CmdLine !~ ' $')
     let nb_args -= 1
