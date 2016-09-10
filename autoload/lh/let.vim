@@ -186,11 +186,23 @@ endfunction
 
 function! lh#let#unlet(var) abort " {{{4
   try
-    let var = s:BuildPublicVariableName(a:var)
-    " The following doesn't work with dictionaries
-    " unlet {var}
-    exe 'unlet '.var
-    call s:Verbose("unlet %1", var)
+    if a:var =~ '^p:'
+      " It's a p:roject variable
+      let suffix = a:var[2:]
+      let h = lh#project#crt().find_holder(suffix)
+      if lh#option#is_unset(h)
+        throw "No p:".a:var." variable found to be unlet!"
+      endif
+      unlet h[suffix]
+      call s:Verbose("unlet %1.%2", h, suffix)
+    else
+      exe 'unlet '.a:var
+      call s:Verbose("unlet %1", a:var)
+      " let var = s:BuildPublicVariableName(a:var)
+      " The following doesn't work with dictionaries
+      " unlet {var}
+      " exe 'unlet '.var
+    endif
   catch /.*/
     throw "Cannot unset ".a:var.": ".(v:exception .' @ '. v:throwpoint)
   endtry

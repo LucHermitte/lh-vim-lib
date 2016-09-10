@@ -5,7 +5,7 @@
 " Version:      4.0.0.0
 let s:k_version = '4000'
 " Created:      08th Sep 2016
-" Last Update:  08th Sep 2016
+" Last Update:  10th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -139,6 +139,21 @@ function! s:map(action) dict abort " {{{4
   return map(copy(self.buffers), a:action)
 endfunction
 
+function! s:find_holder(varname) dict abort " {{{4
+  if has_key(self.variables, a:varname)
+    return self.variables
+  else
+    for p in self.parents
+      silent! unlet h
+      let h = p.find_holder(a:varname)
+      if lh#option#is_set(h)
+        return h
+      endif
+    endfor
+  endif
+  return lh#option#unset()
+endfunction
+
 " Function: lh#project#new(params) {{{3
 " Typical use, in _vimrc_local.vim
 "   :call lh#project#define(s:, params)
@@ -162,6 +177,7 @@ function! lh#project#new(params) abort
   let project.depth           = function('s:depth')
   let project.apply           = function('s:apply')
   let project.map             = function('s:map')
+  let project.find_holder     = function('s:find_holder')
 
   " Let's automatically register the current buffer
   call project.register_buffer()
@@ -177,6 +193,15 @@ function! lh#project#define(s, params) abort
 endfunction
 
 " # Access {{{2
+" Function: lh#project#crt() {{{3
+function! lh#project#crt() abort
+  if exists('b:'.s:project_varname)
+    return b:{s:project_varname}
+  else
+    throw "The current buffer doesn't belong to a project"
+  endif
+endfunction
+
 " Function: lh#project#crt_bufvar_name() {{{3
 function! lh#project#crt_bufvar_name() abort
   if exists('b:'.s:project_varname)
