@@ -112,7 +112,11 @@ function! lh#option#get(name,...)
       let r = lh#project#_get(a:name)
       if lh#option#is_set(r)
         call s:Verbose('p:%1 found -> %2', a:name, r)
-        return r
+        if lh#ref#is_bound(r)
+          return r.resolve()
+        else
+          return r
+        endif
       endif
     endif
     if exists(scope[i].':'.name)
