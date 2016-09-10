@@ -68,10 +68,11 @@ function! s:BuildPublicVariableNameAndValue(...)
   if len(a:000) == 1
     let [all, var, value ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
     " string+eval loses references, and it doesn't seem required.
-    " let value = string(eval(value))
+    let value = eval(value)
   else
     let var = a:1
-    let value = string(a:2)
+    let value = a:2
+    " let value = string(a:2)
   endif
   let var = s:BuildPublicVariableName(var)
   return [var, value]
@@ -88,9 +89,10 @@ function! s:LetIfUndef(var, value) abort " {{{4
     call s:Verbose('%1 --> dict=%2 --- key=%3', a:var, dict, key)
     if !empty(key)
       " Dictionaries
-      let dict2 = s:LetIfUndef(dict, string({}))
+      let dict2 = s:LetIfUndef(dict, {})
       if !has_key(dict2, key)
-        let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        let dict2[key] = a:value
         call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
       endif
       return dict2[key]
@@ -100,9 +102,10 @@ function! s:LetIfUndef(var, value) abort " {{{4
         if a:var =~ '^\$'
           " Environment variables are not supposed to receive anything but
           " strings. And they don't support `let {var} = value`
-          exe 'let '.a:var.' = '.a:value
+          exe 'let '.a:var.' = '.string(a:value)
         else
-          let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+          " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+          let {a:var} = a:value
           call s:Verbose("let %1 = %2", a:var, {a:var})
         endif
       endif
@@ -135,19 +138,21 @@ function! s:LetTo(var, value) abort " {{{4
   " echomsg a:var." --> dict=".dict." --- key=".key
   if !empty(key)
     " Dictionaries
-    let dict2 = s:LetIfUndef(dict, string({})) " Don't override the dict w/ s:LetTo()!
-    let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    let dict2 = s:LetIfUndef(dict, {}) " Don't override the dict w/ s:LetTo()!
+    " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    let dict2[key] = a:value
     call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
     return dict2[key]
   elseif a:var =~ '^\$'
     " Environment variables are not supposed to receive anything but
     " strings. And they don't support `let {var} = value` syntax
-    exe 'let '.a:var.' = '.a:value
+    exe 'let '.a:var.' = '.string(a:value)
     exe 'return '.a:var
   else
     " other variables
     silent! unlet {a:var} " required until vim 7.4-1546
-    let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    let {a:var} = a:value
     call s:Verbose("let %1 = %2", a:var, {a:var})
     return {a:var}
   endif
@@ -172,8 +177,9 @@ function! s:Unlet(var) abort " {{{4
     if !has_key(dict, key)
       return s:Unlet(dict[key])
     endif
-    let dict2 = s:LetIfUndef(dict, string({})) " Don't override the dict w/ s:LetTo()!
-    let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    let dict2 = s:LetIfUndef(dict, {}) " Don't override the dict w/ s:LetTo()!
+    " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    let dict2[key] = a:value
     call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
     return dict2[key]
   else
