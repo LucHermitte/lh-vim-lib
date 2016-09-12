@@ -66,9 +66,9 @@ endfunction
 " Function: s:BuildPublicVariableNameAndValue(string|var, value) {{{3
 function! s:BuildPublicVariableNameAndValue(...)
   if len(a:000) == 1
-    let [all, var, value ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
+    let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
     " string+eval loses references, and it doesn't seem required.
-    let value = eval(value)
+    let value = eval(value0)
   else
     let var = a:1
     let value = a:2
