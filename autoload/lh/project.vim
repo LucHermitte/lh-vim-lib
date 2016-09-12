@@ -221,9 +221,6 @@ function! lh#project#_get(name) abort
 endfunction
 
 " }}}1
-" unlet s:['project']
-" unlet b:crt_project
-let g:prj = lh#project#define(s:, {'name': 'test'})
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
