@@ -171,13 +171,13 @@ function! lh#project#new(params) abort
         \ , 'parents': []
         \ })
 
-  let project.inherit         = function('s:inherit')
-  let project.register_buffer = function('s:register_buffer')
-  let project.get             = function('s:get')
-  let project.depth           = function('s:depth')
-  let project.apply           = function('s:apply')
-  let project.map             = function('s:map')
-  let project.find_holder     = function('s:find_holder')
+  let project.inherit         = function(s:getSNR('inherit'))
+  let project.register_buffer = function(s:getSNR('register_buffer'))
+  let project.get             = function(s:getSNR('get'))
+  let project.depth           = function(s:getSNR('depth'))
+  let project.apply           = function(s:getSNR('apply'))
+  let project.map             = function(s:getSNR('map'))
+  let project.find_holder     = function(s:getSNR('find_holder'))
 
   " Let's automatically register the current buffer
   call project.register_buffer()
@@ -227,7 +227,14 @@ let g:prj = lh#project#define(s:, {'name': 'test'})
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
-
+" # Compatibility functions {{{2
+" s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------
