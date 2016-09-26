@@ -105,7 +105,7 @@ call lh#menu#def_toggle_item(Data4)
 " ## Tests {{{1
 " Tests won't test the menus, but the toggling
 "
-" " Function: s:Test_SimpleToggle() {{{3
+" " Function: s:Test_SimpleToggle() {{{2
 function! s:Test_SimpleToggle() abort
   let idx = g:Data.idx_crt_value
   AssertEquals(g:bar, g:Data.values[idx])
@@ -119,7 +119,7 @@ function! s:Test_SimpleToggle() abort
   endfor
 endfunction
 
-" Function: s:Test_ToggleProjectVars() {{{3
+" Function: s:Test_ToggleProjectVars() {{{2
 function! s:Test_ToggleProjectVars() abort
   let cleanup = lh#on#exit()
         \.restore(s:prj_varname)

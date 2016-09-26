@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      10th Sep 2016
-" Last Update:  10th Sep 2016
+" Last Update:  26th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -24,6 +24,8 @@ set cpo&vim
 " ## Dependencies {{{1
 runtime autoload/lh/project.vim
 runtime autoload/lh/let.vim
+runtime autoload/lh/option.vim
+runtime autoload/lh/os.vim
 
 let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 
@@ -95,6 +97,53 @@ function! s:Test_inherit() " {{{2
     AssertEquals(lh#option#get('test'), 'prj1')
     Unlet p:test
     AssertEquals(lh#option#get('test'), 'glob')
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
+
+function! s:Test_create_opt() " {{{2
+  " p:&opt > l:&opt > &opt
+  let cleanup = lh#on#exit()
+        \.restore(s:prj_varname)
+        \.restore('&isk')
+  try
+    silent! unlet {s:prj_varname}
+    set isk&vim
+    let g_isk = &isk
+
+    silent! unlet b:test
+    let p = lh#project#new({'name': 'UT'})
+    AssertIs(p, {s:prj_varname})
+    AssertEquals(p.depth(), 1)
+
+    call p.set('&isk', '+=µ')
+    AssertEquals(&isk, g_isk.',µ')
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
+
+function! s:Test_create_ENV() " {{{2
+  " p:&opt > l:&opt > &opt
+  let cleanup = lh#on#exit()
+        \.restore(s:prj_varname)
+        \.restore('&isk')
+  try
+    silent! unlet {s:prj_varname}
+    Assert! !exists('$LH_FOOBAR')
+
+    let p = lh#project#new({'name': 'UT'})
+    AssertIs(p, {s:prj_varname})
+    AssertEquals(p.depth(), 1)
+
+    call p.set('$LH_FOOBAR', '42')
+    " environment is not altered globally
+    Assert !exists('$LH_FOOBAR')
+
+    " Just it's updated on the fly
+    AssertEquals(lh#os#system('echo $LH_FOOBAR'), 42)
+
   finally
     call cleanup.finalize()
   endtry

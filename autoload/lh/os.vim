@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.4
-let s:k_version = 3104
+" Version:      4.00.0
+let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  01st Jun 2016
+" Last Update:  26th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -80,8 +80,15 @@ endfunction
 " Function: lh#os#system(cmd) {{{3
 " @return the comp'ed result of system call
 function! lh#os#system(cmd)
-  call s:Verbose(a:cmd)
-  return lh#os#chomp(system(a:cmd))
+  " call s:Verbose(a:cmd)
+  " Alter command to make sure $ENV variables from current project are set
+  let env = join(lh#project#_environment(), ' ')
+  let cmd = a:cmd
+  if !empty(env)
+    let cmd = env . ' ' . &shell . ' ' . &shellcmdflag . ' ' . shellescape(cmd)
+  endif
+  call s:Verbose(cmd)
+  return lh#os#chomp(system(cmd))
 endfunction
 
 " Function: lh#os#sys_cd(path [, ...]) {{{3
