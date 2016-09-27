@@ -2,10 +2,10 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.13.0.
-let s:k_version = '3130'
+" Version:      4.00.0.
+let s:k_version = '4000'
 " Created:      23rd Dec 2015
-" Last Update:  01st Sep 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -168,7 +168,7 @@ function! lh#log#echomsg() abort
   let log = {}
   function! log.log(msg) dict
     let msg = type(a:msg) == type([]) || type(a:msg) == type({})
-          \ ?  string(a:msg)
+          \ ?  lh#object#to_string(a:msg)
           \ : a:msg
     echomsg msg
   endfunction

@@ -2,10 +2,10 @@
 " File:         tests/lh/project.vim                              {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.0.0.
+let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  26th Sep 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project

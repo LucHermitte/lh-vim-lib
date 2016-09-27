@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  26th Sep 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -222,7 +222,8 @@ endfunction
 " - "options"   <- where altered vim options will be stored
 " - "env"       <- where $ENV variables will be stored
 function! lh#project#new(params) abort
-  let project = a:params
+  " Inherits OO.to_string()
+  let project = lh#object#make_top_type(a:params)
   call lh#dict#add_new(project,
         \ { 'buffers':   []
         \ , 'variables': {}

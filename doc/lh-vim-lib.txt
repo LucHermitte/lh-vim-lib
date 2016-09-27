@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 08th Sep 2016
+                        For Vim version 7+      Last change: 27th Sep 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -208,6 +208,10 @@ Version Control System functions                        |lhvl#vcs|
 - |lh#vcs#get_url()|
 - |lh#vcs#decode_github_url()|
 - |lh#vcs#as_http()|
+OO helpers                                              |lhvl#oo|
+- |lh#object#make_top_type()|
+- |lh#object#to_string()|
+- |lh#object#_to_string()|
 Variables helper functions                              |lhvl#variable|
 - |lh#let#if_undef()|
 - |lh#let#to()|
@@ -2843,6 +2847,50 @@ lh#vcs#is_svn([path])~
 @return whether the {path} belongs to a svn repository.
 
 ------------------------------------------------------------------------------
+OO HELPERS                                            *lhvl#oo*         {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Quite a few times I've defined |Dictionaries| that behave as objects, but when
+I wanted to display their value, I've been annoyed to see a gigantic (and
+useless) list of methods. Hence the following helpers.
+For the moment only stringification is addressed, may be other services will
+be provided in the future. I can't tell.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#make_top_type()* {{{3
+lh#object#make_top_type(dict-params)~
+Creates a |Dictionary| that implements:
+- *__lhvl_oo_type()*
+  that returns 1 -- meant to be checked w/ `get(obj, '__lhvl_oo_type', 0)`
+- *_to_string()*
+  that stringifies the current object without its methods.
+  Call `lh#object#verbose(1)` to also display the list of methods.
+
+In order to have a dedicated stringification method, just override `_to_string()`
+to an implementation that fits your needs. You may need to use
+|lh#object#_to_string()| in order to display internal fields without recursion
+issues.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#to_string()* {{{3
+lh#object#to_string(data)~
+This function will work as `:echo data`, i.e. multiple occurrences of a same
+object will be shorten to `[...]` or `{...}`, but it will also hide methods
+from objects created with |lh#object#make_top_type()|, or it'll call a
+`_to_string()` or a `to_string()` when found.
+
+Internally, it relies on |lh#object#_to_string()| to build the string to
+display. Actually, it's just a call to: >
+    lh#object#_to_string(a:data, [])
+<
+                                                 *lh#object#_to_string()* {{{3
+lh#object#to_string(data, list_of_already_handled_data)~
+This is the internal function used to print objects once. Unless you're
+defining your own `_to_string()` overload, don't use it. See
+autoload/lh/object.vim `s:to_string()` implementation to see how to use it.
+
+------------------------------------------------------------------------------
 VARIABLES HELPERS                                     *lhvl#variables*  {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2931,7 +2979,7 @@ PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
 lh#project#new(options)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#project#new()*               {{{3
+                                                *lh#project#define()*            {{{3
 lh#project#define(s:, options)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
