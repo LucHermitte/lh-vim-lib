@@ -50,7 +50,7 @@ endfunction
 
 " Function: lh#visual#selection()                              {{{3
 " @return the text currently selected
-function! lh#visual#selection()
+function! lh#visual#selection() abort
   try
     let a_save = @a
     normal! gv"ay
