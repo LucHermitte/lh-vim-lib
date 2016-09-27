@@ -105,7 +105,7 @@ call lh#menu#def_toggle_item(Data4)
 " ## Tests {{{1
 " Tests won't test the menus, but the toggling
 "
-" " Function: s:Test_SimpleToggle() {{{2
+" Function: s:Test_SimpleToggle() {{{2
 function! s:Test_SimpleToggle() abort
   let idx = g:Data.idx_crt_value
   AssertEquals(g:bar, g:Data.values[idx])

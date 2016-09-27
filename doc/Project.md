@@ -1,7 +1,7 @@
 # Introduction
 Define new kind of variables: `p:` variables.
 
-The objective if to avoid duplicating a lot of `b:variables` in many buffers.
+The objective is to avoid duplicating a lot of `b:variables` in many buffers.
 Instead, all buffers will point to a same global variable associated to the
 current project.
 
