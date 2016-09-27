@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      4.0.0
+let s:k_version = 400
 " Created:      03rd Nov 2008
-" Last Update:  08th Jan 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -18,6 +18,7 @@ let s:k_version = 361
 "
 "------------------------------------------------------------------------
 " History:
+"       v4.0.0:  ENH: Use new OO top class
 "       v3.6.1:  ENH: Use new logging framework
 "       v3.4.0:  ENH: lh#function#bind supports composition
 "       v3.3.20: Explicit error msg w/ lh#function#execute
@@ -222,10 +223,10 @@ function! lh#function#bind(Fn, ...) abort
     let Fn = a:Fn
   endif
 
-  let binded_fn = {
+  let binded_fn = lh#object#make_top_type({
         \ 'function': Fn,
         \ 'execute':  function('s:Execute')
-        \}
+        \})
   if !empty(args)
     " Special case: when bind is used abusivelly
     let binded_fn.args = args

@@ -2,10 +2,10 @@
 " File:         autoload/lh/async.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.13.2.
-let s:k_version = '3132'
+" Version:      4.0.0
+let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  02nd Sep 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -161,7 +161,7 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
 endfunction
 
 " Define job_queue global variable                   {{{3
-let s:default_queue = { 'list': [] }
+let s:default_queue = lh#object#make_top_type({ 'list': [] })
 let s:job_queue = get(s:, 'job_queue', s:default_queue)
 let s:job_queue.is_running    = function('s:is_running')
 let s:job_queue.is_empty      = function('s:is_empty')

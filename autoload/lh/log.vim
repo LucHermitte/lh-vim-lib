@@ -75,7 +75,7 @@ endfunction
 " TODO: add verbose levels
 " }}}4
 function! lh#log#new(where, kind) abort
-  let log = { 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where}
+  let log = lh#object#make_top_type({ 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where})
 
   " open loc/qf window {{{4
   function! s:open() abort dict
@@ -153,7 +153,7 @@ endfunction
 " Function: lh#log#none() {{{3
 " @return a log object that does nothing
 function! lh#log#none() abort
-  let log = {}
+  let log = lh#object#make_top_type({'kind': '(none)'})
   function! log.log(...) dict
   endfunction
   function! log.reset() dict
@@ -165,7 +165,7 @@ endfunction
 " Function: lh#log#echomsg() {{{3
 " @return a log object that prints errors with ":echomsg"
 function! lh#log#echomsg() abort
-  let log = {}
+  let log = lh#object#make_top_type({'kind': '(echomsg)'})
   function! log.log(msg) dict
     let msg = type(a:msg) == type([]) || type(a:msg) == type({})
           \ ?  lh#object#to_string(a:msg)

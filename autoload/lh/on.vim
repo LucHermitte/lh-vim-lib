@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.10.2.
-let s:k_version = 3102
+" Version:      4.00.0.
+let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  24th May 2016
+" Last Update:  27th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -78,7 +78,7 @@ endfunction
 
 " Function: lh#on#exit() {{{3
 function! lh#on#exit()
-  let res = {'actions':[] }
+  let res = lh#object#make_top_type({'actions':[] })
 
   let res.finalize = function(s:getSNR('finalize'))
 
