@@ -469,15 +469,6 @@ function! lh#path#strip_start(pathname, pathslist) abort
   endif
 
   " apply a realpath like operation
-  let nb_paths = len(pathslist) " set before the loop
-  let i = 0
-  " while i != nb_paths
-    " if pathslist[i] =~ '^\.\%(/\|$\)'
-      " let path2 = getcwd().pathslist[i][1:]
-      " call add(pathslist, path2)
-    " endif
-    " let i += 1
-  " endwhile
   let pathslist_abs=filter(copy(pathslist), 'v:val =~ "^\\.\\%(/\\|$\\)"')
   let pathslist += pathslist_abs
   " replace path separators by a regex that can match them
