@@ -56,7 +56,7 @@ function! s:BuildPublicVariableName(var)
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^p:'
     " It's a p:roject variable
-    let var = substitute(a:var, '^p:', lh#project#crt_bufvar_name().".variables.", '')
+    let var = substitute(a:var, '^p:', lh#project#crt_var_prefix(), '')
   else
     let var = a:var
   endif
