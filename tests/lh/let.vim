@@ -323,10 +323,10 @@ function! s:Test_let_funcref() " {{{3
   Assert !exists('g:Dummy_test')
   LetIfUndef g:Dummy_test function('exists')
   Assert exists('g:Dummy_test')
-  Assert g:Dummyg_test('*has')
+  Assert g:Dummy_test('*has')
 
   LetTo g:Dummy_test function('has')
-  Assert g:Dummy_test('patch-7.3.000')
+  Assert g:Dummy_test('eval')
   " }}}4
 endfunction
 
