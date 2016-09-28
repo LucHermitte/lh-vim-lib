@@ -2987,7 +2987,7 @@ lh#project#new(options)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#define()*            {{{3
-lh#project#define(s:, options)~
+lh#project#define(s:, options [, name])~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#_get()*              {{{3

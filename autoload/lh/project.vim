@@ -250,9 +250,10 @@ function! lh#project#new(params) abort
   return project
 endfunction
 
-" Function: lh#project#define(s:, params) {{{3
-function! lh#project#define(s, params) abort
-  if !has_key(a:s, 'project')
+" Function: lh#project#define(s:, params [, name]) {{{3
+function! lh#project#define(s, params, ...) abort
+  let name = get(a:, 1, 'project')
+  if !has_key(a:s, name)
     let a:s.project = lh#project#new(a:params)
   endif
   return a:s.project
