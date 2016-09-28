@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      12th Sep 2016
-" Last Update:  27th Sep 2016
+" Last Update:  28th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       OO functions and helpers
@@ -81,7 +81,13 @@ function! s:to_string(...) dict abort
 endfunction
 
 " ## Exported functions {{{1
-" # Stringification {{{2
+" # Type Information {{{2
+" Function: lh#object#is_an_object(var) {{{3
+function! lh#object#is_an_object(var) abort
+  return has_key(a:var, '__lhvl_oo_type')
+endfunction
+
+" # Stringification  {{{2
 " Function: lh#object#to_string(object) {{{3
 function! lh#object#to_string(object) abort
   return lh#object#_to_string(a:object, [])
@@ -100,7 +106,7 @@ function! lh#object#_to_string(object, handled_list) abort
   elseif type(a:object) == type({})
     if s:is_already_handled(a:object, a:handled_list) | return '{...}' | endif
     call extend(a:handled_list, [a:object])
-    if get(a:object, '__lhvl_oo_type', 0) == 1
+    if lh#object#is_an_object(a:object)
       return a:object._to_string(a:handled_list)
     elseif has_key(a:object, 'to_string')
       " Let's hope there is no recursion

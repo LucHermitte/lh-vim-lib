@@ -2890,6 +2890,13 @@ This is the internal function used to print objects once. Unless you're
 defining your own `_to_string()` overload, don't use it. See
 autoload/lh/object.vim `s:to_string()` implementation to see how to use it.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#is_an_object()* {{{3
+lh#object#is_an_object(var)~
+@return whether the {var} is an object. It tests whether it contains a
+`'__lhvl_oo_type'` field which is automatically added to objects built through
+|lh#object#make_top_type()|.
+
 ------------------------------------------------------------------------------
 VARIABLES HELPERS                                     *lhvl#variables*  {{{2
 
