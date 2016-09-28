@@ -2909,10 +2909,19 @@ lh#let#if_undef({varname}, {value})~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value}
-@warning the interface has changed with v4.0.0, {value} must no longer be
-quoted.
-@warning environment variable only support string and numeric values
 @return variable built
+
+@warning
+    The interface has changed with v4.0.0, {value} must no longer be quoted.
+@warning
+    Environment variable only support string and numeric values.
+@warning
+    The command flavor (and the next one that takes a {assignment-string})
+    only support expressions that aren't modified by function context. I.e.
+    variables must be explictly global, buffer-, windows-, or tab-local.  |s:|
+    variables won't give the correct result, nor expressions like
+    `expand('<sfile>')`.
+
 lh#let#if_undef({assignment-string})~
 Flavour meant to be used internally by |:LetIfUndef|
 
@@ -2924,6 +2933,10 @@ Examples: >
     call lh#let#if_undef('g:dummy_test1', 42)
     LetIfUndef g:dummy_test1 42
     LetIfUndef g:dummy_test1 = 42
+
+    LetIfUndef g:dummy_test1 = some#func(g:var+t:var) " OK
+    LetIfUndef g:dummy_test1 = s:(g:var+t:var)        " Error
+    LetIfUndef g:dummy_test1 = some#func(var)         " Error
 
     call lh#let#if_undef('g:dummy_test2', {'a':1, 'b':{'c':5}})
     LetIfUndef g:dummy_test2.un.deux {'a':1, 'b':{'c':5}})
@@ -2938,7 +2951,18 @@ lh#let#to({varname}, {value})~
                      |g:|), or environment variable.
 @param[in] {value} assigned, must no be quoted
 @return variable built
-@warning environment variable only support string and numeric values
+
+@warning
+    The interface has changed with v4.0.0, {value} must no longer be quoted.
+@warning
+    Environment variable only support string and numeric values.
+@warning
+    The command flavor (and the next one that takes a {assignment-string})
+    only support expressions that aren't modified by function context. I.e.
+    variables must be explictly global, buffer-, windows-, or tab-local.  |s:|
+    variables won't give the correct result, nor expressions like
+    `expand('<sfile>')`.
+
 lh#let#to({assignment-string})~
 Flavour meant to be used internally by |:LetTo|
 
@@ -2950,6 +2974,10 @@ Examples: >
     call lh#let#to('g:dummy_test1', 42)
     LetTo g:dummy_test1 42
     LetTo g:dummy_test1 = 42
+
+    LetTo g:dummy_test1 = some#func(g:var+t:var) " OK
+    LetTo g:dummy_test1 = s:(g:var+t:var)        " Error
+    LetTo g:dummy_test1 = some#func(var)         " Error
 
     call lh#let#to('g:dummy_test2', {'a':1, 'b':{'c':5}})
     LetTo g:dummy_test2.un.deux {'a':1, 'b':{'c':5}})
@@ -2985,6 +3013,15 @@ PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~
+
+Reserved fields:
+- "name"
+- "parents"
+- "paths.root" ?
+- "buffers"
+- "variables" <- where p:foobar will be stored
+- "options"   <- where altered vim options will be stored
+- "env"       <- where $ENV variables will be stored
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#define()*            {{{3

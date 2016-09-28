@@ -8,31 +8,34 @@ current project.
 # Rationale
 
 Vim support various means to define options.
- * First there are vim options that are use to tune how Vim behaves in various
+ * First there are vim options that are used to tune how Vim behaves in various
    situations. They are set with `:set`. Some are global, other are local to
    buffers. In this later case we usually choose their value either on a
    filetype basis, or a project basis.
  * Then there are plugin options. Again, they can be `g:`lobal,
    `b:`uffer-local, or even `w:`indow or `t:`ab local. In lh-vim-lib I've been
    providing `lh#option#get()` to obtain in a simple call the most refined
-   value of an option. In lh-dev, I've went a little bit further in order to
-   support specialization for buffer and/or filetypes.
+   value of an option. In
+   [lh-dev](http://github.com/LucHermitte/lh-dev#options-1), I've went a little
+   bit further in order to support specialization for buffer and/or filetypes.
 
-Given the objective to have options that are project specific, that works
-thanks to plugins like
+Given the objective to have options that are project specific, it's quite to
+achieve it thanks to plugins like
 [local_vimrc](https://github.com/LucHermitte/local_vimrc/) (or similar
 techniques). With these plugins, we say a file belongs to a project when it's
 located in a directory under the one where a `_vimrc_local` file resides.
 
-In that `_vimrc_local` file, we define project-speficic options as local
+In that `_vimrc_local` file, we define project-specific options as local
 options with `:setlocal`, and `b:uffer_local_options`.
 
-That works well I've said. Up to a point: a same options could be duplicated
+That works well I've said. Up to a point: a same option could be duplicated
 hundred times: once in each buffer that belongs to a project. As long as we
 don't want to change an option this is fine. But as soon as we want to change a
-setting we have to change it in every opened buffer belonging to the project.
+setting we have to change it in every opened buffer belonging to the project,
+which is tedious to do correctly.
+
 How often does this need arise? Much to often IMO. In
-[BuildToolsWrappers](https://github.com/LucHermitte/BuildToolsWrappers/) , I've
+[BuildToolsWrappers](https://github.com/LucHermitte/BuildToolsWrappers/), I've
 experimented the issue when I wanted to change the current compilation
 directory (from _Debug_ to _Release_ for instance). This is just one option,
 but it impacts CMake configuration directory, included directory list (for
@@ -42,39 +45,95 @@ Being able to toggle an option between several values, when this is a buffer
 local option, quickly becomes a nightmare. This is because we don't have
 `p:roject_options`.
 
-So? Let's have them!
+So? Let's have them then!
 
 # Usage:
- * New project:
-   * From anywhere:
-     ```vim
-     :let prg = lh#project#new({dict-options})
-     ```
-   * From `local_vimrc`
-     ```vim
-     :call lh#project#define(s:, {dict-options})
-     ```
 
- * Register a buffer to the project
-     ```vim
-     " Meant to be used from _vimrc_local file
-     :call s:project.register_buffer([bufid])
-     ```
+There are a few use-cases depending you're an end user who want to configure
+the plugins you use, or whether you're a plugin maintainer who want to have
+project-aware plugins.
 
- * Propose a value to a project option:
-     ```vim
-     :LetIfUndef p:foo.bar.team 12
-     ```
- * Override the value of a project option (define it if new):
-     ```vim
-     :Let p:foo.bar.team 42
-     ```
+## You're a end-user
+who want to define the options of your current project.
 
- * Set a vim option for all files in a project
-     ```vim
-     :call prj.set('&isk', '+=µ')
-     ```
+### New project
 
+First things first, you'll have to tell files when they are opened they belong
+to a project.
+
+#### From anywhere (power user)
+You can do it from anywhere manually with
+
+```vim
+:let prg = lh#project#new({dict-options})
+```
+
+#### From your `.lvimrc` or `_vimrc_local.vim`
+But I recommend you do it from the project configuration file from a
+[local_vimrc](https://github.com/LucHermitte/local_vimrc/) plugin.
+This file will be named `.lvimrc` or `_vimrc_local.vim` depending on the plugin
+used.
+
+```vim
+" Global definitions executed everytime we enter a file belonging to the project
+.... " This is where we set g:lobal_variables and options for project-unaware
+plugins.
+
+" Then the anti-reinclusion guards for buffer definitions
+if &cp || (exists("b:loaded__my_foobar_project_settings")
+      \ && (b:loaded__my_foobar_project_settings > s:k_version)
+      \ && !exists('g:force_reload__my_foobar_project_settings'))
+  finish
+endif
+let b:loaded__my_foobar_project_settings = s:k_version
+let s:cpo_save=&cpo
+set cpo&vim
+
+" HERE, we say the current buffer belongs to a project
+:call lh#project#define(s:, {'some': 'default values'})
+```
+
+In the case different independent project configurations may co-exist in a
+`_vimrc_local.vim` file, you may need to have several branches, and call
+`lh#project#define()` with a third parameter to distinguish the projects. See
+[my project configuration for my vim
+scripts](http://github.com/LucHermitte/lh-misc/tree/master/_vimrc_local.vim)
+
+
+Note that `lh#project#define()` will take care of creating a project variable,
+if there was none until none, and it'll make sure that the current buffer is
+registered to this project variable.
+
+### Default value for project options
+In order to propose a default value to a project option:
+```vim
+:LetIfUndef p:foo.bar.team 12
+```
+
+### Set a project option
+
+#### Variables
+We can override the value of a project option (or define it if it's a new one):
+
+```vim
+:LetTo p:foo.bar.team 42
+```
+
+#### vim options
+We can set a vim option for all files in a project
+```vim
+" TODO: Show how to fetch prj, or provide :SetInProject
+:call prj.set('&isk', '+=µ')
+```
+
+We could also simply use `setlocal isk+=µ`. The difference is that with this
+new _project_ feature, we register that `&isk` shall contain `'µ'` for all
+buffers belonging to the project. This way, when we enter a buffer that belongs
+to a project where `&isk` is modified, we'll be sure it'll get modified
+dynamically -- TODO: reformuler!
+
+
+#### Environment variables
  * Set an environment variable for all files in a project
      ```vim
      :call prj.set('$FOOBAR', 42)
@@ -85,7 +144,13 @@ So? Let's have them!
      " be injected on-the-fly with lh#os#system(), not w/ system()/make/...
      ```
 
- * Power user
+## Power User
+   * Register a buffer to the project
+     ```vim
+     " Meant to be used from _vimrc_local file
+     :call s:project.register_buffer([bufid])
+     ```
+
    * Get the current project variable (b:crt_project) or lh#option#undef()
      ```vim
      :let prj = lh#project#crt()
@@ -99,7 +164,7 @@ So? Let's have them!
      :let var = lh#project#crt_bufvar_name()
      ```
 
- * Plugins
+## You're a plugin maintainer
    * Get a project variable value:
      ```vim
      " Meant to be used by project-aware plugins
