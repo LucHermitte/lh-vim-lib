@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  27th Sep 2016
+" Last Update:  28th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -54,7 +54,6 @@ let s:k_version = '400'
 " TODO:
 " - Auto detect current project root path when there is yet no project?
 " - Simplify new project creation
-" - Automatically remove deleted buffers
 " - Have root path be official for BTW and lh-tags
 " - Toggling:
 "   - at global level: [a, b, c]
@@ -152,7 +151,7 @@ function! s:_use_options(bid) dict abort " {{{4
   for p in self.parents
     call p._use_options(a:bid)
   endfor
-  for opt in self.options
+  for opt in keys(self.options)
     call self._update_option(opt)
   endfor
 endfunction
