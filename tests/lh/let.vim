@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:      4.0.0
 " Created:      10th Sep 2012
-" Last Update:  09th Sep 2016
+" Last Update:  28th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for plugin/let.vim's LetIfUndef
@@ -314,6 +314,19 @@ function! s:Test_let_if_undef_dictionaries_fn() " {{{3
   " Invalid Var name {{{4
   AssertThrow(lh#let#if_undef('y:dummy_test', 42))
   AssertThrow(lh#let#if_undef('dummy_test', 42))
+  " }}}4
+endfunction
+
+function! s:Test_let_funcref() " {{{3
+  " value = int {{{4
+  silent! unlet g:Dummy_test
+  Assert !exists('g:Dummy_test')
+  LetIfUndef g:Dummy_test function('exists')
+  Assert exists('g:Dummy_test')
+  Assert g:Dummyg_test('*has')
+
+  LetTo g:Dummy_test function('has')
+  Assert g:Dummy_test('patch-7.3.000')
   " }}}4
 endfunction
 

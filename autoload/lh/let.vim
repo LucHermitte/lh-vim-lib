@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  08th Sep 2016
+" Last Update:  28th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -68,14 +68,14 @@ function! s:BuildPublicVariableNameAndValue(...)
   if len(a:000) == 1
     let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
     " string+eval loses references, and it doesn't seem required.
-    let value = eval(value0)
+    let Value = eval(value0)
   else
     let var = a:1
-    let value = a:2
+    let Value = a:2
     " let value = string(a:2)
   endif
   let var = s:BuildPublicVariableName(var)
-  return [var, value]
+  return [var, Value]
 endfunction
 
 " Function: lh#let#if_undef(var, value) {{{3
@@ -117,8 +117,8 @@ endfunction
 function! lh#let#if_undef(...) abort " {{{4
   call s:Verbose('let_if_undef(%1)', a:000)
   try
-    let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    return s:LetIfUndef(var, value)
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    return s:LetIfUndef(var, Value)
   catch /.*/
     throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
@@ -160,8 +160,8 @@ endfunction
 
 function! lh#let#to(...) abort " {{{4
   try
-    let [var,value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    return s:LetTo(var, value)
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    return s:LetTo(var, Value)
   catch /.*/
     throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry

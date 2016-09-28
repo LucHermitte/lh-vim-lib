@@ -2908,7 +2908,7 @@ lh#let#if_undef({varname}, {value})~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value}
-@warning the interface has changed with v4.0.0, {value} no longer need to be
+@warning the interface has changed with v4.0.0, {value} must no longer be
 quoted.
 @warning environment variable only support string and numeric values
 @return variable built
