@@ -160,7 +160,7 @@ function! s:_remove_buffer(bid) dict abort " {{{4
   for p in self.parents
     call p._remove_buffer(a:bid)
   endfor
-  call filter(self.buffers, a:bid)
+  call filter(self.buffers, 'v:val != a:bid')
 endfunction
 
 function! s:get(varname) dict abort " {{{4
@@ -253,9 +253,11 @@ endfunction
 function! lh#project#define(s, params, ...) abort
   let name = get(a:, 1, 'project')
   if !has_key(a:s, name)
-    let a:s.project = lh#project#new(a:params)
+    let a:s[name] = lh#project#new(a:params)
+  else
+    call a:s[name].register_buffer()
   endif
-  return a:s.project
+  return a:s[name]
 endfunction
 
 " # Access {{{2
@@ -327,7 +329,7 @@ augroup LH_PROJECT
   " Need to be executed after local_vimrc
   au BufReadPost * call s:UseProjectOptions()
 
-  au BufUnload * call s:RemoveBufferFromProjectConfig()
+  au BufUnload * call s:RemoveBufferFromProjectConfig(expand('<afile>'))
 augroup END
 
 function! s:UseProjectOptions()
@@ -337,10 +339,12 @@ function! s:UseProjectOptions()
   endif
 endfunction
 
-function! s:RemoveBufferFromProjectConfig()
+function! s:RemoveBufferFromProjectConfig(bname)
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
-    call prj._remove_buffer(bufnr('%'))
+    let bid = bufnr(a:bname)
+    call s:Verbose('Remove buffer %1 from project %2', bid, prj)
+    call prj._remove_buffer(bid)
   endif
 endfunction
 
