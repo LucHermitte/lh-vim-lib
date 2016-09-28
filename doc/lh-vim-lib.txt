@@ -222,6 +222,7 @@ Project related defintions                              |lhvl#project|
 - |lh#project#new()|
 - |lh#project#_get()|
 - |lh#project#crt_bufvar_name()|
+- |lh#project#crt_var_prefix()|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
@@ -2995,7 +2996,11 @@ lh#project#_get(varname)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#crt_bufvar_name()*   {{{3
-lh#project#_get(varname)~
+lh#project#crt_bufvar_name()~
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#project#crt_bufvar_name()*   {{{3
+lh#project#crt_var_prefix()~
 
                                                                      }}}1
 ==============================================================================

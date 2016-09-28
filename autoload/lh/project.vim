@@ -279,6 +279,15 @@ function! lh#project#crt_bufvar_name() abort
   endif
 endfunction
 
+" Function: lh#project#crt_var_prefix() {{{3
+function! lh#project#crt_var_prefix() abort
+  if exists('b:'.s:project_varname)
+    return 'b:'.s:project_varname.'.variables.'
+  else
+    return 'b:'
+  endif
+endfunction
+
 " Function: lh#project#_get(name) {{{3
 function! lh#project#_get(name) abort
   if exists('b:'.s:project_varname)
