@@ -162,6 +162,14 @@ dynamically -- TODO: reformuler!
 Project --list
 ```
 
+#### List project associated to a buffer
+```vim
+Project --which
+```
+
+This'll present the projects the current buffer belongs to directly and
+indirectly through project inheritance.
+
 #### List buffers associated to a project
 
 ```vim

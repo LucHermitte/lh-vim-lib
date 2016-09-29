@@ -3040,6 +3040,10 @@ Lists all known projects.
 An project without an explicit name will be provided one automatically.
 See |lhvl-project_name|.
 
+                                                    *:Project--which*
+:Project --which~
+Lists all projects to which the current buffer belongs.
+
                                                     *:Project-:ls*
 :Project [{prj-name}] :ls~
 Displays the buffers associated to the project {prj-name}, or the current
@@ -3053,6 +3057,10 @@ project, or the current project otherwise.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~
+@internal
+Prefer |:Project--define| or |lh#project#define()|.
+
+@post A project without an explicit name will be provided one automatically.
 
 Reserved fields:
 - "name"      <- Project name   *lhvl-project_name*

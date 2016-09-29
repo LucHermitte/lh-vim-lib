@@ -150,7 +150,7 @@ function! s:get_project(...) dict abort " {{{4
 endfunction
 
 " - :Project Command definition {{{3
-function! s:As_ls(bid) " {{{4
+function! s:As_ls(bid) abort " {{{4
   return printf('%3d%s %s'
         \ , a:bid
         \ , (buflisted(a:bid) ? ' ' : 'u')
@@ -161,12 +161,12 @@ function! s:As_ls(bid) " {{{4
         \ , '"'.bufname(a:bid).'"')
 endfunction
 
-function! s:ls_project(prj) " {{{4
+function! s:ls_project(prj) abort " {{{4
   let lines = map(copy(a:prj.buffers), 's:As_ls(v:val)')
   echo join(lines, "\n")
 endfunction
 
-function! s:echo_project(prj, var) " {{{4
+function! s:echo_project(prj, var) abort " {{{4
   let val = a:prj.get(a:var)
   if lh#option#is_set(val)
     echo 'p:{'.a:prj.name.'}.'.a:var.' -> '.lh#object#to_string(val)
@@ -175,7 +175,7 @@ function! s:echo_project(prj, var) " {{{4
   endif
 endfunction
 
-function! s:define_project(prjname) " {{{4
+function! s:define_project(prjname) abort " {{{4
   " 1- if there is already a project with that name
   " => only register the buffer
   " 2- else if there is a project, with another name
@@ -195,10 +195,28 @@ function! s:define_project(prjname) " {{{4
   endif
 endfunction
 
+function! s:show_related_projects(...) abort " {{{4
+  let prj = a:0 == 0 ? lh#project#crt() : a:1
+  let lvl = a:0 == 0 ? 0                : a:2
+  " Let's assume there is no recursion
+  echo repeat('  ', lvl) . '- '.prj.name
+  for p in prj.parents
+    call s:show_related_projects(p, lvl+1)
+  endfor
+endfunction
+
 " Function: lh#project#_command([prjname]) abort {{{4
+let s:k_usage =
+      \ [ ':Project USAGE:'
+      \ , '  :Project --list           " list existing projects'
+      \ , '  :Project --define <name>  " define a new project/register current buffer'
+      \ , '  :Project --which          " list projects to which the current buffer belongs'
+      \ , '  :Project [<name>] :ls     " list buffers belonging to the project'
+      \ , '  :Project [<name>] :echo   " echo state of a project variable'
+      \ ]
 function! lh#project#_command(...) abort
   if     a:1 =~ '-\+u\%[sage]'  " {{{5
-    call lh#common#warning_msg(":Project --list\n:Project --define <name>\n:Project [<name>] :ls\n:Project [<name>] :echo")
+    call lh#common#warning_msg(s:k_usage)
   elseif a:1 =~ '-\+h\%[elp]'
     help :Project
   elseif a:1 =~ '^-\+l\%[ist]$' " {{{5
@@ -208,6 +226,8 @@ function! lh#project#_command(...) abort
     else
       echo join(keys(projects), "\n")
     endif
+  elseif a:1 =~ '\v^--which$'   " {{{5
+    call s:show_related_projects()
   elseif a:1 =~ '\v^--define$'  " {{{5
     if a:0 != 2
       throw "`:Project --define` expects a project-name as only argument"
@@ -259,7 +279,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--define', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let res = keys(s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset()).variables)
