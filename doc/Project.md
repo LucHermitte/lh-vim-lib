@@ -103,8 +103,15 @@ scripts](http://github.com/LucHermitte/lh-misc/tree/master/_vimrc_local.vim)
 
 
 Note that `lh#project#define()` will take care of creating a project variable
-(if there was none until now), and it'll make sure that the current buffer is
-registered to this project variable.
+named `s:project` (default value) (if there was none until now), and it'll make
+sure that the current buffer is registered to this project variable.
+
+Another way to process is:
+```vim
+:Project --define ProjectName
+```
+which won't set a `s:project` variable. This is most likely the easier way to
+define new projects and register buffers to them.
 
 ### Default value for project options
 In order to propose a default value to a project option:

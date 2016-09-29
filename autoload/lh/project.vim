@@ -68,6 +68,8 @@ let s:k_version = '400'
 " - :LetTo p:$ENV = value
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
+" - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
+"   there are none!
 " }}}1
 "=============================================================================
 
@@ -173,10 +175,30 @@ function! s:echo_project(prj, var) " {{{4
   endif
 endfunction
 
+function! s:define_project(prjname) " {{{4
+  " 1- if there is already a project with that name
+  " => only register the buffer
+  " 2- else if there is a project, with another name
+  " => have the new project be the root project and inherit the other one
+  " register the buffer to the new root project
+  " 3- else (no project at all)
+  " => create a new project
+  " => and register the buffer
+
+  let new_prj = s:project_list.get(a:prjname)
+  if lh#option#is_set(new_prj)
+    call new_prj.register_buffer()
+  else
+    " If there is already a project, register_buffer (called by #new) will
+    " automatically inherit from it.
+    let new_prj = lh#project#new({'name': a:prjname})
+  endif
+endfunction
+
 " Function: lh#project#_command([prjname]) abort {{{4
 function! lh#project#_command(...) abort
   if     a:1 =~ '-\+u\%[sage]'  " {{{5
-    call lh#common#warning_msg(":Project --list\n:Project [<name>] :ls")
+    call lh#common#warning_msg(":Project --list\n:Project --define <name>\n:Project [<name>] :ls\n:Project [<name>] :echo")
   elseif a:1 =~ '-\+h\%[elp]'
     help :Project
   elseif a:1 =~ '^-\+l\%[ist]$' " {{{5
@@ -186,15 +208,22 @@ function! lh#project#_command(...) abort
     else
       echo join(keys(projects), "\n")
     endif
+  elseif a:1 =~ '\v^--define$'  " {{{5
+    if a:0 != 2
+      throw "`:Project --define` expects a project-name as only argument"
+    endif
+    call s:define_project(a:2)
   elseif a:1 =~ '^:'            " {{{5
     let prj = lh#project#crt()
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
     endif
-    if     a:1 =~ '\v^:l%[s]$'  " {{{5
+    if     a:1 =~ '\v^:l%[s]$'     " {{{6
       call s:ls_project(prj)
-    elseif a:1 =~ '\v^:echo$'   " {{{5
+    elseif a:1 =~ '\v^:echo$'      " {{{6
       call s:echo_project(prj, a:2)
+    elseif a:1 =~ '\v^--define$'   " {{{6
+      call s:define_project(a:2)
     else
       throw "Unexpected `:Project ".a:1."` subcommand"
     endif
@@ -230,7 +259,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let res = keys(s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset()).variables)

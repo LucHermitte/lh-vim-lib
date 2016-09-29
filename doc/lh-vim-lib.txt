@@ -3007,6 +3007,7 @@ Examples: >
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *p:* *project-variable*          {{{3
@@ -3018,6 +3019,20 @@ Displays this help.
 
 :Project --usage~
 Shows the various ways to use this command.
+
+                                                    *:Project--define*
+:Project --define {prj-name}~
+Defines a new project named {prj-name} -- see |lhvl-project_name|.
+
+If a project with that name already exists, the current buffer will be
+automatically registered to this project.
+Otherwise, a project named {prj-name} will be defined. If the current buffer
+belonged to another project, the new project will automatically inherit from
+the old one. See |lhvl#project-inherit|.
+
+@post there exists a project named {prj-name}
+@post the current buffer belong to a project named {prj-name}
+@seealso |lh#project#new()| and |lh#project#define()|.
 
                                                     *:Project--list*
 :Project --list~
