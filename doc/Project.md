@@ -106,12 +106,14 @@ Note that `lh#project#define()` will take care of creating a project variable
 named `s:project` (default value) (if there was none until now), and it'll make
 sure that the current buffer is registered to this project variable.
 
-Another way to process is:
+Another way to proceed is:
 ```vim
 :Project --define ProjectName
 ```
 which won't set a `s:project` variable. This is most likely the easier way to
-define new projects and register buffers to them.
+define new projects and register buffers to them. Moreover, this command
+requires the user to specify a name to the project. On the other hand, the
+function will provide a default generated name if none has been provided.
 
 ### Default value for project options
 In order to propose a default value to a project option:
@@ -131,7 +133,8 @@ We can override the value of a project option (or define it if it's a new one):
 #### vim options
 We can set a vim option for all files in a project
 ```vim
-" TODO: Show how to fetch prj, or provide :SetInProject
+" TODO: Show how to fetch prj (lh#project#crt()), or provide :SetInProject
+" or :Project [<name>] :set isk+=µ
 :call prj.set('&isk', '+=µ')
 ```
 
@@ -143,15 +146,18 @@ dynamically -- TODO: reformuler!
 
 
 #### Environment variables
- * Set an environment variable for all files in a project
-     ```vim
-     :call prj.set('$FOOBAR', 42)
+We can set an environment variable for all files in a project
 
-     " And use it from plugins
-     :echo lh#os#system('echo $FOOBAR')
-     " The environment variable won't be changed globally, but its value will
-     " be injected on-the-fly with lh#os#system(), not w/ system()/make/...
-     ```
+```vim
+" TODO: LetTo p:$FOOBAR = 42
+" or
+:call prj.set('$FOOBAR', 42)
+
+" And use it from plugins
+:echo lh#os#system('echo $FOOBAR')
+```
+The environment variable won't be changed globally, but its value will be
+injected on-the-fly with `lh#os#system()`, not w/ `system()`/`:make`/...
 
 ### Display various informations
 
