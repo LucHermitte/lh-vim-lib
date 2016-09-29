@@ -67,6 +67,7 @@ let s:k_version = '400'
 " - :Unlet p:$ENV
 " - :LetTo p:$ENV = value
 " - :Project <name> do <cmd> ...
+" - :Project <name> :bw -> with confirmation!
 " }}}1
 "=============================================================================
 
@@ -172,7 +173,7 @@ function! lh#project#_command(...) abort
     else
       echo join(keys(projects), "\n")
     endif
-  elseif a:1 =~ '\v^:=l%[s]$'   " {{{5
+  elseif a:1 =~ '\v^:l%[s]$'   " {{{5
     let prj = lh#project#crt()
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
