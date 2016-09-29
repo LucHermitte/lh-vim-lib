@@ -19,8 +19,8 @@ Vim support various means to define options.
    [lh-dev](http://github.com/LucHermitte/lh-dev#options-1), I've went a little
    bit further in order to support specialization for buffer and/or filetypes.
 
-Given the objective to have options that are project specific, it's quite to
-achieve it thanks to plugins like
+Given the objective to have options that are project specific, it's quite easy
+to achieve it thanks to plugins like
 [local_vimrc](https://github.com/LucHermitte/local_vimrc/) (or similar
 techniques). With these plugins, we say a file belongs to a project when it's
 located in a directory under the one where a `_vimrc_local` file resides.
@@ -76,8 +76,8 @@ used.
 
 ```vim
 " Global definitions executed everytime we enter a file belonging to the project
-.... " This is where we set g:lobal_variables and options for project-unaware
-plugins.
+" This is where we set g:lobal_variables and options for project-unaware plugins.
+....
 
 " Then the anti-reinclusion guards for buffer definitions
 if &cp || (exists("b:loaded__my_foobar_project_settings")
@@ -100,8 +100,8 @@ In the case different independent project configurations may co-exist in a
 scripts](http://github.com/LucHermitte/lh-misc/tree/master/_vimrc_local.vim)
 
 
-Note that `lh#project#define()` will take care of creating a project variable,
-if there was none until none, and it'll make sure that the current buffer is
+Note that `lh#project#define()` will take care of creating a project variable
+(if there was none until now), and it'll make sure that the current buffer is
 registered to this project variable.
 
 ### Default value for project options
@@ -143,6 +143,32 @@ dynamically -- TODO: reformuler!
      " The environment variable won't be changed globally, but its value will
      " be injected on-the-fly with lh#os#system(), not w/ system()/make/...
      ```
+
+### Display various informations
+
+#### List of active projects
+(well for now, we cannot deactivate a project)
+
+```vim
+Project --list
+```
+
+#### List buffers associated to a project
+
+```vim
+Project ProjectName ls
+Project ProjectName :ls
+```
+
+It'll display the same information as `:ls`, but restricted to the
+project specified.
+
+```vim
+Project :ls
+```
+
+This time, it'll display the buffers associated to the current project (i.e.
+the one the current buffer belongs to).
 
 ## Power User
    * Register a buffer to the project

@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  28th Sep 2016
+" Last Update:  29th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -66,6 +66,7 @@ let s:k_version = '400'
 "   toggling definitions
 " - :Unlet p:$ENV
 " - :LetTo p:$ENV = value
+" - :Project <name> do <cmd> ...
 " }}}1
 "=============================================================================
 
@@ -104,7 +105,117 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-" # Define {{{2
+" # Project list {{{2
+
+" Function: lh#project#_make_project_list() {{{3
+function! lh#project#_make_project_list() abort
+  let res = lh#object#make_top_type(
+        \ { 'name': 'project_list'
+        \ , 'projects': {}
+        \ , '_next_id': 1
+        \ })
+  let res.new_name    = function(s:getSNR('new_name'))
+  let res.add_project = function(s:getSNR('add_project'))
+  let res.get         = function(s:getSNR('get_project'))
+  return res
+endfunction
+
+" - Methods {{{3
+function! s:new_name() dict abort " {{{4
+  let name = 'project'. self._next_id
+  let self._next_id += 1
+  return name
+endfunction
+
+function! s:add_project(project) dict abort " {{{4
+  let name = a:project.name
+  if !has_key(self.projects, name)
+    let self.projects[name] = a:project
+  endif
+endfunction
+
+function! s:get_project(...) dict abort " {{{4
+  if a:0 == 0
+    return self.projects
+  else
+    return get(self.projects, a:1, lh#option#unset())
+  endif
+endfunction
+
+" - :Project Command definition {{{3
+function! s:As_ls(bid) " {{{4
+  return printf('%3d%s %s'
+        \ , a:bid
+        \ , (buflisted(a:bid) ? ' ' : 'u')
+        \ . (bufnr('%') == a:bid ? '%' : bufnr('#') == a:bid ? '#' : ' ')
+        \ . (! bufloaded(a:bid) ? ' ' : bufwinnr(a:bid)<0 ? 'h' : 'a')
+        \ . (! getbufvar(a:bid, "&modifiable") ? '-' : getbufvar(a:bid, "&readonly") ? '=' : ' ')
+        \ . (getbufvar(a:bid, "&modified") ? '+' : ' ')
+        \ , '"'.bufname(a:bid).'"')
+endfunction
+
+function! s:ls_project(prj)
+  let lines = map(copy(a:prj.buffers), 's:As_ls(v:val)')
+  echo join(lines, "\n")
+endfunction
+
+" Function: lh#project#_command([prjname]) abort {{{4
+function! lh#project#_command(...) abort
+  if     a:1 =~ '-\+u\%[sage]'  " {{{5
+    call lh#common#warning_msg(":Project --list\n:Project [<name>] :ls")
+  elseif a:1 =~ '-\+h\%[elp]'
+    help :Project
+  elseif a:1 =~ '^-\+l\%[ist]$' " {{{5
+    let projects = s:project_list.get()
+    if empty(projects)
+      echo "(no project defined)"
+    else
+      echo join(keys(projects), "\n")
+    endif
+  elseif a:1 =~ '\v^:=l%[s]$'   " {{{5
+    let prj = lh#project#crt()
+    if lh#option#is_unset(prj)
+      throw "The current buffer doesn't belong to any project"
+    endif
+    call s:ls_project(prj)
+  else                          " {{{5
+
+    let prj_name = a:1
+    let prj = s:project_list.get(prj_name)
+    if lh#option#is_unset(prj)
+      throw "There is no project named `".prj_name."`"
+    endif
+    if a:0 < 2
+      throw "Not enough arguments to `:Project name`"
+    endif
+    if a:2 =~ '\v^:=l%[s]$'
+      call s:ls_project(prj)
+    else
+      throw "There is no `:Project ".a:2."` subcommand!"
+    endif
+  endif
+
+endfunction " }}}5
+
+" Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{4
+function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
+  let tmp = substitute(a:CmdLine, '\\ ', '', 'g')
+  let tmp = substitute(tmp, '\s*\S*', 'Z', 'g')
+  let pos = strlen(tmp)
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3) -- tmp=%4, pos=%5', a:ArgLead, a:CmdLine, a:CursorPos, tmp, pos)
+
+  if     2 == pos
+    let res = ['--list', '--help', '--usage', ':ls'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+  elseif 3 == pos
+    let res = [':ls']
+  else
+    let res = []
+  endif
+  let res = filter(res, 'v:val =~ a:ArgLead')
+  return res
+endfunction
+
+" # Define a new project {{{2
 " - Methods {{{3
 function! s:register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
@@ -112,7 +223,7 @@ function! s:register_buffer(...) dict abort " {{{4
   let inherited = lh#option#getbufvar(bid, s:project_varname)
   if  lh#option#is_set(inherited) && inherited isnot self
     call self.inherit(inherited)
-    " and then ovveride with new value
+    " and then override with new value
   endif
   call setbufvar(bid, s:project_varname, self)
   call lh#list#push_if_new(self.buffers, bid)
@@ -178,7 +289,7 @@ function! s:get(varname) dict abort " {{{4
   return lh#option#unset()
 endfunction
 
-function! s:apply(action) dict abort " {{{4
+function! s:apply(Action) dict abort " {{{4
   " TODO: support lhvl-functors, functions, "v:val" stuff
   for b in self.buffers
     call a:Action(b)
@@ -230,6 +341,10 @@ function! lh#project#new(params) abort
         \ , 'env':       {}
         \ , 'parents':   []
         \ })
+  " If no name is provided, generate one on the fly
+  if !has_key(project, 'name')
+    let project.name = s:project_list.new_name()
+  endif
 
   let project.inherit         = function(s:getSNR('inherit'))
   let project.register_buffer = function(s:getSNR('register_buffer'))
@@ -246,6 +361,8 @@ function! lh#project#new(params) abort
 
   " Let's automatically register the current buffer
   call project.register_buffer()
+
+  call s:project_list.add_project(project)
   return project
 endfunction
 
@@ -323,23 +440,24 @@ endfunction
 " }}}1
 "------------------------------------------------------------------------
 " ## autocommands {{{1
-" # New buffer => update options {{{2
 augroup LH_PROJECT
   au!
-  " Need to be executed after local_vimrc
-  au BufReadPost * call s:UseProjectOptions()
+  au BufUnload   * call s:RemoveBufferFromProjectConfig(expand('<afile>'))
 
-  au BufUnload * call s:RemoveBufferFromProjectConfig(expand('<afile>'))
+  " Needs to be executed after local_vimrc
+  au BufReadPost * call s:UseProjectOptions()
 augroup END
 
-function! s:UseProjectOptions()
+" # New buffer => update options {{{2
+function! s:UseProjectOptions() " {{{3
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
     call prj._use_options(bufnr('%'))
   endif
 endfunction
 
-function! s:RemoveBufferFromProjectConfig(bname)
+" # Remove buffer {{{2
+function! s:RemoveBufferFromProjectConfig(bname) " {{{3
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
     let bid = bufnr(a:bname)
@@ -348,6 +466,9 @@ function! s:RemoveBufferFromProjectConfig(bname)
   endif
 endfunction
 
+"------------------------------------------------------------------------
+" ## Internal globals {{{1
+let s:project_list = get(s:, 'project_list', lh#project#_make_project_list())
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------

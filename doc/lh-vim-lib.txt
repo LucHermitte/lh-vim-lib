@@ -218,6 +218,7 @@ Variables helper functions                              |lhvl#variable|
 - |lh#let#undef()|
 Project related defintions                              |lhvl#project|
 - |p:| |project-variable|
+- |:Project|
 - |lh#project#define()|
 - |lh#project#new()|
 - |lh#project#_get()|
@@ -3011,11 +3012,30 @@ PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
                                                 *p:* *project-variable*          {{{3
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *:Project*                       {{{3
+:Project --help~
+Displays this help.
+
+:Project --usage~
+Shows the various ways to use this command.
+
+                                                    *:Project--list*
+:Project --list~
+Lists all known projects.
+An project without an explicit name will be provided one automatically.
+See |lhvl-project_name|.
+
+                                                    *:Project-:ls*
+:Project [{prj-name}] :ls~
+Displays the buffers associated to the project {prj-name}, or the current
+project (is none was specified) in the same way as builtin |:ls| command.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~
 
 Reserved fields:
-- "name"
+- "name"      <- Project name   *lhvl-project_name*
 - "parents"
 - "paths.root" ?
 - "buffers"

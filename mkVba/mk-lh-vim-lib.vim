@@ -62,6 +62,7 @@ autoload/lh/window.vim
 doc/lh-vim-lib.txt
 mkVba/mk-lh-vim-lib.vim
 plugin/let.vim
+plugin/lh-project.vim
 plugin/lhvl.vim
 plugin/ui-functions.vim
 plugin/words_tools.vim
