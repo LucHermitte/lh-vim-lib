@@ -139,7 +139,11 @@ function! s:get_project(...) dict abort " {{{4
   if a:0 == 0
     return self.projects
   else
-    return get(self.projects, a:1, lh#option#unset())
+    if lh#option#is_unset(a:1)
+      return lh#project#crt()
+    else
+      return get(self.projects, a:1, lh#option#unset())
+    endif
   endif
 endfunction
 
@@ -155,9 +159,18 @@ function! s:As_ls(bid) " {{{4
         \ , '"'.bufname(a:bid).'"')
 endfunction
 
-function! s:ls_project(prj)
+function! s:ls_project(prj) " {{{4
   let lines = map(copy(a:prj.buffers), 's:As_ls(v:val)')
   echo join(lines, "\n")
+endfunction
+
+function! s:echo_project(prj, var) " {{{4
+  let val = a:prj.get(a:var)
+  if lh#option#is_set(val)
+    echo 'p:{'.a:prj.name.'}.'.a:var.' -> '.lh#object#to_string(val)
+  else
+    call lh#common#warning_msg('No `'.a:var.'` variable in `'.a:prj.name. '` project')
+  endif
 endfunction
 
 " Function: lh#project#_command([prjname]) abort {{{4
@@ -173,12 +186,18 @@ function! lh#project#_command(...) abort
     else
       echo join(keys(projects), "\n")
     endif
-  elseif a:1 =~ '\v^:l%[s]$'   " {{{5
+  elseif a:1 =~ '^:'            " {{{5
     let prj = lh#project#crt()
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
     endif
-    call s:ls_project(prj)
+    if     a:1 =~ '\v^:l%[s]$'  " {{{5
+      call s:ls_project(prj)
+    elseif a:1 =~ '\v^:echo$'   " {{{5
+      call s:echo_project(prj, a:2)
+    else
+      throw "Unexpected `:Project ".a:1."` subcommand"
+    endif
   else                          " {{{5
 
     let prj_name = a:1
@@ -191,8 +210,10 @@ function! lh#project#_command(...) abort
     endif
     if a:2 =~ '\v^:=l%[s]$'
       call s:ls_project(prj)
+    elseif a:2 =~ '\v^:=echo$'   " {{{5
+      call s:echo_project(prj, a:3)
     else
-      throw "There is no `:Project ".a:2."` subcommand!"
+      throw "Unexpected `:Project ".a:2."` subcommand"
     endif
   endif
 
@@ -200,15 +221,21 @@ endfunction " }}}5
 
 " Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{4
 function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
-  let tmp = substitute(a:CmdLine, '\\ ', '', 'g')
+  let tmp = substitute(a:CmdLine, '\\ ', '§', 'g')
+  let tokens = split(tmp, '\s\+')
+  call map(tokens, 'substitute(v:val, "§", " ", "g")')
   let tmp = substitute(tmp, '\s*\S*', 'Z', 'g')
-  let pos = strlen(tmp)
-  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3) -- tmp=%4, pos=%5', a:ArgLead, a:CmdLine, a:CursorPos, tmp, pos)
+  let pos = strlen(tmp) - 1
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3) -- tmp=%4, pos=%5, tokens=%6', a:ArgLead, a:CmdLine, a:CursorPos, tmp, pos, tokens)
 
-  if     2 == pos
-    let res = ['--list', '--help', '--usage', ':ls'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
-  elseif 3 == pos
-    let res = [':ls']
+
+  if     1 == pos
+    let res = ['--list', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+  elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
+        \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
+    let res = keys(s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset()).variables)
+  elseif 2 == pos
+    let res = [':ls', ':echo']
   else
     let res = []
   endif

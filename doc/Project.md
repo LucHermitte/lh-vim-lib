@@ -75,6 +75,8 @@ This file will be named `.lvimrc` or `_vimrc_local.vim` depending on the plugin
 used.
 
 ```vim
+let s:k_version = 1
+
 " Global definitions executed everytime we enter a file belonging to the project
 " This is where we set g:lobal_variables and options for project-unaware plugins.
 ....
@@ -169,6 +171,16 @@ Project :ls
 
 This time, it'll display the buffers associated to the current project (i.e.
 the one the current buffer belongs to).
+
+
+#### Echo a variable associated to a project
+```vim
+Project ProjectName :echo varname
+Project ProjectName echo varname
+
+" Or for the current project only
+Project :echo varname
+```
 
 ## Power User
    * Register a buffer to the project
