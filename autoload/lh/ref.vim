@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      09th Sep 2016
-" Last Update:  09th Sep 2016
+" Last Update:  30th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -51,13 +51,24 @@ endfunction
 " ## functions {{{1
 " # Public  {{{1
 
+" # bind {{{2
+" - Methods {{{3
+function! s:resolve() dict abort " {{{4
+  return eval(self.to)
+endfunction
+
+function! s:to_string() dict abort " {{{4
+  return '{ref->('.(self.to).'): '.lh#object#to_string(self.resolve()).'}'
+endfunction
+
 " Function: lh#ref#bind(varname) {{{3
 function! lh#ref#bind(varname) abort
-  let res =
-        \ { 'to': a:varname
+  let res = lh#object#make_top_type
+        \ ({ 'to': a:varname
         \ , 'type': s:bind
-        \ }
+        \ })
   let res.resolve = function(s:getSNR('resolve'))
+  let res._to_string = function(s:getSNR('to_string'))
   return res
 endfunction
 
@@ -67,10 +78,6 @@ let s:bind = get(s:, 'bind', {})
 " Function: lh#ref#is_bound(var) {{{3
 function! lh#ref#is_bound(var) abort
   return type(a:var) == type({}) && get(a:var, 'type', 42) is s:bind
-endfunction
-
-function! s:resolve() dict abort
-  return eval(self.to)
 endfunction
 
 "------------------------------------------------------------------------
