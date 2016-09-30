@@ -96,21 +96,22 @@ We can override the value of a project option (or define it if it's a new one):
 #### vim options
 We can set a vim option for all files in a project
 ```vim
-" LetTo p:&isk+=µ
+:LetTo p:&isk+=µ
 ```
 
-We could also simply use `setlocal isk+=µ`. The difference is that with this
-new _project_ feature, we register that `&isk` shall contain `'µ'` for all
-buffers belonging to the project. This way, when we enter a buffer that belongs
-to a project where `&isk` is modified, we'll be sure it'll get modified
-dynamically -- TODO: reformuler!
+We could also simply use `setlocal isk+=µ`. The difference is that with `:Let
+p:&isk`, we register that `&isk` shall contain `'µ'` for all buffers belonging
+to the project.
 
+This way, when we enter a buffer that belongs to a project where `&isk` is
+modified, we'll be sure it'll get modified dynamically, without having to
+change a project configuration file.
 
 #### Environment variables
 We can set an environment variable for all files in a project
 
 ```vim
-LetTo p:$FOOBAR = 42
+:LetTo p:$FOOBAR = 42
 
 " And use it from plugins
 :echo lh#os#system('echo $FOOBAR')
@@ -262,7 +263,9 @@ This will most likely return `b:crt_project`, the exact name depends on
 
 ### Fetch the name under which an option is stored
 ```
-:let varname = lh#project#crt_var_name()
+:let varname = lh#project#crt_var_name('&isk')
+:let varname = lh#project#crt_var_name('$PATH')
+:let varname = lh#project#crt_var_name('foobar')
 ```
 This internal function is use by `lh#let#*` functions.
 
