@@ -270,7 +270,8 @@ function! lh#buffer#dialog#Select(...) abort
   return call ('lh#buffer#dialog#select', a:000)
 endfunction
 
-function! Action(results) abort
+" TODO: Check where it's used!
+function! lh#buffer#dialog#action(results) abort
   let dialog = a:results.dialog
   let choices = dialog.choices
   for r in a:results.selection
