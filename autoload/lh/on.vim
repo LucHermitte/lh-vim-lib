@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  27th Sep 2016
+" Last Update:  30th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -83,6 +83,9 @@ function! lh#on#exit()
   let res.finalize = function(s:getSNR('finalize'))
 
   function! res.restore(varname) dict abort " {{{4
+    if type(a:varname) != type('')
+      throw "lh#on#exit().restore() expects a variable name, not a variable!"
+    endif
     " unlet if always required in case the type changes
     let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
     if a:varname =~ '[~@]' || exists(a:varname)
@@ -93,6 +96,9 @@ function! lh#on#exit()
     return self
   endfunction
   function! res.restore_option(varname, ...) dict abort " {{{4
+    if type(a:varname) != type('')
+      throw "lh#on#exit().restore_option() expects a variable name, not a variable!"
+    endif
     let scopes = a:0 > 0 ? a:1 : 'wbg'
     let actions = []
     let lScopes = split(scopes, '\s*')
