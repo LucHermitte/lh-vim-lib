@@ -76,64 +76,71 @@ endfunction
 " ## Exported functions {{{1
 " # RAII/finalization {{{2
 
+" - Methods {{{3
+function! s:restore(varname) dict abort " {{{4
+  if type(a:varname) != type('')
+    throw "lh#on#exit().restore() expects a variable name, not a variable!"
+  endif
+  " unlet if always required in case the type changes
+  let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
+  if a:varname =~ '[~@]' || exists(a:varname)
+    let action = 'let '.a:varname.'='.string(eval(a:varname))
+    let self.actions += [action]
+  endif
+
+  return self
+endfunction
+
+function! s:restore_option(varname, ...) dict abort " {{{4
+  if type(a:varname) != type('')
+    throw "lh#on#exit().restore_option() expects a variable name, not a variable!"
+  endif
+  let scopes = a:0 > 0 ? a:1 : 'wbg'
+  let actions = []
+  let lScopes = split(scopes, '\s*')
+  for scope in lScopes
+    let varname = scope . ':' . a:varname
+    let actions += ['call lh#on#_unlet('.string(varname).')']
+    if stridx(varname, '~')!=-1 || exists(varname)
+      let action = 'let '.varname.'='.string(eval(varname))
+      let actions += [action]
+      " break
+    endif
+  endfor
+  " if empty(actions)
+  " let actions = map(lScopes, '":silent! unlet ".v:val.":".a:varname')
+  " endif
+
+  let self.actions += actions
+  return self
+endfunction
+
+function! s:register(Action) dict abort " {{{4
+  let self.actions += [a:Action]
+  return self
+endfunction
+
+function! s:restore_buffer_mapping(key, mode) dict abort " {{{4
+  let keybinding = maparg(a:key, a:mode, 0, 1)
+  if get(keybinding, 'buffer', 0)
+    let self.actions += [ 'silent! call lh#mapping#define('.string(keybinding).')']
+  else
+    let self.actions += [ 'silent! '.a:mode.'unmap <buffer> '.a:key ]
+  endif
+  return self
+endfunction
+
+
 " Function: lh#on#exit() {{{3
 function! lh#on#exit()
   let res = lh#object#make_top_type({'actions':[] })
 
-  let res.finalize = function(s:getSNR('finalize'))
+  let res.finalize                = function(s:getSNR('finalize'))
+  let res.restore                 = function(s:getSNR('restore'))
+  let res.restore_option          = function(s:getSNR('restore_option'))
+  let res.register                = function(s:getSNR('register'))
+  let res.restore_buffer_mapping  = function(s:getSNR('restore_buffer_mapping'))
 
-  function! res.restore(varname) dict abort " {{{4
-    if type(a:varname) != type('')
-      throw "lh#on#exit().restore() expects a variable name, not a variable!"
-    endif
-    " unlet if always required in case the type changes
-    let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
-    if a:varname =~ '[~@]' || exists(a:varname)
-      let action = 'let '.a:varname.'='.string(eval(a:varname))
-      let self.actions += [action]
-    endif
-
-    return self
-  endfunction
-  function! res.restore_option(varname, ...) dict abort " {{{4
-    if type(a:varname) != type('')
-      throw "lh#on#exit().restore_option() expects a variable name, not a variable!"
-    endif
-    let scopes = a:0 > 0 ? a:1 : 'wbg'
-    let actions = []
-    let lScopes = split(scopes, '\s*')
-    for scope in lScopes
-      let varname = scope . ':' . a:varname
-      let actions += ['call lh#on#_unlet('.string(varname).')']
-      if stridx(varname, '~')!=-1 || exists(varname)
-        let action = 'let '.varname.'='.string(eval(varname))
-        let actions += [action]
-        " break
-      endif
-    endfor
-    " if empty(actions)
-      " let actions = map(lScopes, '":silent! unlet ".v:val.":".a:varname')
-    " endif
-
-    let self.actions += actions
-    return self
-  endfunction
-  function! res.register(action) dict abort " {{{4
-    let self.actions += [a:action]
-    return self
-  endfunction
-
-  function! res.restore_buffer_mapping(key, mode) dict abort " {{{4
-    let keybinding = maparg(a:key, a:mode, 0, 1)
-    if get(keybinding, 'buffer', 0)
-      let self.actions += [ 'silent! call lh#mapping#define('.string(keybinding).')']
-    else
-      let self.actions += [ 'silent! '.a:mode.'unmap <buffer> '.a:key ]
-    endif
-    return self
-  endfunction
-
-  " return {{{4
   return res
 endfunction
 
@@ -143,18 +150,18 @@ endfunction
 " # finalizer methods {{{2
 function! s:finalize() dict " {{{4
   " This function shall not fail!
-  for Action in self.actions
+  for l:Action in self.actions
     try
-      if type(Action) == type(function('has'))
-        call Action()
-      elseif !empty(Action)
-        exe Action
+      if type(l:Action) == type(function('has'))
+        call l:Action()
+      elseif !empty(l:Action)
+        exe l:Action
       endif
     catch /.*/
-      call lh#log#this('Error occured when running action (%1)', Action)
+      call lh#log#this('Error occured when running action (%1)', l:Action)
       call lh#log#exception()
     finally
-      unlet Action
+      unlet l:Action
     endtry
   endfor
 endfunction
