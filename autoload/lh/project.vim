@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  29th Sep 2016
+" Last Update:  30th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -27,14 +27,16 @@ let s:k_version = '400'
 "     :LetIfUndef p:foo.bar.team 12
 " - Override the value of a project option (define it if new):
 "     :Let p:foo.bar.team 42
+"     :Let p:foo.bar.team = 42
 " - Get a project variable value:
 "     :let val = lh#option#get('b:foo.bar.team')
 "
 " - Set a vim option for all files in a project
+"     :LetTo p:&isk+=µ
 "     :call prj.set('&isk', '+=µ')
 "
-"
 " - Set an environment variable for all files in a project
+"     :LetTo p:$FOOBAR = 42
 "     :call prj.set('$FOOBAR', 42)
 "     :echo lh#os#system('echo $FOOBAR')
 "     " The environment variable won't be changed globally, but its value will
@@ -53,23 +55,28 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Auto detect current project root path when there is yet no project?
-" - Simplify new project creation
 " - Have root path be official for BTW and lh-tags
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
-" - Be able to control which parent is filled with lh#let# functions
 " - Doc
 " - Setlocally vim options on new files
-" - Have lh-tags, BTW, ... use p:$ENV variables
+" - Have lh-tags, lh-dev, BTW, ... use p:$ENV variables
 " - Have menu priority + menu name in all projects in order to simplify
 "   toggling definitions
 " - :Unlet p:$ENV
-" - :LetTo p:$ENV = value
+" - Be able to control which parent is filled with lh#let# functions
+" - prj.set(plain_variable, value)
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
+" - Serialize and deserialize options from a file that'll be maintained
+"   alongside a _vimrc_local.vim file.
+"   Expected Caveats:
+"   - How to insert a comment near each variable serialized
+"   - How to computed value at the last moment (e.g. path relative to current
+"     directory, and have the variable hold an absolute path)
 " }}}1
 "=============================================================================
 
@@ -121,6 +128,18 @@ function! lh#project#_make_project_list() abort
   let res.add_project = function(s:getSNR('add_project'))
   let res.get         = function(s:getSNR('get_project'))
   return res
+endfunction
+
+" Function: lh#project#_save_prj_list() {{{3
+" Meant to be used from Unit Tests
+function! lh#project#_save_prj_list() abort
+  return s:project_list
+endfunction
+
+" Function: lh#project#_restore_prj_list(prj_list) {{{3
+" Meant to be used from Unit Tests
+function! lh#project#_restore_prj_list(prj_list) abort
+  let s:project_list = a:prj_list
 endfunction
 
 " - Methods {{{3
@@ -241,6 +260,9 @@ function! lh#project#_command(...) abort
     if     a:1 =~ '\v^:l%[s]$'     " {{{6
       call s:ls_project(prj)
     elseif a:1 =~ '\v^:echo$'      " {{{6
+      if a:0 != 2
+        throw "Not enough arguments to `:Project :echo`"
+      endif
       call s:echo_project(prj, a:2)
     elseif a:1 =~ '\v^--define$'   " {{{6
       call s:define_project(a:2)
@@ -260,6 +282,9 @@ function! lh#project#_command(...) abort
     if a:2 =~ '\v^:=l%[s]$'
       call s:ls_project(prj)
     elseif a:2 =~ '\v^:=echo$'   " {{{5
+      if a:0 != 3
+        throw "Not enough arguments to `:Project :echo`"
+      endif
       call s:echo_project(prj, a:3)
     else
       throw "Unexpected `:Project ".a:2."` subcommand"
@@ -474,12 +499,34 @@ function! lh#project#crt_bufvar_name() abort
   endif
 endfunction
 
-" Function: lh#project#crt_var_prefix() {{{3
-function! lh#project#crt_var_prefix() abort
+" Function: lh#project#_crt_var_name(var) {{{3
+function! lh#project#_crt_var_name(var) abort
+  " call assert_true(a:var =~ '^p:')
+  let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
   if exists('b:'.s:project_varname)
-    return 'b:'.s:project_varname.'.variables.'
+    if kind == '&'
+      return
+            \ { 'name'    : a:var[2:]
+            \ , 'realname': 'b:'.s:project_varname.'.options.'.name
+            \ , 'project' : b:{s:project_varname}
+            \ }
+    elseif kind == '$'
+      return
+            \ { 'name'    : a:var[2:]
+            \ , 'realname': 'b:'.s:project_varname.'.env.'.name
+            \ , 'project' : b:{s:project_varname}
+            \ }
+    else
+      return 'b:'.s:project_varname.'.variables.'.name
+    endif
   else
-    return 'b:'
+    if kind == '&'
+      return 'l&:'.name
+    elseif kind == '$'
+      throw "Cannot set `".a:var."` locally without an active project"
+    else
+      return 'b:'.name
+    endif
   endif
 endfunction
 

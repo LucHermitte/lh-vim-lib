@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 27th Sep 2016
+                        For Vim version 7+      Last change: 30th Sep 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -29,7 +29,6 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#askvim#exe()|
 - |lh#askvim#scriptnames()|
 - |lh#askvim#scriptname()|
-- |lh#async#queue()|
 - |lh#common#check_deps()|
 - |lh#common#echomsg_multilines()|
 - |lh#common#error_msg()|
@@ -180,6 +179,7 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#list_raw()|
 - |lh#syntax#list()|
 OS/System related functions:                            |lhvl#os|
+- |lh#async#queue()|
 - |lh#os#has_unix_layer_installed()|
 - |lh#os#system_detected()|
 - |lh#os#OnDOSWindows()|
@@ -223,7 +223,7 @@ Project related defintions                              |lhvl#project|
 - |lh#project#new()|
 - |lh#project#_get()|
 - |lh#project#crt_bufvar_name()|
-- |lh#project#crt_var_prefix()|
+- |lh#project#_crt_var_name()|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
@@ -3009,8 +3009,66 @@ Examples: >
 PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
 @since Version 4.0.0
 
+Vim support various means to define options.
+ * First there are vim options that are used to tune how Vim behaves in various
+   situations. They are set with |:set|. Some are global, other are local to
+   buffers. In this later case we usually choose their value either on a
+   filetype basis, or a project basis.
+ * Then there are plugin options. Again, they can be |g:|lobal,
+   |b:|uffer-local, or even |w:|indow or |t:|ab local. In lh-vim-lib I've been
+   providing |lh#option#get()| to obtain in a simple call the most refined
+   value of an option. In
+   [|lh-dev|](http://github.com/LucHermitte/lh-dev#options-1), I've went a little
+   bit further in order to support specialization for buffer and/or filetypes.
+
+Given the objective to have options that are project specific, it's quite easy
+to achieve it thanks to plugins like
+[|local_vimrc|](https://github.com/LucHermitte/local_vimrc/) (or similar
+techniques). With these plugins, we say a file belongs to a project when it's
+located in a directory under the one where a `_vimrc_local` file resides.
+
+In that `_vimrc_local` file, we define project-specific options as local
+options with |:setlocal|, and |b:|uffer_local_options.
+
+That works well I've said. Up to a point: a same option could be duplicated
+hundred times: once in each buffer that belongs to a project. As long as we
+don't want to change an option this is fine. But as soon as we want to change a
+setting we have to change it in every opened buffer belonging to the project,
+which is tedious to do correctly.
+
+How often does this need arise? Much to often IMO. In
+[|BuildToolsWrappers|](https://github.com/LucHermitte/BuildToolsWrappers/),
+I've experimented the issue when I wanted to change the current compilation
+directory (from _Debug_ to _Release_ for instance). This is just one option,
+but it impacts CMake configuration directory, included directory list (for
+`.h.in` files), build directory, etc.
+
+Being able to toggle an option between several values, when this is a buffer
+local option, quickly becomes a nightmare. This is because we don't have
+`p:roject_options`.
+
+So? Let's have them then!
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *p:* *project-variable*          {{{3
+Can be a project specific variable:
+- a vim |option|
+- an |environment| variable (which will be set on the fly by functions like
+  |lh#os#system()|, or |lh#asynch#queue()|)
+- any variable.
+
+These variables can be set with:
+- |:LetTo|
+- |:LetIfUndef|
+
+Their value is meant to be retrived with:
+- |lh#option#get()| (and |lh#dev#option#get()| eventually) in variable cases
+- or use on the fly in case of |environment| variables
+
+TODO: add word about special handling of |options|
+
+But first, we need to define a project (see |:Project--define|, and
+|lh#project#define()|).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *:Project*                       {{{3
@@ -3065,7 +3123,7 @@ Prefer |:Project--define| or |lh#project#define()|.
 Reserved fields:
 - "name"      <- Project name   *lhvl-project_name*
 - "parents"
-- "paths.root" ?
+- "paths.root" ? TODO!!
 - "buffers"
 - "variables" <- where p:foobar will be stored
 - "options"   <- where altered vim options will be stored
@@ -3073,19 +3131,64 @@ Reserved fields:
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#define()*            {{{3
-lh#project#define(s:, options [, name])~
+lh#project#define(s:, options [, varname])~
+@post the current buffer is registered to the project returned.
+
+While |:Project--define| permit to create new projects quite easily, it
+doesn't return a variable to the new project.
+
+Instead we could use `lh#project#define()` to store the new project variable
+into `s:project`, or `s:{varname}` automatically. If a project already exists
+in that variable, it get returned.
+
+Unlike |:Project--define|, `lh#project#define()` doesn't require a name. A
+default one will be provided.
+
+In the case different independent project configurations may co-exist in a
+`_vimrc_local.vim` file, you may need to have several branches, and call
+`lh#project#define()` with a third parameter to distinguish the projects. This
+will permit to store project information in a variable with a name which is not
+from `s:project`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#project#crt()*               {{{3
+lh#project#crt()~
+@return the current project.
+@return In case there is no project associated to the current buffer,
+|lh#option#unset()| will be returned.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#_get()*              {{{3
 lh#project#_get(varname)~
+@return a variable named {varname} under the current project, or its parents.
+@return |lh#option#unset()| if the current buffer doesn't belong to a project
+or if there is such project variable.
+
+@internal Used by |lh#option#get()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#crt_bufvar_name()*   {{{3
 lh#project#crt_bufvar_name()~
+@return the name of the current project variable
+
+In case there is no project associated to the current buffer,
+an exception will be thrown.
+
+This will most likely return `b:crt_project`, the exact name depends on
+*g:lh#project#varname* global which can be overridden in your |.vimrc|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#project#crt_bufvar_name()*   {{{3
-lh#project#crt_var_prefix()~
+                                                *lh#project#_crt_var_name()*     {{{3
+lh#project#_crt_var_name(p:var)~
+This internal function is use by `lh#let#*` functions.
+It'll return:
+- A |dictionary| if {var} starts with `&` or `$`:
+  - `"realname"` =
+    - `lh#project#crt_bufvar_name().env.{var}` for environment variables
+    - `lh#project#crt_bufvar_name().options.{var}` for vim |option|s
+  - `"name"` = {var} (without the `"p:"`part)
+  - `"project"` a reference to the associated project variable
+- The |string| `lh#project#crt_bufvar_name().variables.{var}` otherwise.
 
                                                                      }}}1
 ==============================================================================

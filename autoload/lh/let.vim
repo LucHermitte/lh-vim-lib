@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  28th Sep 2016
+" Last Update:  30th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -56,7 +56,7 @@ function! s:BuildPublicVariableName(var)
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^p:'
     " It's a p:roject variable
-    let var = substitute(a:var, '^p:', lh#project#crt_var_prefix(), '')
+    let var = lh#project#_crt_var_name(a:var)
   else
     let var = a:var
   endif
@@ -66,16 +66,23 @@ endfunction
 " Function: s:BuildPublicVariableNameAndValue(string|var, value) {{{3
 function! s:BuildPublicVariableNameAndValue(...)
   if len(a:000) == 1
-    let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
-    " string+eval loses references, and it doesn't seem required.
-    let Value = eval(value0)
+    if a:1 =~ '^p:&'
+      " options need a special handling
+      let [all, var, assign, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})\s*([+-]=\=)\s*(.*)')
+      let l:Value = assign.value0
+    else
+      let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
+      " string+eval loses references, and it doesn't seem required.
+
+      let l:Value = eval(value0)
+    endif
   else
     let var = a:1
-    let Value = a:2
+    let l:Value = a:2
     " let value = string(a:2)
   endif
-  let var = s:BuildPublicVariableName(var)
-  return [var, Value]
+  let resvar = s:BuildPublicVariableName(var)
+  return [resvar, l:Value]
 endfunction
 
 " Function: lh#let#if_undef(var, value) {{{3
@@ -118,7 +125,12 @@ function! lh#let#if_undef(...) abort " {{{4
   call s:Verbose('let_if_undef(%1)', a:000)
   try
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    return s:LetIfUndef(var, Value)
+    if type(var) == type({}) && has_key(var, 'project')
+      " Special case for p:& options (and may be someday to p:$var)
+      call var.project.set(Value)
+    else
+      return s:LetIfUndef(var, Value)
+    endif
   catch /.*/
     throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
@@ -161,7 +173,12 @@ endfunction
 function! lh#let#to(...) abort " {{{4
   try
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    return s:LetTo(var, Value)
+    if type(var) == type({}) && has_key(var, 'project')
+      " Special case for p:& options (and may be someday to p:$var)
+      call var.project.set(var.name, Value)
+    else
+      return s:LetTo(var, Value)
+    endif
   catch /.*/
     throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
   endtry
