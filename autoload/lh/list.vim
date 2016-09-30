@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.14.1
-let s:k_version = 3141
+" Version:      4.0.0
+let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  08th Sep 2016
+" Last Update:  29th Sep 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
 "
 "------------------------------------------------------------------------
 " History: {{{2
+"       v4.0.0.0
+"       (*) ENH: Add lh#list#push_if_new_entity()
 "       v3.13.2
 "       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
@@ -586,6 +588,19 @@ function! lh#list#push_if_new(list, value) abort
   if index(a:list, a:value) < 0
     call add (a:list, a:value)
   endif
+  return a:list
+endfunction
+
+" Function: lh#list#push_if_new_entity(list, value) {{{3
+" @version 4.0.0
+function! lh#list#push_if_new_entity(list, value) abort
+  for e in a:list
+    if e is a:value
+      return a:list
+    endif
+    unlet e
+  endfor
+  call add (a:list, a:value)
   return a:list
 endfunction
 
