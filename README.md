@@ -128,6 +128,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate2()`     | Accumulates the elements from a list -- version closer to C++ std::accumulate()                                   |
+| `lh#list#arg_min()` & `max` | Returns the index of the lesser/greater elements                                                                  |
 | `lh#list#chain_transform()` | Applies a series of transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
 | `lh#list#concurrent_for()`  | Concurrently searches for symettric differences and intersection of two sorted sets                               |
 | `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                            |

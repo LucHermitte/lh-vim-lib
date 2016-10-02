@@ -74,6 +74,7 @@ Functors related functions:                             |lhvl#function|
 - |lh#function#prepare()|
 Lists related functions:                                |lhvl#list|
 - |lh#list#accumulate()|
+- |lh#list#arg_min()|, |lh#list#arg_max()|
 - |lh#list#chain_transform()|
 - |lh#list#concurrent_for()|
 - |lh#list#copy_if()|
@@ -1230,6 +1231,18 @@ Examples: >
    720
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                               *lh#list#arg_max()* *lh#list#arg_min()*            {{{3
+lh#list#arg_min({list} [, Transfo])~
+lh#list#arg_min({list} [, Transfo])~
+@since v4.0.0
+Returns The arg-minimum, /arg-maximum of a |List| of elements.
+If provided, the transformation |function| {Transfo} is applied on each
+element before checking which one is greater/lesser of them all.
+@see also |lh#float#arg_min()| and |lh#float#arg_max| which are dedicated
+|expr-float|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Accumulates elements from {input}.
                                                *lh#list#flatten()*                {{{3
 lh#list#flatten({list})~
 @param[in] {list} to flatten
