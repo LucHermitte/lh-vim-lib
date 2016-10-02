@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.13.2
-let s:k_version = 31302
+" Version:      4.0.0
+let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  02nd Sep 2016
+" Last Update:  03rd Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -98,6 +98,8 @@ let s:k_version = 31302
 "       (*) PERF: Optimize lh#path#glob_as_list()
 "       v3.13.2
 "       (*) ENH: Add `lh#path#remove_dir_mark()`
+"       v4.0.0
+"       (*) TST: Fix `lh#path#find()` to always work w/ vimrunner
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -513,12 +515,9 @@ function! lh#path#find(paths, regex) abort
   let paths = (type(a:paths) == type([]))
         \ ? (a:paths)
         \ : split(a:paths,',')
-  for path in paths
-    if match(path ,a:regex) != -1
-      return path
-    endif
-  endfor
-  return ''
+  call filter(paths, 'match(v:val, a:regex) != -1')
+  let shortest = lh#list#arg_min(paths, function('len'))
+  return empty(paths) ? '' : paths[shortest]
 endfunction
 
 " Function: lh#path#vimfiles() {{{3
