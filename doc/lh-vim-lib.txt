@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 30th Sep 2016
+                        For Vim version 7+      Last change: 05th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -77,6 +77,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#arg_min()|, |lh#list#arg_max()|
 - |lh#list#chain_transform()|
 - |lh#list#concurrent_for()|
+- |lh#list#contain_entity()|
 - |lh#list#copy_if()|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
@@ -938,6 +939,13 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 @return            The |List| of indices, >= {start-pos}, in |List| {list} where
                    the item matches {pattern}.
 @return            [] if no item matches {pattern}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                        *lh#list#contain_entity()*         {{{3
+lh#list#contain_entity({list}, {entity})~
+@param    {list}  |List|
+@param  {entity}  |List| or |Dict| to search within the list with |expr-is|.
+@return Whether an {entity} is present within {list}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*               {{{3

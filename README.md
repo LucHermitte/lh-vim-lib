@@ -131,6 +131,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#arg_min()` & `max` | Returns the index of the lesser/greater elements                                                                  |
 | `lh#list#chain_transform()` | Applies a series of transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
 | `lh#list#concurrent_for()`  | Concurrently searches for symettric differences and intersection of two sorted sets                               |
+| `lh#list#contain_entity()`  | Tells whether a Dict or List entity is present within a list                                                      |
 | `lh#list#copy_if()`         | Copies the elements from a list that match a predicate                                                            |
 | `lh#list#equal_range()`     | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
 | `lh#list#find_if()`         | Searches the first element in a list that verifies a predicate                                                    |
