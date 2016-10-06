@@ -2,10 +2,51 @@
 Define new kind of variables: `p:` variables.
 
 The objective is to avoid duplicating a lot of `b:variables` in many buffers.
-Instead, all buffers will point to a same global variable associated to the
-current project.
+Instead, all those buffers will point to a same global variable associated to
+the current project.
 
 This variable will hold a single instance of each pair _variable_:_value_.
+
+## What is a project?
+
+Given a set of files in a same directory, each file can be the unique file of a
+project -- I always have a tests/ directory where I host pet projects, or where
+I test the behaviour of the compiler. I call those: _monofile projects_.
+On the opposite, the files from a directory hierarchy can be part of a same and
+very big project. We may even imagine subprojects within a hierarchy.
+
+In the end, what really defines a programming project is a (leaf) "makefile" --
+And why restrict ourselves to makefiles, what about scons, autotools, ant,
+(b)jam, aap? And BTW, Sun-Makefiles or GNU-Makefiles? Other project will be
+recognize by the `.git/` directory at their root.
+
+It's important to notice that what distinguishes two projects is not the type
+of their files. Having a configuration for C++ projects and another for Java
+projects is not enough. For instance, I'm often working simultaneously on
+several C++ projects with very set of options, starting with the compilation
+options.
+
+## What's a project aware-plugin?
+So what' the point? What can we do with those _projects_?
+
+We can do many things actually. For instance:
+
+ - each project can have specific compilation instructions (build directory,
+   build mode) ;
+ - ctags build options may also differ, starting with the output tag files ;
+ - different projects may have different indentation setting ;
+ - but also different naming policies ;
+ - different root directory for sources ;
+ - different JSON compilation database ;
+
+To take advantage of this, when a plugin fetch an option that tunes its
+behaviour, it needs to fetch options with a finer granularity than global
+options, when available.
+
+The finest possible option for a given buffer would be a `b:`uffer local
+variable, then a `p:`roject local variable, a `t:`ab local variable, to finish
+with default settings in `g:`lobal variables. That's where `lh#option#get()`
+comes into play.
 
 # Rationale
 
@@ -77,6 +118,38 @@ plugin used.
 ```
 
 Note that this also could be done by hand.
+
+### Auto-detect the project root path
+On a project definition, we can automatically deduce the current project root
+directory. This directory will then be used by other plugins like
+[lh-tags](http://github.com/LucHermitte/lh-tags),
+[mu-template](http://github.com/LucHermitte/mu-template), and
+[BuildToolsWrappers](http://github.com/LucHermitte/BuildToolsWrappers).
+It'll also be used to automatically change the current local directory (`:h
+:lcd`) to the `paths.sources` dirname from the current project (iff
+`g:lh#project.autochdir` is true).
+
+The detection policy will depend on the value of
+`g:lh#project.auto_discover_root`:
+
+ - 1, `'yes'`: We'll always try to automatically find a project root directory.
+ - 0, `'no'`: We'll never try to automatically find a project root directory.
+ - `'in_doubt_ask'`: Ask the end-user whether the file current path is what
+   must be used.
+ - `'in_doubt_ignore`: Don't do anything in doubt.
+ - `'in_doubt_improvise`: Uses the file current path a project root.
+
+By default, we reuse `p:paths.sources`. Then, we check whether a parent
+directory contains a directory named `.git/` or `.svn/` to use it a root
+directory. Then we check among current list of dirnames used as project root
+directories to see whether there is one that matches the pathname of the
+current file. Then, in doubt, we may ask to user to fill in this dirname.
+
+
+This could also be overridden from `lh#project#define()` and `lh#project#new()`
+TODO: Example.
+
+
 
 ### Default value for project options
 In order to propose a default value to a project option:
@@ -327,6 +400,30 @@ Toggle LHTestsTogMenupbar
 ```
 
 # Design choices
+
+## Regarding project file inventory
+I don't see any point in explicitly listing every files that belongs to project
+in order to have vim know them. IMO, they are best globbed.  The venerable
+known project.vim plugin already does the job. Personally I use a
+[local_vimrc](http://github.com/LucHermitte/local_vimrc) plugin.
+
+With this plugin, I just have to drop a `_vimrc_local.vim` file in a directory,
+and what is defined in it (`:mappings`, `:functions`, variables, `:commands`,
+`:settings`, ...) will apply to each file under the directory -- I work on a
+big project having a dozen of subcomponents, each component live in its own
+directory, has its own makefile (not even named Makefile, nor with a name of
+the directory)
+
+
+## Regarding tabs
+We could have said that every thing that is loaded in a tab belongs to a same
+project. Alas, this is not always true. Often I open, in the current tab, files
+that belong to different projects. My typical use case is when I split-open a
+C++ header file (or even sometimes an implementation file) from a third party
+library in order to see how it's meant to be used. When I do that, I want the
+third-party code side by side with the code I'm working on. With tabs, this
+isn't possible.
+
 # Compatible plugins
 
 Most of my plugins that use `lh#option#get()` are already compatible with this
@@ -336,23 +433,24 @@ BuildToolsWrappers are the first I've in mind).
 
 # TO DO list
 
- * Auto detect current project root path when there is yet no project?
+ * Doc
  * Have root path be official for BTW and lh-tags
+ * `:Unlet p:$ENV`
+ * Completion on :Let* and *Unlet
  * Toggling:
    * at global level: [a, b, c]
    * at project level: [default value from global VS force [a, b, c]]
- * Doc
- * Setlocally vim options on new files
- * Have lh-tags, lh-dev, BTW, ... use `p:$ENV` variables
  * Have menu priority + menu name in all projects in order to simplify
    toggling definitions
- * `:Unlet p:$ENV`
+ * Have lh-tags, lh-dev, BTW, ... use `p:$ENV` variables
  * Be able to control which parent is filled with `lh#let#` functions
+     * -> :Project <name> :LetTo var = value
  * `:call prj.set(plain_variable, value)`
  * `:Project <name> do <cmd> ...`
  * `:Project <name> :bw` -> with confirmation!
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
+ * auto projectification of every buffer ?
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.
    Expected Caveats:

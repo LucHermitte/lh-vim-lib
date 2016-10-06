@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  30th Sep 2016
+" Last Update:  06th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -14,63 +14,33 @@ let s:k_version = '400'
 "       associated to the current project.
 "
 " Usage:
-" - New project:
-"   - From anywhere:
-"     :let prg = lh#project#new({dict-options})
-"   - From local_vimrc
-"     :call lh#project#define(s:, {dict-options})
-"
-" - Register a buffer to the project
-"     :call s:project.register_buffer([bufid])
-"
-" - Propose a value to a project option:
-"     :LetIfUndef p:foo.bar.team 12
-" - Override the value of a project option (define it if new):
-"     :Let p:foo.bar.team 42
-"     :Let p:foo.bar.team = 42
-" - Get a project variable value:
-"     :let val = lh#option#get('b:foo.bar.team')
-"
-" - Set a vim option for all files in a project
-"     :LetTo p:&isk+=µ
-"     :call prj.set('&isk', '+=µ')
-"
-" - Set an environment variable for all files in a project
-"     :LetTo p:$FOOBAR = 42
-"     :call prj.set('$FOOBAR', 42)
-"     :echo lh#os#system('echo $FOOBAR')
-"     " The environment variable won't be changed globally, but its value will
-"     " be injected on-the-fly with lh#os#system(), not w/ system()/make/...
-"
-" - Power user
-"   - Get the current project variable (b:crt_project) or lh#option#undef()
-"     :let prj = lh#project#crt()
-"   - Get a variable under the project
-"     :let val = lh#project#_get('foo.bar.team')
-"   - Get "b:crt_project", or lh#option#undef()
-"     :let var = lh#project#crt_bufvar_name()
+"       See doc/Project.md
 "
 "------------------------------------------------------------------------
 " History:
 " @since v4.0.0
 " TODO:
-" - Auto detect current project root path when there is yet no project?
+" - Doc
 " - Have root path be official for BTW and lh-tags
+" - :Unlet p:$ENV
+" - Completion on :Let* and *Unlet
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
-" - Doc
-" - Setlocally vim options on new files
-" - Have lh-tags, lh-dev, BTW, ... use p:$ENV variables
 " - Have menu priority + menu name in all projects in order to simplify
 "   toggling definitions
-" - :Unlet p:$ENV
+" - Setlocally vim options on new files
+" - Have lh-tags, lh-dev, BTW, µTemplate... use:
+"   - p:$ENV variables
+"   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
+"   -> :Project <name> :LetTo var = value
 " - prj.set(plain_variable, value)
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
+" - auto projectification of every buffer ?
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
@@ -108,6 +78,12 @@ function! s:Verbose(expr, ...)
   endif
 endfunction
 
+function! s:Callstack(...)
+  if s:verbose
+    call call('lh#log#callstack',a:000)
+  endif
+endfunction
+
 function! lh#project#debug(expr) abort
   return eval(a:expr)
 endfunction
@@ -127,6 +103,7 @@ function! lh#project#_make_project_list() abort
   let res.new_name    = function(s:getSNR('new_name'))
   let res.add_project = function(s:getSNR('add_project'))
   let res.get         = function(s:getSNR('get_project'))
+  let res.clear       = function(s:getSNR('clear_projects'))
   return res
 endfunction
 
@@ -140,6 +117,11 @@ endfunction
 " Meant to be used from Unit Tests
 function! lh#project#_restore_prj_list(prj_list) abort
   let s:project_list = a:prj_list
+endfunction
+
+" Function: lh#project#_clear_prj_list() {{{3
+function! lh#project#_clear_prj_list() abort
+  call s:project_list.clear()
 endfunction
 
 " - Methods {{{3
@@ -166,6 +148,17 @@ function! s:get_project(...) dict abort " {{{4
       return get(self.projects, a:1, lh#option#unset())
     endif
   endif
+endfunction
+
+function! s:clear_projects() dict abort " {{{4
+  " remove all projects
+  for p in self.projects
+    for b in p.buffers
+      let b = getbufvar(b, '')
+      silent! unlet b[s:project_varname]
+    endfor
+  endfor
+  let self.projects = []
 endfunction
 
 " - :Project Command definition {{{3
@@ -323,7 +316,9 @@ function! s:register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
   " if there is already a (different project), then inherit from it
   let inherited = lh#option#getbufvar(bid, s:project_varname)
-  if  lh#option#is_set(inherited) && inherited isnot self
+  if  lh#option#is_set(inherited)
+        \ && inherited isnot self
+        \ && !lh#list#contain_entity(lh#list#flatten(self.parents), inherited)
     call self.inherit(inherited)
     " and then override with new value
   endif
@@ -465,6 +460,19 @@ function! lh#project#new(params) abort
   call project.register_buffer()
 
   call s:project_list.add_project(project)
+
+  if has_key(project, 'auto_discover_root')
+    " The option can be forced through #define parameter
+    let auto_discover_root = project.auto_discover_root
+    unlet project.auto_discover_root
+  else
+    let auto_discover_root = lh#project#_auto_discover_root()
+  endif
+  if type(auto_discover_root) == type({}) && has_key(auto_discover_root, 'value')
+    call lh#let#if_undef('p:paths.sources', auto_discover_root.value)
+  elseif auto_discover_root !~? '\v^(n%[o]|0)$'
+    call lh#project#root()
+  endif
   return project
 endfunction
 
@@ -548,10 +556,99 @@ function! lh#project#_environment() abort
   endif
 endfunction
 
+" # Find project root {{{2
+let s:project_roots = get(s:, 'project_roots', [])
+" Function: lh#project#root() {{{3
+function! lh#project#root() abort
+  " Will be searched in descending priority in:
+  " - p:paths.sources
+  " - b:project_source_dir (mu-template)
+  " - Where .git/ is found is parent dirs
+  " - Where .svn/ is found in parent dirs
+  " - confirm box for %:p:h, and remember previous paths
+  "
+  " @note Once set for files in a project, it isn't expected to change.
+  "
+  " @warning p:paths.sources is overridden by child projects.
+  let prj_dirname = lh#option#get('paths.sources')
+  if lh#option#is_unset(prj_dirname)
+    unlet prj_dirname
+    let prj_dirname = s:FetchPrjDirname()
+    if empty(prj_dirname)
+      return prj_dirname
+    endif
+    call lh#let#to('p:paths.sources', prj_dirname)
+  endif
+
+  let res = lh#path#to_dirname(prj_dirname)
+  return res
+endfunction
+
+function! s:FetchPrjDirname() abort " {{{3
+  " mu-template variable
+  let project_sources_dir = lh#option#get('project_sources_dir')
+  if lh#option#is_set(project_sources_dir)
+    return project_sources_dir
+  endif
+
+  " VCS
+  let prj_dirname = lh#vcs#get_git_root()
+  if !empty(prj_dirname)
+    return fnamemodify(prj_dirname, ':h')
+    " return matchstr(prj_dirname, '.*\ze\.git$')
+  endif
+  let prj_dirname = lh#vcs#get_svn_root()
+  if !empty(prj_dirname)
+    return fnamemodify(prj_dirname, ':h')
+    " return matchstr(prj_dirname, '.*\ze\.svn$')
+  endif
+
+  " Deduce from current path, previous project paths
+  return s:GetPlausibleRoot()
+endfunction
+
+function! s:GetPlausibleRoot() abort " {{{3
+  call s:Callstack("Request plausible root")
+  let crt = expand('%:p:h')
+  let compatible_paths = filter(copy(s:project_roots), 'lh#path#is_in(crt, v:val)')
+  if len(compatible_paths) == 1
+    return compatible_paths[0]
+  endif
+  if len(compatible_paths) > 1
+    let prj_dirname = lh#path#select_one(compatible_paths, "Project needs to know the current project root directory")
+    if !empty(prj_dirname)
+      return prj_dirname
+    endif
+  endif
+  let auto_discover_root = lh#project#_auto_discover_root()
+  if auto_discover_root == 'in_doubt_ask'
+    let prj_dirname = INPUT("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
+  elseif auto_discover_root == 'in_doubt_ignore'
+    return ''
+  elseif auto_discover_root == 'in_doubt_improvise'
+    let prj_dirname = expand('%:p:h')
+  endif
+  if !empty(prj_dirname)
+    call lh#path#munge(s:project_roots, prj_dirname)
+  endif
+  return prj_dirname
+endfunction
 " }}}1
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+" # Options {{{2
+" Function: lh#project#_auto_discover_root() {{{3
+" Accepted vaues:
+" - 1, y%[es]
+" - 0, n%[o]
+" - in_doubt_ask
+" - in_doubt_ignore
+" - in_doubt_improvise
+" - { 'value': path }
+function! lh#project#_auto_discover_root() abort
+  return lh#option#get('lh#project.auto_discover_root', 'in_doubt_ask', 'g') 
+endfunction
 " # Compatibility functions {{{2
 " s:getSNR([func_name]) {{{3
 function! s:getSNR(...)
@@ -564,16 +661,8 @@ endfunction
 " }}}1
 "------------------------------------------------------------------------
 " ## autocommands {{{1
-augroup LH_PROJECT
-  au!
-  au BufUnload   * call s:RemoveBufferFromProjectConfig(expand('<afile>'))
-
-  " Needs to be executed after local_vimrc
-  au BufReadPost * call s:UseProjectOptions()
-augroup END
-
 " # New buffer => update options {{{2
-function! s:UseProjectOptions() " {{{3
+function! lh#project#_UseProjectOptions() " {{{3
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
     call prj._use_options(bufnr('%'))
@@ -581,7 +670,7 @@ function! s:UseProjectOptions() " {{{3
 endfunction
 
 " # Remove buffer {{{2
-function! s:RemoveBufferFromProjectConfig(bname) " {{{3
+function! lh#project#_RemoveBufferFromProjectConfig(bname) " {{{3
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
     let bid = bufnr(a:bname)
@@ -590,8 +679,18 @@ function! s:RemoveBufferFromProjectConfig(bname) " {{{3
   endif
 endfunction
 
+" # Update lcd {{{2
+function! lh#project#_CheckUpdateCWD() abort " {{{3
+  if lh#option#get('lh#project.autochdir', 0, 'g') == 1
+    let path = lh#option#get('paths.sources')
+    if lh#option#is_set(path) && path != getcwd()
+      call s:Verbose('auprjchdir %1 -> %2', expand('%'), path)
+      exe 'lcd '.path
+    endif
+  endif
+endfunction
 "------------------------------------------------------------------------
-" ## Internal globals {{{1
+" # Internal globals {{{1
 let s:project_list = get(s:, 'project_list', lh#project#_make_project_list())
 "------------------------------------------------------------------------
 " }}}1

@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      29th Sep 2016
-" Last Update:  29th Sep 2016
+" Last Update:  06th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -27,12 +27,22 @@ let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
-" Commands and Mappings {{{1
+" ## Commands {{{1
 command! -nargs=* -complete=customlist,lh#project#_complete_command
       \ Project
       \ call lh#project#_command(<f-args>)
 
-" Commands and Mappings }}}1
+" ## Auto commands {{{1
+augroup LH_PROJECT
+  au!
+  au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<afile>'))
+
+  " Needs to be executed after local_vimrc
+  au BufReadPost * call lh#project#_UseProjectOptions()
+
+  au BufWinEnter,VimEnter * call lh#project#_CheckUpdateCWD()
+augroup END
+
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
