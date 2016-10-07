@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  07th Oct 2016
+" Last Update:  08th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -22,7 +22,6 @@ let s:k_version = '400'
 " TODO:
 " - Doc
 " - Have root path be official for BTW and lh-tags
-" - :Unlet p:$ENV
 " - Completion on :Let* and *Unlet
 " - Toggling:
 "   - at global level: [a, b, c]
@@ -420,7 +419,9 @@ function! s:environment() dict abort " {{{4
 endfunction
 
 function! s:find_holder(varname) dict abort " {{{4
-  if has_key(self.variables, a:varname)
+  if     a:varname[0] == '$'
+    return self.env
+  elseif has_key(self.variables, a:varname)
     return self.variables
   else
     for p in self.parents

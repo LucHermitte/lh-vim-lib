@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  30th Sep 2016
+" Last Update:  08th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -211,12 +211,19 @@ function! lh#let#unlet(var) abort " {{{4
   try
     if a:var =~ '^p:'
       " It's a p:roject variable
-      let suffix = a:var[2:]
-      let h = lh#project#crt().find_holder(suffix)
-      if lh#option#is_unset(h)
-        throw "No p:".a:var." variable found to be unlet!"
+      let prj = lh#project#crt()
+      if lh#option#is_unset(prj)
+        throw "Current buffer isn't under a project. => There is no ".a:var." variable found to be unlet!"
       endif
-      unlet h[suffix]
+      let suffix = a:var[2:]
+      if empty(suffix)
+        throw "Invalid empty variable name. It cannot be unlet!"
+      endif
+      let h = prj.find_holder(suffix)
+      if lh#option#is_unset(h)
+        throw "No ".a:var." variable found to be unlet!"
+      endif
+      unlet h[suffix[0] == '$' ? suffix[1:] : suffix]
       call s:Verbose("unlet %1.%2", h, suffix)
     else
       exe 'unlet '.a:var

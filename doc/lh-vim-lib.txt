@@ -3010,7 +3010,8 @@ Examples: >
 lh#let#unlet({varname})~
 :Unlet {varname}~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
-@pre Environment variables are not supported
+@note `p:`Environment variables are supported as well. But vanilla environment
+variables aren't.
 
 These function and command make sure the variable named {varname} doesn't exists.
 The {varname} can be a |Dictionary| with all its fields. It that case, only
