@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  06th Oct 2016
+" Last Update:  07th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -38,6 +38,8 @@ let s:k_version = '400'
 " - prj.set(plain_variable, value)
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
+" - :Project [<name>] :make
+"   -> rely on `:Make` if it exists
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
 " - auto projectification of every buffer ?
@@ -386,6 +388,21 @@ function! s:get(varname) dict abort " {{{4
   return lh#option#unset()
 endfunction
 
+function! s:exists(varname) dict abort " {{{4
+  let r0 = lh#dict#get_composed(self.variables, a:varname)
+  if lh#option#is_set(r0)
+    " may need to interpret a reference lh#ref('g:variable')
+    return true
+  else
+    for p in self.parents
+      let r = p.get(a:varname)
+      if lh#option#is_set(r) | return true | endif
+      unlet! r
+    endfor
+  endif
+  return 0
+endfunction
+
 function! s:apply(Action) dict abort " {{{4
   " TODO: support lhvl-functors, functions, "v:val" stuff
   for b in self.buffers
@@ -447,6 +464,7 @@ function! lh#project#new(params) abort
   let project.register_buffer = function(s:getSNR('register_buffer'))
   let project.set             = function(s:getSNR('set'))
   let project.get             = function(s:getSNR('get'))
+  let project.exists          = function(s:getSNR('exists'))
   let project.environment     = function(s:getSNR('environment'))
   let project.depth           = function(s:getSNR('depth'))
   let project.apply           = function(s:getSNR('apply'))
@@ -468,10 +486,16 @@ function! lh#project#new(params) abort
   else
     let auto_discover_root = lh#project#_auto_discover_root()
   endif
+
   if type(auto_discover_root) == type({}) && has_key(auto_discover_root, 'value')
     call lh#let#if_undef('p:paths.sources', auto_discover_root.value)
   elseif auto_discover_root !~? '\v^(n%[o]|0)$'
-    call lh#project#root()
+    if ! lh#project#exists('p:paths.sources')
+      let root = lh#project#root()
+      if !empty(root)
+        call lh#let#if_undef('p:paths.sources', root[:-2])
+      endif
+    endif
   endif
   return project
 endfunction
@@ -488,9 +512,14 @@ function! lh#project#define(s, params, ...) abort
 endfunction
 
 " # Access {{{2
+" Function: lh#project#is_in_a_project() {{{3
+function! lh#project#is_in_a_project() abort
+  return exists('b:'.s:project_varname)
+endfunction
+
 " Function: lh#project#crt() {{{3
 function! lh#project#crt() abort
-  if exists('b:'.s:project_varname)
+  if lh#project#is_in_a_project()
     return b:{s:project_varname}
   else
     return lh#option#unset()
@@ -500,7 +529,7 @@ endfunction
 
 " Function: lh#project#crt_bufvar_name() {{{3
 function! lh#project#crt_bufvar_name() abort
-  if exists('b:'.s:project_varname)
+  if lh#project#is_in_a_project()
     return 'b:'.s:project_varname
   else
     throw "The current buffer doesn't belong to a project"
@@ -511,7 +540,7 @@ endfunction
 function! lh#project#_crt_var_name(var) abort
   " call assert_true(a:var =~ '^p:')
   let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
-  if exists('b:'.s:project_varname)
+  if lh#project#is_in_a_project()
     if kind == '&'
       return
             \ { 'name'    : a:var[2:]
@@ -540,7 +569,7 @@ endfunction
 
 " Function: lh#project#_get(name) {{{3
 function! lh#project#_get(name) abort
-  if exists('b:'.s:project_varname)
+  if lh#project#is_in_a_project()
     return b:{s:project_varname}.get(a:name)
   else
     return lh#option#unset()
@@ -549,16 +578,26 @@ endfunction
 
 " Function: lh#project#_environment() {{{3
 function! lh#project#_environment() abort
-  if exists('b:'.s:project_varname)
+  if lh#project#is_in_a_project()
     return b:{s:project_varname}.environment()
   else
     return []
   endif
 endfunction
 
+" Function: lh#project#exists(var) {{{3
+function! lh#project#exists(var) abort
+  if a:var =~ '^p:'
+    return b:{s:project_varname}.exists(a:var)
+  else
+    return exists(a:var)
+  endif
+endfunction
+
 " # Find project root {{{2
 let s:project_roots = get(s:, 'project_roots', [])
 " Function: lh#project#root() {{{3
+" @post result is empty, or result[-1] =~ [/\]
 function! lh#project#root() abort
   " Will be searched in descending priority in:
   " - p:paths.sources
@@ -574,10 +613,12 @@ function! lh#project#root() abort
   if lh#option#is_unset(prj_dirname)
     unlet prj_dirname
     let prj_dirname = s:FetchPrjDirname()
-    if empty(prj_dirname)
+    if   ! isdirectory(prj_dirname)
+      return ''
+    elseif empty(prj_dirname)
       return prj_dirname
     endif
-    call lh#let#to('p:paths.sources', prj_dirname)
+    " Don't update p:paths.sources from here
   endif
 
   let res = lh#path#to_dirname(prj_dirname)
@@ -594,13 +635,11 @@ function! s:FetchPrjDirname() abort " {{{3
   " VCS
   let prj_dirname = lh#vcs#get_git_root()
   if !empty(prj_dirname)
-    return fnamemodify(prj_dirname, ':h')
-    " return matchstr(prj_dirname, '.*\ze\.git$')
+    return fnamemodify(prj_dirname, ':p:h:h')
   endif
   let prj_dirname = lh#vcs#get_svn_root()
   if !empty(prj_dirname)
-    return fnamemodify(prj_dirname, ':h')
-    " return matchstr(prj_dirname, '.*\ze\.svn$')
+    return fnamemodify(prj_dirname, ':p:h:h')
   endif
 
   " Deduce from current path, previous project paths
@@ -647,7 +686,7 @@ endfunction
 " - in_doubt_improvise
 " - { 'value': path }
 function! lh#project#_auto_discover_root() abort
-  return lh#option#get('lh#project.auto_discover_root', 'in_doubt_ask', 'g') 
+  return lh#option#get('lh#project.auto_discover_root', 'in_doubt_ask', 'g')
 endfunction
 " # Compatibility functions {{{2
 " s:getSNR([func_name]) {{{3
@@ -683,14 +722,14 @@ endfunction
 function! lh#project#_CheckUpdateCWD() abort " {{{3
   if lh#option#get('lh#project.autochdir', 0, 'g') == 1
     let path = lh#option#get('paths.sources')
-    if lh#option#is_set(path) && path != getcwd()
+    if lh#option#is_set(path) && path != getcwd() && isdirectory(path)
       call s:Verbose('auprjchdir %1 -> %2', expand('%'), path)
       exe 'lcd '.path
     endif
   endif
 endfunction
 "------------------------------------------------------------------------
-" # Internal globals {{{1
+" ## Internal globals {{{1
 let s:project_list = get(s:, 'project_list', lh#project#_make_project_list())
 "------------------------------------------------------------------------
 " }}}1

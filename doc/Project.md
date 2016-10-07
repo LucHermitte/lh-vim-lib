@@ -424,6 +424,13 @@ library in order to see how it's meant to be used. When I do that, I want the
 third-party code side by side with the code I'm working on. With tabs, this
 isn't possible.
 
+## Miscelleanous stuff
+
+ * `lh#project#root()` shall not fill `p:paths.sources,` but return a value.
+   It's up to `lh#project#new()` to fill `p:paths.sources` from
+   `lh#project#root()` result.
+
+
 # Compatible plugins
 
 Most of my plugins that use `lh#option#get()` are already compatible with this
@@ -442,12 +449,17 @@ BuildToolsWrappers are the first I've in mind).
    * at project level: [default value from global VS force [a, b, c]]
  * Have menu priority + menu name in all projects in order to simplify
    toggling definitions
- * Have lh-tags, lh-dev, BTW, ... use `p:$ENV` variables
+ * Setlocally vim options on new files
+ * Have lh-tags, lh-dev, BTW, ... use:
+   * `p:$ENV variables`
+   * `paths.sources`
  * Be able to control which parent is filled with `lh#let#` functions
      * -> :Project <name> :LetTo var = value
  * `:call prj.set(plain_variable, value)`
  * `:Project <name> do <cmd> ...`
  * `:Project <name> :bw` -> with confirmation!
+ * `:Project [<name>] :make`
+   -> rely on `:Make` if it exists
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
  * auto projectification of every buffer ?
