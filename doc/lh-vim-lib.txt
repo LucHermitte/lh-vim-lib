@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 05th Oct 2016
+                        For Vim version 7+      Last change: 08th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -2933,6 +2933,7 @@ lh#let#if_undef({varname}, {value})~
 @param[in] {value}
 @return variable built
 
+@note |command-completion| is supported on {varname}.
 @warning
     The interface has changed with v4.0.0, {value} must no longer be quoted.
 @warning
@@ -2974,6 +2975,7 @@ lh#let#to({varname}, {value})~
 @param[in] {value} assigned, must no be quoted
 @return variable built
 
+@note |command-completion| is supported on {varname}.
 @warning
     The interface has changed with v4.0.0, {value} must no longer be quoted.
 @warning
@@ -3012,6 +3014,7 @@ lh#let#unlet({varname})~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|, |g:|)
 @note `p:`Environment variables are supported as well. But vanilla environment
 variables aren't.
+@note |command-completion| is supported on {varname}.
 
 These function and command make sure the variable named {varname} doesn't exists.
 The {varname} can be a |Dictionary| with all its fields. It that case, only

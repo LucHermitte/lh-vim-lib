@@ -22,7 +22,7 @@ let s:k_version = '400'
 " TODO:
 " - Doc
 " - Have root path be official for BTW and lh-tags
-" - Completion on :Let* and *Unlet
+" - Completion on :Let* and *Unlet for p:variables
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
@@ -38,7 +38,7 @@ let s:k_version = '400'
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
 " - :Project [<name>] :make
-"   -> rely on `:Make` if it exists
+"   -> rely on `:Make` if it exists, `:make` otherwise
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
 " - auto projectification of every buffer ?

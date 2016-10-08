@@ -257,30 +257,40 @@ function! lh#let#_pop_options(variable, ...) abort
   return filter(eval(a:variable), 'v:val !~ options')
 endfunction
 
+" Function: lh#let#_list_all_variables_in_scope(scope) {{{3
+function! lh#let#_list_all_variables_in_scope(scope) abort
+  let vars = map(keys({a:scope}), 'a:scope.v:val')
+  return vars
+endfunction
+
 " Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
 function! lh#let#_list_all_list_variables_in_scope(scope) abort
-  let vars = map(keys({a:scope}), 'a:scope.v:val')
+  let vars = lh#let#_list_all_variables_in_scope(a:scope)
   " Keep only lists and dictionaries
   call filter(vars, 'type({v:val}) == type([]) || type({v:val}) == type({})')
   return vars
 endfunction
 
 " Function: lh#let#_list_variables(lead) {{{3
-function! lh#let#_list_variables(lead) abort
+function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
+  let ListVarsFn = function(a:keep_only_dicts_and_lists ? 'lh#let#_list_all_list_variables_in_scope' : 'lh#let#_list_all_variables_in_scope')
   if empty(a:lead)
     " No variable specified yet
     let vars
-          \ = lh#let#_list_all_list_variables_in_scope('g:')
-          \ + lh#let#_list_all_list_variables_in_scope('b:')
-          \ + lh#let#_list_all_list_variables_in_scope('w:')
-          \ + lh#let#_list_all_list_variables_in_scope('t:')
+          \ = ListVarsFn('g:')
+          \ + ListVarsFn('b:')
+          \ + ListVarsFn('w:')
+          \ + ListVarsFn('t:')
   elseif stridx(a:lead, '.') >= 0
     " Dictionary
-    let [all, dict, key ; trail] = matchlist(a:lead, '\v(.*)\.(.*)')
-    let vars = keys({dict})
-    call filter(vars, 'type({dict}[v:val]) == type([]) || type({dict}[v:val]) == type({})')
-    call map(vars, 'v:val. (type({dict}[v:val])==type({})?".":"")')
-    call map(vars, 'dict.".".v:val')
+    let [all, sDict, key ; trail] = matchlist(a:lead, '\v(.*)\.(.*)')
+    let dict = eval(sDict)
+    let vars = keys(dict)
+    if a:keep_only_dicts_and_lists
+      call filter(vars, 'type(dict[v:val]) == type([]) || type(dict[v:val]) == type({})')
+    endif
+    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+    call map(vars, 'sDict.".".v:val')
     return vars
   else
     " Simple variables
@@ -292,7 +302,7 @@ function! lh#let#_list_variables(lead) abort
       let scope = 'g'
       let filter_scope = 'g:'
     endif
-    let vars = lh#let#_list_all_list_variables_in_scope(scope.':')
+    let vars = ListVarsFn(scope.':')
     call filter(vars, 'v:val =~ "^".filter_scope.a:lead')
   endif
   " Add dot to identified dictionaries
@@ -311,7 +321,7 @@ function! lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) abort
 
   if     2 == pos
     " First argument: a variable name
-    return lh#let#_list_variables(a:ArgLead)
+    return lh#let#_list_variables(a:ArgLead, 1)
   elseif pos >= 3
     " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
     " name
@@ -331,11 +341,11 @@ function! lh#let#_pop_options_complete(ArgLead, CmdLine, CursorPos) abort
   let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
   let pos = strlen(tmp)
 
-  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3)', a:ArgLead, a:CmdLine, a:CursorPos)
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3, pos=%4)', a:ArgLead, a:CmdLine, a:CursorPos, pos)
 
   if     2 == pos
     " First argument: a variable name
-    return lh#let#_list_variables(a:ArgLead)
+    return lh#let#_list_variables(a:ArgLead, 1)
   elseif pos >= 3
     " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
     " name
@@ -351,6 +361,46 @@ function! lh#let#_pop_options_complete(ArgLead, CmdLine, CursorPos) abort
     return acceptable_values
   endif
 endfunction
+
+" # Completions for :Let* and *:Unlet {{{2
+" Function: lh#let#_complete_let(ArgLead, CmdLine, CursorPos) {{{3
+" :LetTo, :Unlet -> anything
+" :LetIfUndef -> only dicts
+" :Unlet: only one parameter
+function! lh#let#_complete_let(ArgLead, CmdLine, CursorPos) abort
+  let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
+  let pos = strlen(tmp)
+
+  call s:Verbose(':call lh#let#_complete_let("%1", "%2", "%3")', a:ArgLead, a:CmdLine, a:CursorPos)
+  " call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3, pos=%4)', a:ArgLead, a:CmdLine, a:CursorPos, pos)
+
+  if     2 == pos
+    " First argument: a variable name
+    if a:CmdLine =~ '\vLetI%[fUndef]'
+      " todo: don't return the final '.'
+      return lh#let#_list_variables(a:ArgLead, 1)
+    else " :LetTo and Unlet
+      return lh#let#_list_variables(a:ArgLead, 0)
+      " return any variable staring with Arglead, without the final '.'?
+    endif
+  elseif a:CmdLine =~ '\vUnl%[et]'
+    return ''
+  elseif pos >= 3
+    " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
+    " name
+    let args = split(a:CmdLine, '\s\+')
+    let varname = args[1]
+    call s:Verbose('complete: varname=%1', varname)
+    return eval(varname)
+
+    " Other arguments: acceptable values
+    let acceptable_values = get(g:acceptable_options_for, varname, [])
+    let crt_val = '\v^'.join(exists(varname)? eval(varname) : [], '|').'$'
+    let acceptable_values = filter(copy(acceptable_values), 'v:val !~ crt_val')
+    return acceptable_values
+  endif
+endfunction
+
 
 "------------------------------------------------------------------------
 " }}}1

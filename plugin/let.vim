@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:      4.0.0
 " Created:      31st May 2010
-" Last Update:  08th Sep 2016
+" Last Update:  08th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -18,6 +18,7 @@
 " History:
 " 	v4.0.0: +:LetTo
 " 	        :LetTo and LetIfUndef support "var = value" syntax
+" 	        :Let* and :Unlet support command-completion
 " 	v3.7.*: +:PushOption :PopOption
 " 	v3.0.1: :LetIfUndef works with dictionaries as well
 " 	        function moved to its own autoload plugin
@@ -40,10 +41,13 @@ set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " Commands and Mappings {{{1
-command! -nargs=+ LetIfUndef call lh#let#if_undef(<q-args>)
+command! -nargs=+ -complete=customlist,lh#let#_complete_let
+      \ LetIfUndef call lh#let#if_undef(<q-args>)
 " NB: I avoid plain `:Let`  by fear other plugin use the same command name
-command! -nargs=+ LetTo      call lh#let#to(<q-args>)
-command! -nargs=1 Unlet      call lh#let#unlet(<f-args>)
+command! -nargs=+ -complete=customlist,lh#let#_complete_let
+      \ LetTo      call lh#let#to(<q-args>)
+command! -nargs=1 -complete=customlist,lh#let#_complete_let
+      \ Unlet      call lh#let#unlet(<f-args>)
 
 command! -nargs=+ -complete=customlist,lh#let#_push_options_complete
       \ PushOptions call lh#let#_push_options(<f-args>)
