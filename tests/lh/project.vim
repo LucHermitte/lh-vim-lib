@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  30th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -96,8 +96,19 @@ function! s:Test_create() " {{{2
     LetTo p:test = 'prj1'
     Unlet b:test
     AssertEquals(lh#option#get('test'), 'prj1')
+    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
+    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:paths.', 'p:test']))
     Unlet p:test
     AssertEquals(lh#option#get('test'), 'glob')
+
+    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
+    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.'])
+
+    LetTo p:dict.sub.var=42
+    AssertEquals(lh#option#get('dict.sub'), {'var': 42})
+    AssertEquals(lh#option#get('dict.sub.var'), 42)
+    AssertEquals(sort(lh#let#_list_variables('p:', 1)), sort(['p:paths.', 'p:dict.']))
+    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:paths.', 'p:dict.']))
   finally
     call cleanup.finalize()
   endtry
@@ -161,6 +172,9 @@ function! s:Test_create_opt() " {{{2
 
     LetTo p:&isk+=£
     AssertEquals(&isk, g_isk.',µ,£')
+
+    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
+    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.', 'p:&isk'])
   finally
     call cleanup.finalize()
   endtry
@@ -187,6 +201,9 @@ function! s:Test_create_ENV() " {{{2
     LetTo p:$LH_FOOBAR 28
     AssertEquals(lh#os#system('echo $LH_FOOBAR'), 28)
 
+
+    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
+    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.', 'p:$LH_FOOBAR'])
   finally
     call cleanup.finalize()
   endtry

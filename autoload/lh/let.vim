@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  08th Oct 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -259,15 +259,67 @@ endfunction
 
 " Function: lh#let#_list_all_variables_in_scope(scope) {{{3
 function! lh#let#_list_all_variables_in_scope(scope) abort
-  let vars = map(keys({a:scope}), 'a:scope.v:val')
+  if a:scope == 'p:'
+    let prj = lh#project#crt()
+    if lh#option#is_unset(prj)
+      return a:scope
+    endif
+    let vars = keys(prj.variables)
+          \ + map(keys(prj.env), '"$".v:val')
+          \ + map(keys(prj.options), '"&".v:val')
+  else
+    let vars = keys({a:scope})
+  endif
+  call map(vars, 'a:scope.v:val')
   return vars
 endfunction
 
 " Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
+function! s:IsDictOrList(var)
+  " call assert_true(type(a:var) == type(''))
+  if a:var =~ '^p:'
+    " TODO: find inherited variables
+    let vname = lh#project#crt_bufvar_name() . '.'
+    if     a:var[:2] == 'p:&'
+      let vname .= 'options.'
+      let sub    = a:var[3:]
+    elseif a:var[:2] == 'p:$'
+      let vname .= 'env.'
+      let sub    = a:var[3:]
+    else
+      let vname .= 'variables.'
+      let sub    = a:var[2:]
+    endif
+
+    return s:IsDictOrList(vname.sub)
+  else
+    let Val = eval(a:var)
+    return type(Val) == type([]) || type(Val) == type({})
+  endif
+endfunction
+
+function! s:IsDict(var)
+  " call assert_true(type(a:var) == type(''))
+  if a:var =~ '^p:'
+    if a:var =~ '^p:[$&]'
+      return 0
+    elseif a:var =~ '^p:'
+      " TODO: find inherited variables
+      let vname = lh#project#crt_bufvar_name() . '.'
+      let vname .= 'variables.'
+      let sub    = a:var[2:]
+      return s:IsDict(vname.sub)
+    endif
+  else
+    let Val = eval(a:var)
+    return type(Val) == type({})
+  endif
+endfunction
+
 function! lh#let#_list_all_list_variables_in_scope(scope) abort
   let vars = lh#let#_list_all_variables_in_scope(a:scope)
   " Keep only lists and dictionaries
-  call filter(vars, 'type({v:val}) == type([]) || type({v:val}) == type({})')
+  call filter(vars, 's:IsDictOrList(v:val)')
   return vars
 endfunction
 
@@ -281,20 +333,28 @@ function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
           \ + ListVarsFn('b:')
           \ + ListVarsFn('w:')
           \ + ListVarsFn('t:')
+          \ + ListVarsFn('p:')
   elseif stridx(a:lead, '.') >= 0
     " Dictionary
-    let [all, sDict, key ; trail] = matchlist(a:lead, '\v(.*)\.(.*)')
+    let [all, sDict0, key ; trail] = matchlist(a:lead, '\v(.*)\.(.*)')
+    let sDict = sDict0
+    if sDict =~ '^p:'
+      " TODO: find inherited variables
+      let sDict = substitute(sDict, 'p:', lh#project#crt_bufvar_name().'.variables.', '')
+    endif
     let dict = eval(sDict)
     let vars = keys(dict)
     if a:keep_only_dicts_and_lists
-      call filter(vars, 'type(dict[v:val]) == type([]) || type(dict[v:val]) == type({})')
+      call filter(vars, 's:IsDictOrList(sDict.".".v:val)')
     endif
     call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
-    call map(vars, 'sDict.".".v:val')
+    call map(vars, 'sDict0.".".v:val')
+    let l = len(a:lead) - 1
+    call filter(vars, 'v:val[:l] == a:lead')
     return vars
   else
     " Simple variables
-    if         (len(a:lead) == 1 && a:lead    =~ '[gbwt]')
+    if         (len(a:lead) == 1 && a:lead    =~ '[gbwtp]')
           \ || (len(a:lead) > 1  && a:lead[1] == ':')
       let scope = a:lead[0]
       let filter_scope = ''
@@ -306,7 +366,7 @@ function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
     call filter(vars, 'v:val =~ "^".filter_scope.a:lead')
   endif
   " Add dot to identified dictionaries
-  call map(vars, 'v:val. (type({v:val})==type({})?".":"")')
+  call map(vars, 'v:val. (s:IsDict(v:val)?".":"")')
   return vars
 endfunction
 
@@ -378,11 +438,12 @@ function! lh#let#_complete_let(ArgLead, CmdLine, CursorPos) abort
     " First argument: a variable name
     if a:CmdLine =~ '\vLetI%[fUndef]'
       " todo: don't return the final '.'
-      return lh#let#_list_variables(a:ArgLead, 1)
+      let vars = lh#let#_list_variables(a:ArgLead, 1)
     else " :LetTo and Unlet
-      return lh#let#_list_variables(a:ArgLead, 0)
-      " return any variable staring with Arglead, without the final '.'?
+      let vars = lh#let#_list_variables(a:ArgLead, 0)
+      " return any variable starting with Arglead, without the final '.'?
     endif
+    return vars
   elseif a:CmdLine =~ '\vUnl%[et]'
     return ''
   elseif pos >= 3

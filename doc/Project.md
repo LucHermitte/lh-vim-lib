@@ -443,7 +443,7 @@ BuildToolsWrappers are the first I've in mind).
  * Doc
  * Have root path be official for BTW and lh-tags
  * `:Unlet p:$ENV`
- * Completion on :Let* and *Unlet
+ * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
  * Toggling:
    * at global level: [a, b, c]
    * at project level: [default value from global VS force [a, b, c]]
@@ -460,6 +460,7 @@ BuildToolsWrappers are the first I've in mind).
  * `:Project <name> :bw` -> with confirmation!
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
+ * `:Project [<name>] :cd <path>`
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
  * auto projectification of every buffer ?
