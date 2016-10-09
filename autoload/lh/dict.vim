@@ -86,7 +86,7 @@ endfunction
 " @since v4.0.0
 function! lh#dict#get_composed(dst, key, ...) abort
   try
-    let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.([^.]+))=$')
+    let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.(.+))=$')
     call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
     if !has_key(a:dst, key)
       call s:Verbose('Return default value: Key %1 not found in %2.', key, a:dst)
