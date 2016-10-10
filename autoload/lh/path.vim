@@ -666,6 +666,8 @@ function! lh#path#new_permission_lists(options) abort
     throw "Invalid use of `lh#path#new_filtered_list()`
   endif
   let res = lh#object#make_top_type(a:options)
+  let res.valided_paths    = []
+  let res.rejected_paths   = []
   let res.prepare          = function(s:getSNR('lists_prepare'))
   let res.handle_paths     = function(s:getSNR('lists_handle_paths'))
   let res.handle_file      = function(s:getSNR('lists_handle_file'))
@@ -713,12 +715,12 @@ function! s:lists_handle_file(file, permission) dict abort
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
     return
-  elseif a:permission == 'sandbox'
+  elseif a:permission == 'sandboxlist'
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
     sandbox call self._do_handle(a:file)
     " exe 'sandbox source '.escape(a:file, ' \$,')
     return
-  elseif a:permission == 'ask'
+  elseif a:permission == 'asklist'
     if CONFIRM('Do you want to '. self._action_name. '"'.a:file.'"?', "&Yes\n&No", 1) != 1
       return
     endif
@@ -749,13 +751,23 @@ function! s:lists_is_file_accepted(file, permission) dict abort
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
     return 0
-  elseif a:permission == 'sandbox'
+  elseif a:permission == 'sandboxlist'
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
     return 'sandbox'
-  elseif a:permission == 'ask'
+  elseif match(self.rejected_paths, a:file) >= 0
+    call s:Verbose('Path %1 has already been rejected.')
+    return 0
+    " TODO: add a way to remove pathnames from validated list
+  elseif match(self.valided_paths, a:file) >= 0
+    call s:Verbose('Path %1 has already been validated.')
+    " TODO: add a way to remove pathnames from validated list
+  elseif a:permission == 'asklist'
     if CONFIRM('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No", 1) != 1
+      call lh#path#munge(self.rejected_paths, a:file)
       return 0
     endif
+    " And remember previous choices!
+    call lh#path#munge(self.valided_paths, a:file)
   endif
   call s:Verbose('('.a:permission.') '. self._action_name. ' ' . a:file)
   return 1
