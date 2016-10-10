@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      12th Sep 2016
-" Last Update:  28th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       OO functions and helpers
@@ -131,7 +131,7 @@ function! s:is_already_handled(object, handled_list) abort
     if e is a:object
       return 1
     endif
-    silent! unlet e
+    unlet e
   endfor
   return 0
 endfunction

@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  05th Oct 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -177,7 +177,7 @@ function! lh#list#copy_if(input, output, predicate) abort
     if lh#function#execute(a:predicate, element)
       call add(a:output, element)
     endif
-    silent! unlet element " for heterogeneous lists
+    unlet element " for heterogeneous lists
   endfor
   return a:output
 endfunction

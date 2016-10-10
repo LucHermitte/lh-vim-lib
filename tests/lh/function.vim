@@ -4,9 +4,9 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.4.0
+" Version:	4.0.0
 " Created:	03rd Nov 2008
-" Last Update:	15th Dec 2015
+" Last Update:	10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/function.vim

@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  08th Oct 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -157,7 +157,11 @@ function! s:clear_projects() dict abort " {{{4
   for p in self.projects
     for b in p.buffers
       let b = getbufvar(b, '')
-      silent! unlet b[s:project_varname]
+      " Avoid `silent!` as it messes Vim client-server mode and as a
+      " consequence rspecs tests
+      if has_key(b, s:project_varname)
+        unlet b[s:project_varname]
+      endif
     endfor
   endfor
   let self.projects = []
@@ -426,11 +430,11 @@ function! s:find_holder(varname) dict abort " {{{4
     return self.variables
   else
     for p in self.parents
-      silent! unlet h
       let h = p.find_holder(a:varname)
       if lh#option#is_set(h)
         return h
       endif
+      unlet h
     endfor
   endif
   return lh#option#unset()

@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  30th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -187,7 +187,8 @@ function! lh#on#_unlet(varname) abort
       exe "let ".a:varname." = ''"
     endif
   elseif exists(a:varname) && a:varname !~ '[&]'
-    unlet {a:varname}
+    " unlet {a:varname}
+    exe 'unlet '.a:varname
   endif
 endfunction
 

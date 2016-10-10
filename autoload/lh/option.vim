@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  09th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -208,7 +208,7 @@ else
         let b = bufnr('%')
         exe 'buf '.a:buf
         if !exists('b:'.a:name)
-          silent! unlet res
+          unlet res
           let res = a:0 == 0 ? g:lh#option#unset : a:1
         endif
       finally

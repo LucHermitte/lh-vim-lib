@@ -162,7 +162,9 @@ function! s:LetTo(var, value) abort " {{{4
     exe 'return '.a:var
   else
     " other variables
-    silent! unlet {a:var} " required until vim 7.4-1546
+    if exists(a:var)
+      unlet {a:var} " required until vim 7.4-1546
+    endif
     " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
     let {a:var} = a:value
     call s:Verbose("let %1 = %2", a:var, {a:var})

@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:      4.0.0
 " Created:      10th Sep 2012
-" Last Update:  28th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for plugin/let.vim's LetIfUndef
@@ -29,6 +29,34 @@ else
 endif
 runtime autoload/lh/let.vim
 runtime autoload/lh/list.vim
+
+let cleanup = lh#on#exit()
+      \.restore('g:force_reload_lh_project')
+try
+  runtime plugin/lh-project.vim
+finally
+  call cleanup.finalize()
+endtry
+
+
+" ## Fixture {{{1
+let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
+function! s:Setup() " {{{2
+  let s:prj_list = lh#project#_save_prj_list()
+  let s:cleanup = lh#on#exit()
+        \.restore('b:'.s:prj_varname)
+        \.restore('s:prj_varname')
+        \.restore('g:lh#project.auto_discover_root')
+  let g:lh#project = { 'auto_discover_root': 'no' }
+  if exists('b:'.s:prj_varname)
+    exe 'unlet b:'.s:prj_varname
+  endif
+endfunction
+
+function! s:Teardown() " {{{2
+  call s:cleanup.finalize()
+  call lh#project#_restore_prj_list(s:prj_list)
+endfunction
 
 " ## Tests {{{1
 " # LetIfUndef {{{2

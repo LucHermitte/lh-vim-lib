@@ -42,8 +42,14 @@ let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 function! s:Setup() " {{{2
   let s:prj_list = lh#project#_save_prj_list()
   let s:cleanup = lh#on#exit()
+        \.restore('b:'.s:prj_varname)
         \.restore('s:prj_varname')
+        \.restore('g:lh#project.auto_discover_root')
         " \.register({-> lh#project#_restore_prj_list(s:prj_list)})
+  let g:lh#project = { 'auto_discover_root': 'no' }
+  if exists('b:'.s:prj_varname)
+    exe 'unlet b:'.s:prj_varname
+  endif
 endfunction
 
 function! s:Teardown() " {{{2
@@ -54,7 +60,7 @@ endfunction
 " ## Tests {{{1
 " Function: s:Test_varnames() {{{2
 function! s:Test_varnames() abort
-  silent! unlet {s:prj_varname}
+  call lh#on#_unlet(s:prj_varname)
 
   AssertEquals('l&:isk', lh#project#_crt_var_name('p:&isk'))
   AssertEquals('b:isk',  lh#project#_crt_var_name('p:isk'))
@@ -77,9 +83,9 @@ function! s:Test_create() " {{{2
         \.restore('g:test')
         \.restore('b:test')
   try
-    silent! unlet {s:prj_varname}
-    silent! unlet g:test
-    silent! unlet b:test
+    call lh#on#_unlet(s:prj_varname)
+    call lh#on#_unlet('g:test')
+    call lh#on#_unlet('b:test')
     let p = lh#project#new({'name': 'UT'})
     AssertIs(p, {s:prj_varname})
     AssertEquals(p.depth(), 1)
@@ -96,19 +102,19 @@ function! s:Test_create() " {{{2
     LetTo p:test = 'prj1'
     Unlet b:test
     AssertEquals(lh#option#get('test'), 'prj1')
-    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
-    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:paths.', 'p:test']))
+    AssertEquals(lh#let#_list_variables('p:', 1), [])
+    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:test']))
     Unlet p:test
     AssertEquals(lh#option#get('test'), 'glob')
 
-    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
-    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.'])
+    AssertEquals(lh#let#_list_variables('p:', 1), [])
+    AssertEquals(lh#let#_list_variables('p:', 0), [])
 
     LetTo p:dict.sub.var=42
     AssertEquals(lh#option#get('dict.sub'), {'var': 42})
     AssertEquals(lh#option#get('dict.sub.var'), 42)
-    AssertEquals(sort(lh#let#_list_variables('p:', 1)), sort(['p:paths.', 'p:dict.']))
-    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:paths.', 'p:dict.']))
+    AssertEquals(sort(lh#let#_list_variables('p:', 1)), sort(['p:dict.']))
+    AssertEquals(sort(lh#let#_list_variables('p:', 0)), sort(['p:dict.']))
   finally
     call cleanup.finalize()
   endtry
@@ -119,9 +125,9 @@ function! s:Test_inherit() " {{{2
         \.restore('g:test')
         \.restore('b:test')
   try
-    silent! unlet {s:prj_varname}
-    silent! unlet g:test
-    silent! unlet b:test
+    call lh#on#_unlet(s:prj_varname)
+    call lh#on#_unlet('g:test')
+    call lh#on#_unlet('b:test')
     let p1 = lh#project#new({'name': 'UT1'})
     AssertIs(p1, {s:prj_varname})
     AssertEquals(p1.depth(), 1)
@@ -157,12 +163,12 @@ function! s:Test_create_opt() " {{{2
   let cleanup = lh#on#exit()
         \.restore('&isk')
   try
-    silent! unlet {s:prj_varname}
+    call lh#on#_unlet(s:prj_varname)
 
     set isk&vim
     let g_isk = &isk
 
-    silent! unlet b:test
+    call lh#on#_unlet('b:test')
     let p = lh#project#new({'name': 'UT'})
     AssertIs(p, {s:prj_varname})
     AssertEquals(p.depth(), 1)
@@ -173,8 +179,8 @@ function! s:Test_create_opt() " {{{2
     LetTo p:&isk+=£
     AssertEquals(&isk, g_isk.',µ,£')
 
-    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
-    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.', 'p:&isk'])
+    AssertEquals(lh#let#_list_variables('p:', 1), [])
+    AssertEquals(lh#let#_list_variables('p:', 0), ['p:&isk'])
   finally
     call cleanup.finalize()
   endtry
@@ -184,7 +190,7 @@ function! s:Test_create_ENV() " {{{2
   " p:&opt > l:&opt > &opt
   let cleanup = lh#on#exit()
   try
-    silent! unlet {s:prj_varname}
+    call lh#on#_unlet(s:prj_varname)
     Assert! !exists('$LH_FOOBAR')
 
     let p = lh#project#new({'name': 'UT'})
@@ -202,8 +208,8 @@ function! s:Test_create_ENV() " {{{2
     AssertEquals(lh#os#system('echo $LH_FOOBAR'), 28)
 
 
-    AssertEquals(lh#let#_list_variables('p:', 1), ['p:paths.'])
-    AssertEquals(lh#let#_list_variables('p:', 0), ['p:paths.', 'p:$LH_FOOBAR'])
+    AssertEquals(lh#let#_list_variables('p:', 1), [])
+    AssertEquals(lh#let#_list_variables('p:', 0), ['p:$LH_FOOBAR'])
   finally
     call cleanup.finalize()
   endtry

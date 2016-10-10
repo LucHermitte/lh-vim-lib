@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      03rd Nov 2008
-" Last Update:  27th Sep 2016
+" Last Update:  10th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -198,7 +198,6 @@ function! lh#function#bind(Fn, ...) abort
       let i = 0
       let t_args = [] " necessary to avoid type changes
       while i != N
-        silent! unlet arg
         let arg = a:Fn.args[i]
         if arg =~ 'v:\d\+_$'
           let arg2 = eval(s:DoBindString(arg, string(args)))
@@ -209,6 +208,7 @@ function! lh#function#bind(Fn, ...) abort
         endif
         call add(t_args, arg)
         let i += 1
+        unlet arg
       endwhile
       unlet a:Fn.args
       let a:Fn.args = t_args
