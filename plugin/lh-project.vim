@@ -38,11 +38,12 @@ augroup LH_PROJECT
   au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<afile>'))
 
   " Needs to be executed after local_vimrc
-  au BufReadPost * call lh#project#_UseProjectOptions()
+  au BufReadPost * call lh#project#_post_local_vimrc()
 
   au BufWinEnter,VimEnter * call lh#project#_CheckUpdateCWD()
 augroup END
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

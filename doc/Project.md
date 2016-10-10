@@ -1,4 +1,4 @@
-# Introduction
+# 1. Introduction
 Define new kind of variables: `p:` variables.
 
 The objective is to avoid duplicating a lot of `b:variables` in many buffers.
@@ -7,7 +7,7 @@ the current project.
 
 This variable will hold a single instance of each pair _variable_:_value_.
 
-## What is a project?
+## 1.1. What is a project?
 
 Given a set of files in a same directory, each file can be the unique file of a
 project -- I always have a tests/ directory where I host pet projects, or where
@@ -18,15 +18,16 @@ very big project. We may even imagine subprojects within a hierarchy.
 In the end, what really defines a programming project is a (leaf) "makefile" --
 And why restrict ourselves to makefiles, what about scons, autotools, ant,
 (b)jam, aap? And BTW, Sun-Makefiles or GNU-Makefiles? Other project will be
-recognize by the `.git/` directory at their root.
+recognized by the `.git/` directory at their root, and they won't have anything
+to do with programming.
 
 It's important to notice that what distinguishes two projects is not the type
 of their files. Having a configuration for C++ projects and another for Java
 projects is not enough. For instance, I'm often working simultaneously on
-several C++ projects with very set of options, starting with the compilation
-options.
+several C++ projects with very different sets of options, starting with the
+compilation options.
 
-## What's a project aware-plugin?
+## 1.2. What's a project aware-plugin?
 So what' the point? What can we do with those _projects_?
 
 We can do many things actually. For instance:
@@ -48,7 +49,7 @@ variable, then a `p:`roject local variable, a `t:`ab local variable, to finish
 with default settings in `g:`lobal variables. That's where `lh#option#get()`
 comes into play.
 
-# Rationale
+# 2. Rationale
 
 Vim support various means to define options.
  * First there are vim options that are used to tune how Vim behaves in various
@@ -90,26 +91,51 @@ local option, quickly becomes a nightmare. This is because we don't have
 
 So? Let's have them then!
 
-# Usage:
+# 3. Usage:
 
 There are a few use-cases depending you're an end-user who want to configure
 the plugins you use, or whether you're a plugin maintainer who want to have
 project-aware plugins.
 
-## You're a end-user
+## 3.1. You're a end-user
 who want to define the options of your current project.
 
 NB: Of course, if the plugins you use don't take advantage of this library, it
 won't help you much. At best, it'll you help organize buffers into projects.
 
-### and you want to define a new project
+### 3.1.1 and you want to define a new project
 
 First things first, you'll have to tell files when they are opened they belong
 to a project.
 
-#### From your `.lvimrc` or `_vimrc_local.vim`
-I recommend you define new projects from the project configuration file for a
-[local_vimrc](https://github.com/LucHermitte/local_vimrc/) plugin.
+#### 3.1.1.1 Automagically
+Most project detections may be done implicitly. The conditions to detect all
+the files from a directory hierarchy as part of a same project are:
+
+ * At the root, there is a `.svn/` or a `.git/` directory (mercurial is not
+   supported yet, nor other versionning system);
+ * You have set in your `.vimrc`:
+ ```vim
+ LetTo g:lh#project.auto_detect = 1
+ " or
+ let g:lh#project = { 'auto_detect' : 1 }
+ ```
+
+From there, the project name will be built automatically.
+
+This approach is perfect for projects under source control, when we don't need
+to force the project root directory, nor to factorize some settings between
+several subprojects (one per program sub-component for instance).
+
+If you need more control, or if you don't want to activate this automagic
+feature, use one of the following approaches.
+
+Note: See the documentation about blacklists and so on.
+
+#### 3.1.1.2. From your `.lvimrc` or `_vimrc_local.vim`
+If you don't want to automagically detect projects, or if you need more control
+to do so, I recommend you to define new projects from the project configuration
+file of a [local_vimrc](https://github.com/LucHermitte/local_vimrc/) plugin.
 This file will be named `.lvimrc` or `_vimrc_local.vim` depending on the actual
 plugin used.
 
@@ -117,9 +143,9 @@ plugin used.
 :Project --define ProjectName
 ```
 
-Note that this also could be done by hand.
+Note that this also could be done by hand -- see power-user approaches below.
 
-### Auto-detect the project root path
+### 3.1.2. Auto-detect the project root path
 On a project definition, we can automatically deduce the current project root
 directory. This directory will then be used by other plugins like
 [lh-tags](http://github.com/LucHermitte/lh-tags),
@@ -127,7 +153,7 @@ directory. This directory will then be used by other plugins like
 [BuildToolsWrappers](http://github.com/LucHermitte/BuildToolsWrappers).
 It'll also be used to automatically change the current local directory (`:h
 :lcd`) to the `paths.sources` dirname from the current project (iff
-`g:lh#project.autochdir` is true).
+`g:lh#project.auto_chdir` is true).
 
 The detection policy will depend on the value of
 `g:lh#project.auto_discover_root`:
@@ -151,13 +177,13 @@ TODO: Example.
 
 
 
-### Default value for project options
+### 3.1.3. Default value for project options
 In order to propose a default value to a project option:
 ```vim
 :LetIfUndef p:foo.bar.team 12
 ```
 
-### Set a project option
+### 3.1.4. Set a project option
 
 #### Variables
 We can override the value of a project option (or define it if it's a new one):
@@ -181,7 +207,7 @@ modified, we'll be sure it'll get modified dynamically, without having to
 change a project configuration file.
 
 #### Environment variables
-We can set an environment variable for all files in a project
+We can set an environment variable for all buffers in a project
 
 ```vim
 :LetTo p:$FOOBAR = 42
@@ -191,9 +217,9 @@ We can set an environment variable for all files in a project
 ```
 
 The environment variable won't be changed globally, but its value will be
-injected on-the-fly with `lh#os#system()`, not w/ `system()`/`:make`/...
+injected on-the-fly with `lh#os#system()`, not w/ `system()` nor `:make`...
 
-### A more complete configuration example will be:
+### 3.1.5. A more complete configuration example will be:
 ```vim
 " File: _vimrc_local.vim
 let s:k_version = 1
@@ -230,7 +256,7 @@ Here are also a few examples of `_vimrc_local`:
  * [my project configuration for my vim scripts](http://github.com/LucHermitte/lh-misc/tree/master/_vimrc_local.vim)
  * _more to come..._
 
-### Display various informations
+### 3.1.6. Display various informations
 
 #### List of active projects
 (well for now, we cannot deactivate a project)
@@ -239,7 +265,7 @@ Here are also a few examples of `_vimrc_local`:
 Project --list
 ```
 
-#### List project associated to a buffer
+#### List project(s) associated to a buffer
 ```vim
 Project --which
 ```
@@ -274,12 +300,12 @@ Project ProjectName echo varname
 Project :echo varname
 ```
 
-## Power User
+## 3.2. Power User
 
 Here are a few other use cases and alternative ways of doing things in case you
 need more control over _project_ options.
 
-### Create a project from `_vimrc_local.vim`, and keep a reference to the project variable
+### 3.2.1. Create a project from `_vimrc_local.vim`, and keep a reference to the project variable
 Instead of using
 ```vim
 :Project --define ProjectName
@@ -308,7 +334,7 @@ In the case different independent project configurations may co-exist in a
 will permit to store project information in a variable with a name which is not
 from `s:project`.
 
-### Create a new project, from anywhere
+### 3.2.2. Create a new project, from anywhere
 You can do it from anywhere manually with
 
 ```vim
@@ -317,14 +343,14 @@ You can do it from anywhere manually with
 
 Beware, the current buffer will be registered to this project.
 
-### Fetch the current project
+### 3.2.3. Fetch the current project
 ```vim
 :let prj = lh#project#crt()
 ```
 In case there is no project associated to the current buffer,
 `lh#option#unset()` will be returned.
 
-### Fetch a name of the current project variable
+### 3.2.4. Fetch a name of the current project variable
 ```vim
 :let prj_varname = lh#project#crt_bufvar_name()
 ```
@@ -334,7 +360,7 @@ an exception will be thrown.
 This will most likely return `b:crt_project`, the exact name depends on
 `g:lh#project#varname` global which can be overridden in your `.vimrc`.
 
-### Fetch the name under which an option is stored
+### 3.2.5. Fetch the name under which an option is stored
 ```
 :let varname = lh#project#crt_var_name('&isk')
 :let varname = lh#project#crt_var_name('$PATH')
@@ -342,17 +368,17 @@ This will most likely return `b:crt_project`, the exact name depends on
 ```
 This internal function is use by `lh#let#*` functions.
 
-### Register a buffer to the project
+### 3.2.6. Register a buffer to the project
 ```vim
 :call s:project.register_buffer([bufid])
 ```
 
-### Get a variable under the project
+### 3.2.7. Get a variable under the project
 ```vim
 :let val = lh#project#_get('foo.bar.team')
 ```
 
-### Set a variable in a precise project
+### 3.2.8. Set a variable in a precise project
 When a buffer belongs to several projects, it's not easily possible (yet) to
 select which inherited project get the settings.
 
@@ -369,15 +395,15 @@ to what you which:
 
 ```
 
-## You're a plugin maintainer
+## 3.3. You're a plugin maintainer
 and you want your plugins to be project-aware:
 
-### Get a project variable value:
+### 3.3.1. Get a project variable value:
 ```vim
 :let val = lh#option#get('b:foo.bar.team')
 ```
 
-### Define toggable project options
+### 3.3.2. Define toggable project options
 ```vim
 let p1 = lh#project#new({'name': 'Menu'})
 let pData = {
@@ -394,12 +420,12 @@ call lh#menu#def_toggle_item(pData)
 Toggle LHTestsTogMenupbar
 ```
 
-### Execute an external command while some `p:$ENV` variable are defined:
+### 3.3.3. Execute an external command while some `p:$ENV` variable are defined:
 ```vim
 :echo lh#os#system('echo $FOOBAR')
 ```
 
-# Design choices
+# 4. Design choices
 
 ## Regarding project file inventory
 I don't see any point in explicitly listing every files that belongs to project
@@ -424,6 +450,11 @@ library in order to see how it's meant to be used. When I do that, I want the
 third-party code side by side with the code I'm working on. With tabs, this
 isn't possible.
 
+## Regarding environment variables
+
+At this point, we cannot unset environment variables. As a consequence, I've
+prefered setting them on-the-fly and locally only when we need to use them.
+
 ## Miscelleanous stuff
 
  * `lh#project#root()` shall not fill `p:paths.sources,` but return a value.
@@ -431,14 +462,14 @@ isn't possible.
    `lh#project#root()` result.
 
 
-# Compatible plugins
+# 5. Compatible plugins
 
 Most of my plugins that use `lh#option#get()` are already compatible with this
 new feature. However some final tweaking will be required to fully take
-advantage of option toggling, `p:$ENV` variables (lh-tags, and
+advantage of option toggling, `p:$ENV` variables (lh-tags, lh-dev, and
 BuildToolsWrappers are the first I've in mind).
 
-# TO DO list
+# 6. TO DO list
 
  * Doc
  * Have root path be official for BTW and lh-tags
@@ -463,7 +494,6 @@ BuildToolsWrappers are the first I've in mind).
  * `:Project [<name>] :cd <path>`
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
- * auto projectification of every buffer ?
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.
    Expected Caveats:

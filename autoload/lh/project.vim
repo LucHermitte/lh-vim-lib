@@ -42,7 +42,6 @@ let s:k_version = '400'
 " - :Project [<name>] :cd <path>
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
-" - auto projectification of every buffer ?
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
@@ -497,16 +496,20 @@ function! lh#project#new(params) abort
   if has_key(project, 'auto_discover_root')
     " The option can be forced through #define parameter
     let auto_discover_root = project.auto_discover_root
+    call s:Verbose("prj#new: auto_discover_root set in options: %1", auto_discover_root)
     unlet project.auto_discover_root
   else
     let auto_discover_root = lh#project#_auto_discover_root()
+    call s:Verbose("prj#new: auto_discover_root computed: %1", auto_discover_root)
   endif
 
   if type(auto_discover_root) == type({}) && has_key(auto_discover_root, 'value')
+    call s:Verbose("prj#new: auto_discover_root set in options: %1", auto_discover_root.value)
     call lh#let#if_undef('p:paths.sources', auto_discover_root.value)
   elseif auto_discover_root !~? '\v^(n%[o]|0)$'
     if ! lh#project#exists('p:paths.sources')
       let root = lh#project#root()
+      call s:Verbose("prj#new: root found: %1", root)
       if !empty(root)
         call lh#let#if_undef('p:paths.sources', root[:-2])
       endif
@@ -643,6 +646,7 @@ endfunction
 function! s:FetchPrjDirname() abort " {{{3
   " mu-template variable
   let project_sources_dir = lh#option#get('project_sources_dir')
+  call s:Verbose('s:FetchPrjDirname() -- project_sources_dir: %1', project_sources_dir)
   if lh#option#is_set(project_sources_dir)
     return project_sources_dir
   endif
@@ -650,6 +654,7 @@ function! s:FetchPrjDirname() abort " {{{3
   " VCS
   let prj_dirname = lh#vcs#get_git_root()
   if !empty(prj_dirname)
+    call s:Verbose("s:FetchPrjDirname() -> git: %1 -> %2", prj_dirname, fnamemodify(prj_dirname, ':p:h:h'))
     return fnamemodify(prj_dirname, ':p:h:h')
   endif
   let prj_dirname = lh#vcs#get_svn_root()
@@ -664,7 +669,9 @@ endfunction
 function! s:GetPlausibleRoot() abort " {{{3
   call s:Callstack("Request plausible root")
   let crt = expand('%:p:h')
+  call s:Verbose('s:GetPlausibleRoot() -- project roots: %1', s:project_roots)
   let compatible_paths = filter(copy(s:project_roots), 'lh#path#is_in(crt, v:val)')
+  call s:Verbose('s:GetPlausibleRoot() -- Compatible paths: %1', compatible_paths)
   if len(compatible_paths) == 1
     return compatible_paths[0]
   endif
@@ -675,8 +682,13 @@ function! s:GetPlausibleRoot() abort " {{{3
     endif
   endif
   let auto_discover_root = lh#project#_auto_discover_root()
+  call s:Verbose('s:GetPlausibleRoot() -- auto discover root: %1', auto_discover_root)
   if auto_discover_root == 'in_doubt_ask'
-    let prj_dirname = INPUT("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
+    if s:permission_lists.check_paths([ expand('%:p:h')])
+      let prj_dirname = INPUT("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
+    else
+      let prj_dirname = ''
+    endif
   elseif auto_discover_root == 'in_doubt_ignore'
     return ''
   elseif auto_discover_root == 'in_doubt_improvise'
@@ -685,6 +697,7 @@ function! s:GetPlausibleRoot() abort " {{{3
   if !empty(prj_dirname)
     call lh#path#munge(s:project_roots, prj_dirname)
   endif
+  call s:Verbose('s:GetPlausibleRoot -> %1', prj_dirname)
   return prj_dirname
 endfunction
 " }}}1
@@ -715,8 +728,34 @@ endfunction
 " }}}1
 "------------------------------------------------------------------------
 " ## autocommands {{{1
-" # New buffer => update options {{{2
+" # Post local vimrc hook {{{2
+" Function: lh#project#_post_local_vimrc() {{{3
+function! lh#project#_post_local_vimrc() abort
+  call lh#project#_auto_detect_project()
+  call lh#project#_UseProjectOptions()
+endfunction
+
+" Function: lh#project#_auto_detect_project() {{{3
+function! lh#project#_auto_detect_project() abort
+  let auto_detect_projects = lh#option#get('lh#project.auto_detect', 0, 'g')
+  " If there already is a project defined => abort
+  if auto_detect_projects && ! lh#project#is_in_a_project()
+    let root = lh#project#root()
+    if !empty(root) && s:permission_lists.check_paths([root]) == 1
+      " TODO: recognize patterns such as src|source to search the project in
+      " the upper directory
+      let name = fnamemodify(root, ':h:t')
+      let name = substitute(name, '[^A-Za-z0-9_]', '_', 'g')
+      let opt = {'name': name}
+      let opt.auto_discover_root = {'value':  root}
+      call lh#project#define(s:, opt, name)
+    endif
+
+  endif
+endfunction
+
 function! lh#project#_UseProjectOptions() " {{{3
+  " # New buffer => update options
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
     call prj._use_options(bufnr('%'))
@@ -735,17 +774,37 @@ endfunction
 
 " # Update lcd {{{2
 function! lh#project#_CheckUpdateCWD() abort " {{{3
-  if lh#option#get('lh#project.autochdir', 0, 'g') == 1
+  if lh#option#get('lh#project.auto_chdir', 0, 'g') == 1
     let path = lh#option#get('paths.sources')
     if lh#option#is_set(path) && path != getcwd() && isdirectory(path)
-      call s:Verbose('auprjchdir %1 -> %2', expand('%'), path)
+      call s:Verbose('auto prj chdir %1 -> %2', expand('%'), path)
       exe 'lcd '.path
     endif
   endif
 endfunction
 "------------------------------------------------------------------------
-" ## Internal globals {{{1
+" ## globals {{{1
+" # Public globals {{{2
+" - blacklists & co for auto_detect_projects {{{3
+LetIfUndef g:lh#project.permissions             {}
+LetIfUndef g:lh#project.permissions.whitelist   []
+LetIfUndef g:lh#project.permissions.blacklist   []
+LetIfUndef g:lh#project.permissions.asklist     []
+LetIfUndef g:lh#project.permissions.sandboxlist []
+LetIfUndef g:lh#project.permissions._action_name = 'recognize a project at'
+
+" Accept $HOME, but nothing from parent directories
+call lh#path#munge(g:lh#project.permissions.asklist, $HOME)
+call lh#path#munge(g:lh#project.permissions.blacklist, fnamemodify('/', ':p'))
+" TODO: add other disks in windows
+
+" The directories where projects (we trust) are stored shall be added into
+" whitelist
+
+" # Internal globals {{{2
 let s:project_list = get(s:, 'project_list', lh#project#_make_project_list())
+let s:permission_lists = lh#path#new_permission_lists(g:lh#project.permissions)
+
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------

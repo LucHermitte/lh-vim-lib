@@ -3105,11 +3105,11 @@ a project.
 So far, we use |lh#project#root()| result as an indicator of belonging to a
 project.
 
-TODO: support blacklists & al.
+See also |g:lh#project.permissions|.
 
 When set to 1, there is no need to explicitly define a project.
 
-Default value in 0
+Default value is 0
 
 *g:lh#project.auto_chdir*
 Tells whether we should automatically change the local current working
@@ -3118,8 +3118,16 @@ to their associated project *p:paths.sources*
 
 So far, we use |lh#project#root()| result as default value for `p:paths.sources`.
 
-Default value in 0
+Default value is 0
 
+*g:lh#project.permissions*
+Specifies whitelist, blacklist, asklist and sandboxlist of pathnames to be
+used when trying to automagically find projects with |g:lh#project.auto_detect|.
+Default values for:
+- *g:lh#project.permissions.whitelist*   : []
+- *g:lh#project.permissions.asklist*     : [$HOME]
+- *g:lh#project.permissions.blacklist*   : ['/']
+- *g:lh#project.permissions.sandboxlist* : []
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
