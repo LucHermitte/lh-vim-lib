@@ -189,33 +189,34 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
 
 ### Paths related functions
-| Function                                     | Purpose                                                                                                  |
-|:---------------------------------------------|:---------------------------------------------------------------------------------------------------------|
-| `lh#path#add_path_if_exists(listname, path)` | Adds a path is a list iff the path points to an existing node                                            |
-| `lh#path#common()`                           | Returns the biggest common part between several paths                                                    |
-| `lh#path#depth()`                            | Returns the depth of a path                                                                              |
-| `lh#path#find(pathlist, regex)`              | Returns the first path in a list that matches a regex                                                    |
-| `lh#path#find_in_parents()`                  | Support function at the root of [local_vimrc](http://github.com/LucHermitte/local_vimrc)                 |
-| `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                  |
-| `lh#path#glob_as_list()`                     | Returns `globpath()`result as a list                                                                     |
-| `lh#path#is_absolute_path()`                 | Tells whether the parameter is an absolute pathname                                                      |
-| `lh#path#is_in(node, path)`                  | Tells whether a node is already present in a path -- `readlink()` is applied on both parameters          |
-| `lh#path#is_url()`                           | Tells whether the parameter is an URL                                                                    |
-| `lh#path#join(pathparts, ...)`               | Joins path parts into a string                                                                           |
-| `lh#path#munge(pathlist, path)`              | Adds a path to a list on the condition the path isn't already present, and that it points to a valid node|
-| `lh#path#readlink(pathname)`                 | Returns `readlink` result on the pathname -- when the command is available on the system                 |
-| `lh#path#relative_to()`                      | Returns the relative offset to reference files in another directory                                      |
-| `lh#path#remove_dir_mark()`                  | Removes the trailing `/` or `\` in the path if any                                                       |
-| `lh#path#select_one()`                       | Asks the end-user to select one pathname                                                                 |
-| `lh#path#shellslash()`                       | Returns the shellslash character                                                                         |
-| `lh#path#simplify()`                         | Like `simplify()`, but also strips the leading `./`                                                      |
-| `lh#path#split(pathname)`                    | Splits a string into path parts                                                                          |
-| `lh#path#strip_common()`                     | In a set of pathnames, strips the leading part they all have in common                                   |
-| `lh#path#strip_start()`                      | Strips the leading part of a pathname if found in the given list of pathnames                            |
-| `lh#path#to_dirname()`                       | Complete the current path with '/' if missing                                                            |
-| `lh#path#to_regex()`                         | Builds a regex that can be used to match pathnames                                                       |
-| `lh#path#to_relative()`                      | Transforms a pathname to a pathname relative to the current directory                                    |
-| `lh#path#vimfiles()`                         | Returns where the current user vimfiles are (`$HOME/.vim` `~/vimfiles`, ...)                             |
+| Function                                     | Purpose                                                                                                   |
+|:---------------------------------------------|:----------------------------------------------------------------------------------------------------------|
+| `lh#path#add_path_if_exists(listname, path)` | Adds a path is a list iff the path points to an existing node                                             |
+| `lh#path#common()`                           | Returns the biggest common part between several paths                                                     |
+| `lh#path#depth()`                            | Returns the depth of a path                                                                               |
+| `lh#path#find(pathlist, regex)`              | Returns the first path in a list that matches a regex                                                     |
+| `lh#path#find_in_parents()`                  | Support function at the root of [local_vimrc](http://github.com/LucHermitte/local_vimrc)                  |
+| `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                   |
+| `lh#path#glob_as_list()`                     | Returns `globpath()`result as a list                                                                      |
+| `lh#path#is_absolute_path()`                 | Tells whether the parameter is an absolute pathname                                                       |
+| `lh#path#is_in(node, path)`                  | Tells whether a node is already present in a path -- `readlink()` is applied on both parameters           |
+| `lh#path#is_url()`                           | Tells whether the parameter is an URL                                                                     |
+| `lh#path#join(pathparts, ...)`               | Joins path parts into a string                                                                            |
+| `lh#path#munge(pathlist, path)`              | Adds a path to a list on the condition the path isn't already present, and that it points to a valid node |
+| `lh#path#new_permission_lists()`             | Prepares a permission lists object to be used to accept/reject pathnames based upon white/black/... lists |
+| `lh#path#readlink(pathname)`                 | Returns `readlink` result on the pathname -- when the command is available on the system                  |
+| `lh#path#relative_to()`                      | Returns the relative offset to reference files in another directory                                       |
+| `lh#path#remove_dir_mark()`                  | Removes the trailing `/` or `\` in the path if any                                                        |
+| `lh#path#select_one()`                       | Asks the end-user to select one pathname                                                                  |
+| `lh#path#shellslash()`                       | Returns the shellslash character                                                                          |
+| `lh#path#simplify()`                         | Like `simplify()`, but also strips the leading `./`                                                       |
+| `lh#path#split(pathname)`                    | Splits a string into path parts                                                                           |
+| `lh#path#strip_common()`                     | In a set of pathnames, strips the leading part they all have in common                                    |
+| `lh#path#strip_start()`                      | Strips the leading part of a pathname if found in the given list of pathnames                             |
+| `lh#path#to_dirname()`                       | Complete the current path with '/' if missing                                                             |
+| `lh#path#to_regex()`                         | Builds a regex that can be used to match pathnames                                                        |
+| `lh#path#to_relative()`                      | Transforms a pathname to a pathname relative to the current directory                                     |
+| `lh#path#vimfiles()`                         | Returns where the current user vimfiles are (`$HOME/.vim` `~/vimfiles`, ...)                              |
 
 
 ### Commands related functions

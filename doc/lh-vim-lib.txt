@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 08th Oct 2016
+                        For Vim version 7+      Last change: 10th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -133,6 +133,7 @@ Paths related functions:                                |lhvl#path|
 - |lh#path#is_absolute_path()|
 - |lh#path#is_in()|
 - |lh#path#is_url()|
+- |lh#path#new_permission_lists()|
 - |lh#path#readlink()|
 - |lh#path#relative_to()|
 - |lh#path#remove_dir_mark()|
@@ -1898,6 +1899,28 @@ Tells whether a {file} is within a directory tree.
 The function first tries to check whether the names match, then it tries again
 but on resolved pathnames (with |lh#path#readlink()|.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#new_permission_lists()*  {{{3
+                                                *lhvl#permission-list*
+lh#path#new_permission_lists(options)~
+Prepares a permission lists object.
+@param[in] {options} |Dictionary| made of the |List|s:
+  - `"whitelist"`:    |List| of paths always accepted.
+  - `"blacklist"`:    |List| of paths always rejected.
+  - `"asklist"`:      |List| of paths that needs interactive approval.
+  - `"sandboxlist"`:  |List| of paths approved, in the |sandbox| only.
+  - `"_do_hanlde()"`: |Function| executed of approved file,
+                    required only by |handle_file()| and |handle_paths()|.
+  - `"_action_name"`: Name of the action to display in messages.
+@return An object completed with the methods:
+  - *prepare()*          -- internal
+  - *handle_paths()*     -- applies `"_do_handle()"` to files compatibles with permissions
+  - *handle_file()*      -- internal
+  - *check_paths()*      -- tells whether a file is compatible with current permissions
+  - *is_file_accepted()* -- internal
+@since v4.0.0
+@see |local_vimrc| documentation for more details.
+
 ------------------------------------------------------------------------------
 MENUS RELATED FUNCTIONS                               *lhvl#menu*       {{{2
 
@@ -3073,6 +3096,31 @@ local option, quickly becomes a nightmare. This is because we don't have
 `p:roject_options`.
 
 So? Let's have them then!
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *project-options*                {{{3
+*g:lh#project.auto_detect*
+Tells whether we should try to automatically detect whether a file belongs to
+a project.
+So far, we use |lh#project#root()| result as an indicator of belonging to a
+project.
+
+TODO: support blacklists & al.
+
+When set to 1, there is no need to explicitly define a project.
+
+Default value in 0
+
+*g:lh#project.auto_chdir*
+Tells whether we should automatically change the local current working
+directory for every files in projects to reflect the source paths associated
+to their associated project *p:paths.sources*
+
+So far, we use |lh#project#root()| result as default value for `p:paths.sources`.
+
+Default value in 0
+
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *p:* *project-variable*          {{{3
