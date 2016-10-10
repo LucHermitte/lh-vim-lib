@@ -3188,6 +3188,15 @@ Lists all projects to which the current buffer belongs.
 Displays the buffers associated to the project {prj-name}, or the current
 project (is none was specified) in the same way as builtin |:ls| command.
 
+                                                    *:Project-:cd*
+:Project [{prj-name}] :cd {dirname}~
+Changes the project current directory with |:lcd|.
+Applies the change to all windows where buffers from the project are
+displayed.
+@pre {dirname} must be a valid directory
+@pre a project (named {prj-name} if specified) must exist.
+@post `p:paths.sources` equals {dirname}
+
                                                     *:Project-:echo*
 :Project [{prj-name}] :echo {varname}~
 Echoes the value of the |p:|variable {varname} associated to specified

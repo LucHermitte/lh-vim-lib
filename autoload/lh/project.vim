@@ -35,11 +35,10 @@ let s:k_version = '400'
 " - Be able to control which parent is filled with lh#let# functions
 "   -> :Project <name> :LetTo var = value
 " - prj.set(plain_variable, value)
-" - :Project <name> do <cmd> ...
-" - :Project <name> :bw -> with confirmation!
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
-" - :Project [<name>] :cd <path>
+" - :Project <name> do <cmd> ...
+" - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
 " - Serialize and deserialize options from a file that'll be maintained
@@ -188,6 +187,24 @@ function! s:ls_project(prj) abort " {{{4
   echo join(lines, "\n")
 endfunction
 
+function! s:cd_project(prj, path) abort " {{{4
+  if lh#option#is_unset(a:prj)
+    throw "Cannot apply :cd on non existant projects"
+  endif
+  if !isdirectory(a:path)
+    throw "Invalid directory `".a:path."`!"
+  endif
+  let a:prj.variables.paths.sources = a:path
+  " Then, for all windows displaying a buffer from the project: update :lcd
+  let windows = filter(range(1, winnr('$')), 'index(a:prj.buffers, winbufnr(v:val)) >= 0')
+  call map(windows, 'win_getid(v:val)')
+  let crt_win = win_getid(winbufnr('%'))
+  for w in windows
+    call win_gotoid(w)
+    exe 'lcd '.a:path
+  endfor
+endfunction
+
 function! s:echo_project(prj, var) abort " {{{4
   let val = a:prj.get(a:var)
   if lh#option#is_set(val)
@@ -234,11 +251,12 @@ endfunction
 " Function: lh#project#_command([prjname]) abort {{{4
 let s:k_usage =
       \ [ ':Project USAGE:'
-      \ , '  :Project --list           " list existing projects'
-      \ , '  :Project --define <name>  " define a new project/register current buffer'
-      \ , '  :Project --which          " list projects to which the current buffer belongs'
-      \ , '  :Project [<name>] :ls     " list buffers belonging to the project'
-      \ , '  :Project [<name>] :echo   " echo state of a project variable'
+      \ , '  :Project --list              " list existing projects'
+      \ , '  :Project --define <name>     " define a new project/register current buffer'
+      \ , '  :Project --which             " list projects to which the current buffer belongs'
+      \ , '  :Project [<name>] :ls        " list buffers belonging to the project'
+      \ , '  :Project [<name>] :cd <path> " change directory to <path>'
+      \ , '  :Project [<name>] :echo      " echo state of a project variable'
       \ ]
 function! lh#project#_command(...) abort
   if     a:1 =~ '-\+u\%[sage]'  " {{{5
@@ -271,6 +289,11 @@ function! lh#project#_command(...) abort
         throw "Not enough arguments to `:Project :echo`"
       endif
       call s:echo_project(prj, a:2)
+    elseif a:1 =~ '\v^:cd$'        " {{{6
+      if a:0 != 2
+        throw "Not enough arguments to `:Project :cd`"
+      endif
+      call s:cd_project(prj, a:2)
     elseif a:1 =~ '\v^--define$'   " {{{6
       call s:define_project(a:2)
     else
@@ -290,9 +313,14 @@ function! lh#project#_command(...) abort
       call s:ls_project(prj)
     elseif a:2 =~ '\v^:=echo$'   " {{{5
       if a:0 != 3
-        throw "Not enough arguments to `:Project :echo`"
+        throw "Not enough arguments to `:Project <name> :echo`"
       endif
       call s:echo_project(prj, a:3)
+    elseif a:2 =~ '\v^:=cd$'     " {{{5
+      if a:0 != 3
+        throw "Not enough arguments to `:Project <name> :cd`"
+      endif
+      call s:cd_project(prj, a:3)
     else
       throw "Unexpected `:Project ".a:2."` subcommand"
     endif
@@ -311,12 +339,17 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let res = keys(s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset()).variables)
+  elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
+        \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
+    let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
+    call filter(res, 'isdirectory(v:val)')
+    call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
   elseif 2 == pos
-    let res = [':ls', ':echo']
+    let res = [':ls', ':echo', ':cd']
   else
     let res = []
   endif

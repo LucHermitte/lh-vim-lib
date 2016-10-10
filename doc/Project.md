@@ -175,7 +175,11 @@ current file. Then, in doubt, we may ask to user to fill in this dirname.
 This could also be overridden from `lh#project#define()` and `lh#project#new()`
 TODO: Example.
 
-
+The current project path can also be changed dynamically with:
+```vim
+:Project :cd dirname
+:Project ProjectName :cd dirname
+```
 
 ### 3.1.3. Default value for project options
 In order to propose a default value to a project option:
@@ -457,7 +461,7 @@ prefered setting them on-the-fly and locally only when we need to use them.
 
 ## Miscelleanous stuff
 
- * `lh#project#root()` shall not fill `p:paths.sources,` but return a value.
+ * `lh#project#root()` doesn't not fill `p:paths.sources,` but return a value.
    It's up to `lh#project#new()` to fill `p:paths.sources` from
    `lh#project#root()` result.
 
@@ -491,7 +495,6 @@ BuildToolsWrappers are the first I've in mind).
  * `:Project <name> :bw` -> with confirmation!
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
- * `:Project [<name>] :cd <path>`
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
  * Serialize and deserialize options from a file that'll be maintained
