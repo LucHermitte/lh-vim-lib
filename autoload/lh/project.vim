@@ -56,6 +56,7 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 let s:project_varname = get(g:, 'lh#project#varname', 'crt_project')
+
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
@@ -180,7 +181,11 @@ function! s:As_ls(bid) abort " {{{4
 endfunction
 
 function! s:ls_project(prj) abort " {{{4
+  if lh#option#is_unset(a:prj)
+    echo '(no project specified!)'
+  endif
   let lines = map(copy(a:prj.buffers), 's:As_ls(v:val)')
+  echo "Buffer list of ".get(a:prj, 'name', '(unnamed)')." project:"
   echo join(lines, "\n")
 endfunction
 
@@ -215,6 +220,10 @@ endfunction
 
 function! s:show_related_projects(...) abort " {{{4
   let prj = a:0 == 0 ? lh#project#crt() : a:1
+  if lh#option#is_unset(prj)
+    echo "(current buffer is under no project)"
+    return
+  endif
   let lvl = a:0 == 0 ? 0                : a:2
   " Let's assume there is no recursion
   echo repeat('  ', lvl) . '- '.prj.name
