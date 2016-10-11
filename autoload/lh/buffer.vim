@@ -90,7 +90,10 @@ function! lh#buffer#find(filename) abort
   " Workaround a bug in event execution: we may a have a non null buffer, but
   " with a name that doesn't match what is looked for.
   " -> "|| bufname(winbufnr(b)) != a:filename"
-  if b == -1 || bufname(winbufnr(b)) != a:filename | return -1 | endif
+  " The second case is used when the filename is actually a buffer name
+  if b == -1 || (bufname(winbufnr(b)) != a:filename && winbufnr(b) != a:filename)
+    return -1
+  endif
   exe b.'wincmd w'
   return b
 endfunction
