@@ -183,6 +183,8 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#list()|
 OS/System related functions:                            |lhvl#os|
 - |lh#async#queue()|
+- |:Jobs|
+- |:StopBGExecution|
 - |lh#os#has_unix_layer_installed()|
 - |lh#os#system_detected()|
 - |lh#os#OnDOSWindows()|
@@ -435,10 +437,30 @@ Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
     starting any new job. Indeed, things that must be executed before a job
     starts shall not be executed before the previous job has ended. This
     callback helps to delay operations written in |VimL|.
+  - `'start_fail_cb'`: optional callback executed when starting the job fails.
 @todo Support for |job_stop()|
 @todo Support multiple queues -> `lh#async#new_queue()`
 
 Active queues and bakground job will be presented in |airline-section|`_b`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *:Jobs*                           {{{3
+:Jobs~
+Opens a dialog scratch window displaying all jobs being executed in background
+and programmed to be through |lh#async#queue()|.
+
+For the moment this window will:
+- keep the queue displayed up to date
+- permit to cancel jobs with `x`, `<del>` or `d`
+
+Eventually, it'll permit to reorganize pending jobs.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *:StopBGExecution*                {{{3
+:StopBGExecution <pattern>~
+This command will cancel the first job (registered through |lh#async#queue()|)
+it founds that matches the {pattern}.
+This command supports |command-completion| to help select the right job.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#position#IsBefore()*          {{{3

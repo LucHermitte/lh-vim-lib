@@ -12,7 +12,11 @@ let s:k_version = '4000'
 "
 "------------------------------------------------------------------------
 " History:      «history»
-" TODO:         «missing features»
+" TODO:
+" - Merge identical jobs, or ask to cancel previous and add again
+" - Reorganize jobs in `:Job`  dialog
+" - Attach continuations à la _and then_
+"   e.g. `:Make install` may depend on another make job
 " }}}1
 "=============================================================================
 
@@ -61,6 +65,12 @@ function! lh#async#queue(job) abort
   call s:job_queue.push_or_start(a:job)
 endfunction
 
+" Function: lh#async#stop(id) {{{3
+function! lh#async#stop(id) abort
+  call s:Verbose('Try to stop %1', a:id)
+  call s:job_queue.stop(a:id)
+endfunction
+
 " Function: lh#async#do_clear_queue() {{{3
 " Debugging purpose, avoid using this function!!!
 " If a job is really running, errors are to be expected
@@ -71,6 +81,7 @@ function! lh#async#_do_clear_queue() abort
         \ , s:job_queue.list
         \)
   let s:job_queue.list = []
+  call s:ui_update()
 endfunction
 
 "------------------------------------------------------------------------
@@ -85,7 +96,7 @@ function! s:is_empty() dict abort                  " {{{3
   return empty(self.list)
 endfunction
 
-function! s:push_or_start(job) dict abort    " {{{3
+function! s:push_or_start(job) dict abort          " {{{3
   let job_args = lh#dict#subset(a:job, [
         \ 'close_cb', 'in_cb', 'out_cb', 'err_cb', 'exit_cb', 'callback',
         \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit',
@@ -98,7 +109,9 @@ function! s:push_or_start(job) dict abort    " {{{3
         \ ])
   let self.list += [ extend(copy(a:job), {'args': job_args}) ]
   call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
+  call s:ui_update()
   if len(self.list) == 1
+    " Can't start and remove simultaneously => don't wait here
     " There was nothing, the new job is to be started
     call self.start_next()
   endif
@@ -106,6 +119,11 @@ endfunction
 
 function! s:start_next() dict abort                " {{{3
   call assert_true(!self.is_empty())
+  " Wait till adding/removing a job has finished (poor man's mutex)
+  while get(s:job_queue, 'must_wait', 0)
+    :sleep 100m
+  endwhile
+  let self.must_wait = 1
   let job = self.list[0]
   try
     let success = 0
@@ -119,15 +137,19 @@ function! s:start_next() dict abort                " {{{3
     let Close_cb = get(args, 'close_cb', function('s:default_close_cb'))
     let args.close_cb = function('s:close_cb', [Close_cb])
 
+    let env = lh#project#_environment()
     if lh#os#OnDOSWindows() && &shell =~ 'cmd'
-      let cmd = &shell . ' ' . &shellcmdflag . ' '.job.cmd
+      let cmd = join(env + [&shell, &shellcmdflag, job.cmd], ' ')
     else
-      let cmd = [&shell, &shellcmdflag, job.cmd]
+      let cmd = env + [&shell, &shellcmdflag, job.cmd]
     endif
     let job.job = job_start(cmd, args)
     call s:Verbose('job_start(%2) status: %1', job_info(job.job), cmd)
     if job_info(job.job).status == 'fail'
       call s:Verbose('AGAIN job_start(%2) status: %1', job_info(job.job), cmd)
+      if has_key(job, 'start_failed_cb')
+        call job.start_failed_cb()
+      endif
       throw "Starting `".(job.cmd)."` failed!"
     endif
     let success = 1
@@ -136,7 +158,9 @@ function! s:start_next() dict abort                " {{{3
     " unaltered
     if !success
       call remove(self.list, 0)
+      call s:ui_update()
     endif
+    unlet self.must_wait
   endtry
 endfunction
 
@@ -146,11 +170,20 @@ endfunction
 
 function! s:close_cb(user_close_cb, channel) abort " {{{3
   " TODO: bind this function to s:job_queue
-  let job = remove(s:job_queue.list, 0)
+  " Wait till adding/removing a job has finished (poor man's mutex)
+  while get(s:job_queue, 'must_wait', 0)
+    :sleep 100m
+  endwhile
+  let s:job_queue.must_wait = 1
   try
+    let job = remove(s:job_queue.list, 0)
     call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
     call call(a:user_close_cb, [a:channel, job_info(job.job)])
+    call s:ui_update()
   finally
+    unlet s:job_queue.must_wait
+    " TODO: Fix this lock! I need a reentrant lock here.
+
     " Be sure, we always launch the next job
     if !s:job_queue.is_empty()
       call s:job_queue.start_next()
@@ -160,13 +193,66 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
   endtry
 endfunction
 
+function! s:_unsafe_stop_job(idx, nb_jobs) dict abort                " {{{3
+  " Return whether we must update ui
+  call assert_true(self.must_wait)
+  call assert_inrange(0, len(self.list), a:idx)
+
+  let job = self.list[a:idx]
+  call s:Verbose('Found job #%1: %2', a:idx, job)
+  " a:nb_jobs is a security in case the list size changes while the function is
+  " executed
+  if a:idx == 0 && a:nb_jobs == len(self.list)
+    let st = job_stop(job.job)
+    if st == 0
+      throw "Cannot stop the background execution of ".job.txt
+    else
+      call lh#common#warning_msg("Background execution of ".(job.txt)." stopped.")
+    endif
+    return 0 " don't update
+  elseif a:nb_jobs == len(self.list)
+    call remove(self.list, a:idx)
+    call lh#common#warning_msg("Background execution of ".(job.txt)." aborted.")
+    return 1
+  else
+    throw "Unexpected error while trying abort background execution of job #".a:idx
+  endif
+endfunction
+
+function! s:stop_job(id) dict abort                " {{{3
+  " Wait till adding/finishing a job has finished (poor man's mutex)
+  while get(s:job_queue, 'must_wait', 0)
+      :sleep 100m
+  endwhile
+  let self.must_wait = 1
+  try
+    let l = len(self.list)
+    if l == 0
+      throw "No pending job to cancel"
+      return
+    endif
+    let indices = map(copy(self.list), {idx, val -> get(val, 'txt', val.cmd) =~ a:id})
+    let idx = index(indices, 1)
+    if idx == -1
+      throw "No pending job matching ".a:id
+    endif
+    let shall_update_ui = self._unsafe_stop_job(idx, l)
+    if shall_update_ui
+      call s:ui_update()
+    endif
+  finally
+    unlet self.must_wait
+  endtry
+endfunction
 " Define job_queue global variable                   {{{3
 let s:default_queue = lh#object#make_top_type({ 'list': [] })
 let s:job_queue = get(s:, 'job_queue', s:default_queue)
-let s:job_queue.is_running    = function('s:is_running')
-let s:job_queue.is_empty      = function('s:is_empty')
-let s:job_queue.push_or_start = function('s:push_or_start')
-let s:job_queue.start_next    = function('s:start_next')
+let s:job_queue.is_running       = function('s:is_running')
+let s:job_queue.is_empty         = function('s:is_empty')
+let s:job_queue.push_or_start    = function('s:push_or_start')
+let s:job_queue.start_next       = function('s:start_next')
+let s:job_queue.stop             = function('s:stop_job')
+let s:job_queue._unsafe_stop_job = function('s:_unsafe_stop_job')
 
 " Example of Use                                     {{{3
 " function! TestCb(...)
@@ -181,6 +267,130 @@ function! lh#async#_get_jobs() abort
 endfunction
 
 "------------------------------------------------------------------------
+" # command completion {{{2
+" Function: lh#async#_complete_job_names(ArgLead, CmdLine, CursorPos) {{{3
+function! lh#async#_complete_job_names(ArgLead, CmdLine, CursorPos) abort
+  let ids = lh#list#get(s:job_queue.list, 'txt', 'v:val.cmd')
+  let res = filter(ids, 'v:val =~ a:ArgLead')
+  return res
+endfunction
+
+" # Jobs console {{{2
+" Features:
+" - display job queue
+" - cancel selected job
+" - automatically updated when jobs are cancelled, added, finished
+" - Tie executions: -> .andThen
+function! s:ui_build_lines()
+  let list = copy(s:job_queue.list)
+  let names = lh#list#get(list, 'txt', '(unnamed)')
+  let lmax = max(map(copy(names), 'strwidth(v:val)')) + 3
+  let lines = []
+  if !empty(list)
+    let lines += [ printf('>0< - %s %s!(%s)', names[0], repeat(' ', lmax-strwidth(names[0])), list[0].cmd)]
+  endif
+  let lines += map(list[1:],
+        \ {idx, val -> printf('%2d  - %s %s!(%s)', idx+1, names[idx+1], repeat(' ', lmax-strwidth(names[idx+1])), val.cmd)})
+  return lines
+endfunction
+
+" Function: lh#async#_jobs_console() {{{3
+function! lh#async#_jobs_console() abort
+  if exists('s:job_ui')
+    " make the window visible, and jump to it
+    let b = lh#buffer#jump(s:job_ui.id, 'sp')
+    if b > 0
+      if line('$') == 1
+        bw
+      else
+        call s:ui_update()
+        return
+      endif
+    endif
+    " Otherwise, create a new dialog buffer
+  endif
+
+  let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', 'Job queue', '', 1, '', s:ui_build_lines())
+  " Cancellation mappings
+  nnoremap <silent> <buffer> x     :call <sid>ui_cancel_jobs()<cr>
+  nnoremap <silent> <buffer> <del> :call <sid>ui_cancel_jobs()<cr>
+  nnoremap <silent> <buffer> d     :call <sid>ui_cancel_jobs()<cr>
+  " Tag then remove
+  vmap     <silent> <buffer> x     tx
+  vmap     <silent> <buffer> <del> t<del>
+  vmap     <silent> <buffer> d     td
+
+  " Help
+  call lh#buffer#dialog#add_help(b:dialog, '@| x, <del>, d             : Cancel job(s)', 'long')
+  " Highliting job names
+  if has("syntax")
+    syn clear
+
+    " syntax match JobHeader  /^\s*\zs  #.*/
+    syntax region JobLine  start='\d' end='$' contains=JobNumber,JobName,JobCmd
+    syntax region JobNbOcc  start='^--' end='$' contains=JobNumber,JobName
+    syntax match JobNumber /\d\+/ contained
+    syntax match JobName /<.\{-}+>/ contained
+    syntax match JobCmd /!(.*)$/ contained
+
+    syntax region JobExplain start='@' end='$' contains=JobStart
+    syntax match JobStart /@/ contained
+    syntax match Statement /--abort--/
+
+    highlight link JobExplain Comment
+    " highlight link JobHeader Underlined
+    highlight link JobStart Ignore
+    highlight link JobLine Normal
+    highlight link JobName Identifier
+    highlight link JobCmd Directory
+    highlight link JobNumber Number
+  endif
+endfunction
+
+function! s:ui_update() abort " {{{3
+  if exists('s:job_ui')
+    let w = lh#window#getid()
+    try
+      let b = lh#buffer#find(s:job_ui.id)
+      if b >= 0
+        " TODO: try to feed updated tags as well!
+        " For now tags are reset
+        call s:job_ui.reset_choices(s:ui_build_lines())
+        call lh#buffer#dialog#update(s:job_ui)
+        " Otherwise, it means there is nothing to update
+        " (-> window hidden, or destroyed)
+      endif
+    finally
+      call lh#window#gotoid(w)
+    endtry
+  endif
+endfunction
+
+function! s:ui_cancel_jobs() abort " {{{3
+  while get(s:job_queue, 'must_wait', 0)
+    :sleep 100m
+  endwhile
+  let s:job_queue.must_wait = 1
+  let l = len(s:job_queue.list)
+
+  try
+    let selected = s:job_ui.selection()
+    if (len(selected) == 1 && selected[0] >= 0) || (len(selected) >= 2)
+      " call lh#common#echomsg_multilines(map(copy(selected), 's:job_ui.choices[v:val]'))
+      " call s:Verbose("Cancelling: %1", map(copy(selected), 'get(s:job_queue.list[v:val], "txt", s:job_ui.list[v:val].cmd'))
+      let shall_update_ui = 0
+      for j in reverse(selected)
+        let shall_update_ui += s:job_queue._unsafe_stop_job(j, l)
+        let l -= 1
+      endfor
+      if shall_update_ui
+        call s:ui_update()
+      endif
+    endif
+  finally
+    let s:job_queue.must_wait = 0
+  endtry
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
