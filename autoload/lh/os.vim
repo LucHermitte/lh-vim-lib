@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  26th Sep 2016
+" Last Update:  11th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -80,7 +80,6 @@ endfunction
 " Function: lh#os#system(cmd) {{{3
 " @return the comp'ed result of system call
 function! lh#os#system(cmd)
-  " call s:Verbose(a:cmd)
   " Alter command to make sure $ENV variables from current project are set
   let env = join(lh#project#_environment(), ' ')
   let cmd = a:cmd
