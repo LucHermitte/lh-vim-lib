@@ -4,15 +4,17 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.4
-let s:k_version = 3104
+" Version:      4.0.0
+let s:k_version = 4000
 " Created:      21st Sep 2007
-" Last Update:  31st May 2016
+" Last Update:  11th Oct 2016
 "------------------------------------------------------------------------
 " Description:  «description»
 "
 "------------------------------------------------------------------------
 " History:
+"       v4.0.0
+"       (*) ENH: Add `_to_string()` to dialog buffer
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.14  Dialog buffer name may now contain a '#'
@@ -175,7 +177,7 @@ endfunction
 
 function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, choices) abort
   " The ID will be the buffer id
-  let res = {}
+  let res = lh#object#make_top_type({})
   let where_it_started = getpos('.')
   let where_it_started[0] = bufnr('%')
   let res.where_it_started = where_it_started
