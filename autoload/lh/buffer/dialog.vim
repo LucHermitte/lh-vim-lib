@@ -15,6 +15,7 @@ let s:k_version = 4000
 " History:
 "       v4.0.0
 "       (*) ENH: Add `_to_string()` to dialog buffer
+"       (*) ENH: Tags selection support visual mode
 "       (*) REFACT: Several simplifications
 "       v3.6.1
 "       (*) ENH: Use new logging framework
@@ -91,6 +92,8 @@ function! s:Mappings(abuffer) abort " {{{3
   if a:abuffer.support_tagging
     nnoremap <silent> <buffer> t          :silent call <sid>ToggleTag(line("."))<cr>
     nnoremap <silent> <buffer> <space>    :silent call <sid>ToggleTag(line("."))<cr>
+    vnoremap <silent> <buffer> t          :<c-u>silent call <sid>ToggleTag(line("'<"), line("'>"))<cr>
+    vnoremap <silent> <buffer> <space>    :<c-u>silent call <sid>ToggleTag(line("'<"), line("'>"))<cr>
   endif
   nnoremap <silent> <buffer> <tab>        :silent call <sid>NextChoice('')<cr>
   nnoremap <silent> <buffer> <S-tab>      :silent call <sid>NextChoice('b')<cr>
@@ -99,23 +102,31 @@ endfunction
 
 "----------------------------------------
 " Tag / untag the current choice {{{3
-function! s:ToggleTag(lineNum) abort
-   if a:lineNum > s:Help_NbL()
-      " If tagged
-      if (getline(a:lineNum)[0] == '*')
-        let b:NbTags = b:NbTags - 1
-        silent exe a:lineNum.'s/^\* /  /e'
-        let b:dialog.tags[a:lineNum] = 0
-      else
-        let b:NbTags = b:NbTags + 1
-        silent exe a:lineNum.'s/^  /* /e'
-        let b:dialog.tags[a:lineNum] = 1
-      endif
-      " Move after the tag ; there is something with the two previous :s. They
-      " don't leave the cursor at the same position.
-      silent! normal! 3|
-      call s:NextChoice('') " move to the next choice
+function! s:ToggleTag(lineNum, ...) abort
+  let first0 = max([a:lineNum, s:Help_NbL()+1])
+  let first  = first0
+  let last   = a:0 > 0 ? a:1 : a:lineNum
+  while first <= last
+    let idx = first - s:Help_NbL() -1
+    call s:Verbose("Tagging #%1 entry at line %2: %3", idx, a:lineNum, getline(a:lineNum))
+    " If tagged
+    if (getline(first)[0] == '*')
+      let b:dialog.NbTags -= 1
+      silent exe first.'s/^\* /  /e'
+      let b:dialog.tags[idx] = 0
+    else
+      let b:dialog.NbTags += 1
+      silent exe first.'s/^  /* /e'
+      let b:dialog.tags[idx] = 1
     endif
+    let first += 1
+  endwhile
+  if first != first0
+    " Move after the tag ; there is something with the two previous :s. They
+    " don't leave the cursor at the same position.
+    silent! normal! 3|
+    call s:NextChoice('') " move to the next choice
+  endif
 endfunction
 
 function! s:Help_NbL() abort " {{{3
