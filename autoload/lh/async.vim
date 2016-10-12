@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  27th Sep 2016
+" Last Update:  12th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -107,8 +107,35 @@ function! s:push_or_start(job) dict abort          " {{{3
         \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modiiable',
         \ 'block_write'
         \ ])
-  let self.list += [ extend(copy(a:job), {'args': job_args}) ]
-  call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
+  while get(s:job_queue, 'must_wait', 0)
+    :sleep 100m
+  endwhile
+  let self.must_wait = 1
+  try
+    let g:list = deepcopy(self.list)
+    let g:job = deepcopy(a:job)
+
+    let idx = lh#list#find_if(self.list, string(a:job.cmd) . ' == v:val.cmd')
+    call s:Verbose('Found another task in job queue at index %1', idx)
+    if idx >= 0
+      let txt = get(a:job, 'txt', a:job.cmd)
+      let choice = CONFIRM("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
+      redraw
+      if choice == 3
+        call s:Verbose('Ignore the new job')
+        return
+      elseif choice == 2
+        call s:Verbose('Remplate old job by the new job')
+        let shall_update_ui = self._unsafe_stop_job(idx, len(self.list))
+      else
+        call s:Verbose('Queue the new redundant job')
+      endif
+    endif
+    let self.list += [ extend(copy(a:job), {'args': job_args}) ]
+    call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
+  finally
+    let self.must_wait = 0
+  endtry
   call s:ui_update()
   if len(self.list) == 1
     " Can't start and remove simultaneously => don't wait here
