@@ -107,16 +107,18 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
-| Function                           | Purpose                                                                             |
-|------------------------------------|-------------------------------------------------------------------------------------|
-| `lh#env#expand_all()`              | Expands environment variables found in strings                                      |
-| `lh#os#has_unix_layer_installed()` | Tells whether the enduser has declared a unix layer installed (on a Windows box)    |
-| `lh#os#OnDOSWindows()`             | Tells whether the current vim is a native windows flavour of gvim                   |
-| `lh#os#sys_cd()`                   | Build a portable string to use to change directory when executing external commands |
-| `lh#os#chomp(text)`                | Like Perl `chomp`, remove the trailing character produced by `system()` calls       |
-| `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(command))`                                              |
-| `lh#os#cpu_number()`               | Returns the number of processors on the machine                                     |
-| `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                          |
+| Function                           | Purpose                                                                                     |
+|------------------------------------|---------------------------------------------------------------------------------------------|
+| `lh#env#expand_all()`              | Expands environment variables found in strings                                              |
+| `lh#os#has_unix_layer_installed()` | Tells whether the enduser has declared a unix layer installed (on a Windows box)            |
+| `lh#os#OnDOSWindows()`             | Tells whether the current vim is a native windows flavour of gvim                           |
+| `lh#os#sys_cd()`                   | Build a portable string to use to change directory when executing external commands         |
+| `lh#os#chomp(text)`                | Like Perl `chomp`, remove the trailing character produced by `system()` calls               |
+| `lh#os#make(cmd, bang)`            | Executes `export p:$ENV &amp;&amp; :make{bang} {cmd}`                                       |
+| `lh#os#new_script_runner(cmd,env)` | Returns a finalizable temporary script that sets `p:$ENV` variables and execute the command |
+| `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(export p:$ENV &amp;&amp; command))`                             |
+| `lh#os#cpu_number()`               | Returns the number of processors on the machine                                             |
+| `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                                  |
 
 ### Lists and dictionaries related functions
 | Function                    | Purpose                                                                                                           |

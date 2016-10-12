@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 10th Oct 2016
+                        For Vim version 7+      Last change: 12th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -2602,10 +2602,37 @@ It helps to clean |system()| results from extra newlines at the end of the
 result.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#os#make()*                      {{{3
+lh#os#make({options}, {bang})~
+This is a shortcut to: >
+    exe ':make '.bang.' '.option
+
+Any |p:$env| variable will be injected on the fly.
+@internal a temporary script will be created for the occasion.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#os#new_runner_script()*         {{{3
+lh#os#new_runner_script({cmd}, {env})~
+This'll create a finalizable script to execute in 'shell' that initialises
+environment variables, and execute a command.
+
+You'll find in the |dictionary|:
+- `"_script_name"` that contain the name of the temporary script created
+- `"run()"` that'll execute the script
+- `"lines"` that caches the lines stored in the temporary script.
+
+By _finalizable_, understand that the result inherits |lh#on#exit()|, and that
+finalization will |delete()| the temporary file created by the function.
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#os#system()*                    {{{3
 lh#os#system({command)})~
 This is a shortcut to: >
     lh#os#chomp(system(cmd))
+
+Any |p:$env| variable will be injected on the fly.
+@internal a temporary script will be created for the occasion.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#os#sys_cd()*                    {{{3

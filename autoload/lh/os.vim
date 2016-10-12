@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  11th Oct 2016
+" Last Update:  12th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -54,7 +54,7 @@ endfunction
 
 " Function: lh#os#has_unix_layer_installed() {{{3
 function! lh#os#has_unix_layer_installed() abort
-  return exists('g:unix_layer_installed') && g:unix_layer_installed
+  return get(g:, 'unix_layer_installed', 0)
 endfunction
 
 " Function: lh#os#system_detected() {{{3
@@ -81,13 +81,47 @@ endfunction
 " @return the comp'ed result of system call
 function! lh#os#system(cmd)
   " Alter command to make sure $ENV variables from current project are set
-  let env = join(lh#project#_environment(), ' ')
+  let env = lh#project#_environment()
   let cmd = a:cmd
   if !empty(env)
-    let cmd = env . ' ' . &shell . ' ' . &shellcmdflag . ' ' . shellescape(cmd)
+    let scr = lh#os#new_runner_script(cmd, env)
+    try
+      let res = scr.run()
+    finally
+      call scr.finalize()
+    endtry
+  else
+    call s:Verbose(cmd)
+    let res = system(cmd)
   endif
-  call s:Verbose(cmd)
-  return lh#os#chomp(system(cmd))
+  return lh#os#chomp(res)
+endfunction
+
+" Function: lh#os#make(opt) {{{3
+" Prefer to use BuildToolsWrapper when possible
+function! lh#os#make(opt, bang) abort
+  let bang
+        \ = type(a:bang) == type(0) ? (a:bang ? '!' : '')
+        \ : a:bang =~ '\v[1!]|bang' ? '!'
+        \                           : ''
+  let env = lh#project#_environment()
+  if empty(env)
+    exe 'make'.bang.' '.a:opt
+  else
+    try
+      let cleanup = lh#on#exit()
+            \.restore('&makeprg')
+      try
+        let scr = lh#os#new_runner_script(&makeprg, env)
+        let &l:makeprg = &shell . ' '.scr._script_name
+        exe 'make'.bang.' '.a:opt
+      finally
+        call scr.finalize()
+      endtry
+    finally
+      call cleanup.finalize()
+    endtry
+  endif
 endfunction
 
 " Function: lh#os#sys_cd(path [, ...]) {{{3
@@ -118,8 +152,40 @@ function! lh#os#sys_cd(...) abort
   return res
 endfunction
 
-" # CPUs {{{2
+" Function: lh#os#new_runner_script(command, env) {{{3
+function! lh#os#new_runner_script(command, env) abort
+  let tmpname = tempname()
+  let result = lh#on#exit()
+        \.register(':call delete('.string(tmpname).')')
+  let result._script_name = tmpname
+  let result.run = function(s:getSNR('run_script'))
+  try
+    let success = 0
+    " store lines for debug purpose
+    if lh#os#OnDOSWindows() && ! lh#os#system_detected() == 'unix'
+      let result._lines = map(items(a:env), 'set v:val[0]."=".v:val[1]')
+    else
+      let result._lines = map(items(a:env), '"export ".v:val[0]."=".string(v:val[1])')
+    endif
+    let result._lines += [ a:command ]
+    call writefile(result._lines, tmpname)
+    call s:Verbose('Store in runner script %1 the command %2, completed w/ the environment variables: %3', result._script_name, result._lines, a:env)
+    let success = 1
+    return result
+  finally
+    if !success
+      call result.finalize()
+    endif
+  endtry
+endfunction
 
+function! s:run_script() dict abort
+  call s:Verbose(self._lines)
+  let r = system(&shell . ' ' . self._script_name)
+  return r
+endfunction
+
+" # CPUs {{{2
 " Function: lh#os#cpu_number() {{{3
 function! lh#os#cpu_number()
   if filereadable('/proc/cpuinfo')
@@ -147,7 +213,6 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
-
 " Function: s:DetectSystem()                 {{{2
 function! s:DetectSystem()
   " if                *nix-like systems {{{3
@@ -204,6 +269,13 @@ function! s:SystemCmd(cmdName)
   return s:{a:cmdName}
 endfunction
 
+" Function: s:getSNR([func_name]) {{{2
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
