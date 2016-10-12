@@ -137,11 +137,20 @@ function! s:start_next() dict abort                " {{{3
     let Close_cb = get(args, 'close_cb', function('s:default_close_cb'))
     let args.close_cb = function('s:close_cb', [Close_cb])
 
+    " inject env on-the-fly
     let env = lh#project#_environment()
-    if lh#os#OnDOSWindows() && &shell =~ 'cmd'
-      let cmd = join(env + [&shell, &shellcmdflag, job.cmd], ' ')
+    if !empty(env)
+      let scr = lh#os#new_runner_script(job.cmd, env)
+      let job.runner_script = scr
+      let cmd0 = &shell . ' ' . scr._script_name
     else
-      let cmd = env + [&shell, &shellcmdflag, job.cmd]
+      let cmd0 = job.cmd
+    endif
+
+    if lh#os#OnDOSWindows() && &shell =~ 'cmd'
+      let cmd = join([&shell, &shellcmdflag, cmd0], ' ')
+    else
+      let cmd = [&shell, &shellcmdflag, cmd0]
     endif
     let job.job = job_start(cmd, args)
     call s:Verbose('job_start(%2) status: %1', job_info(job.job), cmd)
@@ -158,6 +167,9 @@ function! s:start_next() dict abort                " {{{3
     " unaltered
     if !success
       call remove(self.list, 0)
+      if exists('scr')
+        call scr.finalize()
+      endif
       call s:ui_update()
     endif
     unlet self.must_wait
@@ -178,6 +190,12 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
   try
     let job = remove(s:job_queue.list, 0)
     call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
+    try
+      if has_key(job, 'runner_script')
+        call job.runner_script.finalize()
+      endif
+    catch /.*/
+    endtry
     call call(a:user_close_cb, [a:channel, job_info(job.job)])
     call s:ui_update()
   finally
