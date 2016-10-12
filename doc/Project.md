@@ -477,26 +477,26 @@ BuildToolsWrappers are the first I've in mind).
 
  * Doc
  * Have root path be official for BTW and lh-tags
- * `:Unlet p:$ENV`
- * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
+ * `:Project [<name>] :make`
+   -> rely on `:Make` if it exists
  * Toggling:
    * at global level: [a, b, c]
    * at project level: [default value from global VS force [a, b, c]]
  * Have menu priority + menu name in all projects in order to simplify
    toggling definitions
- * Setlocally vim options on new files
+ * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
  * Have lh-tags, lh-dev, BTW, ... use:
    * `p:$ENV variables`
    * `paths.sources`
  * Be able to control which parent is filled with `lh#let#` functions
      * -> :Project <name> :LetTo var = value
  * `:call prj.set(plain_variable, value)`
+ * Setlocally vim options on new files
  * `:Project <name> do <cmd> ...`
  * `:Project <name> :bw` -> with confirmation!
- * `:Project [<name>] :make`
-   -> rely on `:Make` if it exists
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!
+ * Have let-modeline support p:var, p:&opt, and p:$env
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.
    Expected Caveats:

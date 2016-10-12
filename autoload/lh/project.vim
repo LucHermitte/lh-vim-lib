@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  10th Oct 2016
+" Last Update:  12th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -22,25 +22,33 @@ let s:k_version = '400'
 " TODO:
 " - Doc
 " - Have root path be official for BTW and lh-tags
-" - Completion on :Let* and :Unlet for inherited p:variables
+" - :Project [<name>] :make
+"   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
 " - Have menu priority + menu name in all projects in order to simplify
 "   toggling definitions
-" - Setlocally vim options on new files
-" - Have lh-tags, lh-dev, BTW, µTemplate... use:
+" - Completion on :Let* and :Unlet for inherited p:variables
+" - Use in plugins
 "   - p:$ENV variables
+"     - [X] lh-tags synchronous (via lh#os#system)
+"     - [X] lh-tags asynchronous (via lh#async)
+"     - [X] BTW synchronous (via lh#os#make)
+"     - [X] BTW asynchronous (via lh#async)
+"     - [ ] lh-dev
+"     - [ ] µTemplate
+"     -> Test on windows!
 "   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
 "   -> :Project <name> :LetTo var = value
 " - prj.set(plain_variable, value)
-" - :Project [<name>] :make
-"   -> rely on `:Make` if it exists, `:make` otherwise
+" - Setlocally vim options on new files
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
+" - Have let-modeline support p:var, p:&opt, and p:$env
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
@@ -461,7 +469,13 @@ function! s:map(action) dict abort " {{{4
 endfunction
 
 function! s:environment() dict abort " {{{4
-  return map(items(self.env), 'v:val[0]."=".v:val[1]')
+  let env = {}
+  for p in self.parents
+    call extend(env, p.environment(), 'force')
+  endfor
+  call extend(env, self.env, 'force')
+  return env
+  " return map(items(self.env), 'v:val[0]."=".v:val[1]')
 endfunction
 
 function! s:find_holder(varname) dict abort " {{{4
