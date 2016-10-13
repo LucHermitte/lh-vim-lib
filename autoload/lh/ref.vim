@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      09th Sep 2016
-" Last Update:  30th Sep 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -57,8 +57,9 @@ function! s:resolve() dict abort " {{{4
   return eval(self.to)
 endfunction
 
-function! s:to_string() dict abort " {{{4
-  return '{ref->('.(self.to).'): '.lh#object#to_string(self.resolve()).'}'
+function! s:to_string(...) dict abort " {{{4
+  let handled_list = a:0 > 0 ? a:1 : []
+  return '{ref->('.(self.to).'): '.lh#object#_to_string(self.resolve(), handled_list).'}'
 endfunction
 
 " Function: lh#ref#bind(varname) {{{3
