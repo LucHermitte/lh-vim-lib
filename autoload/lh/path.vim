@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  03rd Oct 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -101,6 +101,7 @@ let s:k_version = 40000
 "       v4.0.0
 "       (*) TST: Fix `lh#path#find()` to always work w/ vimrunner
 "       (*) Move Permission lists code from local_vimrc
+"       (*) Add `p:var` support to `lh#path#add_path_if_exists()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -557,7 +558,12 @@ endfunction
 function! lh#path#add_path_if_exists(listname, path) abort
   let path = substitute(a:path, '[/\\]\*\*$', '', '')
   if isdirectory(path)
-    let {a:listname} += [a:path]
+    if a:listname =~ '^p:'
+      let var = lh#project#_get(a:listname[2:])
+      let var += [a:path]
+    else
+      let {listname} += [a:path]
+    endif
   endif
 endfunction
 
