@@ -54,7 +54,14 @@ endfunction
 " # bind {{{2
 " - Methods {{{3
 function! s:resolve() dict abort " {{{4
-  return eval(self.to)
+  if     self.to =~ '^p:'
+    return lh#project#_get(self.to[2:])
+  elseif self.to =~ ':'
+    let [all, scopes, varname; dummy] = matchlist(self.to, '\v^([^:]+):(.+)$')
+    return lh#option#get(varname, lh#option#unset(), scopes)
+  else
+    return eval(self.to)
+  endif
 endfunction
 
 function! s:to_string(...) dict abort " {{{4
