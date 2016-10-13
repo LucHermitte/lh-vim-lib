@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      12th Sep 2016
-" Last Update:  10th Oct 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       OO functions and helpers
@@ -118,7 +118,7 @@ function! lh#object#_to_string(object, handled_list) abort
       let res = '{'. join(map(items(a:object), 'string(v:val[0]).": ".lh#object#_to_string(v:val[1], a:handled_list)'), ', ') .'}'
       return res
     endif
-  elseif type(a:object) == type('')
+  elseif type(a:object) == type('') || type(a:object) == type(function('has'))
     return string(a:object)
   else
     return a:object
