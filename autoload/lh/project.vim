@@ -651,8 +651,16 @@ function! lh#project#_crt_var_name(var) abort
   endif
 endfunction
 
-" Function: lh#project#_get(name) {{{3
-function! lh#project#_get(name) abort
+" Function: lh#project#_get(name [, bufid]) {{{3
+" FIXME: break cycle between lh#project and lh#option!
+function! lh#project#_get(name, ...) abort
+  if a:0 > 0
+    let bufid = a:1
+    let prj = lh#option#getbufvar(bufid, s:project_varname)
+    if lh#option#is_set(prj)
+      return prj.get(a:name)
+    endif
+  endif
   if lh#project#is_in_a_project()
     return b:{s:project_varname}.get(a:name)
   else
