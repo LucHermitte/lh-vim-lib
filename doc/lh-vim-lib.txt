@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 12th Oct 2016
+                        For Vim version 7+      Last change: 13th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -62,6 +62,7 @@ Miscellanous functions:                                 |lhvl#misc|
 Options related functions:                              |lhvl#option|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
+- |lh#option#get_from_buf()|
 - |lh#option#getbufvar()|
 - |lh#option#getbufglobvar()|
 - |lh#option#is_set()|
@@ -601,9 +602,9 @@ lh#option#get({name}[,{default}[,{scopes}]])~
 @param {default}    Default value in case the option is not defined.
                     Its default value is |g:lh#option#unset|.
 @param {scopes}     Vim scopes in which the options must be searched,
-                    default="bg".
-@return             b:{name} if it exists, or g:{name} if it exists, or
-                    {default} otherwise.
+                    default="bpg".
+@return             b:{name} if it exists, or p:{var} if it exists, or
+                    g:{name} if it exists, or {default} otherwise.
 @see                For development oriented options, |lh-dev| provides a
                     dedicated function: |lh#dev#option#get()|.
 
@@ -634,6 +635,23 @@ variable with an empty value will be ignored as well.
 An |expr-string| will be considered empty if its |strlen()| is 0, an
 |expr-number| when it values 0, |Lists| and |Dictionaries| when their |len()|
 is 0.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#get_from_buf()*        {{{3
+lh#option#get_from_buf({bufid}, {name}[,{default}[,{scopes}]])~
+@param {bufid}      Buffer identifier (name of number)
+@param {name}       Name of the option to fetch
+@param {default}    Default value in case the option is not defined.
+                    Its default value is |g:lh#option#unset|.
+@param {scopes}     Vim scopes in which the options must be searched,
+                    default="bpg".
+@return             {b}:{name} if it exists, or p:{var} if it exists, or
+                    g:{name} if it exists, or {default} otherwise.
+@see                For development oriented options, |lh-dev| provides a
+                    dedicated function: |lh#dev#option#get()|.
+
+This function works exactly as |lh#option#get()| except that it searches the
+`b:var` and `p:var` into the {bufid} buffer.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#getbufvar()*           {{{3

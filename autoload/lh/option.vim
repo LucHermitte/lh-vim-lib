@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  10th Oct 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -139,6 +139,63 @@ endfunction
 function! lh#option#Get(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   return lh#option#get(a:name, a:default, scope)
+endfunction
+
+" Function: lh#option#get_from_buf(bufid, name [, default [, scope]])            {{{3
+" Works as lh#option#get(), except that b: scope is interpreted as from a
+" specified buffer. This impacts b: and p: scopes.
+" See lh#option#get() for more information
+function! lh#option#get_from_buf(bufid, name,...)
+  let scope = (a:0 == 2) ? a:2 : 'bpg'
+  let name = a:name
+  let i = 0
+  while i != strlen(scope)
+    if scope[i] == 'p'
+      let r = lh#project#_get(a:name, a:bufid)
+      if lh#option#is_set(r)
+        call s:Verbose('p:%1 found -> %2', a:name, r)
+        if lh#ref#is_bound(r)
+          return r.resolve()
+        else
+          return r
+        endif
+      endif
+    endif
+    if scope[i] == 'b'
+      " If the variable is a dictionary, getbufvar won't be able to return
+      " anything but the first level => need to split
+      let [all, key, subkey; dummy] = matchlist(name, '\v^([^.]+)%(\.(.*))=$')
+      let front = lh#option#getbufvar(a:bufid, key)
+      if lh#option#is_set(front)
+        if !empty(subkey)
+          let value = lh#dict#get_composed(front, subkey)
+          if lh#option#is_set(value)
+            if lh#ref#is_bound(value)
+              return value.resolve()
+            else
+              return value
+            endif
+          endif
+        else
+          return front
+        endif
+      endif
+    endif
+    if scope[i] == 'g' && exists(scope[i].':'.name)
+      " \ && (0 != strlen({scope[i]}:{name}))
+      " This syntax doesn't work with dictionaries -> !exe
+      " return {scope[i]}:{name}
+      exe 'let value='.scope[i].':'.name
+      call s:Verbose('%1:%2 found -> %3', scope[i], a:name, value)
+      if lh#ref#is_bound(value)
+        return value.resolve()
+      else
+        return value
+      endif
+    endif
+    let i += 1
+  endwhile
+  return a:0 > 0 ? (a:1) : g:lh#option#unset
 endfunction
 
 " Function: s:IsEmpty(variable) {{{3
