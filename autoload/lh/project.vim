@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  12th Oct 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -350,7 +350,26 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
-    let res = keys(s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset()).variables)
+    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
+    if stridx(a:ArgLead, '.') < 0
+      let sDict = 'prj.variables'
+      let dict = eval(sDict)
+      let vars = keys(dict)
+      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+      call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+    else
+      let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
+      let sDict = 'prj.variables.'.sDict0
+      let dict = eval(sDict)
+      let vars = keys(dict)
+      call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+      call map(vars, 'sDict0.".".v:val')
+      let l = len(a:ArgLead) - 1
+      call filter(vars, 'v:val[:l] == a:ArgLead')
+    endif
+    let res = vars
+    " TODO: support var.sub.sub and inherited projects
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
