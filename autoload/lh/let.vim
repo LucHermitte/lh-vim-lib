@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  10th Oct 2016
+" Last Update:  13th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -52,8 +52,18 @@ endfunction
 " # Let* {{{2
 " Function: s:BuildPublicVariableName(var) {{{3
 function! s:BuildPublicVariableName(var)
-  if a:var !~ '\v^[wbptg]:|\$'
+  if a:var !~ '\v^[wbptgP]:|\$'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
+  elseif a:var =~ '^P:'
+    " It's either a project variable if there is a project, or a buffer
+    " variable otherwise
+    if lh#project#is_in_a_project()
+      let var = lh#project#_crt_var_name('p'.a:var[1:])
+    elseif a:var =~ '^P:[&$]'
+      throw "Options and environment variable names like `".a:var."` are not supported. Use `p:` or plain variables."
+    else
+      let var = 'b'.a:var[1:]
+    endif
   elseif a:var =~ '^p:'
     " It's a p:roject variable
     let var = lh#project#_crt_var_name(a:var)

@@ -3018,7 +3018,7 @@ VARIABLES HELPERS                                     *lhvl#variables*  {{{2
 lh#let#if_undef({varname}, {value})~
 :LetIfUndef {varname} {value}~
 :LetIfUndef {varname} = {value}~
-@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |P:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value}
 @return variable built
@@ -3060,7 +3060,7 @@ Examples: >
 lh#let#to({varname}, {value})~
 :LetTo {varname} {value}~
 :LetTo {varname} = {value}~
-@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |t:|,
+@param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |P:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value} assigned, must no be quoted
 @return variable built
@@ -3217,6 +3217,11 @@ TODO: add word about special handling of |options|
 
 But first, we need to define a project (see |:Project--define|, and
 |lh#project#define()|).
+
+*P:*
+|:LetIfUndef|, |:LetTo| and co also support the special `P:` scope. In their
+context it means: try to set the related |p:| variable, if the current buffer
+is under no project, then set instead a |b:| variable with the same name.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *:Project*                       {{{3
