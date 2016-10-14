@@ -145,7 +145,7 @@ endfunction
 
 function! s:RedisplayHelp(dialog) abort " {{{3
   silent! 2,$g/^@/d_
-  silent! call append(1, a:dialog['help_'.a:dialog.help_type])
+  silent! call append(1, a:dialog['help_'.a:dialog.help_type]+a:dialog['help_ruler'])
 endfunction
 
 function! lh#buffer#dialog#update(dialog) abort " {{{3
@@ -207,6 +207,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   let s:LHdialog[res.id]  = res
   let res.help_long       = []
   let res.help_short      = []
+  let res.help_ruler      = []
   let res.help_type       = 'short'
   let res.support_tagging = a:support_tagging
   let res.action          = a:action
@@ -223,11 +224,10 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   call lh#buffer#dialog#add_help(res, '@| <up>/<down>, <tab>, +/- : Move between entries', 'long')
   call lh#buffer#dialog#add_help(res, '@|', 'long')
   " call lh#buffer#dialog#add_help(res, '@| h                       : Toggle help', 'long')
-  call lh#buffer#dialog#add_help(res, '@+'.repeat('-', winwidth(bufwinnr(res.id))-3), 'long')
   " Short Help
   " call lh#buffer#dialog#add_help(res, '@| h                       : Toggle help', 'short')
-  call lh#buffer#dialog#add_help(res, '@+'.repeat('-', winwidth(bufwinnr(res.id))-3), 'short')
 
+  call lh#buffer#dialog#add_help(res, '@+'.repeat('-', winwidth(bufwinnr(res.id))-3), 'ruler')
   let res.toggle_help = function("lh#buffer#dialog#toggle_help")
   let title = '@  ' . a:title
   let helpstr = '| Toggle (h)elp'

@@ -442,8 +442,7 @@ function! s:ui_update() abort " {{{3
         " For now tags are reset
         call s:job_ui.reset_choices(s:ui_build_lines())
         let state = lh#async#_is_queue_paused() ? '> PAUSED <' : '> ACTIVE <'
-        let s:job_ui.help_short[-1] = substitute(s:job_ui.help_short[-1], '\v.{12}\zs.{10}', state, '')
-        let s:job_ui.help_long[-1]  = substitute(s:job_ui.help_long[-1],  '\v.{12}\zs.{10}', state, '')
+        let s:job_ui.help_ruler[0] = substitute(s:job_ui.help_ruler[0], '\v.{12}\zs.{10}', state, '')
         call lh#buffer#dialog#update_all(s:job_ui)
         " Otherwise, it means there is nothing to update
         " (-> window hidden, or destroyed)
