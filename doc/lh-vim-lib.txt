@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 13th Oct 2016
+                        For Vim version 7+      Last change: 14th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -185,6 +185,7 @@ Syntax related functions:                               |lhvl#syntax|
 OS/System related functions:                            |lhvl#os|
 - |lh#async#queue()|
 - |:Jobs|
+- |:JobUnpause|
 - |:StopBGExecution|
 - |lh#os#has_unix_layer_installed()|
 - |lh#os#system_detected()|
@@ -380,7 +381,7 @@ lh#askvim#Exe({command}) (*deprecated*)~
 lh#askvim#exe({command})~
 @param {command}    Command to execute from vim.
 @return             What the command echoes while executed.
-@note               This function encapsultates |redir| without altering any
+@note               This function encapsulates |redir| without altering any
                     register.
 
 Some information aren't directly accessible (yet) through vim API
@@ -442,7 +443,7 @@ Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
 @todo Support for |job_stop()|
 @todo Support multiple queues -> `lh#async#new_queue()`
 
-Active queues and bakground job will be presented in |airline-section|`_b`.
+Active queues and background job will be presented in |airline-section|`_b`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *:Jobs*                           {{{3
@@ -453,8 +454,19 @@ and programmed to be through |lh#async#queue()|.
 For the moment this window will:
 - keep the queue displayed up to date
 - permit to cancel jobs with `x`, `<del>` or `d`
+- permit to un-pause the job queue with `p`. See |:JobUnpause|.
 
 Eventually, it'll permit to reorganize pending jobs.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *:JobUnpause*                     {{{3
+:JobUnpause~
+When a process execution fails, if there are pending jobs, the job queue will
+be paused if you confirm it.
+The only ways to un-pause the queue are through `:JobUnpause` command or
+through the |:Jobs| console.
+
+For the moment, the queue cannot be pause voluntarily.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *:StopBGExecution*                {{{3

@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  12th Oct 2016
+" Last Update:  14th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -71,6 +71,14 @@ function! lh#async#stop(id) abort
   call s:job_queue.stop(a:id)
 endfunction
 
+" Function: lh#async#_unpause_jobs() {{{3
+" TODO: check whether a lock is required
+function! lh#async#_unpause_jobs() abort
+  let s:job_queue.state = 'active'
+  call s:ui_update()
+  call s:job_queue.start_next()
+endfunction
+
 " Function: lh#async#do_clear_queue() {{{3
 " Debugging purpose, avoid using this function!!!
 " If a job is really running, errors are to be expected
@@ -82,6 +90,11 @@ function! lh#async#_do_clear_queue() abort
         \)
   let s:job_queue.list = []
   call s:ui_update()
+endfunction
+
+" Function: lh#async#_is_queue_paused() {{{3
+function! lh#async#_is_queue_paused() abort
+  return s:job_queue.state == 'paused'
 endfunction
 
 "------------------------------------------------------------------------
@@ -141,6 +154,8 @@ function! s:push_or_start(job) dict abort          " {{{3
     " Can't start and remove simultaneously => don't wait here
     " There was nothing, the new job is to be started
     call self.start_next()
+  elseif self.state == 'paused'
+    call lh#common#warning_msg('The jobs are currently paused. Please unpause them to launch the one you have just queued')
   endif
 endfunction
 
@@ -151,6 +166,7 @@ function! s:start_next() dict abort                " {{{3
     :sleep 100m
   endwhile
   let self.must_wait = 1
+  let s:job_queue.state = 'active'
   let job = self.list[0]
   try
     let success = 0
@@ -216,6 +232,7 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
   let s:job_queue.must_wait = 1
   try
     let job = remove(s:job_queue.list, 0)
+    let last_job_status = copy(job_info(job.job))
     call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
     try
       if has_key(job, 'runner_script')
@@ -231,6 +248,21 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
 
     " Be sure, we always launch the next job
     if !s:job_queue.is_empty()
+      if last_job_status.exitval != 0
+        let go_on = CONFIRM("Last `".job.txt."` job failed.\n Shall we -> ", ["&Go on with the ".len(s:job_queue.list)." remaining jobs?", "&Pause?", "&Clear the job queue?"], 2)
+        if     go_on == 3
+          let sure = CONFIRM("Do you confirm to what to clear the following pending jobs ()", ["&Yes", "No"], 2)
+          if sure == 2
+            call lh#async#_do_clear_queue()
+          endif
+        elseif go_on != 1
+          let s:job_queue.state = 'paused'
+          call lh#common#warning_msg('To unpause the pending jobs, please execute `:JobUnpause` or use the `:Jobs`  console')
+          call s:ui_update()
+          redrawstatus
+          return
+        endif
+      endif
       call s:job_queue.start_next()
     endif
     " And get sure airline is refreshed
@@ -290,7 +322,7 @@ function! s:stop_job(id) dict abort                " {{{3
   endtry
 endfunction
 " Define job_queue global variable                   {{{3
-let s:default_queue = lh#object#make_top_type({ 'list': [] })
+let s:default_queue = lh#object#make_top_type({ 'list': [], 'state': 'active' })
 let s:job_queue = get(s:, 'job_queue', s:default_queue)
 let s:job_queue.is_running       = function('s:is_running')
 let s:job_queue.is_empty         = function('s:is_empty')
@@ -355,18 +387,24 @@ function! lh#async#_jobs_console() abort
     " Otherwise, create a new dialog buffer
   endif
 
-  let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', 'Job queue', '', 1, '', s:ui_build_lines())
+  let title = 'Job queue'
+  if lh#async#_is_queue_paused()
+    let title .= '    --> PAUSED <--'
+  endif
+  let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', title, '', 1, '', s:ui_build_lines())
   " Cancellation mappings
   nnoremap <silent> <buffer> x     :call <sid>ui_cancel_jobs()<cr>
   nnoremap <silent> <buffer> <del> :call <sid>ui_cancel_jobs()<cr>
   nnoremap <silent> <buffer> d     :call <sid>ui_cancel_jobs()<cr>
+  nnoremap <silent> <buffer> p     :call lh#async#_unpause_jobs()<cr>
   " Tag then remove
   vmap     <silent> <buffer> x     tx
   vmap     <silent> <buffer> <del> t<del>
   vmap     <silent> <buffer> d     td
 
   " Help
-  call lh#buffer#dialog#add_help(b:dialog, '@| x, <del>, d             : Cancel job(s)', 'long')
+  call lh#buffer#dialog#add_help(b:dialog, '@| x, <del>, d             : Cancel tagged/selected job(s)', 'long')
+  call lh#buffer#dialog#add_help(b:dialog, '@| p                       : Un(p)ause the job queue', 'long')
   " Highliting job names
   if has("syntax")
     syn clear
@@ -378,7 +416,8 @@ function! lh#async#_jobs_console() abort
     syntax match JobName /<.\{-}+>/ contained
     syntax match JobCmd /!(.*)$/ contained
 
-    syntax region JobExplain start='@' end='$' contains=JobStart
+    syntax region JobExplain start='@' end='$' contains=JobStart,JobPAUSED
+    syntax keyword JobPAUSED PAUSED contained
     syntax match JobStart /@/ contained
     syntax match Statement /--abort--/
 
@@ -389,6 +428,7 @@ function! lh#async#_jobs_console() abort
     highlight link JobName Identifier
     highlight link JobCmd Directory
     highlight link JobNumber Number
+    highlight link JobPAUSED Error
   endif
 endfunction
 
@@ -401,7 +441,10 @@ function! s:ui_update() abort " {{{3
         " TODO: try to feed updated tags as well!
         " For now tags are reset
         call s:job_ui.reset_choices(s:ui_build_lines())
-        call lh#buffer#dialog#update(s:job_ui)
+        let state = lh#async#_is_queue_paused() ? '> PAUSED <' : '> ACTIVE <'
+        let s:job_ui.help_short[-1] = substitute(s:job_ui.help_short[-1], '\v.{12}\zs.{10}', state, '')
+        let s:job_ui.help_long[-1]  = substitute(s:job_ui.help_long[-1],  '\v.{12}\zs.{10}', state, '')
+        call lh#buffer#dialog#update_all(s:job_ui)
         " Otherwise, it means there is nothing to update
         " (-> window hidden, or destroyed)
       endif

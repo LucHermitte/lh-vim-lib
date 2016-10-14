@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:	4.0.0
 " Created:	27th Apr 2010
-" Last Update:	11th Oct 2016
+" Last Update:	14th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -15,7 +15,7 @@
 " Installation:
 "       Drop the file into {rtp}/plugin
 " History:
-"       v4.0.0   New commands: :StopBGExecution :Jobs
+"       v4.0.0   New commands: :StopBGExecution :Jobs, :JobUnpause
 "       v3.8.2,3 New command: :LHLog
 "       v3.1.12  New command: :CleanEmptyBuffers
 "       v3.1.6   New command: :LoadedBufDo
@@ -46,7 +46,8 @@ command! -nargs=0 CleanEmptyBuffers call lh#buffer#_clean_empty_buffers()
 command! -nargs=1 -complete=customlist,lh#log#_set_logger_complete LHLog
       \ call lh#log#_log(<q-args>)
 
-command! -nargs=0 Jobs call lh#async#_jobs_console()
+command! -nargs=0 Jobs       call lh#async#_jobs_console()
+command! -nargs=0 JobUnpause call lh#async#_unpause_jobs()
 command! -nargs=1
       \ -complete=customlist,lh#async#_complete_job_names
       \ StopBGExecution call lh#async#stop(<q-args>)

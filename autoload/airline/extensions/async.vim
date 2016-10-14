@@ -2,10 +2,10 @@
 " File:         autoload/extension/async.vim                      {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.13.2.
-let s:k_version = '3132'
+" Version:      4.0.0
+let s:k_version = '40000'
 " Created:      01st Sep 2016
-" Last Update:  02nd Sep 2016
+" Last Update:  14th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Airline extension for lh#async queues
@@ -95,7 +95,9 @@ function! airline#extensions#async#get_activity() abort
   if 0 == nb_jobs
     return ''
   else
-    let txt = get(jobs[0], 'txt', lh#option#unset())
+    let txt = lh#async#_is_queue_paused()
+          \ ? '>JOB QUEUE PAUSED<'
+          \ : get(jobs[0], 'txt', lh#option#unset())
     if lh#option#is_set(txt)
       let waiting = nb_jobs == 1 ? '' : ' + ' . (nb_jobs-1)
       return txt . waiting
