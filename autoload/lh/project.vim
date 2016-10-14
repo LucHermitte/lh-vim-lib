@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  13th Oct 2016
+" Last Update:  14th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -464,11 +464,11 @@ function! s:exists(varname) dict abort " {{{4
   let r0 = lh#dict#get_composed(self.variables, a:varname)
   if lh#option#is_set(r0)
     " may need to interpret a reference lh#ref('g:variable')
-    return true
+    return 1
   else
     for p in self.parents
       let r = p.get(a:varname)
-      if lh#option#is_set(r) | return true | endif
+      if lh#option#is_set(r) | return 1 | endif
       unlet! r
     endfor
   endif
@@ -679,8 +679,8 @@ endfunction
 
 " Function: lh#project#exists(var) {{{3
 function! lh#project#exists(var) abort
-  if a:var =~ '^p:'
-    return b:{s:project_varname}.exists(a:var)
+  if a:var =~ '^p:' && lh#project#is_in_a_project()
+    return b:{s:project_varname}.exists(a:var[2:])
   else
     return exists(a:var)
   endif
