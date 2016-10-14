@@ -391,7 +391,7 @@ function! lh#async#_jobs_console() abort
   if lh#async#_is_queue_paused()
     let title .= '    --> PAUSED <--'
   endif
-  let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', title, '', 1, '', s:ui_build_lines())
+  silent let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', title, '', 1, '', s:ui_build_lines())
   " Cancellation mappings
   nnoremap <silent> <buffer> x     :call <sid>ui_cancel_jobs()<cr>
   nnoremap <silent> <buffer> <del> :call <sid>ui_cancel_jobs()<cr>
