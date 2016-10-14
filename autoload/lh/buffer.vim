@@ -104,7 +104,7 @@ endfunction
 " Function: lh#buffer#jump({filename},{cmd}) {{{2
 function! lh#buffer#jump(filename, cmd) abort
   let b = lh#buffer#find(a:filename)
-  if b != -1 | return b | endif
+  if b != -1 || type(a:filename) == type(0) | return b | endif
   call lh#window#create_window_with(a:cmd . ' ' . a:filename)
   return winnr()
 endfunction
