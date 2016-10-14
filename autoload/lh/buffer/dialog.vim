@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      21st Sep 2007
-" Last Update:  11th Oct 2016
+" Last Update:  14th Oct 2016
 "------------------------------------------------------------------------
 " Description:  «description»
 "
@@ -17,6 +17,7 @@ let s:k_version = 4000
 "       (*) ENH: Add `_to_string()` to dialog buffer
 "       (*) ENH: Tags selection support visual mode
 "       (*) REFACT: Several simplifications
+"       (*) Add lh#buffer#dialog#update_all()
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.14  Dialog buffer name may now contain a '#'
@@ -151,6 +152,13 @@ function! lh#buffer#dialog#update(dialog) abort " {{{3
   set noro
   silent! exe (s:Help_NbL()+1).',$d_'
   silent! call append('$', map(copy(a:dialog.choices), '"  ".v:val'))
+  set ro
+endfunction
+
+function! lh#buffer#dialog#update_all(dialog) abort " {{{3
+  set noro
+  call s:RedisplayHelp(a:dialog)
+  call lh#buffer#dialog#update(a:dialog)
   set ro
 endfunction
 
