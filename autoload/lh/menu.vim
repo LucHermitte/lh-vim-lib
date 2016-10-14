@@ -294,6 +294,7 @@ endfunction
 " Sets a toggle-able menu-item defined by {Data}.
 "
 function! lh#menu#def_toggle_item(Data)
+  call s:Verbose('Def toggle menu: %1', a:Data)
   function! a:Data.eval() dict
     let key = s:MenuKey(self)
     return s:Fetch(self, key)
