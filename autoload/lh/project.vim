@@ -355,8 +355,8 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
       let sDict = 'prj.variables'
       let dict = eval(sDict)
       let vars = keys(dict)
-      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
       call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
     else
       let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
       let sDict = 'prj.variables.'.sDict0
