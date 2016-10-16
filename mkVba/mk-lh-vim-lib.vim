@@ -36,6 +36,8 @@ autoload/lh/env.vim
 autoload/lh/event.vim
 autoload/lh/float.vim
 autoload/lh/fmt.vim
+autoload/lh/ft.vim
+autoload/lh/ft/option.vim
 autoload/lh/function.vim
 autoload/lh/graph/tsort.vim
 autoload/lh/has.vim
@@ -78,5 +80,6 @@ tests/lh/test-askmenu.vim
 tests/lh/test-command.vim
 tests/lh/test-format.vim
 tests/lh/test-menu-map.vim
+tests/lh/test-options.vim
 tests/lh/test-toggle-menu.vim
 tests/lh/topological-sort.vim
