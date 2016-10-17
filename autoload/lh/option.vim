@@ -18,6 +18,7 @@ let s:k_version = 4000
 "       (*) ENH: lh#option#get() functions evolve to support new `p:` project
 "           variables
 "       (*) BUG: `lh#option#getbufvar()` emulation for older vim version was failing.
+"       (*) BUG: Keep previous value for `g:lh#option#unset`
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -83,7 +84,7 @@ endfunction
 let s:has_default_in_getbufvar = lh#has#default_in_getbufvar()
 
 " Function: lh#option#unset() {{{3
-let g:lh#option#unset = {}
+let g:lh#option#unset = get(g:, 'lh#option#unset', {})
 function! lh#option#unset() abort
   return g:lh#option#unset
 endfunction
