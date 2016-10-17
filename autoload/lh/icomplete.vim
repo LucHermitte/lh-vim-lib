@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	3.5.0
-let s:version = '3.5.0'
+" Version:      4.0.0
+let s:version = '4.0.0'
 " Created:      03rd Jan 2011
-" Last Update:  16th Nov 2015
+" Last Update:  17th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -17,15 +17,16 @@ let s:version = '3.5.0'
 "       Drop this file into {rtp}/autoload/lh
 "       Requires Vim7+
 " History:
+"       v4.0.0 : Support vim7.3
 "       v3.5.0 : Smarter completion function added
 "       v3.3.10: Fix conflict with lh-brackets
 "       v3.0.0 : GPLv3
-" 	v2.2.4 : first version
+"       v2.2.4 : first version
 " TODO:
-" 	- We are not able to detect the end of the completion mode. As a
-" 	consequence we can't prevent c/for<space> to trigger an abbreviation
-" 	instead of the right template file.
-" 	In an ideal world, there would exist an event post |complete()|
+"       - We are not able to detect the end of the completion mode. As a
+"       consequence we can't prevent c/for<space> to trigger an abbreviation
+"       instead of the right template file.
+"       In an ideal world, there would exist an event post |complete()|
 " }}}1
 "=============================================================================
 
@@ -120,7 +121,7 @@ function! lh#icomplete#_register_hook(Hook)
   inoremap <buffer> <silent> <esc> <c-e><esc>
 
   call lh#event#register_for_one_execution_at('InsertLeave',
-	\ ':call lh#icomplete#_restore_key_bindings('.string(old_keybindings).')', 'CompleteGroup')
+        \ ':call lh#icomplete#_restore_key_bindings('.string(old_keybindings).')', 'CompleteGroup')
         " \ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
 endfunction
 
@@ -128,9 +129,32 @@ endfunction
 function! lh#icomplete#_register_hook2(Hook)
   " call lh#event#register_for_one_execution_at('InsertLeave',
   call lh#event#register_for_one_execution_at('CompleteDone',
-	\ ':debug call'.a:Hook.'()<cr>', 'CompleteGroup')
+        \ ':debug call'.a:Hook.'()<cr>', 'CompleteGroup')
         " \ ':call lh#icomplete#_clear_key_bindings()', 'CompleteGroup')
 endfunction
+
+" s:getSNR([func_name]) {{{2
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
+
+" s:function(func_name]) {{{2
+function! s:function(funcname)
+  return function(s:getSNR(a:funcname))
+endfunction
+
+if exists('*getcurpos')
+  function! s:getcurpos()
+    return getcurpos()
+  endfunction
+else
+  function! s:getcurpos()
+    return getpos('.')
+  endfunction
+endif
 
 "------------------------------------------------------------------------
 " ## Smart completion {{{1
@@ -208,7 +232,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     " <down>      but do select the first completion item
     silent! call feedkeys( "\<C-X>\<C-O>\<C-P>\<Down>", 'n' )
   endfunction
-  let b:complete_data.start_completion = function('s:start_completion')
+  let b:complete_data.start_completion = s:function('start_completion')
 
   function! s:cursor_moved() abort dict "{{{3
     if self.no_more_matches
@@ -222,7 +246,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     call s:Verbose('cursor moved %1 and text has changed -> relaunch completion', string(getpos('.')))
     call self.start_completion()
   endfunction
-  let b:complete_data.cursor_moved = function('s:cursor_moved')
+  let b:complete_data.cursor_moved = s:function('cursor_moved')
 
   function! s:has_text_changed_since_last_move() abort dict "{{{3
     let l = line('.')
@@ -240,7 +264,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
       let self.last_content = [l, line]
     endtry
   endfunction
-  let b:complete_data.has_text_changed_since_last_move = function('s:has_text_changed_since_last_move')
+  let b:complete_data.has_text_changed_since_last_move = s:function('has_text_changed_since_last_move')
 
   function! s:complete(findstart, base) abort dict "{{{3
     call s:Verbose('findstart?%1 -> %2', a:findstart, a:base)
@@ -250,17 +274,17 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         return -3
         call self.finalize()
       endif
-      if self.cursor_pos == getcurpos()
+      if self.cursor_pos == s:getcurpos()
         call s:Verbose("cursor hasn't moved -> -2")
         return -2
       endif
-      let self.cursor_pos = getcurpos()
+      let self.cursor_pos = s:getcurpos()
       return self.startcol
     else
       return self.get_completions(a:base)
     endif
   endfunction
-  let b:complete_data.complete = function('s:complete')
+  let b:complete_data.complete = s:function('complete')
 
   function! s:get_completions(base) abort dict "{{{3
     let matching = filter(copy(self.all_matches), 'v:val.word =~ join(split(a:base, ".\\zs"), ".*")')
@@ -272,7 +296,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     endif
     return self.matches
   endfunction
-  let b:complete_data.get_completions = function('s:get_completions')
+  let b:complete_data.get_completions = s:function('get_completions')
 
   function! s:conclude() abort dict " {{{3
     let selection = getline('.')[self.startcol : col('.')-1]
@@ -282,7 +306,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
     endif
     call self.finalize()
   endfunction
-  let b:complete_data.conclude = function('s:conclude')
+  let b:complete_data.conclude = s:function('conclude')
 
   " Register {{{3
   " call b:complete_data
