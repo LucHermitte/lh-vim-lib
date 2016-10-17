@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  13th Oct 2016
+" Last Update:  17th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -237,7 +237,7 @@ function! lh#let#unlet(var) abort " {{{4
       endif
       unlet h[suffix[0] == '$' ? suffix[1:] : suffix]
       call s:Verbose("unlet %1.%2", h, suffix)
-    else
+    elseif exists(a:var)
       exe 'unlet '.a:var
       call s:Verbose("unlet %1", a:var)
       " let var = s:BuildPublicVariableName(a:var)
