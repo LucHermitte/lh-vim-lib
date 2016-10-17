@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  13th Oct 2016
+" Last Update:  17th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -693,7 +693,7 @@ function! s:lists_prepare() dict abort
   let sandboxlist = s:GetList('sandboxlist', options)
 
   let mergedlists = whitelist + blacklist + asklist + sandboxlist
-  call reverse(sort(mergedlists, function('s:SortLists')))
+  call reverse(sort(mergedlists, function(s:getSNR('SortLists'))))
   return mergedlists
 endfunction
 

@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      03rd Nov 2008
-" Last Update:  10th Oct 2016
+" Last Update:  17th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -225,13 +225,24 @@ function! lh#function#bind(Fn, ...) abort
 
   let binded_fn = lh#object#make_top_type({
         \ 'function': Fn,
-        \ 'execute':  function('s:Execute')
+        \ 'execute':  function(s:getSNR('Execute'))
         \})
   if !empty(args)
     " Special case: when bind is used abusivelly
     let binded_fn.args = args
   endif
   return binded_fn
+endfunction
+
+"=============================================================================
+" ## Internal functions {{{1
+"
+" " s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
 
 " }}}1

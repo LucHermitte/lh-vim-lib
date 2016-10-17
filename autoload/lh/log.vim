@@ -5,7 +5,7 @@
 " Version:      4.00.0.
 let s:k_version = '4000'
 " Created:      23rd Dec 2015
-" Last Update:  27th Sep 2016
+" Last Update:  17th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -66,7 +66,7 @@ endfunction
 "      function s:foo() dict abort
 "         logger.log("here I am");
 "      endfunction
-"      let dict.foo = function('s:foo')
+"      let dict.foo = s:function('foo')
 "   will work correctly fill the quicklist/loclist, but
 "      function dict.foo() abort
 "         logger.log("here I am");
@@ -138,12 +138,12 @@ function! lh#log#new(where, kind) abort
   endfunction
 
   " register methods {{{4
-  let log.open      = function('s:open')
-  let log._add      = function('s:add_'.a:kind)
-  let log.clear     = function('s:clear_'.a:kind)
-  let log.log       = function('s:log')
-  let log.log_trace = function('s:log_trace')
-  let log.reset     = function('s:reset')
+  let log.open      = s:function('open')
+  let log._add      = s:function('add_'.a:kind)
+  let log.clear     = s:function('clear_'.a:kind)
+  let log.log       = s:function('log')
+  let log.log_trace = s:function('log_trace')
+  let log.reset     = s:function('reset')
 
   " open the window {{{4
   call log.reset()
@@ -258,6 +258,19 @@ function! lh#log#callstack(msg) abort
 endfunction
 
 " ## Internal functions {{{1
+" # SNR
+" s:getSNR([func_name]) {{{2
+function! s:getSNR(...) abort
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
+
+" s:function(funcname) {{{2
+function! s:function(funcname) abort
+  return function(s:getSNR(a:funcname))
+endfunction
 
 " # LHLog support functions {{{2
 " Function: lh#log#_log(cmd) {{{3
