@@ -60,7 +60,7 @@ function! lh#ft#option#get(name, ft,...) abort
   let fts = lh#ft#option#inherited_filetypes(a:ft)
   call map(fts, 'v:val."_"')
   let fts += [ '']
-  let scope = (a:0 == 2) ? a:2 : 'bg'
+  let scope = (a:0 == 2) ? a:2 : 'bpg'
 
   for ft in fts
     let r = lh#option#get(ft.a:name, s:k_unset, scope)
