@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  13th Oct 2016
+" Last Update:  18th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -19,6 +19,7 @@ let s:k_version = 4000
 "           variables
 "       (*) BUG: `lh#option#getbufvar()` emulation for older vim version was failing.
 "       (*) BUG: Keep previous value for `g:lh#option#unset`
+"       (*) ENH: Extend `#to_string(#unset())` to be informative
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -77,6 +78,14 @@ function! lh#option#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+" # Tools {{{2
+" s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 
 "=============================================================================
 " ## Functions {{{1
@@ -84,10 +93,17 @@ endfunction
 let s:has_default_in_getbufvar = lh#has#default_in_getbufvar()
 
 " Function: lh#option#unset() {{{3
-let g:lh#option#unset = get(g:, 'lh#option#unset', {})
+function! s:unset_to_string() dict abort
+  " call assert_true(lh#option#is_unset(self))
+  return '{(unset)}'
+endfunction
+let g:lh#option#unset = get(g:, 'lh#option#unset', lh#object#make_top_type({}))
+let g:lh#option#unset._to_string = function(s:getSNR('unset_to_string'))
+
 function! lh#option#unset() abort
   return g:lh#option#unset
 endfunction
+
 
 " Function: lh#option#is_unset(expr) {{{3
 function! lh#option#is_unset(expr) abort
@@ -104,7 +120,7 @@ endfunction
 " otherwise
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#get(name,...)
+function! lh#option#get(name,...) abort
   let scope = (a:0 == 2) ? a:2 : 'bpg'
   let name = a:name
   let i = 0
@@ -119,8 +135,7 @@ function! lh#option#get(name,...)
           return r
         endif
       endif
-    endif
-    if exists(scope[i].':'.name)
+    elseif exists(scope[i].':'.name)
       " \ && (0 != strlen({scope[i]}:{name}))
       " This syntax doesn't work with dictionaries -> !exe
       " return {scope[i]}:{name}
@@ -131,7 +146,6 @@ function! lh#option#get(name,...)
       else
         return value
       endif
-      " exe 'return '.scope[i].':'.name
     endif
     let i += 1
   endwhile
@@ -146,7 +160,7 @@ endfunction
 " Works as lh#option#get(), except that b: scope is interpreted as from a
 " specified buffer. This impacts b: and p: scopes.
 " See lh#option#get() for more information
-function! lh#option#get_from_buf(bufid, name,...)
+function! lh#option#get_from_buf(bufid, name,...) abort
   let scope = (a:0 == 2) ? a:2 : 'bpg'
   let name = a:name
   let i = 0
@@ -161,8 +175,7 @@ function! lh#option#get_from_buf(bufid, name,...)
           return r
         endif
       endif
-    endif
-    if scope[i] == 'b'
+    elseif scope[i] == 'b'
       " If the variable is a dictionary, getbufvar won't be able to return
       " anything but the first level => need to split
       let [all, key, subkey; dummy] = matchlist(name, '\v^([^.]+)%(\.(.*))=$')
@@ -181,8 +194,7 @@ function! lh#option#get_from_buf(bufid, name,...)
           return front
         endif
       endif
-    endif
-    if scope[i] == 'g' && exists(scope[i].':'.name)
+    elseif scope[i] == 'g' && exists(scope[i].':'.name)
       " \ && (0 != strlen({scope[i]}:{name}))
       " This syntax doesn't work with dictionaries -> !exe
       " return {scope[i]}:{name}
