@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 16th Oct 2016
+                        For Vim version 7+      Last change: 18th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -65,8 +65,6 @@ Options related functions:                              |lhvl#option|
 - |lh#option#get_from_buf()|
 - |lh#option#getbufvar()|
 - |lh#option#getbufglobvar()|
-- |lh#ft#option#get()|
-- |lh#ft#option#get_postfixed()|
 - |lh#option#is_set()|
 - |lh#option#is_unset()|
 - |lh#ref#bind()|
@@ -692,54 +690,6 @@ This function encapsulates  |getbufvar| >
 Unlike the direct call of the previous expression, this function ensures
 |g:lh#option#unset| is known (the lazy-loading mecanism of autoload plugins
 doesn't apply to variables, only to functions)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#ft#option#get()*              {{{3
-lh#ft#option#get({name}, {ft}, {default} [,{scopes}])~
-@return which ever exists first among: `b:{ft}_{name}`, or `p:{ft}_{name}`, or
-`g:{ft}_{name}`, or `b:{name}`, or `p:{name}`, or `g:{name}`. {default} is
-returned if none exists.
-@note filetype inheritance is supported.
-The order of the scopes for the variables checked can be specified through the
-optional argument {scope}
-
-@since Version 4.0.0, replaces |lh#dev#option#get()|.
-
-
-How to set these variables ?~
- * `g:{name}` is a global default option for all filetypes best set from a `.vimrc` or a plugin
- * `g:{filetype}_{name}` is a global default option for a specific filetype
- (and its sub-filetypes) best set from a `.vimrc` or a plugin
- * `p:{name}` is a project option for all filetypes, best set for a
- [vimrc\_local](https://github.com/LucHermitte/local_vimrc), or possibly a
- ftplugin.
- * `b:{name}` is a local option for all filetypes, best set for a
- [vimrc\_local](https://github.com/LucHermitte/local_vimrc), or possibly a
- ftplugin.
- * `b:{filetype}_{name}` is a local option for a specific filetype (and its
- sub-filetypes), best set for a
- [vimrc\_local](https://github.com/LucHermitte/local_vimrc), or possibly a
- ftplugin.
- * `p:{filetype}_{name}` is a project option for a specific filetype (and its
- sub-filetypes), best set for a
- [vimrc\_local](https://github.com/LucHermitte/local_vimrc), or possibly a
- ftplugin.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#ft#option#get_postfixed()*    {{{3
-lh#ft#option#get_postfixed({name}, {ft}, {default} [,{scopes}])~
-@return which ever exists first among: `b:{name}_{ft}`, or `p:{name}_{ft}`, or
-`g:{ft}_{name}`, or `b:{name}`, or `p:{name}`, or `g:{name}`. {default} is
-returned if none exists.
-@note filetype inheritance is supported.
-The order of the scopes for the variables checked can be specified through the
-optional argument {scope}
-@see |lh#ft#option#get()|
-
-This flavour is more suited to variables like
-`g:airline#extensions#btw#section` and `g:airline#extensions#btw#section_qf`.
-
-@since Version 4.0.0, replaces |lh#dev#option#get()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#is_set()*              {{{3
@@ -2861,19 +2811,20 @@ Sets the global logger.
   - `"echomsg"` -> |lh#log#echomsg()| and log with |:echomsg|
   - `"qf"`      -> |lh#log#new()| and log in |quickfix-window|
                 Takes another parameter that tells {where} the window is opened.
-  - `"log`      -> |lh#log#new()| and log in |location-list-window|
+  - `"loc`      -> |lh#log#new()| and log in |location-list-window|
                 Takes another parameter that tells {where} the window is opened.
+  - `"file"`    -> |lh#log#new()| and log in a file named {where}
+                @since v4.0.0
 
 
                                                 *:LHLog*                          {{{3
-:LHLog {kind}~
+:LHLog {kind} [{where}]~
 Sets the global logger.
-@param {kind} any of `"none"`, `"echomsg"`, `"qf"`, `"log"`, and `"clear"`
+@param {kind} any of `"none"`, `"echomsg"`, `"qf"`, `"log"`, `"file"` and `"clear"`
 
 This command is simply a helper command that'll execute
 |lh#log#set_logger()||. It presents the advantage to support completion: i.e.
-no need to remember all possible parameter values. However, the {options}
-cannot be passed (for now).
+no need to remember all possible parameter values.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#log#this()*                   {{{3

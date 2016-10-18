@@ -5,7 +5,7 @@
 " Version:      4.00.0.
 let s:k_version = '4000'
 " Created:      23rd Dec 2015
-" Last Update:  17th Oct 2016
+" Last Update:  18th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -52,8 +52,8 @@ endfunction
 
 " Function: lh#log#new(where, kind) {{{3
 " DOC: {{{4
-" - where: "vert"/""
-" - kind:  "qf" / "loc" for loclist
+" - where: "vert"/""/filename
+" - kind:  "qf" / "loc" for loclist / "file"
 " NOTE: In order to obtain the name of the calling function, an exception is
 " thrown and the backtrace is analysed.
 " In order to work, this trick requires:
@@ -75,7 +75,7 @@ endfunction
 " TODO: add verbose levels
 " }}}4
 function! lh#log#new(where, kind) abort
-  let log = lh#object#make_top_type({ 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where})
+  let log = lh#object#make_top_type({ 'winnr': bufwinnr('%'), 'kind': a:kind, 'where': a:where, 'lines':[]})
 
   " open loc/qf window {{{4
   function! s:open() abort dict
@@ -94,6 +94,16 @@ function! lh#log#new(where, kind) abort
   function! s:add_qf(msg) abort dict
     call setqflist([a:msg], 'a')
   endfunction
+  if has('patch-7.4-503')
+    function! s:add_file(msg) abort dict
+      call writefile([lh#fmt#printf("%1:%2: %3", get(a:msg,'filename', ''), get(a:msg,'lnum', ''), a:msg.text)], self.where, 'a')
+    endfunction
+  else
+    function! s:add_file(msg) abort dict
+      let self.lines += [lh#fmt#printf("%1:%2: %3", get(a:msg,'filename', ''), get(a:msg,'lnum', ''), a:msg.text)]
+      call writefile(self.lines, self.where)
+    endfunction
+  endif
 
   " clear {{{4
   function! s:clear_loc() abort dict
@@ -103,6 +113,9 @@ function! lh#log#new(where, kind) abort
   function! s:clear_qf() abort dict
     call setqflist([])
     cclose
+  endfunction
+  function! s:clear_file() abort dict
+    call writefile([], self.where)
   endfunction
 
   " log {{{4
@@ -190,6 +203,8 @@ function! lh#log#set_logger(kind, ...) abort
   elseif a:kind ==? "echomsg"
     let s:logger = lh#log#echomsg()
   elseif a:kind =~? '\vqf|loc'
+    let s:logger = lh#log#new(get(a:, 1, ''), a:kind)
+  elseif a:kind =~? 'file'
     let s:logger = lh#log#new(a:1, a:kind)
   else
     throw "Invalid logger required"
@@ -273,17 +288,17 @@ function! s:function(funcname) abort
 endfunction
 
 " # LHLog support functions {{{2
-" Function: lh#log#_log(cmd) {{{3
-function! lh#log#_log(cmd) abort
+" Function: lh#log#_log(cmd [, where]) {{{3
+function! lh#log#_log(cmd, ...) abort
   if a:cmd == 'clear'
     call lh#log#clear()
   else
-    call lh#log#set_logger(a:cmd, '')
+    call call('lh#log#set_logger',[a:cmd] + a:000)
   endif
 endfunction
 
 " Function: lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) {{{3
-let s:k_lhlog_cmds = [ 'none', 'echomsg', 'qf', 'loc', 'clear']
+let s:k_lhlog_cmds = [ 'none', 'echomsg', 'qf', 'loc', 'clear', 'file']
 function! lh#log#_set_logger_complete(ArgLead, CmdLine, CursorPos) abort
   return filter(copy(s:k_lhlog_cmds), 'v:val =~ "^".a:ArgLead.".*"')
 endfunction

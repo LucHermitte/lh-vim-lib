@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:	4.0.0
 " Created:	27th Apr 2010
-" Last Update:	14th Oct 2016
+" Last Update:	18th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -43,8 +43,8 @@ command! PopSearch :call histdel('search', -1)| let @/=histget('search',-1)
 command! -nargs=1 LoadedBufDo       call lh#buffer#_loaded_buf_do(<q-args>)
 command! -nargs=0 CleanEmptyBuffers call lh#buffer#_clean_empty_buffers()
 
-command! -nargs=1 -complete=customlist,lh#log#_set_logger_complete LHLog
-      \ call lh#log#_log(<q-args>)
+command! -nargs=+ -complete=customlist,lh#log#_set_logger_complete LHLog
+      \ call lh#log#_log(<f-args>)
 
 command! -nargs=0 Jobs       call lh#async#_jobs_console()
 command! -nargs=0 JobUnpause call lh#async#_unpause_jobs()
