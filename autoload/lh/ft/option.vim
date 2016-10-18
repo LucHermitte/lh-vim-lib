@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  16th Oct 2016
+" Last Update:  18th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -118,7 +118,7 @@ else
     let lFts = split(a:fts, ',')
     for ft in lFts
       let parents = lh#option#get(ft.'_inherits', '')
-      let res += [ft] + lh#dev#option#inherited_filetypes(parents)
+      let res += [ft] + lh#ft#option#inherited_filetypes(parents)
     endfor
     return res
   endfunction
