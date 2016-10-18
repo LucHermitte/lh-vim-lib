@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  18th Oct 2016
+" Last Update:  16th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -100,31 +100,16 @@ endfunction
 " # List of inherited properties between languages {{{2
 " Function: lh#ft#option#inherited_filetypes(fts) {{{3
 " - todo, this may required to be specific to each property considered
-if has('patch-7.4-1980')
-  " Arbitrary version number.
-  " This new recursive code seems to mess travis unit testing of lh-dev
-  function! lh#ft#option#inherited_filetypes(fts)
-    let res = []
-    let lFts = split(a:fts, ',')
-    let aux = map(copy(lFts), '[v:val] + lh#ft#option#inherited_filetypes(lh#option#get(v:val."_inherits", ""))')
-    for a in aux
-      let res += a
-    endfor
-    return res
-  endfunction
-else
-  function! lh#ft#option#inherited_filetypes(fts)
-    let res = []
-    let lFts = split(a:fts, ',')
-    for ft in lFts
-      let parents = lh#option#get(ft.'_inherits', '')
-      let res += [ft] + lh#ft#option#inherited_filetypes(parents)
-    endfor
-    return res
-  endfunction
-endif
+function! lh#ft#option#inherited_filetypes(fts) abort
+  let res = []
+  let lFts = split(a:fts, ',')
+  let aux = map(copy(lFts), '[v:val] + lh#ft#option#inherited_filetypes(lh#option#get(v:val."_inherits", ""))')
+  for a in aux
+    let res += a
+  endfor
+  return res
+endfunction
 
-runtime plugin/let.vim
 LetIfUndef g:cpp_inherits 'c'
 
 " }}}1
