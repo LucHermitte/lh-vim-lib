@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  18th Oct 2016
+" Last Update:  19th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -80,25 +80,26 @@ function! lh#exception#callstack(throwpoint) abort
           let script_id = matchstr(fname,  '\v(\<SNR\>|^)\zs\d+\ze_')
           let fname  = substitute(fname, '\v(\<SNR\>|^)\d+_', 's:', '')
           let script = lh#askvim#scriptname(script_id)
+          if lh#option#is_unset(script)
+            unlet script
+            let script = ''
+          endif
         else
-          let definition = split(lh#askvim#exe('verbose function '.func_data[1]), "\n")
-          let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
+          let script = lh#askvim#where_is_function_defined(func_data[1])
         endif
         let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
-        if filereadable(script)
+        let offset = !empty(func_data[2]) ? func_data[2] : 0
+        if !empty(script) && filereadable(script)
           if !has_key(dScripts, script)
             let dScripts[script] = reverse(readfile(script))
           endif
           let fstart = len(dScripts[script]) - match(dScripts[script], '^\s*fu\%[nction]!\=\s\+'.fname)
-          let data = {'script': script, 'fname': fname, 'fstart': fstart, }
-          if !empty(func_data[2])
-            let data.offset = func_data[2]
-          else
-            let data.offset = 0
-          endif
+          let data = {'script': script, 'fname': fname, 'fstart': fstart, 'offset': offset }
           let data.pos = data.offset + fstart
-          let function_stack += [data]
+        else
+          let data = {'script': '???', 'fname': fname, 'fstart':0, 'offset': offset, 'pos': offset  }
         endif
+        let function_stack += [data]
       endif
     endfor
     " let g:stacks += [a:throwpoint]
