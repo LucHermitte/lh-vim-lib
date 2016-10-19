@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.1
-let s:k_version = 3101
+" Version:      4.0.0
+let s:k_version = 4000
 " Created:      17th Apr 2007
-" Last Update:  23rd May 2016
+" Last Update:  19th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -70,26 +70,57 @@ function! lh#askvim#exe(command) abort
   return res
 endfunction
 
+" Function: lh#askvim#execute(command) {{{3
+" @since Version 4.0.0
+if exists('*execute')
+  function! lh#askvim#execute(command) abort
+    return split(execute(a:command), "\n")
+  endfunction
+else
+  function! lh#askvim#execute(command) abort
+    return s:beware_running_through_client_server ? [] : split(lh#askvim#exe(a:command), "\n")
+  endfunction
+endif
 
 " Function: lh#askvim#scriptnames() {{{3
 function! lh#askvim#scriptnames() abort
-  let scripts = split(lh#askvim#exe('scriptnames'), "\n")
+  let scripts = lh#askvim#execute('scriptnames')
   let s:scripts = map(copy(scripts), 'split(v:val, "\\v:=\\s+")')
   return s:scripts
 endfunction
 
 " Function: lh#askvim#scriptname(id) {{{3
 function! lh#askvim#scriptname(id) abort
-  if !exists('s:scripts') || len(s:scripts) < eval(a:id)
+  if !exists('s:scripts') || len(s:scripts) <= eval(a:id)
     call lh#askvim#scriptnames()
+    if len(s:scripts) <= eval(a:id)
+      return lh#option#unset()
+    endif
   endif
-  return s:scripts[a:id-1][1]
+  return s:scripts[a:id - 1][1]
+endfunction
+
+" Function: lh#askvim#where_is_function_defined(funcname) {{{3
+" @since Version 4.0.0
+function! lh#askvim#where_is_function_defined(funcname) abort
+  if has('*execute') || ! s:beware_running_through_client_server
+    let definition = lh#askvim#execute('verbose function '.a:funcname)
+    let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
+    return script
+  elseif a:funcname =~ '#'
+    " autoloaded function
+    let script = substitute(a:funcname, '#', '/', 'g')
+    let script = 'autoload/'.substitute(script, '.*\zs/.*$', '.vim', '')
+    let scripts = lh#path#glob_as_list(&rtp, script)
+    return empty(scripts) ? '' : fnamemodify(scripts[0], ':.')
+  else
+    return ''
+  endif
 endfunction
 
 " Function: lh#askvim#menu(menuid) {{{3
 function! s:AskOneMenu(menuact, res) abort
-  let sKnown_menus = lh#askvim#exe(a:menuact)
-  let lKnown_menus = split(sKnown_menus, '\n')
+  let lKnown_menus = lh#askvim#execute(a:menuact)
   " echo string(lKnown_menus)
 
   " 1- search for the menuid
@@ -169,6 +200,15 @@ function! lh#askvim#is_valid_call(fcall) abort
   catch /.*/
     return 0
   endtry
+endfunction
+
+" Function: lh#askvim#_beware_running_through_client_server() {{{3
+" @since Version 4.0.0
+" I use this odd function to tell this autoload plugin that `:redir` will mess
+" up what the remote instance of vim return through the client-server channel
+let s:beware_running_through_client_server = get(s:, 'beware_running_through_client_server', 0)
+function! lh#askvim#_beware_running_through_client_server() abort
+  let s:beware_running_through_client_server = 1
 endfunction
 
 " Functions }}}1

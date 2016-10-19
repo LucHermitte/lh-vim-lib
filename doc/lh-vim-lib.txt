@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 18th Oct 2016
+                        For Vim version 7+      Last change: 19th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -27,8 +27,10 @@ FUNCTIONS                                    *lhvl-functions*     {{{1
                                                                         {{{2Functions list~
 Miscellanous functions:                                 |lhvl#misc|
 - |lh#askvim#exe()|
+- |lh#askvim#execute()|
 - |lh#askvim#scriptnames()|
 - |lh#askvim#scriptname()|
+- |lh#askvim#where_is_function_defined()|
 - |lh#common#check_deps()|
 - |lh#common#echomsg_multilines()|
 - |lh#common#error_msg()|
@@ -389,6 +391,19 @@ Some information aren't directly accessible (yet) through vim API
 redirecting the result of these commands.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#askvim#execute()*             {{{3
+lh#askvim#execute({command})~
+Portable (to old vim versions) of |execute()| that returns a |List|.
+@param {command}    Command to execute from vim.
+@return             What the command echoes while executed.
+@note               This function encapsulates |redir| without altering any
+                    register.
+
+If *lh#askvim#_beware_running_through_client_server()* has been called, and if
+|execute()| is not supported by your vim version (v < 7.4-2008)
+`lh#askvim#execute()` will return an empty list.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#scriptnames()*         {{{3
 lh#askvim#scriptnames()~
 @return |:scriptnames| result as a list of [script_id, name] arrays.
@@ -399,6 +414,16 @@ lh#askvim#scriptnames()~
 lh#askvim#scriptname(id)~
 @return the name of the script associate to {id}.
 @internal Lazily updates `s:scripts`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#askvim#where_is_function_defined()* {{{3
+lh#askvim#where_is_function_defined({funcname})~
+@return the scriptname where {funcname} has been defined.
+
+If |lh#askvim#_beware_running_through_client_server()| has been called, and if
+|execute()| is not supported by your vim version (v < 7.4-2008)
+`lh#askvim#where_is_function_defined` will try to decode the name of an
+autoloaded function, or return an empty string otherwise.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#menu()*                {{{3
