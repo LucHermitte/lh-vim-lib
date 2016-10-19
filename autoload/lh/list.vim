@@ -18,6 +18,7 @@ let s:k_version = 40000
 "       (*) ENH: Add lh#list#push_if_new_entity()
 "       (*) ENH: Add lh#list#contain_entity()
 "       (*) ENH: Add lh#list#arg_min() & max()
+"       (*) BUG: Add support for empty lists in `lh#list#find_if`
 "       v3.13.2
 "       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
@@ -309,7 +310,7 @@ function! lh#list#find_if(list, predicate, ...) abort
   else
     let predicate = a:predicate
   endif
-  while idx != len(a:list)
+  while idx < len(a:list)
     let res = lh#function#execute(predicate, a:list[idx])
     if res | return idx | endif
     let idx += 1
