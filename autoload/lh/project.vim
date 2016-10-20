@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  14th Oct 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -36,6 +36,7 @@ let s:k_version = '400'
 "     - [X] lh-tags asynchronous (via lh#async)
 "     - [X] BTW synchronous (via lh#os#make)
 "     - [X] BTW asynchronous (via lh#async)
+"     - [ ] BTW -> QFImport b:crt_project
 "     - [ ] lh-dev
 "     - [ ] µTemplate
 "     -> Test on windows!
@@ -199,17 +200,19 @@ function! s:cd_project(prj, path) abort " {{{4
   if lh#option#is_unset(a:prj)
     throw "Cannot apply :cd on non existant projects"
   endif
-  if !isdirectory(a:path)
-    throw "Invalid directory `".a:path."`!"
+  let path = expand(a:path)
+  if !isdirectory(path)
+    throw "Invalid directory `".path."`!"
   endif
-  let a:prj.variables.paths.sources = a:path
+  call lh#dict#add_new(a:prj.variables, {'paths': {}})
+  call lh#dict#add_new(a:prj.variables.paths, {'sources': path})
   " Then, for all windows displaying a buffer from the project: update :lcd
   let windows = filter(range(1, winnr('$')), 'index(a:prj.buffers, winbufnr(v:val)) >= 0')
   call map(windows, 'win_getid(v:val)')
   let crt_win = win_getid(winbufnr('%'))
   for w in windows
     call win_gotoid(w)
-    exe 'lcd '.a:path
+    exe 'lcd '.path
   endfor
 endfunction
 
