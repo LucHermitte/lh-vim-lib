@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      3.14.1
+" Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  08th Sep 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -316,7 +316,7 @@ function! s:Test_possible_values_list_list()
   " OK, this line is odd, but it works!
   if has("patch-7.4-411")
     " It'll fail with vim 7.3, but I don't care
-    AssertEquals (lh#list#possible_values(list, 3), [ 12, [], {}])
+    AssertEquals (lh#list#possible_values(list, 3), [ 12, [], lh#option#unset()])
   endif
 endfunction
 
