@@ -50,6 +50,7 @@ let s:k_version = '400'
 " - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
 "   there are none!
 " - Have let-modeline support p:var, p:&opt, and p:$env
+" - Add convinience functions to fill permission lists
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
@@ -891,7 +892,11 @@ LetIfUndef g:lh#project.permissions.sandboxlist []
 LetIfUndef g:lh#project.permissions._action_name = 'recognize a project at'
 
 " Accept $HOME, but nothing from parent directories
-call lh#path#munge(g:lh#project.permissions.asklist, $HOME)
+if         index(g:lh#project.permissions.whitelist, $HOME)   < 0
+      \ && index(g:lh#project.permissions.blacklist, $HOME)   < 0
+      \ && index(g:lh#project.permissions.sandboxlist, $HOME) < 0
+  call lh#path#munge(g:lh#project.permissions.asklist, $HOME)
+endif
 call lh#path#munge(g:lh#project.permissions.blacklist, fnamemodify('/', ':p'))
 " TODO: add other disks in windows
 
