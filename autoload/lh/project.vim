@@ -354,25 +354,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
-    if stridx(a:ArgLead, '.') < 0
-      let sDict = 'prj.variables'
-      let dict = eval(sDict)
-      let vars = keys(dict)
-      call filter(vars, 'type(dict[v:val]) != type(function("has"))')
-      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
-    else
-      let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
-      let sDict = 'prj.variables.'.sDict0
-      let dict = eval(sDict)
-      let vars = keys(dict)
-      call filter(vars, 'type(dict[v:val]) != type(function("has"))')
-      call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
-      call map(vars, 'sDict0.".".v:val')
-      let l = len(a:ArgLead) - 1
-      call filter(vars, 'v:val[:l] == a:ArgLead')
-    endif
-    let res = vars
-    " TODO: support var.sub.sub and inherited projects
+    let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
@@ -385,6 +367,38 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
   endif
   let res = filter(res, 'v:val =~ a:ArgLead')
   return res
+endfunction
+
+function! s:list_var_for_complete(prj, ArgLead) " {{{4
+  let prj = a:prj
+  if !empty(a:ArgLead) && a:ArgLead[0] == '$'
+    let vars = map(keys(prj.env), '"$".v:val')
+  elseif !empty(a:ArgLead) && a:ArgLead[0] == '&'
+    let vars = map(keys(prj.options), '"&".v:val')
+  elseif stridx(a:ArgLead, '.') < 0
+    let sDict = 'prj.variables'
+    let dict = eval(sDict)
+    let vars = keys(dict)
+    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+  else
+    let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
+    let sDict = 'prj.variables.'.sDict0
+    let dict = eval(sDict)
+    let vars = keys(dict)
+    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+    call map(vars, 'sDict0.".".v:val')
+    let l = len(a:ArgLead) - 1
+    call filter(vars, 'v:val[:l] == a:ArgLead')
+  endif
+  if empty(a:ArgLead)
+    let vars += s:list_var_for_complete(a:prj, '$')
+    let vars += s:list_var_for_complete(a:prj, '&')
+  endif
+  let res = vars
+  " TODO: support var.sub.sub and inherited projects
+  return vars
 endfunction
 
 " # Define a new project {{{2
@@ -449,7 +463,13 @@ function! s:_remove_buffer(bid) dict abort " {{{4
 endfunction
 
 function! s:get(varname) dict abort " {{{4
-  let r0 = lh#dict#get_composed(self.variables, a:varname)
+  if     a:varname[0] == '$'
+    let r0 = self.env[a:varname[1:]]
+  elseif a:varname[0] == '&'
+    let r0 = self.options[a:varname[1:]]
+  else
+    let r0 = lh#dict#get_composed(self.variables, a:varname)
+  endif
   if lh#option#is_set(r0)
     " may need to interpret a reference lh#ref('g:variable')
     return r0
