@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  14th Oct 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -125,8 +125,8 @@ function! s:push_or_start(job) dict abort          " {{{3
   endwhile
   let self.must_wait = 1
   try
-    let g:list = deepcopy(self.list)
-    let g:job = deepcopy(a:job)
+    " let g:list = deepcopy(self.list)
+    " let g:job = deepcopy(a:job)
 
     let idx = lh#list#find_if(self.list, string(a:job.cmd) . ' == v:val.cmd')
     call s:Verbose('Found another task in job queue at index %1', idx)

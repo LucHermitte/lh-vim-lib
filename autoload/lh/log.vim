@@ -4,9 +4,9 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " Version:      4.00.0.
 " let s:k_version = '4000'
-let s:k_version = '4000rc1'
+let s:k_version = '4000'
 " Created:      23rd Dec 2015
-" Last Update:  18th Oct 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -252,7 +252,7 @@ function! lh#log#exception(...) abort
   let exception  = a:0 > 0 ? a:1 : v:exception
   let throwpoint = a:0 > 1 ? a:2 : v:throwpoint
   let bt = lh#exception#callstack(throwpoint)
-  let g:bt = bt
+  " let g:bt = bt
   if !empty(bt)
     " TODO: ignore function from this plugin!
     let data = map(copy(bt), '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").")", "lnum": v:val.pos}')

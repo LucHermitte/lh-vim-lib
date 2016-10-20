@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  19th Oct 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -56,7 +56,7 @@ endfunction
 " - "fstart": line where the function is defined in the script
 " - "offset": offset, from the start of the function, of the line where the
 "             exception was thrown
-let g:stacks = []
+" let g:stacks = []
 function! lh#exception#callstack(throwpoint) abort
   let cleanup = lh#on#exit()
         \.restore('&isk')
