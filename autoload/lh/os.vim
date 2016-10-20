@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  12th Oct 2016
+" Last Update:  20th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -77,11 +77,11 @@ function! lh#os#chomp(text)
   return a:text[:-2]
 endfunction
 
-" Function: lh#os#system(cmd) {{{3
+" Function: lh#os#system(cmd [, apply_env]) {{{3
 " @return the comp'ed result of system call
-function! lh#os#system(cmd)
+function! lh#os#system(cmd, ...)
   " Alter command to make sure $ENV variables from current project are set
-  let env = lh#project#_environment()
+  let env = ((a:0 == 0) || (a:1 == 1)) ? lh#project#_environment() : {}
   let cmd = a:cmd
   if !empty(env)
     let scr = lh#os#new_runner_script(cmd, env)
