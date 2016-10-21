@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  10th Sep 2016
+" Last Update:  21st Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -98,7 +98,7 @@ endfunction
 " Menu variable names are either global (without g: said), or from the
 " environment.
 function! lh#menu#_var_name(varname)
-  return (a:varname[0]=='$' ? '' : 'g:') . a:varname
+  return (a:varname=~'\v^(\$|[gp]:)' ? '' : 'g:') . a:varname
 endfunction
 
 " # Toggling menu item {{{2
@@ -214,7 +214,7 @@ function! s:SetTextValue(Data, text)
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo a:Data.variable.'='.value
+  echo a:Data.variable.'='.string(value)
 endfunction
 
 " Function: s:NextValue({Data})                            {{{3
@@ -376,9 +376,13 @@ endfunction
 " @param[in] key  Table table from which the result will be fetched
 " @return the current value
 function! s:VarFetch(Data, key)
-  let len = len(a:Data[a:key])
-  let variable = (a:Data.variable[0] == '$' ? '' : 'g:') . a:Data.variable
-  let value = eval(variable)
+  call s:Verbose('Fetching variable <%1> for menu', a:Data.variable)
+  let variable = lh#menu#_var_name(a:Data.variable)
+  if variable =~ '^p:'
+    return lh#project#_get(variable[2:])
+  else
+    let value = eval(variable)
+  endif
   return value
 endfunction
 
@@ -390,7 +394,7 @@ endfunction
 function! s:VarSet(Data, value)
   let variable = a:Data.variable
   let value = a:value
-  if variable[0] == '$' " environment variabmes
+  if variable[0] == '$' " environment variables
     exe "let ".variable." = ".string(value)
   elseif variable[0:1] == 'p:'
     call lh#let#to(variable, value)
@@ -431,7 +435,7 @@ function! s:VarSetTextValue(Data, text)
   call s:VarUpdateMenu(a:Data.menu, a:text, a:Data.command)
   " Update the binded global variable
   let value = s:VarSet(a:Data, a:text)
-  echo a:Data.variable.'='.value
+  echo a:Data.variable.'='.lh#object#to_string(value)
 endfunction
 
 " Function: s:VarUpdateMenu({Menu}, {text}, {command})     {{{3
@@ -447,7 +451,7 @@ function! s:VarUpdateMenu(Menu, text, command)
   if has('gui_running')
     let cmd = 'nnoremenu '.a:Menu.priority.' '.
           \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
-          \ ' :'.s:k_Set_cmd.' '.a:command.' '
+          \ ' :'.s:k_Set_cmd.' '.a:command
     silent! exe cmd
   endif
 endfunction
@@ -458,7 +462,6 @@ endfunction
 " @param Data.menu        == { name:, position: }
 "
 " Sets a string-variable defined by {Data}.
-"
 function! lh#menu#def_string_item(Data)
   " Add evaluation function
   function! a:Data.eval() dict
@@ -486,6 +489,10 @@ function! lh#menu#def_string_item(Data)
   " Add the menu entry according to the current value
   let key = s:MenuKey(a:Data)
   let crt_value = s:VarFetch(a:Data, key)
+  if lh#option#is_unset(crt_value)
+    let crt_value = '{(undefined)}'
+    call lh#common#warning_msg('Warning: '.(a:Data.menu.name).' is currently undefined')
+  endif
   call s:VarUpdateMenu(a:Data.menu, crt_value, cmdName)
   " Update the associated global variable to the default value
   call s:VarSet(a:Data, crt_value)
