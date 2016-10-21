@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  20th Oct 2016
+" Last Update:  21st Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -85,7 +85,8 @@ function! lh#exception#callstack(throwpoint) abort
             let script = ''
           endif
         else
-          let script = lh#askvim#where_is_function_defined(func_data[1])
+          if fname =~ '^\d\+$' | let fname = '{'.fname.'}' | endif
+          let script = lh#askvim#where_is_function_defined(fname)
         endif
         let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
         let offset = !empty(func_data[2]) ? func_data[2] : 0
