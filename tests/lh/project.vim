@@ -40,7 +40,7 @@ let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 "------------------------------------------------------------------------
 " ## Fixture {{{1
 function! s:Setup() " {{{2
-  let s:prj_list = lh#project#_save_prj_list()
+  let s:prj_list = copy(lh#project#_save_prj_list())
   let s:cleanup = lh#on#exit()
         \.restore('b:'.s:prj_varname)
         \.restore('s:prj_varname')
@@ -137,6 +137,15 @@ function! s:Test_inherit() " {{{2
     LetTo b:test = 'buff'
     AssertEquals(lh#option#get('test'), 'buff')
 
+    " Set on parent project
+    call p1.set('d.1.2.3', 42)
+    Assert lh#option#is_set(lh#option#get('d.1.2.3'))
+    AssertEquals(lh#option#get('d.1.2.3'), 42)
+    AssertEquals(p1.get('d.1.2.3'), 42)
+    call p1.update('d.1.2.3', 43)
+    AssertEquals(lh#option#get('d.1.2.3'), 43)
+    AssertEquals(p1.get('d.1.2.3'), 43)
+
 
     let p2 = lh#project#new({'name': 'UT2'})
     AssertEquals(p2.depth(), 2)
@@ -153,6 +162,21 @@ function! s:Test_inherit() " {{{2
     AssertEquals(lh#option#get('test'), 'prj1')
     Unlet p:test
     AssertEquals(lh#option#get('test'), 'glob')
+
+    " Set on child project
+    call p2.set('d.1.2.4', 42)
+    Assert lh#option#is_set(lh#option#get('d.1.2.4'))
+    AssertEquals(lh#option#get('d.1.2.4'), 42)
+    AssertEquals(p2.get('d.1.2.4'), 42)
+
+    " Update on child project
+    call p2.update('d.1.2.3', 44)
+    call p2.update('d.1.2.4', 44)
+    AssertEquals(lh#option#get('d.1.2.3'), 44)
+    AssertEquals(lh#option#get('d.1.2.4'), 44)
+    AssertEquals(p1.get('d.1.2.3'), 44)
+    AssertEquals(p2.get('d.1.2.4'), 44)
+
   finally
     call cleanup.finalize()
   endtry
