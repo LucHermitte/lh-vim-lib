@@ -65,7 +65,7 @@ function! lh#dict#let(dict, key, value) abort
   if empty(subkey)
     let a:dict[key] = a:value
   else
-    if !has_key(a:dict, a:value)
+    if !has_key(a:dict, key)
       let a:dict[key] = {}
     endif
     call lh#dict#let(a:dict[key], subkey, a:value)

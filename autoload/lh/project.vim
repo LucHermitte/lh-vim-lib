@@ -42,7 +42,6 @@ let s:k_version = '400'
 "     -> Test on windows!
 "   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
-"   -> :Project <name> :LetTo var = value
 " - Setlocally vim options on new files
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
@@ -227,6 +226,24 @@ function! s:echo_project(prj, var) abort " {{{4
   endif
 endfunction
 
+function! s:let_project(prj, var, lVal) abort " {{{4
+  let value0 = join(a:lVal, ' ')
+  let [all, compound, equal, value ; rem] = matchlist(value0, '\v^\s=%(([+-/*.])\=|(\=))\s*(.*)$')
+  if !empty(compound)
+    let old = a:prj.get(a:var)
+    if compound == '*'
+      exe 'let old = old * '.value
+    elseif compound == '/'
+      exe 'let old = old / '.value
+    else
+      exe 'let old '.compound.'= '.value
+    endif
+    call a:prj.update(a:var, old)
+  else
+    call a:prj.set(a:var, eval(value))
+  endif
+endfunction
+
 function! s:define_project(prjname) abort " {{{4
   " 1- if there is already a project with that name
   " => only register the buffer
@@ -270,6 +287,7 @@ let s:k_usage =
       \ , '  :Project [<name>] :ls        " list buffers belonging to the project'
       \ , '  :Project [<name>] :cd <path> " change directory to <path>'
       \ , '  :Project [<name>] :echo      " echo state of a project variable'
+      \ , '  :Project [<name>] :let       " set state of a project variable'
       \ ]
 function! lh#project#_command(...) abort
   if     a:1 =~ '-\+u\%[sage]'  " {{{5
@@ -302,6 +320,11 @@ function! lh#project#_command(...) abort
         throw "Not enough arguments to `:Project :echo`"
       endif
       call s:echo_project(prj, a:2)
+    elseif a:1 =~ '\v^:let$'       " {{{6
+      if a:0 < 3
+        throw "Not enough arguments to `:Project :let`"
+      endif
+      call s:let_project(prj, a:2, a:000[2:])
     elseif a:1 =~ '\v^:cd$'        " {{{6
       if a:0 != 2
         throw "Not enough arguments to `:Project :cd`"
@@ -329,6 +352,11 @@ function! lh#project#_command(...) abort
         throw "Not enough arguments to `:Project <name> :echo`"
       endif
       call s:echo_project(prj, a:3)
+    elseif a:2 =~ '\v^:=let$'    " {{{5
+      if a:0 < 4
+        throw "Not enough arguments to `:Project <name> :let`"
+      endif
+      call s:let_project(prj, a:3, a:000[3:])
     elseif a:2 =~ '\v^:=cd$'     " {{{5
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :cd`"
@@ -352,9 +380,13 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
+    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
+    let res = s:list_var_for_complete(prj, a:ArgLead)
+  elseif     (2 == pos && tokens[pos-1] =~ '\v^:let$')
+        \ || (3 == pos && tokens[pos-1] =~ '\v^:=let$')
     let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
     let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
@@ -363,7 +395,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     call filter(res, 'isdirectory(v:val)')
     call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
   elseif 2 == pos
-    let res = [':ls', ':echo', ':cd']
+    let res = [':ls', ':echo', ':cd', ':let']
   else
     let res = []
   endif
@@ -440,7 +472,6 @@ function! s:set(varname, value) dict abort " {{{4
     " This part is very similar to lh#let#to instead we don't have a variable
     " name => need to do the same work, but differently
     call lh#dict#let(self.variables, a:varname, a:value)
-    " call lh#let#to(self.variables[a:varname], a:value)
   endif " }}}5
 endfunction
 

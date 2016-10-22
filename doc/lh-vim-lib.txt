@@ -3343,6 +3343,20 @@ displayed.
 Echoes the value of the |p:|variable {varname} associated to specified
 project, or the current project otherwise.
 
+                                                    *:Project-:let*
+:Project [{prj-name}] :let {varname} = {value}~
+:Project [{prj-name}] :let {varname} += {value}~
+:Project [{prj-name}] :let {varname} -= {value}~
+:Project [{prj-name}] :let {varname} *= {value}~
+:Project [{prj-name}] :let {varname} /= {value}~
+:Project [{prj-name}] :let {varname} .= {value}~
+Sets the value of the |p:|variable {varname} associated to specified
+project, or the current project otherwise.
+
+In the case of the compound operators (`+=`, `-=`, `*=`, `/*` and `.=`), it's
+the value of the previous |p:|variables that gets updated. In other words, it
+may be a variable inherited from a parent project.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~
