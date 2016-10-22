@@ -129,6 +129,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#dict#add_new()`         | Adds elements from the second dictionary if they are not set yet in the first                                     |
 | `lh#dict#get_composed()`    | Function symetric to `lh#let#*()` functions                                                                       |
 | `lh#dict#key()`             | Expects the dictionary to have only one element (throw otherwise) and returns it                                  |
+| `lh#dict#let()`             | Emulates `:let dict.key.key.key = value`                                                                          |
 | `lh#dict#subset()`          | Builds a subset dictionary of a dict                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate()`      | Accumulates the elements from a list                                                                              |

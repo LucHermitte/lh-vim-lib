@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  20th Oct 2016
+" Last Update:  22nd Oct 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -512,6 +512,24 @@ function! s:Test_separate() abort
   endif
 endfunction
 
+" lh#dict#let() {{{2
+" Function: s:Test_dict_let() {{{3
+function! s:Test_dict_let() abort
+  let d = { 'a': { 'b': 1}, 'c': 2}
+  AssertEquals(d.a.b, 1)
+  AssertEquals(d.c, 2)
+
+  call lh#dict#let(d, 'd', 42)
+  AssertEquals(d.d, 42)
+  " The following may not work out of the box with older vim versions
+  call lh#dict#let(d, 'd.d', 42)
+  AssertEquals(d.d, {'d': 42})
+
+  call lh#dict#let(d, 'a.b.z', 42)
+  AssertEquals(d.a.b.z, 42)
+  call lh#dict#let(d, 'a.z1.z2.z3', 42)
+  AssertEquals(d.a.z1.z2.z3, 42)
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

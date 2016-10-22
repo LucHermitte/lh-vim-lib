@@ -7,7 +7,7 @@
 " Version:      4.0.0.0
 let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  08th Sep 2016
+" Last Update:  22nd Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -58,6 +58,19 @@ function! lh#dict#add_new(dst, src) abort
   " return a:dst
 endfunction
 
+" Function: lh#dict#let(dict, key, value) {{{3
+function! lh#dict#let(dict, key, value) abort
+  let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.(.+))=$')
+  call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
+  if empty(subkey)
+    let a:dict[key] = a:value
+  else
+    if !has_key(a:dict, a:value)
+      let a:dict[key] = {}
+    endif
+    call lh#dict#let(a:dict[key], subkey, a:value)
+  endif
+endfunction
 " # Dictionary in read-only {{{2
 
 " Function: lh#dict#key(one_key_dict) {{{3

@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 19th Oct 2016
+                        For Vim version 7+      Last change: 22nd Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -109,6 +109,7 @@ Dicts related functions:                                |lhvl#dict|
 - |lh#dict#add_new()|
 - |lh#dict#get_composed()|
 - |lh#dict#key()|
+- |lh#dict#let()|
 - |lh#dict#subset()|
 Stack related functions:                                |lhvl#stack|
 - |lh#stack#push()|
@@ -1494,9 +1495,39 @@ Examples: >
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#dict#key()*                    {{{3
 lh#dict#key(one_key_dict)~
-@param[in]     {one_key_dict} Dictionary to test
+@param[in]     {one_key_dict} |Dictionary| to test
 @return        The first element of the dictionary
 @throw         An exception if the dictionary has more than one element.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#let()*                    {{{3
+lh#dict#let(dict, key, value)~
+@param[in] {dict} |Dictionary| to set
+@param[in] {key.subjet...} (embedded) keys referencing what must be set
+@param[in] {value} value to set
+@return    0
+@throw     None -- normally
+@post      {dict}.{key.subkey...} == {value}
+@see |lh#let#to()| which does the same job except, it works on strings and not
+on preexisting dictionaries.
+
+If the dictionary was missing intrmediary keys, they'll get created on the
+fly.
+
+Examples: >
+  let d = { 'a': { 'b': 1}, 'c': 2}
+  AssertEquals(d.a.b, 1)
+  AssertEquals(d.c, 2)
+
+  call lh#dict#let(d, 'd', 42)
+  AssertEquals(d.d, 42)
+  call lh#dict#let(d, 'd.d', 42)
+  AssertEquals(d.d, {'d': 42})
+
+  call lh#dict#let(d, 'a.b.z', 42)
+  AssertEquals(d.a.b.z, 42)
+  call lh#dict#let(d, 'a.z1.z2.z3', 42)
+  AssertEquals(d.a.z1.z2.z3, 42)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#push_if_new()*            {{{3
