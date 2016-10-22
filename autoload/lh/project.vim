@@ -43,12 +43,13 @@ let s:k_version = '400'
 "   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
 "   -> :Project <name> :LetTo var = value
-" - prj.set(plain_variable, value)
 " - Setlocally vim options on new files
 " - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
-" - Simplify dictionaries -> no 'parents', 'variables', 'env', 'options' when
-"   there are none!
+" - Simplify dictionaries
+"   -> no 'parents' when there are none!
+"   -> merge 'variables', 'env', 'options' in `variables`
+" - Fix find_holder() to use update() code and refactor the later
 " - Have let-modeline support p:var, p:&opt, and p:$env
 " - Add convinience functions to fill permission lists
 " - Serialize and deserialize options from a file that'll be maintained
@@ -436,9 +437,51 @@ function! s:set(varname, value) dict abort " {{{4
   elseif a:varname[0] == '$' " {{{5 -- $ENV
     let self.env[varname] = a:value
   else                       " {{{5 -- Any variable
-    throw "`proj.set(".a:varname.",".a:value.") -- Not implemented yet"
+    " This part is very similar to lh#let#to instead we don't have a variable
+    " name => need to do the same work, but differently
+    call lh#dict#let(self.variables, a:varname, a:value)
     " call lh#let#to(self.variables[a:varname], a:value)
   endif " }}}5
+endfunction
+
+function! s:update(varname, value, ...) dict abort " {{{4
+  " @param[in] {optional: is_recursing} => don't set on parent level, but on
+  " child one
+  " like s:set, but find first where the option is already set (i.e.
+  " possibily in a parent project), and update the "old" setting instead of
+  " overridding it.
+  " call assert_true(!empty(a:varname))
+  let varname = a:varname[1:]
+  if     a:varname[0] == '&' " {{{5 -- options
+    if has_key(self.options, varname)
+      call self._update_option(varname)
+      return 1
+    endif
+  elseif a:varname[0] == '$' " {{{5 -- $ENV
+    if has_key(self.env, varname)
+      let self.env[varname] = a:value
+      return 1
+    endif
+  else                       " {{{5 -- Any variable
+    let r0 = lh#dict#get_composed(self.variables, a:varname)
+    if lh#option#is_set(r0)
+      call lh#dict#let(self.variables, a:varname, a:value)
+      return 1
+    endif
+  endif " }}}5
+  " The variable is unknown locally => search in parents
+  for p in self.parents
+    " Search in parent, but don't set new variables
+    if p.update(a:varname, a:value, 1)
+      return 1
+    endif
+  endfor
+  " Unknown at parent level as well => set it locally
+  if a:0 == 0 || a:1 == 0
+    call self.set(a:varname, a:value)
+    return 1
+  endif
+  return 0
 endfunction
 
 function! s:_update_option(varname) dict abort " {{{4
@@ -567,6 +610,7 @@ function! lh#project#new(params) abort
   let project.inherit         = function(s:getSNR('inherit'))
   let project.register_buffer = function(s:getSNR('register_buffer'))
   let project.set             = function(s:getSNR('set'))
+  let project.update          = function(s:getSNR('update'))
   let project.get             = function(s:getSNR('get'))
   let project.exists          = function(s:getSNR('exists'))
   let project.environment     = function(s:getSNR('environment'))

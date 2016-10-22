@@ -3351,6 +3351,19 @@ Prefer |:Project--define| or |lh#project#define()|.
 
 @post A project without an explicit name will be provided one automatically.
 
+Methods:
+- `register_buffer(...)`:
+- `inherit(parent)`:
+- `depth()`:
+- `set(varname, value)`:
+- `update(varname, value)`:
+- `get(varname)`:
+- `exists(varname)`:
+- `apply(Action)`:
+- `map(action)`:
+- `environment()`:
+- `find_holder(varname)`:
+
 Reserved fields:
 - "name"      <- Project name   *lhvl-project_name*
 - "parents"
