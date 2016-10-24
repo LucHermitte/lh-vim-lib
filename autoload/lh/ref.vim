@@ -74,9 +74,16 @@ function! s:assign(value) dict abort " {{{4
   endif
 endfunction
 
+function! s:print_with_fmt(fmt) dict abort "{{{4
+  let self.fmt = a:fmt
+  return self
+endfunction
+
 function! s:to_string(...) dict abort " {{{4
   let handled_list = a:0 > 0 ? a:1 : []
-  if has_key(self, 'key')
+  if has_key(self, 'fmt')
+    return lh#fmt#printf(self.fmt, self)
+  elseif has_key(self, 'key')
     return '{ref->(dict['.self.key.']): '.lh#object#_to_string(self.resolve(), handled_list).'}'
   else
     return '{ref->('.(self.to).'): '.lh#object#_to_string(self.resolve(), handled_list).'}'
@@ -92,9 +99,10 @@ function! lh#ref#bind(varname, ...) abort
   if a:0 > 0
     let res.key = a:1
   endif
-  let res.resolve    = function(s:getSNR('resolve'))
-  let res.assign     = function(s:getSNR('assign'))
-  let res._to_string = function(s:getSNR('to_string'))
+  let res.resolve        = function(s:getSNR('resolve'))
+  let res.assign         = function(s:getSNR('assign'))
+  let res._to_string     = function(s:getSNR('to_string'))
+  let res.print_with_fmt = function(s:getSNR('print_with_fmt'))
   return res
 endfunction
 
