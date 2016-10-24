@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 22nd Oct 2016
+                        For Vim version 7+      Last change: 24th Oct 2016
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -109,7 +109,6 @@ Dicts related functions:                                |lhvl#dict|
 - |lh#dict#add_new()|
 - |lh#dict#get_composed()|
 - |lh#dict#key()|
-- |lh#dict#let()|
 - |lh#dict#subset()|
 Stack related functions:                                |lhvl#stack|
 - |lh#stack#push()|
@@ -737,12 +736,20 @@ This function will permit to test whether an option is set or not: >
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#ref#bind()*                   {{{3
 lh#ref#bind(varname)~
+lh#ref#bind(dict, key)~
 This function builds a reference to another variable.
 The long term objective is to be able to habe global preferences, and project
 specific preferences that either default to the global ones, or that can be
 overriden.
 A bound value shall be obtained with |lh#option#get()| and
 |lh#dev#option#get()| functions.
+
+The first overload builds a symbolic link to a named variables.
+The second overload build a link to the soft-linked {key} relative to the
+hard-linked |dictionary| variable.
+
+The linked variable can be interrogated with `ref.resolve()`, or assigned with
+`ref.assign(value)`.
 
 *lh#ref#is_bound()* tells whether its parameter is the name of a variable bound to another.
 
@@ -1495,39 +1502,9 @@ Examples: >
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#dict#key()*                    {{{3
 lh#dict#key(one_key_dict)~
-@param[in]     {one_key_dict} |Dictionary| to test
+@param[in]     {one_key_dict} Dictionary to test
 @return        The first element of the dictionary
 @throw         An exception if the dictionary has more than one element.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#dict#let()*                    {{{3
-lh#dict#let(dict, key, value)~
-@param[in] {dict} |Dictionary| to set
-@param[in] {key.subjet...} (embedded) keys referencing what must be set
-@param[in] {value} value to set
-@return    0
-@throw     None -- normally
-@post      {dict}.{key.subkey...} == {value}
-@see |lh#let#to()| which does the same job except, it works on strings and not
-on preexisting dictionaries.
-
-If the dictionary was missing intrmediary keys, they'll get created on the
-fly.
-
-Examples: >
-  let d = { 'a': { 'b': 1}, 'c': 2}
-  AssertEquals(d.a.b, 1)
-  AssertEquals(d.c, 2)
-
-  call lh#dict#let(d, 'd', 42)
-  AssertEquals(d.d, 42)
-  call lh#dict#let(d, 'd.d', 42)
-  AssertEquals(d.d, {'d': 42})
-
-  call lh#dict#let(d, 'a.b.z', 42)
-  AssertEquals(d.a.b.z, 42)
-  call lh#dict#let(d, 'a.z1.z2.z3', 42)
-  AssertEquals(d.a.z1.z2.z3, 42)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#push_if_new()*            {{{3
@@ -2813,6 +2790,7 @@ LOG RELATED FUNCTIONS                                 *lhvl#log*        {{{2
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lhvl-global-logger*              {{{3
 lh-vim-lib provides a global logger since version 3.6.0.
+s_bo
 By default, it'll echo everything with |:echomsg| (through |lh#log#echomsg|).
 
 The logging policy can be set thanks to |lh#log#set_logger()|.
@@ -3343,20 +3321,6 @@ displayed.
 Echoes the value of the |p:|variable {varname} associated to specified
 project, or the current project otherwise.
 
-                                                    *:Project-:let*
-:Project [{prj-name}] :let {varname} = {value}~
-:Project [{prj-name}] :let {varname} += {value}~
-:Project [{prj-name}] :let {varname} -= {value}~
-:Project [{prj-name}] :let {varname} *= {value}~
-:Project [{prj-name}] :let {varname} /= {value}~
-:Project [{prj-name}] :let {varname} .= {value}~
-Sets the value of the |p:|variable {varname} associated to specified
-project, or the current project otherwise.
-
-In the case of the compound operators (`+=`, `-=`, `*=`, `/*` and `.=`), it's
-the value of the previous |p:|variables that gets updated. In other words, it
-may be a variable inherited from a parent project.
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~
@@ -3364,19 +3328,6 @@ lh#project#new(options)~
 Prefer |:Project--define| or |lh#project#define()|.
 
 @post A project without an explicit name will be provided one automatically.
-
-Methods:
-- `register_buffer(...)`:
-- `inherit(parent)`:
-- `depth()`:
-- `set(varname, value)`:
-- `update(varname, value)`:
-- `get(varname)`:
-- `exists(varname)`:
-- `apply(Action)`:
-- `map(action)`:
-- `environment()`:
-- `find_holder(varname)`:
 
 Reserved fields:
 - "name"      <- Project name   *lhvl-project_name*

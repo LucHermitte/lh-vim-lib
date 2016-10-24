@@ -54,7 +54,9 @@ endfunction
 " # bind {{{2
 " - Methods {{{3
 function! s:resolve() dict abort " {{{4
-  if     self.to =~ '^p:'
+  if     type(self.to) == type({})
+    return lh#dict#get_composed(self.to, self.key)
+  elseif self.to =~ '^p:'
     return lh#project#_get(self.to[2:])
   elseif self.to =~ ':'
     let [all, scopes, varname; dummy] = matchlist(self.to, '\v^([^:]+):(.+)$')
@@ -64,18 +66,34 @@ function! s:resolve() dict abort " {{{4
   endif
 endfunction
 
-function! s:to_string(...) dict abort " {{{4
-  let handled_list = a:0 > 0 ? a:1 : []
-  return '{ref->('.(self.to).'): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+function! s:assign(value) dict abort " {{{4
+  if     type(self.to) == type({})
+    return lh#dict#let(self.to, self.key, a:value)
+  else
+    call lh#let#to(self.to, a:value)
+  endif
 endfunction
 
-" Function: lh#ref#bind(varname) {{{3
-function! lh#ref#bind(varname) abort
+function! s:to_string(...) dict abort " {{{4
+  let handled_list = a:0 > 0 ? a:1 : []
+  if has_key(self, 'key')
+    return '{ref->(dict['.self.key.']): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+  else
+    return '{ref->('.(self.to).'): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+  endif
+endfunction
+
+" Function: lh#ref#bind(varname [, key]) {{{3
+function! lh#ref#bind(varname, ...) abort
   let res = lh#object#make_top_type
         \ ({ 'to': a:varname
         \ , 'type': s:bind
         \ })
-  let res.resolve = function(s:getSNR('resolve'))
+  if a:0 > 0
+    let res.key = a:1
+  endif
+  let res.resolve    = function(s:getSNR('resolve'))
+  let res.assign     = function(s:getSNR('assign'))
   let res._to_string = function(s:getSNR('to_string'))
   return res
 endfunction
