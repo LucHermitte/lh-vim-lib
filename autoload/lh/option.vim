@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  18th Oct 2016
+" Last Update:  24th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -93,7 +93,7 @@ endfunction
 let s:has_default_in_getbufvar = lh#has#default_in_getbufvar()
 
 " Function: lh#option#unset() {{{3
-function! s:unset_to_string() dict abort
+function! s:unset_to_string(...) dict abort
   " call assert_true(lh#option#is_unset(self))
   return '{(unset)}'
 endfunction
