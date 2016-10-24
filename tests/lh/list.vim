@@ -521,7 +521,6 @@ function! s:Test_dict_let() abort
 
   call lh#dict#let(d, 'd', 42)
   AssertEquals(d.d, 42)
-  " The following may not work out of the box with older vim versions
   call lh#dict#let(d, 'd.d', 42)
   AssertEquals(d.d, {'d': 42})
 
@@ -535,4 +534,3 @@ endfunction
 let &cpo=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:
-"

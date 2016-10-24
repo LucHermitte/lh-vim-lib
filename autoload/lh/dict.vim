@@ -7,7 +7,7 @@
 " Version:      4.0.0.0
 let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  22nd Oct 2016
+" Last Update:  24th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -66,6 +66,9 @@ function! lh#dict#let(dict, key, value) abort
     let a:dict[key] = a:value
   else
     if !has_key(a:dict, key)
+      let a:dict[key] = {}
+    elseif type(a:dict[key]) != type({})
+      unlet a:dict[key]
       let a:dict[key] = {}
     endif
     call lh#dict#let(a:dict[key], subkey, a:value)
