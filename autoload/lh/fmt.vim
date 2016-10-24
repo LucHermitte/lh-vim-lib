@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1.
-let s:k_version = '3.6.01'
+" Version:      4.0.0
+let s:k_version = '4.0.00'
 " Created:      20th Nov 2015
-" Last Update:  08th Jan 2016
+" Last Update:  24th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Formatting functions
@@ -61,7 +61,7 @@ function! lh#fmt#printf(format, ...) abort
   call uniq(sort(matches))
   let args = copy(a:000)
   for i in matches
-    let args[i] = lh#string#as(args[i])
+    let args[i-1] = lh#string#as(args[i-1])
   endfor
   " let args = map(args, 'lh#string#as(v:val)')
   let res = substitute(a:format, '\v\%(\d+)', '\=args[submatch(1)-1]', 'g')
