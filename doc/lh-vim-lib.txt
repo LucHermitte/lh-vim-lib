@@ -325,6 +325,7 @@ Unlike |printf()|, this function takes positional parameters, i.e. >
   AssertEquals(lh#fmt#printf("foo %1 bar", 42), "foo 42 bar")
   AssertEquals(lh#fmt#printf("foo %1 bar %2", 42, "toto"), "foo 42 bar toto")
   AssertEquals(lh#fmt#printf("foo %2 bar %1", 42, "toto"), "foo toto bar 42")
+  AssertEquals(lh#fmt#printf("foo %{2.toto}-%{1.titi} bar %1", {'a':42, 'titi': 'tutu'}, {'toto': {'foo': 42}}), "foo {'foo': 42}-tutu bar {'a': 42, 'titi': 'tutu'}")
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#math#abs()*                   {{{3

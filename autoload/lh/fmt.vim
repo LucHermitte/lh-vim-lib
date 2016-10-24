@@ -50,13 +50,22 @@ endfunction
 " ## Exported functions {{{1
 " # Formatting {{{2
 " Function: lh#fmt#printf(format, args) {{{3
+" WARNING: Beware of infinity loops
+" => Don't call lh#fmt#printf() from a _to_string() function that passes the
+" objet to be printed w/ "%42". Use a "%{42.field}" instead.
 " TODO:
 " - support precision/width/fill
 " - %%1 that would expand into %1
-" - support named fields
 function! lh#fmt#printf(format, ...) abort
-  let args = map(copy(a:000), 'lh#string#as(v:val)')
+  let matches = lh#string#matches(a:format, '\v\%\zs\d+\ze')
+  call uniq(sort(matches))
+  let args = copy(a:000)
+  for i in matches
+    let args[i] = lh#string#as(args[i])
+  endfor
+  " let args = map(args, 'lh#string#as(v:val)')
   let res = substitute(a:format, '\v\%(\d+)', '\=args[submatch(1)-1]', 'g')
+  let res = substitute(res, '\v\%\{(\d+)\.(\k{-})\}', '\=lh#string#as(a:000[submatch(1)-1][submatch(2)])', 'g')
   return res
 endfunction
 
