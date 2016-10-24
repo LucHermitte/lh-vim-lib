@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  21st Oct 2016
+" Last Update:  24th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -141,7 +141,9 @@ function! s:Set(Data) abort
   try
     let value = a:Data.values[a:Data.idx_crt_value]
     let variable = a:Data.variable
-    if variable[0] == '$' " environment variabmes
+    if     lh#ref#is_bound(variable)
+      call variable.assign(value)
+    elseif variable[0] == '$' " environment variabmes
       exe "let ".variable." = ".string(value)
     elseif variable[0:1] == 'p:' " environment variabmes
       call lh#let#to(variable, value)
@@ -168,7 +170,8 @@ function! s:Set(Data) abort
     endif
     return value
   catch /.*/
-    throw "Cannot set: ".variable."=".value.": ".v:exception." in ".v:throwpoint
+    throw lh#fmt#printf('Cannot set: %1=%2: %3 in %4', variable, value, v:exception, v:throwpoint)
+    " throw "Cannot set: ".variable."=".value.": ".v:exception." in ".v:throwpoint
   finally
   endtry
 endfunction
@@ -196,7 +199,7 @@ function! s:SetTextValue(Data, text)
   let old = s:Fetch(a:Data, labels_key)
   let new_idx = s:SearchText(a:Data, a:text)
   if -1 == new_idx
-    throw "toggle-menu: unsupported value for {".(a:Data.variable)."}"
+    throw "toggle-menu: unsupported value for {".lh#object#to_string(a:Data.variable)."}"
   endif
   if a:Data.idx_crt_value == new_idx
     " value unchanged => abort
@@ -214,7 +217,7 @@ function! s:SetTextValue(Data, text)
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo a:Data.variable.'='.string(value)
+  echo lh#object#to_string(a:Data.variable).'='.string(value)
 endfunction
 
 " Function: s:NextValue({Data})                            {{{3
@@ -237,7 +240,7 @@ function! s:NextValue(Data)
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo a:Data.variable.'='.string(value)
+  echo lh#object#to_string(a:Data.variable).'='.string(value)
 endfunction
 
 " Function: s:ClearMenu({Menu}, {text})                    {{{3
@@ -309,7 +312,11 @@ function! lh#menu#def_toggle_item(Data)
   " associated variable
   if !has_key(a:Data, "idx_crt_value")
     " Fetch the value of the associated variable
-    let value = lh#option#get(a:Data.variable, 0, 'g')
+    if lh#ref#is_bound(a:Data.variable)
+      let value = a:Data.variable.resolve()
+    else
+      let value = lh#option#get(a:Data.variable, 0, 'g')
+    endif
     " echo a:Data.variable . " <- " . value
     " Update the index of the current value
     let a:Data.idx_crt_value  = s:Search(a:Data, value)
@@ -377,6 +384,9 @@ endfunction
 " @return the current value
 function! s:VarFetch(Data, key)
   call s:Verbose('Fetching variable <%1> for menu', a:Data.variable)
+  if lh#ref#is_bound(a:Data.variable)
+    return a:Data.variable.resolve()
+  endif
   let variable = lh#menu#_var_name(a:Data.variable)
   if variable =~ '^p:'
     return lh#project#_get(variable[2:])
@@ -394,7 +404,9 @@ endfunction
 function! s:VarSet(Data, value)
   let variable = a:Data.variable
   let value = a:value
-  if variable[0] == '$' " environment variables
+  if lh#ref#is_bound(variable)
+    call variable.assign(value)
+  elseif variable[0] == '$' " environment variables
     exe "let ".variable." = ".string(value)
   elseif variable[0:1] == 'p:'
     call lh#let#to(variable, value)
@@ -435,7 +447,7 @@ function! s:VarSetTextValue(Data, text)
   call s:VarUpdateMenu(a:Data.menu, a:text, a:Data.command)
   " Update the binded global variable
   let value = s:VarSet(a:Data, a:text)
-  echo a:Data.variable.'='.lh#object#to_string(value)
+  echo lh#objet#to_string(a:Data.variable).'='.lh#object#to_string(value)
 endfunction
 
 " Function: s:VarUpdateMenu({Menu}, {text}, {command})     {{{3
