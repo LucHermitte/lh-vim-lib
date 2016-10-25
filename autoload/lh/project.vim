@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  20th Oct 2016
+" Last Update:  25th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -518,7 +518,7 @@ endfunction
 function! s:_update_option(varname) dict abort " {{{4
   " call assert_true(find(self.buffers, bufnr('%')))
   let value = self.options[a:varname]
-  exe 'setlocal '.a:varname.value
+  exe 'setlocal '.a:varname.escape(value, '\ ')
 endfunction
 
 function! s:_use_options(bid) dict abort " {{{4
