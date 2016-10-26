@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  17th Oct 2016
+" Last Update:  26th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -562,7 +562,7 @@ function! lh#path#add_path_if_exists(listname, path) abort
       let var = lh#project#_get(a:listname[2:])
       let var += [a:path]
     else
-      let {listname} += [a:path]
+      let {a:listname} += [a:path]
     endif
   endif
 endfunction
