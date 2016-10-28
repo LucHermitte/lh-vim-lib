@@ -63,7 +63,8 @@ let s:k_version = '400'
 let s:cpo_save=&cpo
 set cpo&vim
 
-let s:project_varname = get(g:, 'lh#project#varname', 'crt_project')
+let g:lh#project#varname = get(g:, 'lh#project#varname', 'crt_project')
+let s:project_varname    = g:lh#project#varname
 let s:k_unset            = lh#option#unset()
 
 "------------------------------------------------------------------------
