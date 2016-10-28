@@ -51,6 +51,7 @@ let s:k_version = '400'
 " - Fix find_holder() to use update() code and refactor the later
 " - Have let-modeline support p:var, p:&opt, and p:$env
 " - Add convinience functions to fill permission lists
+" - Add VimL Syntax highlight from LetTo, LetIfUndef, p:var
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
@@ -614,6 +615,10 @@ function! s:find_holder(varname) dict abort " {{{4
   return s:k_unset
 endfunction
 
+function! s:__lhvl_oo_type() dict abort " {{{4
+  return 'project'
+endfunction
+
 " Function: lh#project#new(params) {{{3
 " Typical use, in _vimrc_local.vim
 "   :call lh#project#define(s:, params)
@@ -654,6 +659,7 @@ function! lh#project#new(params) abort
   let project._update_option  = function(s:getSNR('_update_option'))
   let project._use_options    = function(s:getSNR('_use_options'))
   let project._remove_buffer  = function(s:getSNR('_remove_buffer'))
+  let project.__lhvl_oo_type  = function(s:getSNR('__lhvl_oo_type'))
 
   " Let's automatically register the current buffer
   call project.register_buffer()
@@ -697,6 +703,13 @@ function! lh#project#define(s, params, ...) abort
 endfunction
 
 " # Access {{{2
+" Function: lh#project#is_a_project(dict) {{{3
+function! lh#project#is_a_project(dict) abort
+  return type(a:dict) == type({})
+        \ && lh#object#is_an_object(a:dict)
+        \ && a:dict.__lhvl_oo_type() == 'project'
+endfunction
+
 " Function: lh#project#is_in_a_project() {{{3
 function! lh#project#is_in_a_project() abort
   return exists('b:'.s:project_varname)
