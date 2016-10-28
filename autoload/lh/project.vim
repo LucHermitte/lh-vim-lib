@@ -539,7 +539,7 @@ function! s:_remove_buffer(bid) dict abort " {{{4
   call filter(self.buffers, 'v:val != a:bid')
 endfunction
 
-function! s:get(varname) dict abort " {{{4
+function! s:get(varname, ...) dict abort " {{{4
   if     a:varname[0] == '$'
     let r0 = self.env[a:varname[1:]]
   elseif a:varname[0] == '&'
@@ -557,7 +557,7 @@ function! s:get(varname) dict abort " {{{4
       unlet! r
     endfor
   endif
-  return s:k_unset
+  return get(a:, 1, s:k_unset)
 endfunction
 
 function! s:exists(varname) dict abort " {{{4
