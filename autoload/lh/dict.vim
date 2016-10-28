@@ -7,7 +7,7 @@
 " Version:      4.0.0.0
 let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  24th Oct 2016
+" Last Update:  28th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -16,6 +16,7 @@ let s:k_version = '40000'
 
 let s:cpo_save=&cpo
 set cpo&vim
+let s:k_unset = lh#option#unset()
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
@@ -89,7 +90,7 @@ endfunction
 function! lh#dict#subset(dict, keys) abort
   let result={}
   for e in a:keys
-    let Val = get(a:dict, e, lh#option#unset())
+    let Val = get(a:dict, e, s:k_unset)
     if lh#option#is_set(Val)
       let result[e] = Val
     endif
@@ -106,7 +107,7 @@ function! lh#dict#get_composed(dst, key, ...) abort
     call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
     if !has_key(a:dst, key)
       call s:Verbose('Return default value: Key %1 not found in %2.', key, a:dst)
-      return get(a:, 1, lh#option#unset())
+      return get(a:, 1, s:k_unset)
     endif
     if empty(subkey)
       return a:dst[a:key]

@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  25th Oct 2016
+" Last Update:  28th Oct 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -64,6 +64,7 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 let s:project_varname = get(g:, 'lh#project#varname', 'crt_project')
+let s:k_unset            = lh#option#unset()
 
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
@@ -156,7 +157,7 @@ function! s:get_project(...) dict abort " {{{4
     if lh#option#is_unset(a:1)
       return lh#project#crt()
     else
-      return get(self.projects, a:1, lh#option#unset())
+      return get(self.projects, a:1, s:k_unset)
     endif
   endif
 endfunction
@@ -383,11 +384,11 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
-    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
+    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:let$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=let$')
-    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : lh#option#unset())
+    let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
@@ -555,7 +556,7 @@ function! s:get(varname) dict abort " {{{4
       unlet! r
     endfor
   endif
-  return lh#option#unset()
+  return s:k_unset
 endfunction
 
 function! s:exists(varname) dict abort " {{{4
@@ -609,7 +610,7 @@ function! s:find_holder(varname) dict abort " {{{4
       unlet h
     endfor
   endif
-  return lh#option#unset()
+  return s:k_unset
 endfunction
 
 " Function: lh#project#new(params) {{{3
@@ -705,7 +706,7 @@ function! lh#project#crt() abort
   if lh#project#is_in_a_project()
     return b:{s:project_varname}
   else
-    return lh#option#unset()
+    return s:k_unset
     " throw "The current buffer doesn't belong to a project"
   endif
 endfunction
@@ -763,7 +764,7 @@ function! lh#project#_get(name, ...) abort
   if lh#project#is_in_a_project()
     return b:{s:project_varname}.get(a:name)
   else
-    return lh#option#unset()
+    return s:k_unset
   endif
 endfunction
 
