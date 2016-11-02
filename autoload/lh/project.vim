@@ -488,7 +488,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
     if has_key(self.options, varname)
-      call self._update_option(varname)
+      call self._update_option(a:varname)
       return 1
     endif
   elseif a:varname[0] == '$' " {{{5 -- $ENV
@@ -518,10 +518,34 @@ function! s:update(varname, value, ...) dict abort " {{{4
   return 0
 endfunction
 
-function! s:_update_option(varname) dict abort " {{{4
-  " call assert_true(find(self.buffers, bufnr('%')))
+function! s:do_update_option(bid, varname, value)
+  if     a:value =~ '^+='
+    let lValue = split(getbufvar(a:bid, a:varname), ',')
+    call lh#list#push_if_new_elements(lValue, split(a:value, ','))
+    let value = join(lValue, ',')
+  elseif a:value =~ '^-='
+    let lValue = split(getbufvar(a:bid, a:varname), ',')
+    let toRemove = split(a:value, ',')
+    call filter(lValue, 'index(toRemove, v:val) >= 0')
+    let value = join(lValue, ',')
+  elseif a:value =~ '^='
+    let value = a:value[1:]
+  else
+    let value = a:value
+  endif
+  call setbufvar(a:bid, a:varname, value)
+endfunction
+
+function! s:_update_option(varname, ...) dict abort " {{{4
   let value = self.options[a:varname]
-  exe 'setlocal '.a:varname.escape(value, '\ ')
+  if a:0 == 0
+    " Apply to all buffers
+    for b in self.buffers
+      call s:do_update_option(b, '&'.a:varname, value)
+    endfor
+  else
+    call s:do_update_option(a:1, '&'.a:varname, value)
+  endif
 endfunction
 
 function! s:_use_options(bid) dict abort " {{{4
@@ -529,7 +553,7 @@ function! s:_use_options(bid) dict abort " {{{4
     call p._use_options(a:bid)
   endfor
   for opt in keys(self.options)
-    call self._update_option(opt)
+    call self._update_option(opt, a:bid)
   endfor
 endfunction
 
