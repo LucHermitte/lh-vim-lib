@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4.0.00'
 " Created:      20th Nov 2015
-" Last Update:  24th Oct 2016
+" Last Update:  02nd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Formatting functions
@@ -58,7 +58,7 @@ endfunction
 " - %%1 that would expand into %1
 function! lh#fmt#printf(format, ...) abort
   let matches = lh#string#matches(a:format, '\v\%\zs\d+\ze')
-  call uniq(sort(matches))
+  call lh#list#unique_sort(matches)
   let args = copy(a:000)
   for i in matches
     let args[i-1] = lh#string#as(args[i-1])
