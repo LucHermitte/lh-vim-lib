@@ -20,6 +20,7 @@ let s:k_version = 40000
 "       (*) ENH: Add lh#list#arg_min() & max()
 "       (*) BUG: Add support for empty lists in `lh#list#find_if`
 "       (*) PERF: Simplify lh#list#uniq()
+"       (*) ENH: Add lh#list#push_if_new_elements()
 "       v3.13.2
 "       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
@@ -637,6 +638,13 @@ function! lh#list#push_if_new(list, value) abort
   if index(a:list, a:value) < 0
     call add (a:list, a:value)
   endif
+  return a:list
+endfunction
+
+" Function: lh#list#push_if_new_elements(list, values) {{{3
+function! lh#list#push_if_new_elements(list, values) abort
+  let new = filter(copy(a:values), 'index(a:list, v:val) < 0')
+  call extend(a:list, new)
   return a:list
 endfunction
 

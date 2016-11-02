@@ -96,6 +96,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#not_found()|
 - |lh#list#possible_values()|
 - |lh#list#push_if_new()|
+- |lh#list#push_if_new_elements()|
 - |lh#list#remove()|
 - |lh#list#separate()|
 - |lh#list#sort()|
@@ -1511,7 +1512,7 @@ lh#dict#key(one_key_dict)~
                                                *lh#list#push_if_new()*            {{{3
 lh#list#push_if_new(list, value)~
 @param[in,out] {list} |List| to extend
-@param[in]      {rhs} Element to insert, if new.
+@param[in]     {value} Element to insert, if new.
 @return        The {list}
 Adds an element into a list, if not already present
 
@@ -1521,6 +1522,20 @@ Examples: >
 
   AssertEquals(lh#list#push_if_new(copy(list), 5), [1,2,3,5])
   AssertEquals(lh#list#push_if_new(copy(list), 2), [1,2,3])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#push_if_new_elements()*   {{{3
+lh#list#push_if_new_elements(list, values)~
+@param[in,out] {list} |List| to extend
+@param[in]     {values} Elements to insert, if new.
+@return        The {list}
+Adds elements into a list, if not already present
+
+Examples: >
+
+  let list = [1,2,3]
+
+  AssertEquals(lh#list#push_if_new_elements(copy(list), [1, 2, 5, 8]), [1,2,3,5,8])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#remove()*                 {{{3
