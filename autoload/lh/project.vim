@@ -521,11 +521,11 @@ endfunction
 function! s:do_update_option(bid, varname, value)
   if     a:value =~ '^+='
     let lValue = split(getbufvar(a:bid, a:varname), ',')
-    call lh#list#push_if_new_elements(lValue, split(a:value, ','))
+    call lh#list#push_if_new_elements(lValue, split(a:value[2:], ','))
     let value = join(lValue, ',')
   elseif a:value =~ '^-='
     let lValue = split(getbufvar(a:bid, a:varname), ',')
-    let toRemove = split(a:value, ',')
+    let toRemove = split(a:value[2:], ',')
     call filter(lValue, 'index(toRemove, v:val) >= 0')
     let value = join(lValue, ',')
   elseif a:value =~ '^='
