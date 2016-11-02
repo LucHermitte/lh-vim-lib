@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  28th Oct 2016
+" Last Update:  02nd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -641,7 +641,7 @@ function! lh#project#new(params) abort
         \ , 'parents':   []
         \ })
   " If no name is provided, generate one on the fly
-  if !has_key(project, 'name')
+  if empty(get(project, 'name', ''))
     let project.name = s:project_list.new_name()
   endif
 
