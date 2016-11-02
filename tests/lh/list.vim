@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  22nd Oct 2016
+" Last Update:  02nd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -67,6 +67,15 @@ endfunction
 UTIgnore Test_find_if_double_bind
 
 "------------------------------------------------------------------------
+" Uniq {{{2
+function! s:Test_uniq()
+  AssertEquals([], lh#list#uniq([]))
+  AssertEquals([1], lh#list#uniq([1]))
+  AssertEquals([1,2,3,4,5,8], lh#list#uniq([1,2,3,4,5,8]))
+  AssertEquals([1,2,3,4,5,8], lh#list#uniq([1,1,2,3,4,5,8]))
+  AssertEquals([1,2,3,4,2,5,8], lh#list#uniq([1,2,2,2,3,4,2,5,8]))
+endfunction
+
 " Unique Sorting {{{2
 function! s:Test_sort_num()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
