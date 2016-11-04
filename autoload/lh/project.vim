@@ -464,6 +464,7 @@ function! s:depth() dict abort " {{{4
 endfunction
 
 function! s:set(varname, value) dict abort " {{{4
+  call s:Verbose('%1.set(%2 <- %3)', self.name, a:varname, a:value)
   " call assert_true(!empty(a:varname))
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
@@ -485,6 +486,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   " possibily in a parent project), and update the "old" setting instead of
   " overridding it.
   " call assert_true(!empty(a:varname))
+  call s:Verbose('%1.set(%2 <- %3, %4)', self.name, a:varname, a:value, a:000)
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
     if has_key(self.options, varname)
@@ -518,7 +520,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   return 0
 endfunction
 
-function! s:do_update_option(bid, varname, value)
+function! s:do_update_option(bid, varname, value) " {{{4
   if     a:value =~ '^+='
     let lValue = split(getbufvar(a:bid, a:varname), ',')
     call lh#list#push_if_new_elements(lValue, split(a:value[2:], ','))
@@ -533,11 +535,13 @@ function! s:do_update_option(bid, varname, value)
   else
     let value = a:value
   endif
+  call s:Verbose('setlocal{%1} %2%3 -> %4', a:bid, a:varname, a:value, value)
   call setbufvar(a:bid, a:varname, value)
 endfunction
 
 function! s:_update_option(varname, ...) dict abort " {{{4
   let value = self.options[a:varname]
+  call s:Verbose('%1._update_option(%2 <- %3)', self.name, a:varname, value)
   if a:0 == 0
     " Apply to all buffers
     for b in self.buffers
@@ -549,6 +553,7 @@ function! s:_update_option(varname, ...) dict abort " {{{4
 endfunction
 
 function! s:_use_options(bid) dict abort " {{{4
+  call s:Verbose('%1._use_options(%2)', self.name, a:bid)
   for p in self.parents
     call p._use_options(a:bid)
   endfor
@@ -565,11 +570,12 @@ function! s:_remove_buffer(bid) dict abort " {{{4
 endfunction
 
 function! s:get(varname, ...) dict abort " {{{4
-  if     a:varname[0] == '$'
+  let r0 = s:k_unset
+  if     a:varname[0] == '$' && has_key(self.env, a:varname[1:])
     let r0 = self.env[a:varname[1:]]
-  elseif a:varname[0] == '&'
+  elseif a:varname[0] == '&' && has_key(self.options, a:varname[1:])
     let r0 = self.options[a:varname[1:]]
-  else
+  elseif a:varname[0] !~ '[&$]'
     let r0 = lh#dict#get_composed(self.variables, a:varname)
   endif
   if lh#option#is_set(r0)
@@ -948,6 +954,7 @@ endfunction
 " # Post local vimrc hook {{{2
 " Function: lh#project#_post_local_vimrc() {{{3
 function! lh#project#_post_local_vimrc() abort
+  call s:Verbose('lh#project#_post_local_vimrc()')
   call lh#project#_auto_detect_project()
   call lh#project#_UseProjectOptions()
 endfunction
