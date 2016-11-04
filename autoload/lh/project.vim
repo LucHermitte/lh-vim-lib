@@ -570,7 +570,6 @@ function! s:_remove_buffer(bid) dict abort " {{{4
 endfunction
 
 function! s:get(varname, ...) dict abort " {{{4
-  let r0 = s:k_unset
   if     a:varname[0] == '$' && has_key(self.env, a:varname[1:])
     let r0 = self.env[a:varname[1:]]
   elseif a:varname[0] == '&' && has_key(self.options, a:varname[1:])
@@ -578,7 +577,7 @@ function! s:get(varname, ...) dict abort " {{{4
   elseif a:varname[0] !~ '[&$]'
     let r0 = lh#dict#get_composed(self.variables, a:varname)
   endif
-  if lh#option#is_set(r0)
+  if exists('r0') && lh#option#is_set(r0)
     " may need to interpret a reference lh#ref('g:variable')
     return r0
   else
