@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  02nd Nov 2016
+" Last Update:  04th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -747,6 +747,11 @@ function! lh#project#crt() abort
     return s:k_unset
     " throw "The current buffer doesn't belong to a project"
   endif
+endfunction
+
+" Function: lh#project#_get_varname() {{{3
+function! lh#project#_get_varname() abort
+  return s:project_varname
 endfunction
 
 " Function: lh#project#crt_bufvar_name() {{{3
