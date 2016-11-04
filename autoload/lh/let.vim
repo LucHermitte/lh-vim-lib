@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  27th Oct 2016
+" Last Update:  04th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -52,7 +52,7 @@ endfunction
 " # Let* {{{2
 " Function: s:BuildPublicVariableName(var) {{{3
 function! s:BuildPublicVariableName(var)
-  if a:var !~ '\v^[wbptgP]:|\$'
+  if a:var !~ '\v^[wbptgP]:|[$&]'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^P:'
     " It's either a project variable if there is a project, or a buffer
@@ -174,13 +174,14 @@ function! s:LetTo(var, value) abort " {{{4
     exe 'return '.a:var
   else
     " other variables
-    if exists(a:var)
+    if a:var !~ '&' && exists(a:var)
       unlet {a:var} " required until vim 7.4-1546
     endif
     " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
-    let {a:var} = a:value
-    call s:Verbose("let %1 = %2", a:var, {a:var})
-    return {a:var}
+    " let {a:var} = a:value
+    exe 'let '.a:var.' = a:value'
+    call s:Verbose("let %1 = %2", a:var, eval(a:var))
+    return eval(a:var)
   endif
 endfunction
 
