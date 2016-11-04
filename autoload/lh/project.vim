@@ -955,8 +955,10 @@ endfunction
 " Function: lh#project#_auto_detect_project() {{{3
 function! lh#project#_auto_detect_project() abort
   let auto_detect_projects = lh#option#get('lh#project.auto_detect', 0, 'g')
-  " If there already is a project defined => abort
-  if auto_detect_projects && ! lh#project#is_in_a_project()
+  " If there already is a project defined
+  " Or if this is the quickfix window
+  " => abort
+  if auto_detect_projects && ! lh#project#is_in_a_project() && &ft != 'qf'
     let root = lh#project#root()
     if !empty(root) && s:permission_lists.check_paths([root]) == 1
       " TODO: recognize patterns such as src|source to search the project in
