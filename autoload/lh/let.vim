@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  04th Nov 2016
+" Last Update:  07th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -84,9 +84,14 @@ function! s:BuildPublicVariableNameAndValue(...)
       let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
       " string+eval loses references, and it doesn't seem required.
 
-      " Simplified way to handle viml comments
-      let value0 = substitute(value0, '\v^("[^"]*"|[^"])*\zs"[^"]*$', '', '')
-      let l:Value = eval(value0)
+      " Handle comments and assign value
+      exe 'let l:Value = '.value0
+      " The following
+      "    " Simplified handling of comments
+      "    :let value0 = substitute(value0, '\v^("[^"]*"|[^"])*\zs"[^"]*$', '', '')
+      "    :let l:Value = eval(value0)
+      " won't work with:
+      "    :LetIfUndef g:c_import_pattern      '^#\s*include\s*["<]${module}\>'
     endif
   else
     let var = a:1
