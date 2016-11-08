@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  04th Nov 2016
+" Last Update:  08th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -209,7 +209,8 @@ function! s:cd_project(prj, path) abort " {{{4
     throw "Invalid directory `".path."`!"
   endif
   call lh#dict#add_new(a:prj.variables, {'paths': {}})
-  call lh#dict#add_new(a:prj.variables.paths, {'sources': path})
+  " Explicit :cd => force the path
+  let a:prj.variables.paths.sources = path
   " Then, for all windows displaying a buffer from the project: update :lcd
   let windows = filter(range(1, winnr('$')), 'index(a:prj.buffers, winbufnr(v:val)) >= 0')
   call map(windows, 'win_getid(v:val)')
