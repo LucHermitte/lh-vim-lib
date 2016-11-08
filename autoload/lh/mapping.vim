@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	3.6.1
-let s:version = '3.6.01'
+" Version:	4.0.0
+let s:version = '4.0.0'
 " Created:      01st Mar 2013
-" Last Update:  08th Jan 2016
+" Last Update:  08th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -47,7 +47,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-" Function: lh#mapping#_build_command(mapping_definition) {{{3
+" Function: lh#mapping#_build_command(mapping_definition) {{{2
 " @param mapping_definition is a dictionary witch the same keys than the ones
 " filled by maparg()
 function! lh#mapping#_build_command(mapping_definition)
@@ -68,15 +68,33 @@ function! lh#mapping#_build_command(mapping_definition)
   return cmd
 endfunction
 
-" Function: lh#mapping#define(mapping_definition) {{{3
+" Function: lh#mapping#define(mapping_definition) {{{2
 function! lh#mapping#define(mapping_definition)
   let cmd = lh#mapping#_build_command(a:mapping_definition)
   silent exe cmd
+endfunction
+
+" Function: lh#mapping#plug(keybinding, name, modes) {{{3
+function! lh#mapping#plug(keybinding, name, modes) abort
+  let modes = split(a:modes, '\zs')
+  for mode in modes
+    if !hasmapto(a:name, mode) && (mapcheck(a:keybinding, mode) == "")
+      try
+        exe mode.'map <silent> <unique> '.a:keybinding.' '.a:name
+      catch /E226:.*/
+        throw 'E226: a ('.mode.')mapping already exists for '.strtrans(a:keybinding)
+      catch /.*/
+        echo lh#exception#callstack(v:throwpoint)
+        throw 'E227: a ('.mode.')mapping already exists for '.strtrans(a:keybinding)
+      endtry
+    endif
+  endfor
 endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
 "------------------------------------------------------------------------
+" }}}1
 let &cpo=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:

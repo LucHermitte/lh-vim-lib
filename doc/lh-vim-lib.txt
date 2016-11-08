@@ -51,6 +51,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
 - |lh#math#abs()|
+- |lh#mapping#define()|
+- |lh#mapping#plug()|
 - |lh#on#exit()|
 - |lh#position#char_at()|
 - |lh#position#char_at_mark()|
@@ -336,6 +338,30 @@ lh#math#abs(val)~
 
 The purpose of the function is to emulate |abs()| on vim version where it
 isn't defined.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mapping#define()*             {{{3
+lh#mapping#define(map_dict)~
+Defines a |mapping| from:
+- `"mode"`  : i, n, ..
+- `"nore"`  : 1/[0]
+- `"silent"`: 1/[0]
+- `"expr"`  : 1/[0]
+- `"buffer"`: 1/[0]
+- `"lhs"`   : keybinding
+- `"rhs"`   : action bound
+- `"sid"`   : optional number
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mapping#plug()*               {{{3
+lh#mapping#plug(keybinding, name, modes)~
+Helper function to define in one go several default and unique mappings for a
+plug mapping.
+
+For all the mode specified, it executes: >
+    if !hasmapto(name, mode) && (mapcheck(keybinding, mode) == "")
+        exe mode.'map <silent> <unique> '.keybinding.' '.name
+    endif
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3
