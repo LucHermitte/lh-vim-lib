@@ -68,6 +68,20 @@ function! lh#position#IsBefore(lhs_pos, rhs_pos)
 endfunction
 
 
+" Function: lh#position#compare(lhs_pos, rhs_pos) {{{3
+function! lh#position#compare(lhs_pos, rhs_pos) abort
+  if a:lhs_pos[0] != a:rhs_pos[0]
+    throw "Positions from incompatible buffers can't be ordered"
+  endif
+  "1 test lines
+  "2 test cols
+  let res
+        \ = (a:lhs_pos[1] == a:rhs_pos[1])
+        \ ? (a:lhs_pos[2] - a:rhs_pos[2])
+        \ : (a:lhs_pos[1] - a:rhs_pos[1])
+  return res
+endfunction
+
 " Function: lh#position#char_at_mark {{{3
 " @return the character at a given mark (|mark|)
 function! lh#position#char_at_mark(mark) abort
