@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.9.1
-let s:k_version = 391
+" Version:      4.0.0
+let s:k_version = 400
 " Created:      05th Sep 2007
-" Last Update:  18th May 2016
+" Last Update:  08th Nov 2016
 "------------------------------------------------------------------------
 " Description:  «description»
 " }}}1
@@ -97,9 +97,12 @@ endfunction
 " Function: lh#position#extract(pos1, pos2) {{{3
 " positions from |getpos()|
 function! lh#position#extract(pos1, pos2) abort
-  let lines = getline(a:pos1[0], a:pos2[0])
-  let lines[-1] = lines[-1][:a:pos2[1]-2]
-  let lines[0]  = lines[0][a:pos1[1]-1 : ]
+  call s:Verbose('extract(%1, %2)', a:pos1, a:pos2)
+  let pos1 = len(a:pos1) == 4 ? a:pos1[1:2] : a:pos1
+  let pos2 = len(a:pos2) == 4 ? a:pos2[1:2] : a:pos2
+  let lines = getline(pos1[0], pos2[0])
+  let lines[-1] = lines[-1][:pos2[1]-2]
+  let lines[0]  = lines[0][pos1[1]-1 : ]
   return join(lines, "\n")
 endfunction
 
