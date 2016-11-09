@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  08th Nov 2016
+" Last Update:  09th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -210,15 +210,20 @@ function! s:cd_project(prj, path) abort " {{{4
   endif
   call lh#dict#add_new(a:prj.variables, {'paths': {}})
   " Explicit :cd => force the path
-  let a:prj.variables.paths.sources = path
+  let a:prj.variables.paths.sources = fnamemodify(lh#path#simplify(path), ':p')
   " Then, for all windows displaying a buffer from the project: update :lcd
   let windows = filter(range(1, winnr('$')), 'index(a:prj.buffers, winbufnr(v:val)) >= 0')
   call map(windows, 'win_getid(v:val)')
-  let crt_win = win_getid(winbufnr('%'))
-  for w in windows
-    call win_gotoid(w)
-    exe 'lcd '.path
-  endfor
+  let crt_win = win_getid()
+  try
+    for w in windows
+      call win_gotoid(w)
+      " We must use the most precise path.
+      exe 'lcd '.lh#option#get('paths.sources')
+    endfor
+  finally
+    call win_gotoid(crt_win)
+  endtry
 endfunction
 
 function! s:echo_project(prj, var) abort " {{{4
@@ -658,6 +663,8 @@ endfunction
 " - "paths.root" ?
 " - "buffers"
 " - "variables" <- where p:foobar will be stored
+"   - "paths"
+"     - "sources" <- @inv absolute path when defined
 " - "options"   <- where altered vim options will be stored
 " - "env"       <- where $ENV variables will be stored
 function! lh#project#new(params) abort
@@ -708,13 +715,13 @@ function! lh#project#new(params) abort
 
   if type(auto_discover_root) == type({}) && has_key(auto_discover_root, 'value')
     call s:Verbose("prj#new: auto_discover_root set in options: %1", auto_discover_root.value)
-    call lh#let#if_undef('p:paths.sources', auto_discover_root.value)
+    call lh#let#if_undef('p:paths.sources', fnamemodify(auto_discover_root.value, ':p'))
   elseif auto_discover_root !~? '\v^(n%[o]|0)$'
     if ! lh#project#exists('p:paths.sources')
       let root = lh#project#root()
       call s:Verbose("prj#new: root found: %1", root)
       if !empty(root)
-        call lh#let#if_undef('p:paths.sources', root[:-2])
+        call lh#let#if_undef('p:paths.sources', fnamemodify(root[:-2], ':p'))
       endif
     endif
   endif
