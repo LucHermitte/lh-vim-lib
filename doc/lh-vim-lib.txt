@@ -72,6 +72,9 @@ Options related functions:                              |lhvl#option|
 - |lh#option#getbufglobvar()|
 - |lh#option#is_set()|
 - |lh#option#is_unset()|
+- |lh#ft#option#get()|
+- |lh#ft#option#get_postfixed()|
+- |lh#ft#option#get_all()|
 - |lh#ref#bind()|
 - |lh#ref#is_bound()|
 Functors related functions:                             |lhvl#function|
@@ -770,6 +773,68 @@ This function will permit to test whether an option is set or not: >
     Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
     let b:foobar = 1
     Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#ft#option#get()*              {{{3
+lh#ft#option#get({name}, {ft}, {default} [,{scopes}])~
+@return which ever exists first among: b:{ft}_{name}, or p:{ft}_{name}, or
+g:{ft}_{name}, or b:{name}, or p:{name}, or g:{name}. {default} is returned
+if none exists.
+@note filetype inheritance is supported -- see |lhdev-filetype|.
+The order of the scopes for the variables checked can be specified through the
+optional argument {scope}
+@see also |lh#ft#option#get_postfixed()|
+@see also |lh#ft#option#get_all()|
+@since Version 4.0.0, moved from |lh-dev| `lh#dev#option#get()`.
+
+Example: >
+    LetTo g:foo.glob        = 'g'
+    LetTo g:foo.spe_buff    = 'g'
+    LetTo g:foo.spe_gFT     = 'g'
+    LetTo g:FT_foo.gFT      = 'gft'
+    LetTo g:FT_foo.spe_gFT  = 'gft'
+    LetTo g:FT_foo.spe_bFT  = 'gft'
+    LetTo b:foo.buff        = 'b'
+    LetTo b:foo.spe_buff    = 'b'
+    LetTo b:foo.spe_bFT     = 'b'
+    LetTo b:FT_foo.bFT      = 'bft'
+    LetTo b:FT_foo.spe_bFT  = 'bft'
+
+    let d = lh#ft#option#get_all('foo', 'FT')
+
+    AssertEquals(d.glob,     'g')
+    AssertEquals(d.buff,     'b')
+    AssertEquals(d.spe_buff, 'b')
+    AssertEquals(d.gFT,      'gft')
+    AssertEquals(d.spe_gFT,  'gft')
+    AssertEquals(d.bFT,      'bft')
+    AssertEquals(d.spe_bFT,  'bft')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#ft#option#get_postfixed()*    {{{3
+lh#ft#option#get({name}, {ft}, {default} [,{scopes}])~
+@return which ever exists first among: b:{name}_{ft}, or p:{name}_{ft}, or
+g:{name}_{ft}, or b:{name}, or p:{name}, or g:{name}. {default} is returned
+if none exists.
+@note filetype inheritance is supported -- see |lhdev-filetype|.
+The order of the scopes for the variables checked can be specified through the
+optional argument {scope}
+@see also |lh#ft#option#get()|
+@since Version 4.0.0, moved from |lh-dev| `lh#dev#option#get_postfixed()`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#ft#option#get_all()*          {{{3
+lh#ft#option#get_all({name} [, {ft}})~
+Considering that the following variables will be |dictionaries| -- expecting they
+exists --, this function will merge all their values into one, keeping the
+most specialized value when there are.
+Possible variable names: b:{ft}_{name}, or p:{ft}_{name}, or g:{ft}_{name}, or
+b:{name}, or p:{name}, or g:{name}.
+@note filetype inheritance is supported -- see |lhdev-filetype|.
+The order of the scopes for the variables checked can be specified through the
+optional argument {scope}
+@see also |lh#ft#option#get()|
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#ref#bind()*                   {{{3

@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:	05th Oct 2009
-" Last Update:	16th Oct 2016
+" Last Update:	15th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Test lh#ft#options#*() functions
@@ -59,7 +59,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Tests {{{1
-function! s:Test_global()
+function! s:Test_global() " {{{2
   let cleanup = lh#on#exit()
         \.restore('g:foo')
         \.restore('b:foo')
@@ -87,7 +87,7 @@ function! s:Test_global()
   endtry
 endfunction
 
-function! s:Test_local()
+function! s:Test_local() " {{{2
   let cleanup = lh#on#exit()
         \.restore('b:foo')
         \.restore('g:FT_foo')
@@ -106,7 +106,7 @@ function! s:Test_local()
   endtry
 endfunction
 
-function! s:Test_FT_global()
+function! s:Test_FT_global() " {{{2
 
   let cleanup = lh#on#exit()
         \.restore('g:FT_foo')
@@ -122,7 +122,7 @@ function! s:Test_FT_global()
   endtry
 endfunction
 
-" Function: s:Test_inheritedFT() {{{3
+" Function: s:Test_inheritedFT() {{{2
 function! s:Test_inheritedFT()
   AssertEquals(lh#ft#option#inherited_filetypes('zz') , ['zz'])
   AssertEquals(lh#ft#option#inherited_filetypes('c') , ['c'])
@@ -149,6 +149,45 @@ function! s:Test_inheritedFT()
   endtry
 endfunction
 
+" Function: s:Test_MergeDicts() {{{2
+function! s:Test_MergeDicts() abort
+  let cleanup = lh#on#exit()
+        \.restore('g:foo')
+        \.restore('b:foo')
+        \.restore('g:FT_foo')
+        \.restore('b:FT_foo')
+  try
+    Unlet g:foo
+    Unlet b:foo
+    Unlet g:FT_foo
+    Unlet b:FT_foo
+    LetTo g:foo.glob        = 'g'
+    LetTo g:foo.spe_buff    = 'g'
+    LetTo g:foo.spe_gFT     = 'g'
+
+    LetTo g:FT_foo.gFT      = 'gft'
+    LetTo g:FT_foo.spe_gFT  = 'gft'
+    LetTo g:FT_foo.spe_bFT  = 'gft'
+
+    LetTo b:foo.buff        = 'b'
+    LetTo b:foo.spe_buff    = 'b'
+    LetTo b:foo.spe_bFT     = 'b'
+
+    LetTo b:FT_foo.bFT      = 'bft'
+    LetTo b:FT_foo.spe_bFT  = 'bft'
+
+    let d = lh#ft#option#get_all('foo', 'FT')
+    AssertEquals(d.glob,     'g')
+    AssertEquals(d.buff,     'b')
+    AssertEquals(d.spe_buff, 'b')
+    AssertEquals(d.gFT,      'gft')
+    AssertEquals(d.spe_gFT,  'gft')
+    AssertEquals(d.bFT,      'bft')
+    AssertEquals(d.spe_bFT,  'bft')
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

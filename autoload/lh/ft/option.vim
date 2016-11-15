@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  16th Oct 2016
+" Last Update:  15th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -92,6 +92,31 @@ function! lh#ft#option#get_postfixed(name, ft,...) abort
     unlet r
   endfor
   return a:0 > 0 ? a:1 : s:k_unset
+endfunction
+
+" Function: lh#ft#option#get_all(varname [, ft]) {{{2
+" Unlike lh#ft#option#get(), this time, we gather every possible value, but
+" keeping the most specialized value
+" This only works to gather disctionaries scatered in many specialized
+" variables.
+function! lh#ft#option#get_all(varname, ...) abort
+  let ft = get(a:, '1', &ft)
+  let fts = map(lh#ft#option#inherited_filetypes(ft), 'v:val."_"') + ['']
+  call map(fts, 'v:val.a:varname')
+  let scopes = ['b:', 'p:', 'g:']
+  let res = {}
+  let rs = []
+  for s in scopes
+    let scope_res = map(copy(fts), 'lh#option#get(v:val, s:k_unset, s)')
+    call filter(scope_res, 'lh#option#is_set(v:val)')
+    call s:Verbose('%1%2 -> %3', s, fts, scope_res)
+    let rs += scope_res
+  endfor
+  " The specialized results are sorted from most specialized to more generic
+  for r in rs
+    call extend(res, r, 'keep')
+  endfor
+  return res
 endfunction
 
 "------------------------------------------------------------------------
