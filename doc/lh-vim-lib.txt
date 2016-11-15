@@ -138,6 +138,7 @@ Graphs related functions:                               |lhvl#graph|
 Paths related functions:                                |lhvl#path|
 - |lh#path#common()|
 - |lh#path#depth()|
+- |lh#path#exists()|
 - |lh#path#fix()|
 - |lh#path#glob_as_list()|
 - |lh#path#is_absolute_path()|
@@ -1854,7 +1855,7 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
 PATHS RELATED FUNCTIONS                               *lhvl#path*       {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                   *lh#path#depth()*              {{{3
+                                                   *lh#path#depth()*                 {{{3
 lh#path#depth({dirname})~
 Returns the depth of a directory name.
 
@@ -1867,7 +1868,14 @@ Returns the depth of a directory name.
       -1 or 3.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#to_dirname()*              {{{3
+                                                   *lh#path#exists()*                {{{3
+lh#path#exists({pathname})~
+@return whether {pathname} can be read (with |filereadable|) or whether a
+buffer exists with that name (see |bufexists()|).
+@since Version 4.0.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#path#to_dirname()*            {{{3
 lh#path#to_dirname({dirname})~
 Ensures the returned directory name ends with a '`/`' or a '`\`'.
 
@@ -1875,7 +1883,7 @@ Ensures the returned directory name ends with a '`/`' or a '`\`'.
       character to append.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#remove_dir_mark()*         {{{3
+                                                 *lh#path#remove_dir_mark()*       {{{3
 lh#path#remove_dir_mark({dirname})~
 Remove the trailing 'shellslash' character ('`/`' or a '`\`') from {dirname}.
 
@@ -1941,7 +1949,7 @@ containing "`..\`". (It likelly works this way when vim is compiled without
 'shellslash' support)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#common()*            {{{3
+                                                    *lh#path#common()*                {{{3
 lh#path#common({pathnames})~
 @param[in] {pathnames} |List| of pathnames to analyse
 @return the common leading path between all {pathnames}
@@ -1968,7 +1976,7 @@ echoes >
  ['bar/file','file', 'foo/file']
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#StripStart()*           {{{3
+                                                 *lh#path#StripStart()*            {{{3
 lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
                                                  *lh#path#strip_start()*
 lh#path#strip_start({pathname}, {pathslist})~
@@ -2063,7 +2071,7 @@ In case {expr} is a |List|, |globpath()| is applied on each expression in
 {expr}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#find()*              {{{3
+                                                    *lh#path#find()*                  {{{3
 lh#path#find({pathslist}, {regex})~
 @param[in] {pathslist} List of paths which can be received as a |List| or as a
                        string made of coma separated paths.

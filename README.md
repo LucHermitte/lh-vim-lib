@@ -81,8 +81,9 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#object#to_string()`                        | Stringifies a data -- hide objects methods                                                                                                                               |
 | `lh#option#add()`                              | Adds new values to a vim option -- and avoid the values being listed more than once                                                                                      |
 | `lh#option#get(name [,default [, scope]])`     | Fetches the value of a user defined option, that may be _empty_. `default` is returned if the option does not exists. Default value for `default` is `g:lh#option#unset` |
-| `lh#ft#option#get(ft, name [...])`             | Fetches the value of a user defined option that can be specialized on a filetype basis                                                                                   |
-| `lh#ft#option#get_postfixed(ft, name [...])`   | Fetches the value of a user defined option that can be specialized on a filetype basis                                                                                   |
+| `lh#ft#option#get(name, ft [...])`             | Fetches the value of a user defined option that can be specialized on a filetype basis                                                                                   |
+| `lh#ft#option#get_postfixed(name, ft [...])`   | Fetches the value of a user defined option that can be specialized on a filetype basis                                                                                   |
+| `lh#ft#option#get_all(name [, ft...])`         | Fetches the merged values of a dictionnary that can be specialized on a filetype basis                                                                                   |
 | `lh#option#get_non_empty()`                    | Fetches the value of a user defined option, that is not _empty_                                                                                                          |
 | `lh#option#get_from_buf(bufid, name [...])`    | Same as `lh#option#get()` except that it works from bufid context                                                                                                        |
 | `lh#option#getbufvar(buf, varname [,def])`     | Encapsulates `getbufvar(buf, varname, g:lh#option#unset)` when `def` is not passed                                                                                       |
@@ -205,6 +206,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#add_path_if_exists(listname, path)` | Adds a path is a list iff the path points to an existing node                                             |
 | `lh#path#common()`                           | Returns the biggest common part between several paths                                                     |
 | `lh#path#depth()`                            | Returns the depth of a path                                                                               |
+| `lh#path#exists()`                           | Returns whether a pathname can be read, or if it's open in a buffer                                       |
 | `lh#path#find(pathlist, regex)`              | Returns the first path in a list that matches a regex                                                     |
 | `lh#path#find_in_parents()`                  | Support function at the root of [local_vimrc](http://github.com/LucHermitte/local_vimrc)                  |
 | `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                   |

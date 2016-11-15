@@ -670,6 +670,12 @@ function! lh#path#munge(pathlist, path) abort
   endif
 endfunction
 
+" Function: lh#path#exists(pathname) {{{3
+" @return whether the file is readable or a buffer with the same name exists
+function! lh#path#exists(pathname) abort
+  return filereadable(a:pathname) || bufexists(a:pathname)
+endfunction
+
 " # Permission lists {{{2
 " @since v4.0.0, code moved from local_vimrc
 " Function: lh#path#new_permission_lists(options) {{{3
