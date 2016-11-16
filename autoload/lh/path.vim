@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  15th Nov 2016
+" Last Update:  16th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -103,6 +103,7 @@ let s:k_version = 40000
 "       (*) Move Permission lists code from local_vimrc
 "       (*) Add `p:var` support to `lh#path#add_path_if_exists()`
 "       (*) Escape `_` in `lh#path#select_one()` confirm box
+"       (*) Support `lh#path#glob_as_list(list`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -417,7 +418,8 @@ endfunction
 " Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
 if has("patch-7.4-279")
   function! s:DoGlobPath(pathslist, expr) abort
-    return globpath(a:pathslist, a:expr, 1, 1)
+    let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
+    return globpath(pathslist, a:expr, 1, 1)
   endfunction
 else
   function! s:DoGlobPath(pathslist, expr) abort
