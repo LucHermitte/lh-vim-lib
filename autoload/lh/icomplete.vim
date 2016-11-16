@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:version = '4.0.0'
 " Created:      03rd Jan 2011
-" Last Update:  17th Oct 2016
+" Last Update:  16th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -18,6 +18,7 @@ let s:version = '4.0.0'
 "       Requires Vim7+
 " History:
 "       v4.0.0 : Support vim7.3
+"                Stay in insert mode when there is no hook
 "       v3.5.0 : Smarter completion function added
 "       v3.3.10: Fix conflict with lh-brackets
 "       v3.0.0 : GPLv3
@@ -205,8 +206,13 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         \.restore_buffer_mapping('<esc>', 'i')
         \.restore_buffer_mapping('<tab>', 'i')
         \.restore_buffer_mapping('<s-tab>', 'i')
-  inoremap <buffer> <silent> <cr>  <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
-  inoremap <buffer> <silent> <c-y> <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
+  if empty(a:hook) " Then stay in insert mode
+    inoremap <buffer> <silent> <cr>  <c-y><c-r>=b:complete_data.conclude()<cr>
+    inoremap <buffer> <silent> <c-y> <c-y><c-r>=b:complete_data.conclude()<cr>
+  else " Let the hook do whatever it wished
+    inoremap <buffer> <silent> <cr>  <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
+    inoremap <buffer> <silent> <c-y> <c-y><c-\><c-n>:call b:complete_data.conclude()<cr>
+  endif
   " Unlike usual <tab> behaviour, this time, <tab> cycle through the matches
   inoremap <buffer> <silent> <tab> <down>
   inoremap <buffer> <silent> <s-tab> <up>
@@ -301,10 +307,14 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   function! s:conclude() abort dict " {{{3
     let selection = getline('.')[self.startcol : col('.')-1]
     call s:Verbose("Successful selection of <".selection.">")
-    if !empty(self.hook)
-      call lh#function#execute(self.hook, selection)
-    endif
-    call self.finalize()
+    try
+      if !empty(self.hook)
+        return lh#function#execute(self.hook, selection)
+      endif
+      return ''
+    finally
+      call self.finalize()
+    endtry
   endfunction
   let b:complete_data.conclude = s:function('conclude')
 
