@@ -674,16 +674,17 @@ This sub-library helps fetching option values for plugins.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#Get()*                 {{{3
-lh#option#Get({name},{default}[,{scopes}])  (*deprecated*)~
+lh#option#Get({names},{default}[,{scopes}])  (*deprecated*)~
                                                 *lh#option#get()*
-lh#option#get({name}[,{default}[,{scopes}]])~
-@param {name}       Name of the option to fetch
+lh#option#get({names}[,{default}[,{scopes}]])~
+@param {name}       Names of the option to fetch
 @param {default}    Default value in case the option is not defined.
                     Its default value is |g:lh#option#unset|.
 @param {scopes}     Vim scopes in which the options must be searched,
                     default="bpg".
-@return             b:{name} if it exists, or p:{var} if it exists, or
-                    g:{name} if it exists, or {default} otherwise.
+@return             b:{names[0]} if it exists, or p:{names[0]} if it exists, or
+                    g:{names[0]} if it exists, or b:{names[1]}, ...
+                    or {default} if none exists.
 @see                For development oriented options, |lh-dev| provides a
                     dedicated function: |lh#dev#option#get()|.
 

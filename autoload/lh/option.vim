@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  24th Oct 2016
+" Last Update:  16th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -20,6 +20,7 @@ let s:k_version = 4000
 "       (*) BUG: `lh#option#getbufvar()` emulation for older vim version was failing.
 "       (*) BUG: Keep previous value for `g:lh#option#unset`
 "       (*) ENH: Extend `#to_string(#unset())` to be informative
+"       (*) ENH: Extend `lh#option#get()` to take a list of names
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -115,45 +116,46 @@ function! lh#option#is_set(expr) abort
   return ! (a:expr is g:lh#option#unset)
 endfunction
 
-" Function: lh#option#get(name [, default [, scope]])            {{{3
+" Function: lh#option#get(names [, default [, scope]])            {{{3
 " @return b:{name} if it exists, or g:{name} if it exists, or {default}
 " otherwise
 " The order of the variables checked can be specified through the optional
 " argument {scope}
-function! lh#option#get(name,...) abort
-  let scope = (a:0 == 2) ? a:2 : 'bpg'
-  let name = a:name
-  let i = 0
-  while i != strlen(scope)
-    if scope[i] == 'p'
-      let r = lh#project#_get(a:name)
-      if lh#option#is_set(r)
-        call s:Verbose('p:%1 found -> %2', a:name, r)
-        if lh#ref#is_bound(r)
-          return r.resolve()
+function! lh#option#get(names,...) abort
+  let sScopes = (a:0 == 2) ? a:2 : 'bpg'
+  let lScopes = split(sScopes, '\zs')
+  let names = type(a:names) == type([]) ? a:names : [a:names]
+  for name in names
+    for scope in lScopes
+      if scope == 'p'
+        let r = lh#project#_get(name)
+        if lh#option#is_set(r)
+          call s:Verbose('p:%1 found -> %2', name, r)
+          if lh#ref#is_bound(r)
+            return r.resolve()
+          else
+            return r
+          endif
+        endif
+      elseif exists(scope.':'.name)
+        " \ && (0 != strlen({scope}:{name}))
+        " This syntax doesn't work with dictionaries -> !exe
+        " return {scope}:{name}
+        exe 'let value='.scope.':'.name
+        call s:Verbose('%1:%2 found -> %3', scope, name, value)
+        if lh#ref#is_bound(value)
+          return value.resolve()
         else
-          return r
+          return value
         endif
       endif
-    elseif exists(scope[i].':'.name)
-      " \ && (0 != strlen({scope[i]}:{name}))
-      " This syntax doesn't work with dictionaries -> !exe
-      " return {scope[i]}:{name}
-      exe 'let value='.scope[i].':'.name
-      call s:Verbose('%1:%2 found -> %3', scope[i], a:name, value)
-      if lh#ref#is_bound(value)
-        return value.resolve()
-      else
-        return value
-      endif
-    endif
-    let i += 1
-  endwhile
+    endfor
+  endfor
   return a:0 > 0 ? (a:1) : g:lh#option#unset
 endfunction
-function! lh#option#Get(name,default,...)
+function! lh#option#Get(names,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
-  return lh#option#get(a:name, a:default, scope)
+  return lh#option#get(a:names, a:default, scope)
 endfunction
 
 " Function: lh#option#get_from_buf(bufid, name [, default [, scope]])            {{{3
