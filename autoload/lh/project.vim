@@ -505,13 +505,7 @@ endfunction
 
 " Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{3
 function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
-  let tmp = substitute(a:CmdLine[: a:CursorPos-1], '\\ ', '§', 'g')
-  let tokens = split(tmp, '\s\+')
-  call map(tokens, 'substitute(v:val, "§", " ", "g")')
-  let tmp = substitute(tmp, '\s*\S*', 'Z', 'g')
-  let pos = strlen(tmp) - 1
-  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3) -- tmp=%4, pos=%5, tokens=%6', a:ArgLead, a:CmdLine, a:CursorPos, tmp, pos, tokens)
-
+  let [pos, tokens; dummy] = lh#command#analyse_args(a:ArgLead, a:CmdLine, a:CursorPos)
 
   if     1 == pos
     let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
@@ -528,6 +522,13 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
     call filter(res, 'isdirectory(v:val)')
     call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
+  elseif     (2 == pos && tokens[1] =~ '\v^:(doonce|bufdo|windo)$')
+        \ || (3 == pos && tokens[2] =~ '\v^:=(doonce|bufdo|windo)$')
+    let res = lh#command#matching_askvim('command', a:ArgLead)
+  elseif     (2 <  pos && tokens[1] =~ '\v^:(doonce|bufdo|windo)$')
+        \ || (3 <  pos && tokens[2] =~ '\v^:=(doonce|bufdo|windo)$')
+    let lead = matchstr(a:CmdLine[: a:CursorPos-1], '\v^.{-}:=(doonce|bufdo|windo)\s*\zs.*')
+    let res = lh#command#matching_for_command(lead)
   elseif 2 == pos
     let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', 'windo']
   else
