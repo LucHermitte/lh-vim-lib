@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  09th Nov 2016
+" Last Update:  17th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -21,7 +21,6 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Doc
-" - Have root path be official for BTW and lh-tags
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:
@@ -43,7 +42,6 @@ let s:k_version = '400'
 "   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
 " - Setlocally vim options on new files
-" - :Project <name> do <cmd> ...
 " - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries
 "   -> no 'parents' when there are none!
@@ -253,6 +251,98 @@ function! s:let_project(prj, var, lVal) abort " {{{4
   endif
 endfunction
 
+function! s:doonce_project(prj, cmd) abort " {{{4
+  if lh#option#is_unset(a:prj)
+    throw "Cannot apply :doonce on non existant projects"
+  endif
+  " In case of bug in lh#project#_RemoveBufferFromProjectConfig(), keep only
+  " listed buffers.
+  let buffers = filter(copy(a:prj.buffers), 'buflisted(v:val)')
+  if empty(buffers)
+    throw "Project has no active buffer => abort (".string(a:cmd).')'
+  endif
+  if index(buffers, bufnr('%')) >= 0
+    call s:Verbose('Execute once in current windows: %1', a:cmd)
+    exe join(a:cmd, ' ')
+  else
+    let crt_win = win_getid()
+    let cleanup = lh#on#exit()
+          \.register('call win_gotoid('.crt_win.')')
+    try
+      let windows = filter(range(1, winnr('$')), 'index(buffers, winbufnr(v:val)) >= 0')
+      if ! empty(windows)
+        call map(windows, 'win_getid(v:val)')
+        call win_gotoid(windows[0])
+        call s:Verbose('Execute once in windows %2 (%3): %1', a:cmd, windows[0], bufnr('%'))
+        exe join(a:cmd, ' ')
+      else
+        " No buffer from the project is opened in any window, and yet the
+        " project has buffers => open a buffer in a new window and execute
+        call lh#window#create_window_with('sp '.bufname(buffers[0]))
+        call cleanup.register(':silent! q', 'priority')
+        call s:Verbose('Execute once in a window created for the occasion (%2): %1', a:cmd, bufnr('%'))
+        exe join(a:cmd, ' ')
+      endif
+    finally
+      call cleanup.finalize()
+    endtry
+  endif
+endfunction
+
+function! s:windo_project(prj, cmd) abort " {{{4
+  if lh#option#is_unset(a:prj)
+    throw "Cannot apply :windo on non existant projects"
+  endif
+  " In case of bug in lh#project#_RemoveBufferFromProjectConfig(), keep only
+  " listed buffers.
+  let buffers = filter(copy(a:prj.buffers), 'buflisted(v:val)')
+  if empty(buffers)
+    throw "Project has no active buffer => abort (".string(a:cmd).')'
+  endif
+  let crt_win = win_getid()
+  let cleanup = lh#on#exit()
+        \.register('call win_gotoid('.crt_win.')')
+  try
+    let windows = filter(range(1, winnr('$')), 'index(buffers, winbufnr(v:val)) >= 0')
+    if empty(windows)
+      call lh#common#warning_msg('Project '.a:prj.name.' has no active window => nothing is executed')
+    endif
+    call map(windows, 'win_getid(v:val)')
+    for win in windows
+      call win_gotoid(win)
+      call s:Verbose('Execute in windows %2 (%3): %1', a:cmd, win, bufnr('%'))
+      exe join(a:cmd, ' ')
+    endfor
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
+
+function! s:bufdo_project(prj, cmd) abort " {{{4
+  if lh#option#is_unset(a:prj)
+    throw "Cannot apply :bufdo on non existant projects"
+  endif
+  " In case of bug in lh#project#_RemoveBufferFromProjectConfig(), keep only
+  " listed buffers.
+  let buffers = filter(copy(a:prj.buffers), 'buflisted(v:val)')
+  if empty(buffers)
+    throw "Project has no active buffer => abort (".string(a:cmd).')'
+  endif
+  try
+    call lh#window#create_window_with('sp '.bufname(buffers[0]))
+    let cleanup = lh#on#exit()
+          \.register(':silent! q')
+    call s:Verbose('Execute in a window created for the occasion (%2): %1', a:cmd, bufnr('%'))
+    exe join(a:cmd, ' ')
+    for buf in buffers[1:]
+      silent! exe 'b ' . buf
+      exe join(a:cmd, ' ')
+    endfor
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
+
 function! s:define_project(prjname) abort " {{{4
   " 1- if there is already a project with that name
   " => only register the buffer
@@ -297,8 +387,12 @@ let s:k_usage =
       \ , '  :Project [<name>] :cd <path> " change directory to <path>'
       \ , '  :Project [<name>] :echo      " echo state of a project variable'
       \ , '  :Project [<name>] :let       " set state of a project variable'
+      \ , '  :Project [<name>] :bufdo[!]  " execute a command on all buffers belonging to the project'
+      \ , '  :Project [<name>] :windo[!]  " execute a command on all opened windows belonging to the project'
+      \ , '  :Project [<name>] :doonce    " execute a command on the first opened window found which belongs to the project'
       \ ]
 function! lh#project#_command(...) abort
+  " TODO: Merge cases.
   if     a:1 =~ '-\+u\%[sage]'  " {{{5
     call lh#common#warning_msg(s:k_usage)
   elseif a:1 =~ '-\+h\%[elp]'
@@ -317,7 +411,7 @@ function! lh#project#_command(...) abort
       throw "`:Project --define` expects a project-name as only argument"
     endif
     call s:define_project(a:2)
-  elseif a:1 =~ '^:'            " {{{5
+  elseif a:1 =~ '^:'            " -- commands {{{5
     let prj = lh#project#crt()
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
@@ -339,12 +433,27 @@ function! lh#project#_command(...) abort
         throw "Not enough arguments to `:Project :cd`"
       endif
       call s:cd_project(prj, a:2)
+    elseif a:1 =~ '\v^:doonce'     " {{{6
+      if a:0 < 2
+        throw "Not enough arguments to `:Project :doonce`"
+      endif
+      call s:doonce_project(prj, a:000[1:])
+    elseif a:1 =~ '\v^:bufdo'      " {{{6
+      if a:0 < 2
+        throw "Not enough arguments to `:Project :bufdo`"
+      endif
+      call s:bufdo_project(prj, a:000[1:])
+    elseif a:1 =~ '\v^:windo'      " {{{6
+      if a:0 < 2
+        throw "Not enough arguments to `:Project :windo`"
+      endif
+      call s:windo_project(prj, a:000[1:])
     elseif a:1 =~ '\v^--define$'   " {{{6
       call s:define_project(a:2)
-    else
+    else                           " -- unknown command {{{6
       throw "Unexpected `:Project ".a:1."` subcommand"
     endif
-  else                          " {{{5
+  else                          " -- project name specified {{{5
 
     let prj_name = a:1
     let prj = s:project_list.get(prj_name)
@@ -354,29 +463,45 @@ function! lh#project#_command(...) abort
     if a:0 < 2
       throw "Not enough arguments to `:Project name`"
     endif
-    if a:2 =~ '\v^:=l%[s]$'
+    if     a:2 =~ '\v^:=l%[s]$'    " {{{6
       call s:ls_project(prj)
-    elseif a:2 =~ '\v^:=echo$'   " {{{5
+    elseif a:2 =~ '\v^:=echo$'     " {{{6
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :echo`"
       endif
       call s:echo_project(prj, a:3)
-    elseif a:2 =~ '\v^:=let$'    " {{{5
+    elseif a:2 =~ '\v^:=let$'      " {{{6
       if a:0 < 4
         throw "Not enough arguments to `:Project <name> :let`"
       endif
       call s:let_project(prj, a:3, a:000[3:])
-    elseif a:2 =~ '\v^:=cd$'     " {{{5
+    elseif a:2 =~ '\v^:=cd$'       " {{{6
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :cd`"
       endif
       call s:cd_project(prj, a:3)
-    else
+    elseif a:2 =~ '\v^:=doonce$'   " {{{6
+      if a:0 < 3
+        throw "Not enough arguments to `:Project <name> :doonce`"
+      endif
+      call s:doonce_project(prj, a:000[2:])
+    elseif a:2 =~ '\v^:=bufdo$'    " {{{6
+      if a:0 < 3
+        throw "Not enough arguments to `:Project <name> :bufdo`"
+      endif
+      call s:bufdo_project(prj, a:000[2:])
+    elseif a:2 =~ '\v^:=windo$'    " {{{6
+      if a:0 < 3
+        throw "Not enough arguments to `:Project <name> :windo`"
+      endif
+      call s:windo_project(prj, a:000[2:])
+    else                           " -- unknown command {{{6
       throw "Unexpected `:Project ".a:2."` subcommand"
     endif
   endif
 
-endfunction " }}}5
+  " }}}5
+endfunction
 
 " Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{4
 function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
@@ -389,7 +514,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', 'windo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : s:k_unset)
@@ -404,7 +529,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     call filter(res, 'isdirectory(v:val)')
     call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
   elseif 2 == pos
-    let res = [':ls', ':echo', ':cd', ':let']
+    let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', 'windo']
   else
     let res = []
   endif

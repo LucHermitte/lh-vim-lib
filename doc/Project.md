@@ -304,6 +304,30 @@ Project ProjectName echo varname
 Project :echo varname
 ```
 
+#### Execute a command in any window associated to a project
+```vim
+Project ProjectName :doonce echo bufname('%')
+
+" Or for the current project only
+Project :doonce echo bufname('%')
+```
+
+#### Execute a command in all opened windows associated a project
+```vim
+Project ProjectName :windo echo bufname('%')
+
+" Or for the current project only
+Project :windo echo bufname('%')
+```
+
+#### Execute a command in all buffers associated a project
+```vim
+Project ProjectName :bufdo echo bufname('%')
+
+" Or for the current project only
+Project :bufdo echo bufname('%')
+```
+
 ## 3.2. Power User
 
 Here are a few other use cases and alternative ways of doing things in case you
@@ -476,7 +500,6 @@ BuildToolsWrappers are the first I've in mind).
 # 6. TO DO list
 
  * Doc
- * Have root path be official for BTW and lh-tags
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
  * Toggling:
@@ -492,7 +515,6 @@ BuildToolsWrappers are the first I've in mind).
      * -> :Project <name> :LetTo var = value
  * `:call prj.set(plain_variable, value)`
  * Setlocally vim options on new files
- * `:Project <name> do <cmd> ...`
  * `:Project <name> :bw` -> with confirmation!
  * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
    when there are none!

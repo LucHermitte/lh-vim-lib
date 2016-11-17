@@ -377,6 +377,8 @@ It permits to do the following things:
 - `restore()`                restores a |variable| or a vim |option|.
 - `restore_option()`         restores a |lhvl#option|
 - `register()`               registers a |command| to execute.
+                           it takes a second facultative argument `"priority"`
+                           to give the highest priority to the command.
 - `restore_buffer_mapping()` restores a |map-<buffer>|
 
 e.g. >
@@ -3446,6 +3448,27 @@ displayed.
 :Project [{prj-name}] :echo {varname}~
 Echoes the value of the |p:|variable {varname} associated to specified
 project, or the current project otherwise.
+
+                                                    *:Project-:doonce*
+:Project [{prj-name}] :doonce {cmd}~
+Executes {cmd} in the first window found that is associated to specified
+(or current) project. If no buffer from the project is opened in a window, we
+try to open one (which'll be automatically discarded).
+@pre the project shall have listed buffers.
+
+                                                    *:Project-:windo*
+:Project [{prj-name}] :windo {cmd}~
+Executes {cmd} in all windows associated to the specified (or current)
+project. This is similar to |:windo|, except the windows used are filtered
+beforehand.
+@pre the project shall have listed buffers.
+
+                                                    *:Project-:bufdo*
+:Project [{prj-name}] :bufdo {cmd}~
+Executes {cmd} in all buffers associated to the specified (or current)
+project. A temporary window is opened for the occasion (contrary to
+|:bufdo| which uses the current window) .
+@pre the project shall have listed buffers.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
