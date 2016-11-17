@@ -505,7 +505,7 @@ endfunction
 
 " Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{4
 function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
-  let tmp = substitute(a:CmdLine, '\\ ', '§', 'g')
+  let tmp = substitute(a:CmdLine[: a:CursorPos-1], '\\ ', '§', 'g')
   let tokens = split(tmp, '\s\+')
   call map(tokens, 'substitute(v:val, "§", " ", "g")')
   let tmp = substitute(tmp, '\s*\S*', 'Z', 'g')
@@ -514,7 +514,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
 
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', 'windo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(s:project_list.projects)), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
     let prj = s:project_list.get(pos == 3 ? tokens[pos-2] : s:k_unset)
