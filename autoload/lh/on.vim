@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  10th Oct 2016
+" Last Update:  17th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -115,8 +115,12 @@ function! s:restore_option(varname, ...) dict abort " {{{4
   return self
 endfunction
 
-function! s:register(Action) dict abort " {{{4
-  let self.actions += [a:Action]
+function! s:register(Action, ...) dict abort " {{{4
+  if get(a:, '1', 0) == 'priority'
+    let self.actions = [a:Action] + self.actions
+  else
+    let self.actions += [a:Action]
+  endif
   return self
 endfunction
 
