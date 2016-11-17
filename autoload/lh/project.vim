@@ -177,8 +177,8 @@ function! s:clear_projects() dict abort " {{{4
   let self.projects = []
 endfunction
 
-" - :Project Command definition {{{3
-function! s:As_ls(bid) abort " {{{4
+" # :Project Command definition {{{2
+function! s:As_ls(bid) abort " {{{3
   return printf('%3d%s %s'
         \ , a:bid
         \ , (buflisted(a:bid) ? ' ' : 'u')
@@ -189,7 +189,7 @@ function! s:As_ls(bid) abort " {{{4
         \ , '"'.bufname(a:bid).'"')
 endfunction
 
-function! s:ls_project(prj) abort " {{{4
+function! s:ls_project(prj) abort " {{{3
   if lh#option#is_unset(a:prj)
     echo '(no project specified!)'
   endif
@@ -198,7 +198,7 @@ function! s:ls_project(prj) abort " {{{4
   echo join(lines, "\n")
 endfunction
 
-function! s:cd_project(prj, path) abort " {{{4
+function! s:cd_project(prj, path) abort " {{{3
   if lh#option#is_unset(a:prj)
     throw "Cannot apply :cd on non existant projects"
   endif
@@ -224,7 +224,7 @@ function! s:cd_project(prj, path) abort " {{{4
   endtry
 endfunction
 
-function! s:echo_project(prj, var) abort " {{{4
+function! s:echo_project(prj, var) abort " {{{3
   let val = a:prj.get(a:var)
   if lh#option#is_set(val)
     echo 'p:{'.a:prj.name.'}.'.a:var.' -> '.lh#object#to_string(val)
@@ -233,7 +233,7 @@ function! s:echo_project(prj, var) abort " {{{4
   endif
 endfunction
 
-function! s:let_project(prj, var, lVal) abort " {{{4
+function! s:let_project(prj, var, lVal) abort " {{{3
   let value0 = join(a:lVal, ' ')
   let [all, compound, equal, value ; rem] = matchlist(value0, '\v^\s=%(([+-/*.])\=|(\=))\s*(.*)$')
   if !empty(compound)
@@ -251,7 +251,7 @@ function! s:let_project(prj, var, lVal) abort " {{{4
   endif
 endfunction
 
-function! s:doonce_project(prj, cmd) abort " {{{4
+function! s:doonce_project(prj, cmd) abort " {{{3
   if lh#option#is_unset(a:prj)
     throw "Cannot apply :doonce on non existant projects"
   endif
@@ -289,7 +289,7 @@ function! s:doonce_project(prj, cmd) abort " {{{4
   endif
 endfunction
 
-function! s:windo_project(prj, cmd) abort " {{{4
+function! s:windo_project(prj, cmd) abort " {{{3
   if lh#option#is_unset(a:prj)
     throw "Cannot apply :windo on non existant projects"
   endif
@@ -318,7 +318,7 @@ function! s:windo_project(prj, cmd) abort " {{{4
   endtry
 endfunction
 
-function! s:bufdo_project(prj, cmd) abort " {{{4
+function! s:bufdo_project(prj, cmd) abort " {{{3
   if lh#option#is_unset(a:prj)
     throw "Cannot apply :bufdo on non existant projects"
   endif
@@ -343,7 +343,7 @@ function! s:bufdo_project(prj, cmd) abort " {{{4
   endtry
 endfunction
 
-function! s:define_project(prjname) abort " {{{4
+function! s:define_project(prjname) abort " {{{3
   " 1- if there is already a project with that name
   " => only register the buffer
   " 2- else if there is a project, with another name
@@ -363,7 +363,7 @@ function! s:define_project(prjname) abort " {{{4
   endif
 endfunction
 
-function! s:show_related_projects(...) abort " {{{4
+function! s:show_related_projects(...) abort " {{{3
   let prj = a:0 == 0 ? lh#project#crt() : a:1
   if lh#option#is_unset(prj)
     echo "(current buffer is under no project)"
@@ -377,7 +377,7 @@ function! s:show_related_projects(...) abort " {{{4
   endfor
 endfunction
 
-" Function: lh#project#_command([prjname]) abort {{{4
+" Function: lh#project#_command([prjname]) abort {{{3
 let s:k_usage =
       \ [ ':Project USAGE:'
       \ , '  :Project --list              " list existing projects'
@@ -393,67 +393,67 @@ let s:k_usage =
       \ ]
 function! lh#project#_command(...) abort
   " TODO: Merge cases.
-  if     a:1 =~ '-\+u\%[sage]'  " {{{5
+  if     a:1 =~ '-\+u\%[sage]'  " {{{4
     call lh#common#warning_msg(s:k_usage)
   elseif a:1 =~ '-\+h\%[elp]'
     help :Project
-  elseif a:1 =~ '^-\+l\%[ist]$' " {{{5
+  elseif a:1 =~ '^-\+l\%[ist]$' " {{{4
     let projects = s:project_list.get()
     if empty(projects)
       echo "(no project defined)"
     else
       echo join(keys(projects), "\n")
     endif
-  elseif a:1 =~ '\v^--which$'   " {{{5
+  elseif a:1 =~ '\v^--which$'   " {{{4
     call s:show_related_projects()
-  elseif a:1 =~ '\v^--define$'  " {{{5
+  elseif a:1 =~ '\v^--define$'  " {{{4
     if a:0 != 2
       throw "`:Project --define` expects a project-name as only argument"
     endif
     call s:define_project(a:2)
-  elseif a:1 =~ '^:'            " -- commands {{{5
+  elseif a:1 =~ '^:'            " -- commands {{{4
     let prj = lh#project#crt()
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
     endif
-    if     a:1 =~ '\v^:l%[s]$'     " {{{6
+    if     a:1 =~ '\v^:l%[s]$'     " {{{5
       call s:ls_project(prj)
-    elseif a:1 =~ '\v^:echo$'      " {{{6
+    elseif a:1 =~ '\v^:echo$'      " {{{5
       if a:0 != 2
         throw "Not enough arguments to `:Project :echo`"
       endif
       call s:echo_project(prj, a:2)
-    elseif a:1 =~ '\v^:let$'       " {{{6
+    elseif a:1 =~ '\v^:let$'       " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project :let`"
       endif
       call s:let_project(prj, a:2, a:000[2:])
-    elseif a:1 =~ '\v^:cd$'        " {{{6
+    elseif a:1 =~ '\v^:cd$'        " {{{5
       if a:0 != 2
         throw "Not enough arguments to `:Project :cd`"
       endif
       call s:cd_project(prj, a:2)
-    elseif a:1 =~ '\v^:doonce'     " {{{6
+    elseif a:1 =~ '\v^:doonce'     " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :doonce`"
       endif
       call s:doonce_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:bufdo'      " {{{6
+    elseif a:1 =~ '\v^:bufdo'      " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :bufdo`"
       endif
       call s:bufdo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:windo'      " {{{6
+    elseif a:1 =~ '\v^:windo'      " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :windo`"
       endif
       call s:windo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^--define$'   " {{{6
+    elseif a:1 =~ '\v^--define$'   " {{{5
       call s:define_project(a:2)
-    else                           " -- unknown command {{{6
+    else                           " -- unknown command {{{5
       throw "Unexpected `:Project ".a:1."` subcommand"
     endif
-  else                          " -- project name specified {{{5
+  else                          " -- project name specified {{{4
 
     let prj_name = a:1
     let prj = s:project_list.get(prj_name)
@@ -463,39 +463,39 @@ function! lh#project#_command(...) abort
     if a:0 < 2
       throw "Not enough arguments to `:Project name`"
     endif
-    if     a:2 =~ '\v^:=l%[s]$'    " {{{6
+    if     a:2 =~ '\v^:=l%[s]$'    " {{{5
       call s:ls_project(prj)
-    elseif a:2 =~ '\v^:=echo$'     " {{{6
+    elseif a:2 =~ '\v^:=echo$'     " {{{5
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :echo`"
       endif
       call s:echo_project(prj, a:3)
-    elseif a:2 =~ '\v^:=let$'      " {{{6
+    elseif a:2 =~ '\v^:=let$'      " {{{5
       if a:0 < 4
         throw "Not enough arguments to `:Project <name> :let`"
       endif
       call s:let_project(prj, a:3, a:000[3:])
-    elseif a:2 =~ '\v^:=cd$'       " {{{6
+    elseif a:2 =~ '\v^:=cd$'       " {{{5
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :cd`"
       endif
       call s:cd_project(prj, a:3)
-    elseif a:2 =~ '\v^:=doonce$'   " {{{6
+    elseif a:2 =~ '\v^:=doonce$'   " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :doonce`"
       endif
       call s:doonce_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=bufdo$'    " {{{6
+    elseif a:2 =~ '\v^:=bufdo$'    " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :bufdo`"
       endif
       call s:bufdo_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=windo$'    " {{{6
+    elseif a:2 =~ '\v^:=windo$'    " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :windo`"
       endif
       call s:windo_project(prj, a:000[2:])
-    else                           " -- unknown command {{{6
+    else                           " -- unknown command {{{5
       throw "Unexpected `:Project ".a:2."` subcommand"
     endif
   endif
@@ -503,7 +503,7 @@ function! lh#project#_command(...) abort
   " }}}5
 endfunction
 
-" Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{4
+" Function: lh#project#_complete_command(ArgLead, CmdLine, CursorPos) {{{3
 function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
   let tmp = substitute(a:CmdLine[: a:CursorPos-1], '\\ ', '§', 'g')
   let tokens = split(tmp, '\s\+')
@@ -537,7 +537,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
   return res
 endfunction
 
-function! s:list_var_for_complete(prj, ArgLead) " {{{4
+function! s:list_var_for_complete(prj, ArgLead) " {{{3
   let prj = a:prj
   if !empty(a:ArgLead) && a:ArgLead[0] == '$'
     let vars = map(keys(prj.env), '"$".v:val')
