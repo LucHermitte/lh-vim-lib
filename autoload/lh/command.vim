@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      4.0.0
+let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  08th Jan 2016
+" Last Update:  17th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -71,6 +71,73 @@ function! lh#command#Fargs2String(aList)
     call remove(a:aList, 0)
   endwhile
   return res
+endfunction
+
+" Function: lh#command#analyse_args(ArgLead, CmdLine, CursorPos) {{{3
+" Returns
+" - the position of the token where the cursor is
+" - all the tokens up to cursor position
+function! lh#command#analyse_args(ArgLead, CmdLine, CursorPos) abort
+  let tmp = substitute(a:CmdLine[: a:CursorPos-1], '\\ ', '§', 'g')
+  let tokens = split(tmp, '\s\+')
+  call map(tokens, 'substitute(v:val, "§", " ", "g")')
+  let tmp = substitute(tmp, '\s*\S*', 'Z', 'g')
+  let pos = strlen(tmp) - 1
+  call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3) -- tmp=%4, pos=%5, tokens=%6', a:ArgLead, a:CmdLine, a:CursorPos, tmp, pos, tokens)
+
+  return [pos, tokens, a:ArgLead, a:CmdLine, a:CursorPos]
+endfunction
+
+" Function: lh#command#matching_variables(lead [, scope=all]) {{{3
+" TODO: support p:
+function! lh#command#matching_variables(lead, ...) abort
+  let lead = a:lead
+  if a:lead =~ '^\k:'
+    let scopes = [a:lead[0]]
+    let lead   = a:lead[2:]
+  elseif a:lead =~ '^\$'
+    let scopes = [a:lead[0]]
+    let lead   = a:lead[1:]
+  elseif a:lead =~ '^&'
+    let scopes = [a:lead[0]]
+    let lead   = a:lead[1:]
+  elseif a:0 > 0
+    let scopes = type(a:1) == type([]) ? a:1 : split(a:1, '\zs')
+  else
+    let scopes = ['b', 'g', 't', 'w']
+  endif
+  let res = []
+  for scope in scopes
+    if     scope == '$'
+      let res += lh#command#matching_askvim('environment', lead)
+    elseif scope == '&'
+      let res += lh#command#matching_askvim('option', lead)
+    else
+      let res += map(
+            \ filter(copy(keys(eval(scope.':'))), 'v:val =~ "^".lead')
+            \ ,'scope.":".v:val')
+    endif
+  endfor
+  return res
+endfunction
+
+" Function: lh#command#matching_askvim(what, lead) {{{3
+function! lh#command#matching_askvim(what, lead) abort
+  let cleanup = lh#on#exit()
+        \.register('delcom LHAskVimMatchingCompletion')
+  try
+    exe 'command! -complete='.a:what.' -nargs=* LHAskVimMatchingCompletion :echo "<args>"'
+    silent! exe "norm! :LHAskVimMatchingCompletion ".a:lead."\<c-a>\"\<home>let\ cmds=\"\<cr>"
+    return split(cmds, ' ')[1:]
+  finally
+    call cleanup.finalize()
+  endtry
+endfunction
+
+" Function: lh#command#matching_for_command(lead) {{{3
+function! lh#command#matching_for_command(lead) abort
+  silent! exe "norm! :".a:lead."\<c-a>\"\<home>let\ cmds=\"\<cr>"
+  return split(cmds, ' ')[1:]
 endfunction
 
 "------------------------------------------------------------------------
