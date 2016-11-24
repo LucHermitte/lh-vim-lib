@@ -1133,10 +1133,10 @@ function! lh#project#_UseProjectOptions() " {{{3
 endfunction
 
 " # Remove buffer {{{2
-function! lh#project#_RemoveBufferFromProjectConfig(bname) " {{{3
-  let prj = lh#project#crt(bufnr(a:bname))
+function! lh#project#_RemoveBufferFromProjectConfig(bnum) " {{{3
+  let bid = a:bnum
+  let prj = lh#project#crt(bid)
   if lh#option#is_set(prj)
-    let bid = bufnr(a:bname)
     call s:Verbose('Remove buffer %1 from project %2', bid, prj)
     call prj._remove_buffer(bid)
   endif

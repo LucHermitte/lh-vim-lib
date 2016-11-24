@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      29th Sep 2016
-" Last Update:  06th Oct 2016
+" Last Update:  24th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -35,7 +35,7 @@ command! -nargs=* -complete=customlist,lh#project#_complete_command
 " ## Auto commands {{{1
 augroup LH_PROJECT
   au!
-  au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<afile>'))
+  au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<abuf>'))
 
   " Needs to be executed after local_vimrc
   au BufReadPost * call lh#project#_post_local_vimrc()
