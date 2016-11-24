@@ -27,6 +27,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Buffers related functions](#buffers-related-functions)
   * [Syntax related functions](#syntax-related-functions)
   * [UI functions](#ui-functions)
+  * [Design by Contract function](#design-by-contract-functions)
 
 ### Miscellaneous functions
 
@@ -48,6 +49,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#encoding#strpart(mb_string, p, l)`         | Executes `strpart()` on a multibytes string                                                                                                                              |
 | `lh#event#register_for_one_execution_at()`     | Registers a command to be executed once (and only once) when an event is triggered on the current file                                                                   |
 | `lh#exception#callstack()`                     | Parses `v:throwpoint` to extract the functions called                                                                                                                    |
+| `lh#exception#callstack()as_qf`                | Returns the callstack in a format compatible with quickfix functions                                                                                                     |
 | `lh#fmt#printf({format}, {args...})`           | `printf` overload that takes positional arguments                                                                                                                        |
 | `lh#float#arg_max(list)`                       | Returns the index of the maximum element of a list of floats                                                                                                             |
 | `lh#float#arg_min(list)`                       | Returns the index of the minimum element of a list of floats                                                                                                             |
@@ -315,12 +317,35 @@ function, or a plain text UI function (defined by vim, or emulated)
 
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
 
+### Design by Contract functions
+This set of functions introduce DbC helpers. There are here to help plugin
+developers to detect and eradicate VimL programming errors.
+
+When an assertion fails, we cannot expect the script to go on correctly. There
+IS an error in its logic. We cannot expect anything good after that. That's
+where `lh#assert#*()` functions differs from Vim |test-functions| and my
+[vim-UT](http://github.com/LucHermitte/vim-UT) plugin: these other functions
+aim at providing tools to write unit tests.
+
+| Function                 | Purpose                                                                                                                        |
+|:-------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+| `lh#assert#mode()`       | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`                                                             |
+| `lh#assert#errors()`     | Returns the last known contract failures                                                                                       |
+| `lh#assert#clear()`      | Clears the last known contract failures                                                                                        |
+| `lh#assert#true()`       | Asserts a value is true                                                                                                        |
+| `lh#assert#false()`      | Asserts a value is false                                                                                                       |
+| `lh#assert#equal()`      | Asserts a value equals to what is expected                                                                                     |
+| `lh#assert#not_equal()`  | Asserts a value differs from a reference value                                                                                 |
+| `lh#assert#match()`      | Asserts a pattern matches a value                                                                                              |
+| `lh#assert#unexpected()` | Signals an unexpected situation                                                                                                |
+
+
 ### Word Tools
 See http://hermitte.free.fr/vim/general.php#expl_words_tools
 
 
 ## Installation
-  * Requirements: Vim 7.4
+  * Requirements: Vim 7.4, Vim8 for `lh#async` feature.
   * Clone from the git repository
 ```
 git clone git@github.com:LucHermitte/lh-vim-lib.git

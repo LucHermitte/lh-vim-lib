@@ -41,6 +41,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
+- |lh#exception#callstack_as_qf()|
 - |lh#fmt#printf()|
 - |lh#float#min()|, |lh#float#max()|,
   |lh#float#arg_min()|, |lh#float#arg_max()|
@@ -245,6 +246,17 @@ Project related defintions                              |lhvl#project|
 - |lh#project#_get()|
 - |lh#project#crt_bufvar_name()|
 - |lh#project#_crt_var_name()|
+Design by Contract related functions                    |lhvl#DbC|
+- |lh#assert#mode()|
+- |lh#assert#clear()|
+- |lh#assert#errors()|
+- Assertions:
+  - |lh#assert#equal()|
+  - |lh#assert#false()|
+  - |lh#assert#match()|
+  - |lh#assert#not_equal()|
+  - |lh#assert#true()|
+  - |lh#assert#unexpected()|
 
 ------------------------------------------------------------------------------
 COMMANDS                                              *lhvl#commands*   {{{2
@@ -646,12 +658,23 @@ triggered on the current file.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#exception#callstack()*        {{{3
 lh#exception#callstack({throwpoint})~
-Decodes the {throwpoint} and return a list of dictionaries made of:
+Decodes the {throwpoint} and returns a list of dictionaries made of:
 - "`script`": name of the file where the exception comes from
 - "`pos`"   : abolute line number in the script where the exception has been issued
 - "`fname`" : name of the function where the exception has been issued
 - "`offset`": Relative line number from the function first line where the
   exception....
+@see also |lh#exception#callstack_as_qf()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#exception#callstack_as_qf()*        {{{3
+lh#exception#callstack_as_qf({filter} [{msg}])~
+Decodes the current callstack and returns a list of dictionaries compatible
+with |setqflist()| and |setloclist()|.
+Entries with a `fname` field  matching `'\vlh#exception#'.{filter}` will be
+filtered out. If you plan to use this field, don't forget to prepend with
+a `/\|`, (magic mode).
+@see also |lh#exception#callstack()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                *lh#float#max()*     *lh#float#min()*             {{{3
@@ -3580,6 +3603,71 @@ It'll return:
   - `"name"` = {var} (without the `"p:"`part)
   - `"project"` a reference to the associated project variable
 - The |string| `lh#project#crt_bufvar_name().variables.{var}` otherwise.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+DESIGN BY CONTRACT FUNCTIONS                          *lhvl#project*    {{{2
+@since Version 4.0.0
+This set of functions introduce DbC helpers. There are here to help plugin
+developers to detect and eradicate VimL programming errors.
+When an assertion fails, we cannot expect the script to go on correctly. There
+IS an error in its logic. We cannot expect anything good after that. That's
+where `lh#assert#*()` functions differs from Vim |test-functions| and my
+vim-|UT.txt| plugin: these other functions aim at providing tools to write
+unit tests.
+
+As with Vim |test-functions|, all errors will be traced in an internal
+variable that can be:
+- fetched with *lh#assert#errors()*
+- and cleared with *lh#assert#clear()*
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                   *dbc-mode*   *lh#assert#mode()*     {{{3
+lh#assert#mode([mode])~
+As with C++17+ DbC proposal, end-user can select the assertion mode he wants
+to run with. The default behaviour will remind things to Windows users: a
+|confirm| box will ask whether we want to |dbc-ignore|, |dbc-abort|, or enter
+in |dcb-debug|.
+
+- |dbc-ignore|, we'll try to go on. But don't (you, the end-user) expect
+  miracles, the plugin will certainly fail miserably in a few seconds.
+  Pray.
+- |dbc-abort|, we'll |:throw| an exception with as much context as possible.
+- |bdc-debug| is a tricky one. This mode is aimed at plugin writers.
+  |:debug| mode will be entered. Don't expect to be able to run anything
+  useful that isn't |>bt|, |>up|, |>down| or |:echo|.
+  - At the current level, the `cb` variable contains the call stack in a format
+  compatible with |setqflist()| and |setloclist()|. This means you can fill
+  them with either >
+    :call setqflist(cb) " or
+    :call setloclist(0, cb)
+<  - At the next level (run `:up` once), the `bt` variable contains unfiltered
+information about the backtrace. You should not need it.
+  - In order to exist this debugging mode, you have the choice between |>cont|,
+  |>next|, |>interrupt| or |>quit| (beware, `>q` will not trigger the
+  execution of |:finally| blocks.)
+
+Executing `lh#assert#mode()` with either `'ignore'`, `'abort'` or `'debug'`
+will force the assertion mode globally. (TODO: provide a |:Toggle| option for
+this mode). To go back to the |confirm| box, call the function with an empty
+string.
+Calling the function with no argument will permit to know which mode is the
+current one.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#assert#X()*     {{{3
+Let me know if you really need to know what is tested...
+In doubt, remember that I've mimicked the interfaces from Vim |test-functions|.
+
+lh#assert#true({actual} [, {msg}])                     *lh#assert#true()*
+lh#assert#false({actual} [, {msg}])                    *lh#assert#false()*
+lh#assert#equal({expected}, {actual} [, {msg}])        *lh#assert#equal()*
+lh#assert#not_equal({expected}, {actual}  [, {msg}])   *lh#assert#not_equal()*
+lh#assert#match({pattern}, {actual} [, {msg}])         *lh#assert#match()*
+
+lh#assert#unexpected([, {msg}])                        *lh#assert#unexpected()*
+    This one is new: it marks unexpected situations, without the need to call
+    `lh#assert#true(0, msg)`
 
                                                                      }}}1
 ==============================================================================

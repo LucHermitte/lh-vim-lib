@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  21st Oct 2016
+" Last Update:  23rd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -108,6 +108,25 @@ function! lh#exception#callstack(throwpoint) abort
     call cleanup.finalize()
   endtry
   return function_stack
+endfunction
+
+" Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
+function! lh#exception#callstack_as_qf(filter, ...) abort
+  try
+    throw "dummy"
+  catch /.*/
+    let data = []
+    let bt = lh#exception#callstack(v:throwpoint)
+    let g:bt = bt
+    let idx = lh#list#find_if(bt, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"', 1)
+    if idx >= 0
+      let data = map(copy(bt)[idx : ], '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+      " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', bt[idx], get(a:, 1, '...'))
+      " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', bt[0], get(a:, 1, '...'))
+      let data[0].text =  get(a:, 1, '...')
+    endif
+    return data
+  endtry
 endfunction
 
 "------------------------------------------------------------------------
