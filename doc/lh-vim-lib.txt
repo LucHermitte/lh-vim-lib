@@ -711,9 +711,9 @@ lh#option#get({names}[,{default}[,{scopes}]])~
                     Its default value is |g:lh#option#unset|.
 @param {scopes}     Vim scopes in which the options must be searched,
                     default="bpg".
-@return             b:{names[0]} if it exists, or p:{names[0]} if it exists, or
-                    g:{names[0]} if it exists, or b:{names[1]}, ...
-                    or {default} if none exists.
+@return             b:{names[0]} if it exists, or b:{names[1...]} if any
+                    exist, or p:{names[0...]} if any exist, or g:{names[0...]}
+                    if any exist, or {default} if none exists.
 @see                For development oriented options, |lh-dev| provides a
                     dedicated function: |lh#dev#option#get()|.
 

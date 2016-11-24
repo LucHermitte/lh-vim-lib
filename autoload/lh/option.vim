@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  16th Nov 2016
+" Last Update:  23rd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -125,8 +125,8 @@ function! lh#option#get(names,...) abort
   let sScopes = (a:0 == 2) ? a:2 : 'bpg'
   let lScopes = split(sScopes, '\zs')
   let names = type(a:names) == type([]) ? a:names : [a:names]
-  for name in names
-    for scope in lScopes
+  for scope in lScopes
+    for name in names
       if scope == 'p'
         let r = lh#project#_get(name)
         if lh#option#is_set(r)
