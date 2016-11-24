@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  17th Nov 2016
+" Last Update:  24th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -584,7 +584,6 @@ function! s:register_buffer(...) dict abort " {{{4
   endif
   call setbufvar(bid, s:project_varname, self)
   call lh#list#push_if_new(self.buffers, bid)
-  " todo: register bid removing when bid is destroyed
 endfunction
 
 function! s:inherit(parent) dict abort " {{{4
@@ -597,7 +596,7 @@ endfunction
 
 function! s:set(varname, value) dict abort " {{{4
   call s:Verbose('%1.set(%2 <- %3)', self.name, a:varname, a:value)
-  " call assert_true(!empty(a:varname))
+  call lh#assert#true(!empty(a:varname))
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
     let self.options[varname] = a:value
@@ -617,7 +616,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   " like s:set, but find first where the option is already set (i.e.
   " possibily in a parent project), and update the "old" setting instead of
   " overridding it.
-  " call assert_true(!empty(a:varname))
+  call lh#assert#true(!empty(a:varname))
   call s:Verbose('%1.set(%2 <- %3, %4)', self.name, a:varname, a:value, a:000)
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
@@ -698,6 +697,10 @@ function! s:_remove_buffer(bid) dict abort " {{{4
   for p in self.parents
     call p._remove_buffer(a:bid)
   endfor
+  if getbufvar(a:bid, '&ft') != 'qf'
+    " Quickfix buffers may not be registered to projects
+    call lh#assert#not_equal(-1, index(self.buffers, a:bid), "Buffer ".a:bid.'('.bufname(a:bid).') doesn''t belong to project '.self.name.' '.string(self.buffers) )
+  endif
   call filter(self.buffers, 'v:val != a:bid')
 endfunction
 
@@ -856,6 +859,7 @@ endfunction
 
 " Function: lh#project#define(s:, params [, name]) {{{3
 function! lh#project#define(s, params, ...) abort
+  call lh#assert#not_equal(&ft, 'qf', "Don't run lh#project#define() from qf window!")
   let name = get(a:, 1, 'project')
   if !has_key(a:s, name)
     let a:s[name] = lh#project#new(a:params)
@@ -875,12 +879,18 @@ endfunction
 
 " Function: lh#project#is_in_a_project() {{{3
 function! lh#project#is_in_a_project() abort
-  return exists('b:'.s:project_varname)
+  let res = exists('b:'.s:project_varname)
+  call lh#assert#true(!res || (lh#option#is_set(b:{s:project_varname}) && (b:{s:project_varname} != lh#option#unset())), 'b:'.s:project_varname.' shall not be unset if it exists!')
+  return res
 endfunction
 
-" Function: lh#project#crt() {{{3
-function! lh#project#crt() abort
-  if lh#project#is_in_a_project()
+" Function: lh#project#crt([bufid]) {{{3
+function! lh#project#crt(...) abort
+  if a:0 > 0
+    let bufid = a:1
+    let prj = lh#option#getbufvar(bufid, s:project_varname)
+    return prj
+  elseif lh#project#is_in_a_project()
     return b:{s:project_varname}
   else
     return s:k_unset
@@ -904,7 +914,7 @@ endfunction
 
 " Function: lh#project#_crt_var_name(var) {{{3
 function! lh#project#_crt_var_name(var) abort
-  " call assert_true(a:var =~ '^p:')
+  call lh#assert#match('^p:', a:var)
   let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
   if lh#project#is_in_a_project()
     if kind == '&'
@@ -944,6 +954,7 @@ function! lh#project#_get(name, ...) abort
     endif
   endif
   if lh#project#is_in_a_project()
+    call lh#assert#true(has_key(b:{s:project_varname}, 'get'))
     return b:{s:project_varname}.get(a:name)
   else
     return s:k_unset
@@ -1123,7 +1134,7 @@ endfunction
 
 " # Remove buffer {{{2
 function! lh#project#_RemoveBufferFromProjectConfig(bname) " {{{3
-  let prj = lh#project#crt()
+  let prj = lh#project#crt(bufnr(a:bname))
   if lh#option#is_set(prj)
     let bid = bufnr(a:bname)
     call s:Verbose('Remove buffer %1 from project %2', bid, prj)
