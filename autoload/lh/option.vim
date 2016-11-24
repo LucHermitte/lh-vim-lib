@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  23rd Nov 2016
+" Last Update:  24th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -21,6 +21,7 @@ let s:k_version = 4000
 "       (*) BUG: Keep previous value for `g:lh#option#unset`
 "       (*) ENH: Extend `#to_string(#unset())` to be informative
 "       (*) ENH: Extend `lh#option#get()` to take a list of names
+"       (*) ENH: Add `lh#option#exists_in_buf()`
 "       v3.6.1
 "       (*) ENH: Use new logging framework
 "       v3.2.12
@@ -258,6 +259,13 @@ endfunction
 function! lh#option#GetNonEmpty(name,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   return lh#option#get_non_empty(a:name, a:default, scope)
+endfunction
+
+" Function: lh#option#exists_in_buf(bufid, varname) {{{3
+" Return exists(varname) in bufid context
+function! lh#option#exists_in_buf(bufid, varname) abort
+  let bufvars = getbufvar(a:bufid, '')
+  return has_key(bufvars, a:varname)
 endfunction
 
 " Function: lh#option#getbufvar(expr, name [, default])            {{{3

@@ -66,6 +66,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
 Options related functions:                              |lhvl#option|
+- |lh#option#exists_in_buf()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
 - |lh#option#get_from_buf()|
@@ -700,6 +701,13 @@ python, ruby, perl).
 ------------------------------------------------------------------------------
 OPTIONS RELATED FUNCTIONS                             *lhvl#option*     {{{2
 This sub-library helps fetching option values for plugins.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#exists_in_buf()*       {{{3
+lh#option#exists_in_buf({expr}, {name})~
+@return what `exists({name})` would return when the current buffer matches
+{expr}.
+This function encapsulates  |getbufvar| >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#option#Get()*                 {{{3
