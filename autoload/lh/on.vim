@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  17th Nov 2016
+" Last Update:  22nd Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "
@@ -81,7 +81,7 @@ function! s:restore(varname) dict abort " {{{4
   if type(a:varname) != type('')
     throw "lh#on#exit().restore() expects a variable name, not a variable!"
   endif
-  " unlet if always required in case the type changes
+  " unlet is always required in case the type changes
   let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
   if a:varname =~ '[~@]' || exists(a:varname)
     let action = 'let '.a:varname.'='.string(eval(a:varname))
