@@ -144,6 +144,7 @@ Paths related functions:                                |lhvl#path|
 - |lh#path#fix()|
 - |lh#path#glob_as_list()|
 - |lh#path#is_absolute_path()|
+- |lh#path#is_distant_or_scratch()|
 - |lh#path#is_in()|
 - |lh#path#is_url()|
 - |lh#path#new_permission_lists()|
@@ -2032,20 +2033,29 @@ echoes >
  template/bar.template
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#IsAbsolutePath()*        {{{3
-lh#path#IsAbsolutePath({path})  (*deprecated*)~
-                                                *lh#path#is_absolute_path()*
+                                                *lh#path#is_absolute_path()*      {{{3
 lh#path#is_absolute_path({path})~
-@return {path} Path to test
+                                                *lh#path#IsAbsolutePath()*
+lh#path#IsAbsolutePath({path})  (*deprecated*)~
+@param[in] {path} Path to test
 @return whether the path is an absolute path
 @note Supports Unix absolute paths, Windows absolute paths, and UNC paths
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#IsURL()*                 {{{3
-lh#path#IsURL({path})  (*deprecated*)~
-                                                *lh#path#is_url()*
+                                                *lh#path#is_distant_or_scratch()* {{{3
+lh#path#is_distant_or_scratch({path})~
+@param[in] {path} Path to test
+@return
+- whether the path is an URL or a name for a scratch buffer (according to
+  recent conventions), i.e. whether it contains `"://"`,
+- or whether it's an UNC path, i.e. starting with either `"//"` or `"\\"`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#is_url()*                {{{3
 lh#path#is_url({path})~
-@return {path} Path to test
+                                                *lh#path#IsURL()*
+lh#path#IsURL({path})  (*deprecated*)~
+@param[in] {path} Path to test
 @return whether the path is an URL
 @note Supports http(s)://, (s)ftp://, dav://, fetch://, file://, rcp://,
 rsynch://, scp://
@@ -2157,7 +2167,7 @@ Prepares a permission lists object.
   - `"blacklist"`:    |List| of paths always rejected.
   - `"asklist"`:      |List| of paths that needs interactive approval.
   - `"sandboxlist"`:  |List| of paths approved, in the |sandbox| only.
-  - `"_do_hanlde()"`: |Function| executed of approved file,
+  - `"_do_handle()"`: |Function| executed of approved file,
                     required only by |handle_file()| and |handle_paths()|.
   - `"_action_name"`: Name of the action to display in messages.
 @return An object completed with the methods:

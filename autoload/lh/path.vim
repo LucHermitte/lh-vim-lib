@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  16th Nov 2016
+" Last Update:  25th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -104,6 +104,7 @@ let s:k_version = 40000
 "       (*) Add `p:var` support to `lh#path#add_path_if_exists()`
 "       (*) Escape `_` in `lh#path#select_one()` confirm box
 "       (*) Support `lh#path#glob_as_list(list`
+"       (*) Add `lh#path#is_distant_or_scratch()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -322,6 +323,11 @@ function! lh#path#is_url(path) abort
 endfunction
 function! lh#path#IsURL(path)
   return lh#path#is_url(a:path)
+endfunction
+
+" Function: lh#path#is_distant_or_scratch(path) {{{3
+function! lh#path#is_distant_or_scratch(path) abort
+  return a:path =~ '\v://|^//|^\\\\'
 endfunction
 
 " Function: lh#path#select_one({pathnames},{prompt}) {{{3

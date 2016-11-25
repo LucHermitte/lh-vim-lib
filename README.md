@@ -214,6 +214,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                   |
 | `lh#path#glob_as_list()`                     | Returns `globpath()`result as a list                                                                      |
 | `lh#path#is_absolute_path()`                 | Tells whether the parameter is an absolute pathname                                                       |
+| `lh#path#is_distant_or_scratch()`            | Tells whether the parameter is a distant path or a scratch buffer name                                    |
 | `lh#path#is_in(node, path)`                  | Tells whether a node is already present in a path -- `readlink()` is applied on both parameters           |
 | `lh#path#is_url()`                           | Tells whether the parameter is an URL                                                                     |
 | `lh#path#join(pathparts, ...)`               | Joins path parts into a string                                                                            |
