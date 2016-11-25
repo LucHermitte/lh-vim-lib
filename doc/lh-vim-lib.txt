@@ -3565,6 +3565,9 @@ Reserved fields:
                                                 *lh#project#define()*            {{{3
 lh#project#define(s:, options [, varname])~
 @post the current buffer is registered to the project returned.
+Unless the current buffer is not eligible to belong to a project, in which
+case |lh#option#unset()| is returned. To be eligible to a project a buffer
+shall neither be distant, nor be a scratch buffer, nor be a quickfix buffer.
 
 While |:Project--define| permit to create new projects quite easily, it
 doesn't return a variable to the new project.

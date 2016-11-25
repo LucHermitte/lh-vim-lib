@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  24th Nov 2016
+" Last Update:  25th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -859,6 +859,7 @@ endfunction
 
 " Function: lh#project#define(s:, params [, name]) {{{3
 function! lh#project#define(s, params, ...) abort
+  if !lh#project#is_eligible() | return s:k_unset  | endif
   call lh#assert#not_equal(&ft, 'qf', "Don't run lh#project#define() from qf window!")
   let name = get(a:, 1, 'project')
   if !has_key(a:s, name)
@@ -1083,6 +1084,16 @@ endfunction
 function! lh#project#_auto_discover_root() abort
   return lh#option#get('lh#project.auto_discover_root', 'in_doubt_ask', 'g')
 endfunction
+" # Misc {{{2
+" Function: lh#project#is_eligible([bid]) {{{3
+function! lh#project#is_eligible(...) abort
+  if a:0 > 0
+    return (getbufvar(a:1, '&ft') != 'qf') && ! lh#path#is_distant_or_scratch(bufname(a:1))
+  else
+    return (&ft != 'qf') && ! lh#path#is_distant_or_scratch(expand('%:p'))
+  endif
+endfunction
+
 " # Compatibility functions {{{2
 " s:getSNR([func_name]) {{{3
 function! s:getSNR(...)
@@ -1109,7 +1120,7 @@ function! lh#project#_auto_detect_project() abort
   " If there already is a project defined
   " Or if this is the quickfix window
   " => abort
-  if auto_detect_projects && ! lh#project#is_in_a_project() && &ft != 'qf'
+  if auto_detect_projects && ! lh#project#is_in_a_project() && lh#project#is_eligible()
     let root = lh#project#root()
     if !empty(root) && s:permission_lists.check_paths([root]) == 1
       " TODO: recognize patterns such as src|source to search the project in
@@ -1120,7 +1131,6 @@ function! lh#project#_auto_detect_project() abort
       let opt.auto_discover_root = {'value':  root}
       call lh#project#define(s:, opt, name)
     endif
-
   endif
 endfunction
 
