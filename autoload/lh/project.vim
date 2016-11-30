@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  25th Nov 2016
+" Last Update:  30th Nov 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -1132,6 +1132,7 @@ function! lh#project#_auto_detect_project() abort
       call lh#project#define(s:, opt, name)
     endif
   endif
+  call lh#assert#if(lh#project#is_in_a_project() && lh#project#is_eligible()).then_expect(index(lh#project#crt().buffers, eval(bufnr('%'))) >= 0)
 endfunction
 
 function! lh#project#_UseProjectOptions() " {{{3
@@ -1144,11 +1145,13 @@ endfunction
 
 " # Remove buffer {{{2
 function! lh#project#_RemoveBufferFromProjectConfig(bnum) " {{{3
-  let bid = a:bnum
+  let bid = eval(a:bnum) " Be sure this is a number and not a string!
   let prj = lh#project#crt(bid)
   if lh#option#is_set(prj)
     call s:Verbose('Remove buffer %1 from project %2', bid, prj)
     call prj._remove_buffer(bid)
+    let b_vars = getbufvar(bid, '')
+    call remove(b_vars, lh#project#_get_varname())
   endif
 endfunction
 
