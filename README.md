@@ -328,17 +328,18 @@ where `lh#assert#*()` functions differs from Vim |test-functions| and my
 [vim-UT](http://github.com/LucHermitte/vim-UT) plugin: these other functions
 aim at providing tools to write unit tests.
 
-| Function                 | Purpose                                                                                                                        |
-|:-------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `lh#assert#mode()`       | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`                                                             |
-| `lh#assert#errors()`     | Returns the last known contract failures                                                                                       |
-| `lh#assert#clear()`      | Clears the last known contract failures                                                                                        |
-| `lh#assert#true()`       | Asserts a value is true                                                                                                        |
-| `lh#assert#false()`      | Asserts a value is false                                                                                                       |
-| `lh#assert#equal()`      | Asserts a value equals to what is expected                                                                                     |
-| `lh#assert#not_equal()`  | Asserts a value differs from a reference value                                                                                 |
-| `lh#assert#match()`      | Asserts a pattern matches a value                                                                                              |
-| `lh#assert#unexpected()` | Signals an unexpected situation                                                                                                |
+| Function                       | Purpose                                                                                                                        |
+|:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`                                                             |
+| `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
+| `lh#assert#clear()`            | Clears the last known contract failures                                                                                        |
+| `lh#assert#true()`             | Asserts a value is true                                                                                                        |
+| `lh#assert#false()`            | Asserts a value is false                                                                                                       |
+| `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                     |
+| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
+| `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
+| `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
+| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
 
 
 ### Word Tools

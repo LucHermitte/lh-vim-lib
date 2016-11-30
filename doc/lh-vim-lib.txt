@@ -3690,6 +3690,11 @@ lh#assert#unexpected([, {msg}])                        *lh#assert#unexpected()*
     This one is new: it marks unexpected situations, without the need to call
     `lh#assert#true(0, msg)`
 
+lh#assert#if({cond1}).then_expect({cond2} [, {msg}])   *lh#assert#if().then_expect()*
+    This one is new: it asserts {cond1} => {cond2},
+    i.e. it asserts that {cond2} is True when {cond1} is True.
+    `lh#assert#if(context_applies).then_expect(stuff)`
+
                                                                      }}}1
 ==============================================================================
  (c) Luc Hermitte, 2001-2016 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
