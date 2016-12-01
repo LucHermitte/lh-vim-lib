@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  30th Nov 2016
+" Last Update:  01st Dec 2016
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -179,6 +179,10 @@ endfunction
 
 " # :Project Command definition {{{2
 function! s:As_ls(bid) abort " {{{3
+  let name = bufname(a:bid)
+  if empty(name)
+    let name = 'Used to be known as: '.get(s:buffers, a:bid, '???')
+  endif
   return printf('%3d%s %s'
         \ , a:bid
         \ , (buflisted(a:bid) ? ' ' : 'u')
@@ -186,7 +190,7 @@ function! s:As_ls(bid) abort " {{{3
         \ . (! bufloaded(a:bid) ? ' ' : bufwinnr(a:bid)<0 ? 'h' : 'a')
         \ . (! getbufvar(a:bid, "&modifiable") ? '-' : getbufvar(a:bid, "&readonly") ? '=' : ' ')
         \ . (getbufvar(a:bid, "&modified") ? '+' : ' ')
-        \ , '"'.bufname(a:bid).'"')
+        \ , '"'.name.'"')
 endfunction
 
 function! s:ls_project(prj) abort " {{{3
@@ -572,8 +576,13 @@ endfunction
 
 " # Define a new project {{{2
 " - Methods {{{3
+" s:buffers is debug variable used to track disapearing buffers
+let s:buffers = get(s:, 'buffers', {})
 function! s:register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
+  if !empty(bufname(bid))
+    let s:buffers[bid] = bufname(bid).' -- ft:'.getbufvar(bid, '&ft', '???')
+  endif
   " if there is already a (different project), then inherit from it
   let inherited = lh#option#getbufvar(bid, s:project_varname)
   if  lh#option#is_set(inherited)
@@ -1132,7 +1141,9 @@ function! lh#project#_auto_detect_project() abort
       call lh#project#define(s:, opt, name)
     endif
   endif
-  call lh#assert#if(lh#project#is_in_a_project() && lh#project#is_eligible()).then_expect(index(lh#project#crt().buffers, eval(bufnr('%'))) >= 0)
+  if lh#project#is_in_a_project() && lh#project#is_eligible()
+    call lh#assert#true(index(lh#project#crt().buffers, eval(bufnr('%'))) >= 0)
+  endif
 endfunction
 
 function! lh#project#_UseProjectOptions() " {{{3
