@@ -258,6 +258,12 @@ Design by Contract related functions                    |lhvl#DbC|
   - |lh#assert#match()|
   - |lh#assert#not_equal()|
   - |lh#assert#true()|
+  - |lh#assert#value().equal()|
+  - |lh#assert#value().differ()|
+  - |lh#assert#value().is_lt()|
+  - |lh#assert#value().is_le()|
+  - |lh#assert#value().is_gt()|
+  - |lh#assert#value().is_ge()|
   - |lh#assert#unexpected()|
 
 ------------------------------------------------------------------------------
@@ -3695,6 +3701,13 @@ lh#assert#if({cond1}).then_expect({cond2} [, {msg}])   *lh#assert#if().then_expe
     i.e. it asserts that {cond2} is True when {cond1} is True.
     `lh#assert#if(context_applies).then_expect(stuff)`
 
+lh#assert#value({actual}).equal({ref})                 *lh#assert#value().equal()*
+lh#assert#value({actual}).differ({ref})                *lh#assert#value().differ()*
+lh#assert#value({actual}).is_lt({ref})                 *lh#assert#value().is_lt()*
+lh#assert#value({actual}).is_le({ref})                 *lh#assert#value().is_le()*
+lh#assert#value({actual}).is_gt({ref})                 *lh#assert#value().is_gt()*
+lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge()*
+    Just another syntax to do the same thing. Choose what suits you best.
                                                                      }}}1
 ==============================================================================
  (c) Luc Hermitte, 2001-2016 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1

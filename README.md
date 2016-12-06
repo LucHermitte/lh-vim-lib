@@ -340,6 +340,12 @@ aim at providing tools to write unit tests.
 | `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
 | `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
 | `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
+| `lh#assert#value().equal()`    | Asserts actual == ref                                                                                                          |
+| `lh#assert#value().differ()`   | Asserts actual != ref                                                                                                          |
+| `lh#assert#value().is_le()`    | Asserts actual <= ref                                                                                                          |
+| `lh#assert#value().is_lt()`    | Asserts actual <  ref                                                                                                          |
+| `lh#assert#value().is_ge()`    | Asserts actual >= ref                                                                                                          |
+| `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                          |
 
 
 ### Word Tools
