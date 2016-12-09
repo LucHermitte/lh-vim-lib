@@ -96,25 +96,31 @@ let s:has_default_in_getbufvar = lh#has#default_in_getbufvar()
 
 " Function: lh#option#unset() {{{3
 function! s:unset_to_string(...) dict abort
-  " call assert_true(lh#option#is_unset(self))
+  return '{('.get(self, '__msg', 'unset').')}'
+endfunction
+function! s:unset_type(...) dict abort
   return '{(unset)}'
 endfunction
 let g:lh#option#unset = get(g:, 'lh#option#unset', lh#object#make_top_type({}))
 let g:lh#option#unset._to_string = function(s:getSNR('unset_to_string'))
+let g:lh#option#unset.__lhvl_unset_type = function(s:getSNR('unset_type'))
 
-function! lh#option#unset() abort
-  return g:lh#option#unset
+function! lh#option#unset(...) abort
+  return a:0 > 0
+        \ ? extend(copy(g:lh#option#unset), {'__msg': a:1})
+        \ : g:lh#option#unset
+  endif
 endfunction
 
 
 " Function: lh#option#is_unset(expr) {{{3
 function! lh#option#is_unset(expr) abort
-  return a:expr is g:lh#option#unset
+  return (type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type')
 endfunction
 
 " Function: lh#option#is_set(expr) {{{3
 function! lh#option#is_set(expr) abort
-  return ! (a:expr is g:lh#option#unset)
+  return ! ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
 endfunction
 
 " Function: lh#option#get(names [, default [, scope]])            {{{3
@@ -152,7 +158,7 @@ function! lh#option#get(names,...) abort
       endif
     endfor
   endfor
-  return a:0 > 0 ? (a:1) : g:lh#option#unset
+  return a:0 > 0 ? (a:1) : lh#option#unset('unknown option: ('.sScopes.'):'.(len(names)==1 ? names[0] : string(names)))
 endfunction
 function! lh#option#Get(names,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
@@ -275,7 +281,7 @@ endfunction
 " of autoload plugins doesn't apply to variables, only to functions)
 if s:has_default_in_getbufvar
   function! lh#option#getbufvar(buf, name,...)
-    let def = a:0 == 0 ? g:lh#option#unset : a:1
+    let def = a:0 == 0 ? lh#option#unset('unknow option ['.a:buf.']:'.a:name) : a:1
     return getbufvar(a:buf, a:name, def)
   endfunction
 else
@@ -289,7 +295,7 @@ else
         exe 'buf '.a:buf
         if !exists('b:'.a:name)
           unlet res
-          let res = a:0 == 0 ? g:lh#option#unset : a:1
+          let res = a:0 == 0 ? lh#option#unset('unknow option ['.a:buf.']:'.a:name) : a:1
         endif
       finally
         exe 'buf '.b
@@ -302,18 +308,11 @@ endif
 " Function: lh#option#getbufglobvar(expr, name [, default]) {{{3
 if s:has_default_in_getbufvar
   function! lh#option#getbufglobvar(expr, name, ...) abort
-    return getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
-
-    let res = call('lh#option#getbufvar', [a:expr, a:name, g:lh#option#unset])
-    if lh#option#is_unset(res)
-      let def = a:0 == 0 ? g:lh#option#unset : a:1
-      return get(g:, a:name, def)
-    endif
-    return res
+    return getbufvar(a:expr, a:name, get(g:, a:name, lh#option#unset('unknow option ['.a:buf.']:'.a:name)))
   endfunction
 else
   function! lh#option#getbufglobvar(expr, name, ...) abort
-    return lh#option#getbufvar(a:expr, a:name, get(g:, a:name, g:lh#option#unset))
+    return lh#option#getbufvar(a:expr, a:name, get(g:, a:name, lh#option#unset('unknow option ['.a:buf.']:'.a:name)))
   endfunction
 endif
 
