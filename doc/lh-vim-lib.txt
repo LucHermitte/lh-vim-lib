@@ -3633,7 +3633,7 @@ It'll return:
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-DESIGN BY CONTRACT FUNCTIONS                          *lhvl#project*    {{{2
+DESIGN BY CONTRACT FUNCTIONS                          *lhvl#DbC*    {{{2
 @since Version 4.0.0
 This set of functions introduce DbC helpers. There are here to help plugin
 developers to detect and eradicate VimL programming errors.
