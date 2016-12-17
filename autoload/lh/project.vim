@@ -112,10 +112,11 @@ function! lh#project#_make_project_list() abort
         \ , 'projects': {}
         \ , '_next_id': 1
         \ })
-  let res.new_name    = function(s:getSNR('new_name'))
-  let res.add_project = function(s:getSNR('add_project'))
-  let res.get         = function(s:getSNR('get_project'))
-  let res.clear       = function(s:getSNR('clear_projects'))
+  let res.new_name             = function(s:getSNR('new_name'))
+  let res.add_project          = function(s:getSNR('add_project'))
+  let res.get                  = function(s:getSNR('get_project'))
+  let res.clear                = function(s:getSNR('clear_projects'))
+  let res.clear_empty_projects = function(s:getSNR('clear_empty_projects'))
   return res
 endfunction
 
@@ -134,6 +135,11 @@ endfunction
 " Function: lh#project#_clear_prj_list() {{{3
 function! lh#project#_clear_prj_list() abort
   call s:project_list.clear()
+endfunction
+
+" Function: lh#project#_clear_empty_projects() {{{3
+function! lh#project#_clear_empty_projects() abort
+  call s:project_list.clear_empty_projects()
 endfunction
 
 " - Methods {{{3
@@ -175,6 +181,11 @@ function! s:clear_projects() dict abort " {{{4
     endfor
   endfor
   let self.projects = []
+endfunction
+
+function! s:clear_empty_projects() dict abort " {{{4
+  " remove empty projects
+  call filter(self.projects, '!empty(v:val.buffers)')
 endfunction
 
 " # :Project Command definition {{{2
