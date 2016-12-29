@@ -1,16 +1,16 @@
 "=============================================================================
-" File:		autoload/lh/encoding.vim                               {{{1
+" File:         autoload/lh/encoding.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	3.6.1
+" Version:      3.6.1
 let s:k_version = 361
-" Created:	21st Feb 2008
-" Last Update:	08th Jan 2016
+" Created:      21st Feb 2008
+" Last Update:  29th Dec 2016
 "------------------------------------------------------------------------
 " Description:
-" 	Defines functions that help managing various encodings
+"       Defines functions that help managing various encodings
 "
 "------------------------------------------------------------------------
 " History:
@@ -18,10 +18,10 @@ let s:k_version = 361
 "       (*) ENH: Use new logging framework
 "       v3.0.0:
 "       (*) GPLv3
-" 	v2.2.2:
-" 	(*) new mb_strings functions: strlen, strpart, at
-" 	v2.0.7:
-" 	(*) lh#encoding#Iconv() copied from map-tools
+"       v2.2.2:
+"       (*) new mb_strings functions: strlen, strpart, at
+"       v2.0.7:
+"       (*) lh#encoding#Iconv() copied from map-tools
 " }}}1
 "=============================================================================
 
@@ -64,8 +64,8 @@ endfunction
 function! lh#encoding#iconv(expr, from, to)
   " call Dfunc("s:ICONV(".a:expr.','.a:from.','.a:to.')')
   if has('multi_byte') &&
-	\ ( has('iconv') || has('iconv/dyn') ||
-	\ ((a:from=~'latin1\|utf-8') && (a:to=~'latin1\|utf-8')))
+        \ ( has('iconv') || has('iconv/dyn') ||
+        \ ((a:from=~'latin1\|utf-8') && (a:to=~'latin1\|utf-8')))
     " call confirm('encoding: '.&enc."\nto:".a:to, "&Ok", 1)
     " call Dret("s:ICONV convert=".iconv(a:expr, a:from, a:to))
     return iconv(a:expr,a:from,a:to)
@@ -90,9 +90,17 @@ endfunction
 " @parem mb_string multi-bytes string
 " @param p 0-indexed position
 " @param l length of the string to extract
-function! lh#encoding#strpart(mb_string, p, l)
-  return matchstr(a:mb_string, '.\{'.a:l.'}', 0, a:p+1)
-endfunction
+if exists('*strcharpart')
+  function! lh#encoding#strpart(mb_string, p, l)
+    " call lh#assert#value(lh#encoding#strlen(a:mb_string)).is_ge(a:p+a:l)
+    return strcharpart(a:mb_string, a:p, a:l)
+  endfunction
+else
+  function! lh#encoding#strpart(mb_string, p, l)
+    " call lh#assert#value(lh#encoding#strlen(a:mb_string)).is_ge(a:p+a:l)
+    return matchstr(a:mb_string, '.\{,'.a:l.'}', 0, a:p+1)
+  endfunction
+endif
 
 " Function: lh#encoding#strlen(mb_string) " {{{2
 " @return the length of the multi-bytes string.
