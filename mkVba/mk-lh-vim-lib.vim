@@ -7,7 +7,7 @@
 " Version:	4.0.0.0
 let s:version = '4.00.0'
 " Created:	06th Nov 2007
-" Last Update:  08th Sep 2016
+" Last Update:  03rd Jan 2017
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -58,6 +58,7 @@ autoload/lh/ref.vim
 autoload/lh/stack.vim
 autoload/lh/string.vim
 autoload/lh/syntax.vim
+autoload/lh/ui.vim
 autoload/lh/vcs.vim
 autoload/lh/visual.vim
 autoload/lh/window.vim
