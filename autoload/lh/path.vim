@@ -106,6 +106,7 @@ let s:k_version = 40000
 "       (*) Support `lh#path#glob_as_list(list`
 "       (*) Add `lh#path#is_distant_or_scratch()`
 "       (*) Add `lh#path#is_up_to_date()`
+"       (*) Improve `lh#path#strip_start()` performances
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -472,7 +473,8 @@ endfunction
 " @param[in] {pathname} name to simplify
 " @param[in] {pathslist} list of pathname (can be a |string| of pathnames
 " separated by ",", of a |List|).
-function! lh#path#strip_start(pathname, pathslist) abort
+" @note Unfortunatelly, this function is quite slow
+function! s:prepare_pathlist_for_strip_start(pathslist)
   if type(a:pathslist) == type('string')
     " let strip_re = escape(a:pathslist, '\\.')
     " let strip_re = '^' . substitute(strip_re, ',', '\\|^', 'g')
@@ -495,6 +497,11 @@ function! lh#path#strip_start(pathname, pathslist) abort
   call map(pathslist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
   " reverse the list to use the real best match, which is "after"
   call reverse(pathslist)
+
+  return pathslist
+endfunction
+function! lh#path#strip_start(pathname, pathslist) abort
+  let pathslist = s:prepare_pathlist_for_strip_start(a:pathslist)
   if 0
     " build the strip regex
     let strip_re = join(pathslist, '\|')
@@ -502,16 +509,23 @@ function! lh#path#strip_start(pathname, pathslist) abort
     let best_match = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
   else
     if !empty(pathslist)
-      let best_match = substitute(a:pathname, '\%('.pathslist[0].'\)[/\\]\=', '', '')
-      for path in pathslist[1:]
-        let a_match = substitute(a:pathname, '\%('.path.'\)[/\\]\=', '', '')
-        if len(a_match) < len(best_match)
-          let best_match = a_match
-        endif
-      endfor
+      let pathnames = type(a:pathname) == type([]) ? a:pathname : [a:pathname]
+      let res = []
+      for pathname in pathnames
+        let best_match = substitute(pathname, '^\%('.pathslist[0].'\)[/\\]\=', '', '')
+        for path in pathslist[1:]
+          let a_match = substitute(pathname, '^\%('.path.'\)[/\\]\=', '', '')
+          if len(a_match) < len(best_match)
+            let best_match = a_match
+          endif
+        endfor " each pathslist
+        let res += [best_match]
+      endfor " each pathnames
+    else
+      let res = a:pathname
     endif
   endif
-  return best_match
+  return type(a:pathname) == type([]) ? res : res[0]
 endfunction
 function! lh#path#StripStart(pathname, pathslist)
   return lh#path#strip_start(a:pathname, a:pathslist)
