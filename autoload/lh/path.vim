@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  09th Dec 2016
+" Last Update:  03rd Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -105,6 +105,7 @@ let s:k_version = 40000
 "       (*) Escape `_` in `lh#path#select_one()` confirm box
 "       (*) Support `lh#path#glob_as_list(list`
 "       (*) Add `lh#path#is_distant_or_scratch()`
+"       (*) Add `lh#path#is_up_to_date()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -683,6 +684,19 @@ endfunction
 " @return whether the file is readable or a buffer with the same name exists
 function! lh#path#exists(pathname) abort
   return filereadable(a:pathname) || bufexists(a:pathname)
+endfunction
+
+" Function: lh#path#is_up_to_date(file1, file2) {{{3
+" @pre file1 exists and can be read
+" @return whether date(f1) <= date(f2)
+function! lh#path#is_up_to_date(file1, file2) abort
+  call lh#assert#true(filereadable(a:file1))
+  if filereadable( a:file2 )
+    let d1 = getftime( a:file1 )
+    let d2 = getftime( a:file2 )
+    return d1 <= d2
+  endif
+  return 0
 endfunction
 
 " # Permission lists {{{2
