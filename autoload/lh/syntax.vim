@@ -7,7 +7,7 @@
 " Version:	3.6.1
 let s:k_version = 361
 " Created:	05th Sep 2007
-" Last Update:	08th Jan 2016
+" Last Update:	03rd Jan 2017
 "------------------------------------------------------------------------
 " Description:	«description»
 "
@@ -161,6 +161,74 @@ function! lh#syntax#is_a_comment_at(l,c) abort
 endfunction
 
 
+" Function: lh#syntax#next_hl({name},[{trans}=1]) {{{3
+" @param {name}    Name of the highlight group
+" @param {trans}   See |synID()| -> {trans} ; default = 1
+" @return 1 if found, 0 otherwose
+" @post move the cursor to the next word which highlight group has {name} for
+" name.
+function! lh#syntax#next_hl(name, ...) abort
+  " Facultative parameters
+  let trans = (a:0 > 0) ? a:1 : 1
+
+  " Cache the searched group id
+  let groupid = hlID(a:name)
+  " Remember where the search started
+  let lastline= line("$")
+  let curcol  = 0
+  let pos = line('.').'normal! '.virtcol('.').'|'
+
+  silent! norm! w
+
+  " skip words until we find next error
+  while synID(line("."),col("."),trans) != groupid
+    silent! norm! w
+    if line(".") == lastline
+      let prvcol=curcol
+      let curcol=col(".")
+      if curcol == prvcol
+        exe pos
+        " call s:ErrorMsg ('No other catch() by value found')
+        return 0
+      endif
+    endif
+  endwhile
+  return 1
+endfunction
+
+" Function: lh#syntax#prev_hl({name},[{trans}=1]) {{{3
+" @param {name}    Name of the highlight group
+" @param {trans}   See |synID()| -> {trans} ; default = 1
+" @return 1 if found, 0 otherwose
+" @post move the cursor to the previous word which highlight group has {name}
+" for name.
+function! lh#syntax#prev_hl(name, ...) abort
+  " Facultative parameters
+  let trans = (a:0 > 0) ? a:1 : 1
+
+  " Cache the searched group id
+  let groupid = hlID(a:name)
+  " Remember where the search started
+  let curcol  = 0
+  let pos = line('.').'normal! '.virtcol('.').'|'
+
+  silent! norm! b
+
+  " skip words until we find next error
+  while synID(line("."),col("."),trans) != groupid
+    silent! norm! b
+    if line(".") == 1
+      let prvcol=curcol
+      let curcol=col(".")
+      if curcol == prvcol
+        exe pos
+        " call s:ErrorMsg ('No other catch() by value found')
+        return 0
+      endif
+    endif
+  endwhile
+  return 1
+endfunction
 " Functions }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
