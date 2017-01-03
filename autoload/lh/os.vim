@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  20th Oct 2016
+" Last Update:  03rd Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -130,7 +130,7 @@ endfunction
 " Unlike |:cd|, the new directory doesn't affect Vim, only what it executed
 " through :make, system(), :!, ...
 function! lh#os#sys_cd(...) abort
-  let res = s:SystemCmd('cd')
+  let res = lh#os#SystemCmd('cd')
   let i = 0
   while i != a:0
     let i += 1
@@ -262,9 +262,11 @@ function! s:DetectSystem()
   endif " }}}3
 endfunction
 
-" Function: s:SystemCmd(cmdName) {{{2
-function! s:SystemCmd(cmdName)
-  call lh#os#system_detected()
+" Function: lh#os#SystemCmd(cmdName) {{{2
+function! lh#os#SystemCmd(cmdName)
+  if !exists('s:'.a:cmdName)
+    call lh#os#system_detected()
+  endif
   " @todo add some checkings
   return s:{a:cmdName}
 endfunction
