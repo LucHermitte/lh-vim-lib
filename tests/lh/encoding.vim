@@ -5,7 +5,7 @@
 " Version:      3.8.1.
 let s:k_version = '381'
 " Created:      01st Mar 2016
-" Last Update:  01st Mar 2016
+" Last Update:  29th Dec 2016
 "------------------------------------------------------------------------
 " Description:
 "       UT for lh#encoding#*() functions
@@ -63,6 +63,17 @@ function! s:Test_strpart() abort
     let i += 1
   endwhile
 
+  " Test for neomake equivalent functions
+  AssertEqual(lh#encoding#strpart('123', 0, 0), '')
+  AssertEqual(lh#encoding#strpart('123', 0, 1), '1')
+  AssertEqual(lh#encoding#strpart('123', 0, 2), '12')
+  AssertEqual(lh#encoding#strpart('123', 1, 2), '23')
+  AssertEqual(lh#encoding#strpart('123', 1, 1), '2')
+  AssertEqual(lh#encoding#strpart('123', 1, 0), '')
+
+  AssertEqual(lh#encoding#strpart('…', 0, 1), '…')
+  AssertEqual(lh#encoding#strpart('12…45', 1, 3), '2…4')
+  AssertEqual(lh#encoding#strpart('…after', 1, 10), 'after')
 endfunction
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
