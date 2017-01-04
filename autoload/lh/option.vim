@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  24th Nov 2016
+" Last Update:  04th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -135,6 +135,7 @@ function! lh#option#get(names,...) abort
   for scope in lScopes
     for name in names
       if scope == 'p'
+            \ && exists('*lh#project#_get') " the contrary means: no option associated to any project
         let r = lh#project#_get(name)
         if lh#option#is_set(r)
           call s:Verbose('p:%1 found -> %2', name, r)

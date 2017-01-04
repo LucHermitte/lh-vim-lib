@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  03rd Jan 2017
+" Last Update:  04th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -81,7 +81,7 @@ endfunction
 " @return the comp'ed result of system call
 function! lh#os#system(cmd, ...)
   " Alter command to make sure $ENV variables from current project are set
-  let env = ((a:0 == 0) || (a:1 == 1)) ? lh#project#_environment() : {}
+  let env = (get(a:, 1, 1) && exists('*lh#project#_environment')) ? lh#project#_environment() : {}
   let cmd = a:cmd
   if !empty(env)
     let scr = lh#os#new_runner_script(cmd, env)
