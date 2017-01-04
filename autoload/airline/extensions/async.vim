@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '40000'
 " Created:      01st Sep 2016
-" Last Update:  14th Oct 2016
+" Last Update:  04th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Airline extension for lh#async queues
@@ -90,6 +90,12 @@ endfunction
 
 " Function: airline#extensions#async#get_activity() {{{3
 function! airline#extensions#async#get_activity() abort
+  if !exists('*lh#async#_get_jobs')
+    " lh#async hasn't been used yet => there is no jobs
+    " => no need to load the autoload plugin
+    return ''
+  endif
+
   let jobs = lh#async#_get_jobs()
   let nb_jobs = len(jobs)
   if 0 == nb_jobs
