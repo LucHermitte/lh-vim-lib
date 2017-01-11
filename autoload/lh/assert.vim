@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  06th Dec 2016
+" Last Update:  11th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -87,18 +87,18 @@ function! lh#assert#false(actual, ...) abort
   endif
 endfunction
 
-" Function: lh#assert#equal(then_expected, actual, ...) {{{3
-function! lh#assert#equal(then_expected, actual, ...) abort
-  if a:then_expected != a:actual
-    let msg = a:0 > 0 ? a:1 : 'Expected '.a:then_expected.' but got '.a:actual
+" Function: lh#assert#equal(expected, actual, ...) {{{3
+function! lh#assert#equal(expected, actual, ...) abort
+  if a:expected != a:actual
+    let msg = a:0 > 0 ? a:1 : 'Expected '.a:expected.' but got '.a:actual
     call lh#assert#_trace_assert(msg)
   endif
 endfunction
 
-" Function: lh#assert#not_equal(then_expected, actual, ...) {{{3
-function! lh#assert#not_equal(then_expected, actual, ...) abort
-  if a:then_expected == a:actual
-    let msg = a:0 > 0 ? a:1 : 'Expected not '.a:then_expected.' but got '.a:actual
+" Function: lh#assert#not_equal(expected, actual, ...) {{{3
+function! lh#assert#not_equal(expected, actual, ...) abort
+  if a:expected == a:actual
+    let msg = a:0 > 0 ? a:1 : 'Expected not '.a:expected.' but got '.a:actual
     call lh#assert#_trace_assert(msg)
   endif
 endfunction
@@ -111,8 +111,8 @@ function! lh#assert#match(pattern, actual, ...) abort
   endif
 endfunction
 
-" Function: lh#assert#unthen_expected(...) {{{3
-function! lh#assert#unthen_expected( ...) abort
+" Function: lh#assert#unexpected(...) {{{3
+function! lh#assert#unexpected( ...) abort
   let msg = 'Unexception situation' . (a:0 > 0 ? ': '.a:1 : '')
   call lh#assert#_trace_assert(msg)
 endfunction
