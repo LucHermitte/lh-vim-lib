@@ -2527,6 +2527,16 @@ lh#command#matching_askvim(attribute, lead)~
 Helper function to define |:command-completion-custom| functions.
 Returns what vim would have expanded for |:command-complete| {attribute}.
 
+For instance:
+- To obtain the list of known options >
+    let opts = lh#command#matching_askvim('option', '')
+- To obtain the list of active mappings: >
+    let opts = lh#command#matching_askvim('mapping', '')
+<  WARNING: This will not work correctly with vim versions that don't have
+    |getcmdline()|.
+    Mapping list will end at the first mapping keybinding with a double quote
+    in it.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#command#new()*                {{{3
 Highly Experimental.
