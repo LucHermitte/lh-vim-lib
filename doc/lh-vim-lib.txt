@@ -398,12 +398,15 @@ lh#on#exit()~
 This function will register action to be executed at the end on a scope, and
 more precisally in a |:finally| section.
 It permits to do the following things:
-- `restore()`                restores a |variable| or a vim |option|.
-- `restore_option()`         restores a |lhvl#option|
-- `register()`               registers a |command| to execute.
-                           it takes a second facultative argument `"priority"`
-                           to give the highest priority to the command.
-- `restore_buffer_mapping()` restores a |map-<buffer>|
+- `restore()`                       restores a |variable| or a vim |option|.
+- `restore_option()`                restores a |lhvl#option.|
+- `register()`                      registers a |command| to execute.
+                                  it takes a second facultative argument
+                                  `"priority"` to give the highest priority to
+                                  the command.
+- `restore_buffer_mapping()`        restores a |:map-<buffer>|.
+- `restore_mapping_and_clear_now()` restores |:map| and |:map-<buffer>| on
+                                  `finalize()` and undefine them right away.
 
 e.g. >
 
