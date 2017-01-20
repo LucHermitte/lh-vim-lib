@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      03rd Nov 2008
-" Last Update:  17th Oct 2016
+" Last Update:  20th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -19,6 +19,7 @@ let s:k_version = 400
 "------------------------------------------------------------------------
 " History:
 "       v4.0.0:  ENH: Use new OO top class
+"                ENH: Use `call()` instead of `eval()`
 "       v3.6.1:  ENH: Use new logging framework
 "       v3.4.0:  ENH: lh#function#bind supports composition
 "       v3.3.20: Explicit error msg w/ lh#function#execute
@@ -131,7 +132,9 @@ function! s:Execute(args) dict abort
   if type(self.function) == type(function('exists'))
     " let args = s:DoBindList(self.args, a:args)
     " echomsg '##'.string(self.function).'('.join(args, ',').')'
-    let res = eval(string(self.function).'('.s:Join(args).')')
+    " let res = eval(string(self.function).'('.s:Join(args).')')
+    " TODO: test the new |call()| syntax
+    let res = call(self.function, args)
   elseif type(self.function) == type('string')
     let expr = s:DoBindString(self.function, 'args')
     let res = eval(expr)
