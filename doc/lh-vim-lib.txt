@@ -411,19 +411,25 @@ It permits to do the following things:
 e.g. >
 
    " Here let suppose g:foo exists, but not g:bar
+   let l:d = {'a': 1}
    let cleanup = lh#on#exit()
       \ . restore('g:foo')
       \ . restore('g:bar')
+      \ . restore(l:d, 'a')
+      \ . restore(l:d, 'b')
       \ . register('echo "The END"')
       " note: |function|s can be registered as well
     try
       let g:foo = 1 - g:foo
       let g:bar = 42
+      let l:d.a = 12
+      let l:d.b = 13
       other actions that may throw
     finally
       call cleanup.finalize()
     endtry
-    " Then g:foo and g:bar are restored, and "The END" has been echoed
+    " Then g:foo and g:bar are restored, "The END" has been echoed
+    " l:d.a is restored to 1, and l:d.b is removed
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#leader#get()*                 {{{3

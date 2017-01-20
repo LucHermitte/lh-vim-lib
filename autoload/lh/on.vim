@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  13th Jan 2017
+" Last Update:  20th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -17,9 +17,12 @@ let s:k_version = 4000
 "
 "   # Here let suppose g:foo exists, but not g:bar
 "   # and b:opt1 exists, and g:opt2 exists, but b:opt2, g:opt3 not b:opt3 exist
+"   let l:d = {'a': 1}
 "   let cleanup = lh#on#exit()
 "      \ . restore('g:foo')
 "      \ . restore('g:bar')
+"      \ . restore(l:d, 'a')
+"      \ . restore(l:d, 'b')
 "      \ . register('echo "The END"')
 "      \ . restore_option('opt1')
 "      \ . restore_option('opt2')
@@ -33,11 +36,14 @@ let s:k_version = 4000
 "      let g:opt2 = 'bar'
 "      let b:opt2 = 'foobar'
 "      let b:opt3 = 'bar'
+"      let l:d.a  = 12
+"      let l:d.b  = 13
 "    finally
 "      call cleanup.finalize()
 "    endtry
 "    # Then g:foo and g:bar are restored, "The END" has been echoed
 "    # b:opt1, g:opt2 are restored, b:opt2, b:opt3 and g:opt3 are "!unlet"
+"    # Keys "a" and "b" of dictionary l:d are restored
 " }}}1
 "=============================================================================
 
@@ -77,15 +83,27 @@ endfunction
 " # RAII/finalization {{{2
 
 " - Methods {{{3
-function! s:restore(varname) dict abort " {{{4
-  if type(a:varname) != type('')
-    throw "lh#on#exit().restore() expects a variable name, not a variable!"
-  endif
-  " unlet is always required in case the type changes
-  let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
-  if a:varname =~ '[~@]' || exists(a:varname)
-    let action = 'let '.a:varname.'='.string(eval(a:varname))
-    let self.actions += [action]
+function! s:restore(varname, ...) dict abort " {{{4
+  let is_dict = type(a:varname) == type({})
+  call lh#assert#true((type(a:varname) == type(''))
+        \ || (is_dict && a:0 == 1),
+        \ "lh#on#exit().restore() expects a variable name or a dictionary key, not a variable!"
+        \ )
+  if is_dict
+    let args = [function(s:getSNR('var_restorer')), a:varname, string(a:1)]
+    if has_key(a:varname, a:1)
+      let args += [ string(a:varname[a:1]) ]
+    endif
+
+    let clean = call('lh#function#bind', args)
+    let self.actions += [clean]
+  else
+    " unlet is always required in case the type changes
+    let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
+    if a:varname =~ '[~@]' || exists(a:varname)
+      let action = 'let '.a:varname.'='.string(eval(a:varname))
+      let self.actions += [action]
+    endif
   endif
 
   return self
@@ -175,6 +193,8 @@ function! s:finalize() dict " {{{4
     try
       if type(l:Action) == type(function('has'))
         call l:Action()
+      elseif type(l:Action) == type({}) && has_key(l:Action, 'execute')
+        call l:Action.execute([])
       elseif !empty(l:Action)
         exe l:Action
       endif
@@ -194,6 +214,16 @@ function! s:getSNR(...)
     let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
   endif
   return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
+
+" s:var_restorer(var, key [, old]) {{{3
+function! s:var_restorer(var, key, ...) abort
+  if has_key(a:var, a:key)
+    unlet a:var[a:key]
+  endif
+  if a:0 > 0
+    let a:var[a:key] = a:1
+  endif
 endfunction
 
 " Function: lh#on#_unlet(varname) {{{3

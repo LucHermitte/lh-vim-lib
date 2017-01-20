@@ -2,10 +2,10 @@
 " File:         tests/lh/on.vim                                   {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.5.0.
-let s:k_version = '350'
+" Version:      4.0.0
+let s:k_version = '400'
 " Created:      23rd Dec 2015
-" Last Update:  23rd Dec 2015
+" Last Update:  20th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       UT for lh#on#exit()
@@ -41,6 +41,23 @@ function! s:Test_restore()
   Assert exists('g:foobar')
   call cleanup.finalize()
   Assert !exists('g:foobar')
+endfunction
+
+"------------------------------------------------------------------------
+" Function: s:Test_restore_dict() {{{3
+function! s:Test_restore_dict()
+  let l:foobar = {'a': 1}
+  let cleanup = lh#on#exit()
+        \.restore(l:foobar, 'a')
+        \.restore(l:foobar, 'b')
+  let l:foobar.a = 5
+  let l:foobar.b = 6
+  let l:foobar.c = 42
+  Assert exists('l:foobar')
+  call cleanup.finalize()
+  AssertEquals(l:foobar.a, 1)
+  Assert !has_key(l:foobar, 'b')
+  AssertEquals(l:foobar.c, 42)
 endfunction
 
 "------------------------------------------------------------------------
@@ -100,7 +117,7 @@ endfunction
 " Likelly to fail with vimrunner
 " Function: s:Test_throw_finalize() {{{3
 function! s:Test_throw_finalize_msg() abort
-  if !exists('*VimrunnerEvaluateCommandOutput')
+  if 0 && !exists('*VimrunnerEvaluateCommandOutput')
     silent! unlet g:foobar
     let cleanup = lh#on#exit()
           \.register('throw "Error"')
@@ -113,7 +130,7 @@ function! s:Test_throw_finalize_msg() abort
 endfunction
 
 function! s:Test_throw_finalize() abort
-  if !exists('*VimrunnerEvaluateCommandOutput')
+  if 0 && !exists('*VimrunnerEvaluateCommandOutput')
     silent! unlet g:foobar
     let cleanup = lh#on#exit()
           \.register('throw "Error"')
