@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.9.0
-let s:k_version = 390
+" Version:      4.0.0
+let s:k_version = 400
 " Created:      20th Sep 2014
-" Last Update:  13th May 2016
+" Last Update:  20th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functionto implement the stack ADT
@@ -79,9 +79,9 @@ endfunction
 " # OO way {{{2
 " Function: lh#stack#new(...) {{{3
 function! lh#stack#new(...)
-  let s = {
+  let s = lh#object#make_top_type({
         \ 'values': (a:0 ? (a:1) : [])
-        \}
+        \})
   function! s.push(value) dict
     let self.values+=[a:value]
   endfunction
