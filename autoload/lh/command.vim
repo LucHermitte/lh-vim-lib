@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  13th Jan 2017
+" Last Update:  24th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -179,7 +179,7 @@ function! s:SaveData(Data)
   endif
 endfunction
 
-" BTWComplete(ArgLead, CmdLine, CursorPos):      Auto-complete {{{3
+" lh#command#complete(ArgLead, CmdLine, CursorPos):      Auto-complete {{{3
 function! lh#command#complete(ArgLead, CmdLine, CursorPos)
   let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
   let pos = strlen(tmp)
