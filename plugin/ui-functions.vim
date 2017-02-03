@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:      3.3.21
 " Created:      18th nov 2002
-" Last Update:  03rd Jan 2017
+" Last Update:  04th Jan 2017
 "------------------------------------------------------------------------
 " Description:  Functions for the interaction with a User Interface.
 "               The UI can be graphical or textual.
@@ -87,7 +87,7 @@ endfunction
 
 " Function: INPUT(prompt [, default ]) {{{2
 function! INPUT(prompt, ...) abort
-  return call('lh#ui#prompt', [a:prompt]+a:000)
+  return call('lh#ui#input', [a:prompt]+a:000)
 endfunction
 
 " Function: COMBO(prompt, choice [, ... ]) {{{2
