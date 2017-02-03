@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 24th Oct 2016
+                        For Vim version 7+      Last change: 03rd Feb 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -55,6 +55,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
 - |lh#on#exit()|
+- |lh#po#context()|
 - |lh#position#char_at()|
 - |lh#position#char_at_mark()|
 - |lh#position#char_at_pos()|
@@ -567,6 +568,23 @@ For the moment, the queue cannot be pause voluntarily.
 This command will cancel the first job (registered through |lh#async#queue()|)
 it founds that matches the {pattern}.
 This command supports |command-completion| to help select the right job.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#po#context()*                 {{{3
+lh#po#context([textdomain, textdomaindir])~
+@require `&shell == "bash`," otherwise no translation will be performed.
+Builds a context that'll permit to translate messages. The default values for
+the options will permit to translate Vim messages.
+
+The context permits to request the translation of any messageId from a
+.po/.mo file with *lh#po#context().translate()*
+
+For instance, >
+    :language mes fr_FR.UTF-8
+    :echo lh#po#context().translate('[readonly]')
+
+will print >
+    [lecture-seule]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#position#IsBefore()*          {{{3
