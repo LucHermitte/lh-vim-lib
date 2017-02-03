@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  24th Oct 2016
+" Last Update:  04th Jan 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -88,6 +88,14 @@ endfunction
 " ## Functions {{{1
 "------------------------------------------------------------------------
 " # Common stuff       {{{2
+" s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
+
 " Function: lh#menu#text({text})                             {{{3
 " @return a text to be used in menus where "\" and spaces have been escaped.
 function! lh#menu#text(text)
@@ -143,9 +151,9 @@ function! s:Set(Data) abort
     let variable = a:Data.variable
     if     lh#ref#is_bound(variable)
       call variable.assign(value)
-    elseif variable[0] == '$' " environment variabmes
+    elseif variable[0] == '$' " environment variables
       exe "let ".variable." = ".string(value)
-    elseif variable[0:1] == 'p:' " environment variabmes
+    elseif variable[0:1] == 'p:' " project variables
       call lh#let#to(variable, value)
     else
       " the following syntax doesn't work with dictionaries => use :exe
@@ -289,27 +297,30 @@ function! s:SaveData(Data)
   return id
 endfunction
 
-" Function: lh#menu#def_toggle_item({Data})                  {{{3
+" Function: lh#menu#def_toggle_item({Data})                {{{3
 " @param Data.idx_crt_value
 " @param Data.definitions == [ {value:, menutext: } ]
 " @param Data.menu        == { name:, position: }
 "
 " Sets a toggle-able menu-item defined by {Data}.
-"
+function! s:eval() dict abort
+  let key = s:MenuKey(self)
+  return s:Fetch(self, key)
+endfunction
+function! s:val_id() dict abort
+  return self.idx_crt_value
+endfunction
+
 function! lh#menu#def_toggle_item(Data)
   call s:Verbose('Def toggle menu: %1', a:Data)
-  function! a:Data.eval() dict
-    let key = s:MenuKey(self)
-    return s:Fetch(self, key)
-  endfunction
-  function! a:Data.val_id() dict
-    return self.idx_crt_value
-  endfunction
+  let a:Data.eval   = function(s:getSNR('eval'))
+  let a:Data.val_id = function(s:getSNR('val_id'))
   " Save the menu data as an internal script variable
   let id = s:SaveData(a:Data)
 
   " If the index of the current value hasn't been set, fetch it from the
   " associated variable
+  " @post `has_key(a:Data, "idx_crt_value")` is true
   if !has_key(a:Data, "idx_crt_value")
     " Fetch the value of the associated variable
     if lh#ref#is_bound(a:Data.variable)
@@ -331,7 +342,7 @@ function! lh#menu#def_toggle_item(Data)
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
   let s:toggle_commands[cmdName] = eval('s:Data'.id)
-  let a:Data["command"] = cmdName
+  let a:Data.command = cmdName
 
   " Add the menu entry according to the current value
   call s:UpdateMenu(a:Data.menu, s:Fetch(a:Data, s:MenuKey(a:Data)), cmdName)
@@ -341,6 +352,7 @@ endfunction
 
 
 "------------------------------------------------------------------------
+" :Toggle support functions                                {{{3
 function! s:Toggle(cmdName, ...)
   if !has_key(s:toggle_commands, a:cmdName)
     throw "toggle-menu: unknown toggable variable ".a:cmdName
@@ -619,18 +631,13 @@ function! lh#menu#make(prefix, code, text, binding, ...)
   let prefix  = matchstr(substitute(a:prefix, nore, '', ''), '[aincvsx]*')
   let b       = (a:1 == '<buffer>') ? 1 : 0
   let cmd = join(a:000[b : ], ' ')
-  let build_cmd = nore . 'menu <silent> ' . a:code . ' ' . lh#menu#text(a:text)
   if type(a:binding) == type({})
     let binding = get(a:binding, 'binding', '')
     " TODO: Support action
-    let no_mapping = has_key(a:binding, 'action')
+    " let no_mapping = has_key(a:binding, 'action')
   else
     let binding = a:binding
-    let no_mapping = empty(binding)
-  endif
-  if !empty(binding)
-    let build_cmd .=  '<tab>' .
-          \ substitute(lh#menu#text(binding), '&', '\0\0', 'g')
+    " let no_mapping = empty(binding)
   endif
   if !empty(binding)
     if prefix == 'i' && exists('*IMAP')
@@ -640,11 +647,16 @@ function! lh#menu#make(prefix, code, text, binding, ...)
         call IMAP(binding, cmd)
       endif
     else
-      let sBuffer = (a:1 == '<buffer>') ? ' <buffer> ' : ''
+      let sBuffer = b ? ' <buffer> ' : ''
       call lh#menu#map_all(prefix.nore.'map', sBuffer.binding, cmd)
     endif
   endif
   if has("gui_running") && has ('menu')
+    let build_cmd = nore . 'menu <silent> ' . a:code . ' ' . lh#menu#text(a:text)
+    if !empty(binding)
+      let build_cmd .=  '<tab>' .
+            \ substitute(lh#menu#text(binding), '&', '\0\0', 'g')
+    endif
     while strlen(prefix)
       execute s:BMenu(b) . prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd)
       let prefix = strpart(prefix, 1)
