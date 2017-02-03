@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  23rd Nov 2016
+" Last Update:  03rd Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -42,6 +42,13 @@ function! lh#exception#debug(expr)
   return eval(a:expr)
 endfunction
 
+" s:getSNR([func_name]) {{{2
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
@@ -58,6 +65,10 @@ endfunction
 "             exception was thrown
 " let g:stacks = []
 function! lh#exception#callstack(throwpoint) abort
+  let po_line = lh#po#context().translate('%s, line %ld')
+  let po_line = substitute(po_line, '%s', '(\k+)%(', '')
+  let po_line = substitute(po_line, '%ld', '(\d+)', 'g')
+  let rx_line = '\v'.po_line.')=$'
   let cleanup = lh#on#exit()
         \.restore('&isk')
   try
@@ -68,11 +79,11 @@ function! lh#exception#callstack(throwpoint) abort
     let function_stack = []
     let dScripts = {}
     for sFunc in stack
+      " next line requires '#' in &isk for autoload function names
       let func_data = matchlist(sFunc, '\(\k\+\)\[\(\d\+\)\]')
       if empty(func_data)
-        " TODO: support when vim is in other language than English or French
-        " => need access to vim internal gettext usage
-        let func_data = matchlist(sFunc, '\v(\k+)%(, %(line|ligne) (\d+))=$')
+        " Should support internationalized Vim PO/gettext messages w/ bash
+        let func_data = matchlist(sFunc, rx_line)
       endif
       if !empty(func_data)
         let fname = func_data[1]
@@ -115,23 +126,33 @@ function! lh#exception#callstack_as_qf(filter, ...) abort
   try
     throw "dummy"
   catch /.*/
-    let data = []
-    let bt = lh#exception#callstack(v:throwpoint)
-    let g:bt = bt
-    let idx = lh#list#find_if(bt, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"', 1)
-    if idx >= 0
-      let data = map(copy(bt)[idx : ], '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
-      " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', bt[idx], get(a:, 1, '...'))
-      " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', bt[0], get(a:, 1, '...'))
-      let data[0].text =  get(a:, 1, '...')
-    endif
-    return data
+    return call(lh#exception#decode().as_qf, [a:filter]+a:000)
   endtry
+endfunction
+
+" Function: lh#exception#decode([throwpoint]) {{{3
+function! s:as_qf(filter, ...) dict abort
+  let data = []
+  let idx = lh#list#find_if(self.callstack, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"', 1)
+  if idx >= 0
+    let data = map(copy(self.callstack)[idx : ], '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+    " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[idx], get(a:, 1, '...'))
+    " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[0], get(a:, 1, '...'))
+    let data[0].text =  get(a:, 1, '...')
+  endif
+  return data
+endfunction
+
+function! lh#exception#decode(...) abort
+  let throwpoint = get(a:, 1, v:throwpoint)
+  let callstack = lh#exception#callstack(throwpoint)
+  let res = lh#object#make_top_type({'callstack': callstack})
+  let res.as_qf = function(s:getSNR('as_qf'))
+  return res
 endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
-
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------
