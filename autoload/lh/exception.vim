@@ -66,8 +66,8 @@ endfunction
 " let g:stacks = []
 function! lh#exception#callstack(throwpoint) abort
   let po_line = lh#po#context().translate('%s, line %ld')
-  let po_line = substitute(po_line, '%s', '(\k+)%(', '')
-  let po_line = substitute(po_line, '%ld', '(\d+)', 'g')
+  let po_line = substitute(po_line, '%s', '(\\k+)%(', '')
+  let po_line = substitute(po_line, '%ld', '(\\d+)', 'g')
   let rx_line = '\v'.po_line.')=$'
   let cleanup = lh#on#exit()
         \.restore('&isk')
@@ -135,10 +135,16 @@ function! s:as_qf(filter, ...) dict abort
   let data = []
   let idx = lh#list#find_if(self.callstack, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"', 1)
   if idx >= 0
-    let data = map(copy(self.callstack)[idx : ], '{"filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+    let data = map(copy(self.callstack)[idx : ], '{"type": "I", "filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
     " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[idx], get(a:, 1, '...'))
     " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[0], get(a:, 1, '...'))
-    let data[0].text =  get(a:, 1, '...')
+  elseif !empty(self.callstack)
+    let idx = 0
+    let data = map(copy(self.callstack), '{"type": "I", "filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+  endif
+  if !empty(data)
+    let data[0].text =  get(a:, 1, "... (".get(self.callstack[idx],"fname", "n/a").":".get(self.callstack[idx],"offset", "?").")")
+    let data[0].type = 'E'
   endif
   return data
 endfunction
@@ -149,6 +155,52 @@ function! lh#exception#decode(...) abort
   let res = lh#object#make_top_type({'callstack': callstack})
   let res.as_qf = function(s:getSNR('as_qf'))
   return res
+endfunction
+
+" Function: lh#exception#say_what() {{{3
+" Function inspired by https://github.com/tweekmonster/exception.vim
+" A neat way to use it is:
+"   command! WTF call lh#exception#say_what()
+"
+" The differences are:
+" - Support for localized messages
+" - Support for autoloaded functions, even when `#` isn't in &isk (that may
+"   happen depending on the filetype of the current buffer)
+" - Use a framework that have been here for little time for other topics
+"   (logging, unit testing)
+" - As few loops as possible -- I hate debugging them
+function! lh#exception#say_what() abort
+  let po_ctx = lh#po#context()
+  let po_err_detected = po_ctx.translate('Error detected while processing %s:')
+  let rx_err_detected = '^\v'.printf(po_err_detected, '\zsfunction .*\ze').'$'
+
+  let po_in_line = lh#po#context().translate('line %4ld:')
+  let rx_in_line = '^\v'.substitute(po_in_line, '%4ld', '\\s*\\zs\\d+\\ze', '')
+
+  let po_out_line = lh#po#context().translate('%s, line %ld')
+
+  let messages = reverse(lh#askvim#execute('messages'))
+  let i = match(messages, rx_err_detected)
+  if i < 2
+    throw "No error detected!"
+  endif
+  let throwpoint = matchstr(messages[i], rx_err_detected)
+  let line = matchstr(messages[i-1], rx_in_line)
+  call lh#assert#true(!empty(line))
+
+  let throwpoint = printf(po_out_line, throwpoint, line)
+
+  let qf = lh#exception#decode(throwpoint).as_qf('')
+  let qf[0].text = substitute(qf[0].text, '^\.\.\.', messages[i-2], '')
+  call lh#assert#true(!empty(qf))
+
+  call setqflist(qf)
+  if exists(':Copen')
+    Copen
+  else
+    copen
+  endif
+  copen
 endfunction
 
 "------------------------------------------------------------------------
