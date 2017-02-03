@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Jun 2016
-" Last Update:  17th Oct 2016
+" Last Update:  03rd Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       File related functions
@@ -42,40 +42,6 @@ function! lh#file#debug(expr) abort
   return eval(a:expr)
 endfunction
 
-
-"------------------------------------------------------------------------
-" ## Exported functions {{{1
-" # file stamps {{{2
-" Function: lh#file#stamp(filename [, update_callback]) {{{3
-function! lh#file#stamp(filename, ...) abort " {{{4
-  if !filereadable(a:filename)
-    throw "Cannot access to " . a:filename
-  endif
-  let res = { 'filename': a:filename, 'stamp': getftime(a:filename) }
-
-  let res.check_up_to_date = function(s:getSNR('check_up_to_date'))
-
-  " return {{{4
-  return res
-endfunction
-
-function! s:check_up_to_date() dict abort "{{{4
-  let new_stamp = getftime(self.filename)
-  let must_update = self.stamp < new_stamp
-  call s:Verbose('Check if file %1 data is up-to-date at %3 -- last update: %2 --> %4!',
-          \ self.filename, self.stamp, new_stamp, must_update ? 'YES' : 'NO')
-  if must_update
-    if has_key(self, '_update_callback')
-      call call(self.update_callback, self)
-    endif
-    let self.stamp = new_stamp
-    call s:Verbose('Time stamp for %1 updated to %2', self.filename, self.stamp)
-  endif
-endfunction
-
-"------------------------------------------------------------------------
-" ## Internal functions {{{1
-
 " s:getSNR([func_name]) {{{2
 function! s:getSNR(...)
   if !exists("s:SNR")
@@ -84,6 +50,54 @@ function! s:getSNR(...)
   return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
 
+"------------------------------------------------------------------------
+" ## Exported functions {{{1
+" # file stamps {{{2
+function! s:must_update(filename, file_data) abort " {{{3
+  let new_stamp = getftime(a:filename)
+  return a:file_data._stamp < new_stamp
+endfunction
+
+function! s:get(filename) dict abort " {{{3
+  if !has_key(self._files, a:filename) || s:must_update(a:filename, self._files[a:filename])
+    call self._update(a:filename)
+  endif
+  return self._files[a:filename]._data
+endfunction
+
+function! s:_update(filename) dict abort " {{{3
+  let file_data =
+        \ { '_stamp' : getftime(a:filename)
+        \ , '_data'  : self._compute_data(a:filename)
+        \ }
+  let self._files[a:filename] = file_data
+  call s:Verbose('Updating %1 data: %2', a:filename, file_data)
+endfunction
+
+function! s:clear() dict abort " {{{3
+  let self._files = {}
+endfunction
+
+function! s:reset() dict abort " {{{3
+  call map(copy(keys(self._files)), 'self._update(v:val)')
+endfunction
+
+" Function: lh#file#new_cache([update_func]) {{{3
+function! lh#file#new_cache(update_func) abort
+  let cache = lh#object#make_top_type({})
+  let cache._files        = {}
+  " Public functions
+  let cache.get           = function(s:getSNR('get'))
+  let cache.clear         = function(s:getSNR('clear'))
+  let cache.reset         = function(s:getSNR('reset'))
+  " Internal functions
+  let cache._update       = function(s:getSNR('_update'))
+  let cache._compute_data = a:update_func
+  return cache
+endfunction
+
+"------------------------------------------------------------------------
+" ## Internal functions {{{1
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------

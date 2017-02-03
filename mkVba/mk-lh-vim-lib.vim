@@ -34,6 +34,7 @@ autoload/lh/dict.vim
 autoload/lh/encoding.vim
 autoload/lh/env.vim
 autoload/lh/event.vim
+autoload/lh/file.vim
 autoload/lh/float.vim
 autoload/lh/fmt.vim
 autoload/lh/ft.vim
