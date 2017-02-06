@@ -42,6 +42,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
 - |lh#exception#callstack_as_qf()|
+- |lh#file#new_cache()|
 - |lh#fmt#printf()|
 - |lh#float#min()|, |lh#float#max()|,
   |lh#float#arg_min()|, |lh#float#arg_max()|
@@ -704,7 +705,7 @@ Decodes the {throwpoint} and returns a list of dictionaries made of:
 @see also |lh#exception#callstack_as_qf()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#exception#callstack_as_qf()*        {{{3
+                                                *lh#exception#callstack_as_qf()*  {{{3
 lh#exception#callstack_as_qf({filter} [{msg}])~
 Decodes the current callstack and returns a list of dictionaries compatible
 with |setqflist()| and |setloclist()|.
@@ -712,6 +713,35 @@ Entries with a `fname` field  matching `'\vlh#exception#'.{filter}` will be
 filtered out. If you plan to use this field, don't forget to prepend with
 a `/\|`, (magic mode).
 @see also |lh#exception#callstack()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                               *lh#file#new_cache()*             {{{3
+lh#file#new_cache({update-function})~
+Returns a new object that can caches data associated to files.
+@param {update-function} shall be a callable object that takes one parameter
+(a filename) and return data it want to associated to it.
+
+Data associated to a file can be retrieved with `get(filename)`, it be
+either computed on-the-fly if the data is not up-to-date, or returned from the
+cache. *lh#file#new_cache().get()*
+
+Example: >
+    function! s:get_make_compl(makefile) dict abort
+      let dir = fnamemodify(a:makefile, ':h')
+      let completions = split(lh#command#matching_bash_completion('make', '', dir), "\n")
+      call lh#list#unique_sort(completions))
+      return completions
+    endfunction
+
+    let s:make_cache = lh#file#new_cache(function(s:getSNR('get_make_compl')))
+
+    function! lh#command#matching_make_completion(lead, ...) abort
+      let makefile = (a:0 > 0 ? a:1.'/' : '') . 'Makefile'
+      let makefile = fnamemodify(makefile, ':p')
+      let matches = copy(s:make_cache.get(makefile))
+      call filter(matches, 'v:val =~ "^".a:lead')
+      return matches
+    endfunction
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                *lh#float#max()*     *lh#float#min()*             {{{3
