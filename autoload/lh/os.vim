@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  03rd Feb 2017
+" Last Update:  06th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -166,12 +166,18 @@ function! lh#os#new_runner_script(command, env) abort
   try
     let success = 0
     " store lines for debug purpose
-    if lh#os#OnDOSWindows() && ! lh#os#system_detected() == 'unix'
-      let result._lines = map(items(a:env), 'set v:val[0]."=".v:val[1]')
-    else
-      let result._lines = map(items(a:env), '"export ".v:val[0]."=".string(v:val[1])')
+    let result._lines = []
+    let env = copy(a:env)
+    if has_key(env, '__shebang')
+      let result._lines += ['#!'.(env.__shebang)]
+      unlet env.__shebang
     endif
-    let result._lines += [ a:command ]
+    if lh#os#OnDOSWindows() && ! lh#os#system_detected() == 'unix'
+      let result._lines += map(items(env), 'set v:val[0]."=".v:val[1]')
+    else
+      let result._lines += map(items(env), '"export ".v:val[0]."=".s:as_string(v:val[1])')
+    endif
+    let result._lines += type(a:command) == type([]) ? a:command : [ a:command ]
     call writefile(result._lines, tmpname)
     call s:Verbose('Store in runner script %1 the command %2, completed w/ the environment variables: %3', result._script_name, result._lines, a:env)
     let success = 1
@@ -282,6 +288,17 @@ function! s:getSNR(...)
   endif
   return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
+
+function! s:as_string(value) abort " {{{2
+  " Meant to be used as alternative to shellescape
+  if type(a:value) == type([])
+    return '('.join(map(copy(a:value), 'shellescape(v:val)'), ' ').')'
+  else
+    call lh#assert#not_equal(type(a:value), type({}))
+    return shellescape(a:value)
+  endif
+endfunction
+
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
