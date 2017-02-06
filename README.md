@@ -237,10 +237,16 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
 
 ### Commands related functions
-| Function                    | Purpose                                                          |
-|:----------------------------|:-----------------------------------------------------------------|
-| `lh#command#new()`          | Experimental way to define commands that support auto-completion |
-| `lh#command#Fargs2String()` | Merges a set strings into a set of parameters (experimental)     |
+| Function                                | Purpose                                                                                     |
+|:----------------------------------------|:--------------------------------------------------------------------------------------------|
+| `lh#command#new()`                      | Experimental way to define commands that support auto-completion                            |
+| `lh#command#Fargs2String()`             | Merges a set strings into a set of parameters (experimental)                                |
+| `lh#command#analyse_args()`             | Parse `:command-completion-custom` function parameters                                      |
+| `lh#command#matching_variables()`       | Returns a list of VimL variable names matching the lead                                     |
+| `lh#command#matching_for_commands()`    | Returns a list of Ex command names matching the lead                                        |
+| `lh#command#matching_askvim()`          | Returns a list of what Vim what have returned for cmdline completion given a type of things |
+| `lh#command#matching_bash_completion()` | Asks Bash what it'll complete the lead following the command with                           |
+| `lh#command#matching_make_completion()` | Asks Bash what it'll complete the lead following `make` with                                |
 
 
 ### Menus related functions

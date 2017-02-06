@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  24th Jan 2017
+" Last Update:  06th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -46,6 +46,15 @@ endfunction
 
 function! lh#command#debug(expr) abort
   return eval(a:expr)
+endfunction
+
+" # Misc {{{2
+" s:getSNR([func_name]) {{{3
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
 
 "------------------------------------------------------------------------
@@ -154,6 +163,58 @@ endfunction
 function! lh#command#matching_for_command(lead) abort
   silent! exe "norm! :".a:lead."\<c-a>\"\<home>let\ cmds=\"\<cr>"
   return split(cmds, ' ')[1:]
+endfunction
+
+" Function: lh#command#matching_bash_completion(command, lead [, dir]) {{{3
+" Requires bash
+function! lh#command#matching_bash_completion(command, lead, ...) abort
+  if !executable('bash')
+    return a:lead
+  endif
+
+  let lead = [a:command]
+  if !empty(a:lead) | let lead += [ a:lead ] | endif
+  let sLead = join(lead, ' ')
+  let env = {}
+  let env.__shebang  = '/bin/env bash'
+  let env.COMP_LINE  = sLead
+  let env.COMP_POINT = lh#encoding#strlen(sLead) + 1
+  let env.COMP_WORDS = lead
+  let env.COMP_CWORD = 1
+
+  let commands = []
+  let commands += [ '__print_completions() { printf ''%s\n'' "${COMPREPLY[@]}"; }']
+  let commands += [ 'source /etc/bash_completion']
+  let commands += [ '_completion_loader '.a:command ]
+  let commands += [ 'compl_def=$(complete -p '.a:command.')' ]
+  let commands += [ 'policy="${compl_def/complete -F /}"' ]
+  let commands += [ 'pol_tokens=(${policy})' ]
+  let commands += [ '${pol_tokens[0]}' ]
+  if a:0 > 0
+    let commands[-1] = 'cd '.shellescape(a:1). ' && ' . commands[-1] .' || echo "Invalid directory!"'
+  endif
+  let commands += [ '__print_completions' ]
+  let commands += [ '']
+
+  let script = lh#os#new_runner_script(commands, env)
+  return script.run()
+endfunction
+
+" Function: lh#command#matching_make_completion(lead [, dir]) {{{3
+function! s:get_make_compl(makefile) dict abort
+  let dir = fnamemodify(a:makefile, ':h')
+  let completions = split(lh#command#matching_bash_completion('make', '', dir), "\n")
+  call lh#list#unique_sort(completions)
+  return completions
+endfunction
+
+let s:make_cache = lh#file#new_cache(function(s:getSNR('get_make_compl')))
+function! lh#command#matching_make_completion(lead, ...) abort
+  let makefile = (a:0 > 0 ? a:1.'/' : '') . 'Makefile'
+  let makefile = fnamemodify(makefile, ':p')
+  let matches = copy(s:make_cache.get(makefile))
+  call filter(matches, 'v:val =~ "^".a:lead')
+  return matches
 endfunction
 
 "------------------------------------------------------------------------

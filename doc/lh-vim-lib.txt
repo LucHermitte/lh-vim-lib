@@ -164,6 +164,8 @@ Commands related functions:                             |lhvl#command|
 - |lh#command#matching_variables()|
 - |lh#command#matching_askvim()|
 - |lh#command#matching_for_command()|
+- |lh#command#matching_bash_completion()|
+- |lh#command#matching_make_completion()|
 - |lh#command#new()| (alpha version)
 - |lh#command#Fargs2String()| (alpha version)
 - |lh#command#complete()| (alpha version)
@@ -2523,7 +2525,7 @@ The action to execute will be corrected depending on the current mode. See
 COMMANDS RELATED FUNCTIONS                            *lhvl#command*    {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#command#analyse_args()*       {{{3
+                                                *lh#command#analyse_args()*              {{{3
 lh#command#analyse_args(a:ArgLead, a:CmdLine, a:CursorPos)~
 Helper function to define |:command-completion-custom| functions.
 It parses the function parameters to return a |List| of:
@@ -2531,7 +2533,7 @@ It parses the function parameters to return a |List| of:
 " - all the tokens up to cursor position
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#command#matching_variables()* {{{3
+                                                *lh#command#matching_variables()*        {{{3
 lh#command#matching_variables(lead [, scopes=all])~
 Helper function to define |:command-completion-custom| functions.
 Returns a list of variables matching the {lead}. Supported variables are:
@@ -2539,14 +2541,14 @@ Returns a list of variables matching the {lead}. Supported variables are:
 |p:var| are not supported (yet).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#command#matching_for_command()* {{{3
+                                                *lh#command#matching_for_command()*      {{{3
 lh#command#matching_for_command(lead)~
 Helper function to define |:command-completion-custom| functions.
 Returns what vim would have expanded for the command contained in the {lead}
 string.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#command#matching_askvim()*    {{{3
+                                                *lh#command#matching_askvim()*           {{{3
 lh#command#matching_askvim(attribute, lead)~
 Helper function to define |:command-completion-custom| functions.
 Returns what vim would have expanded for |:command-complete| {attribute}.
@@ -2562,17 +2564,41 @@ For instance:
     in it.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#command#new()*                {{{3
+                                                *lh#command#matching_bash_completion()*  {{{3
+lh#command#matching_bash_completion(command, lead [, directory])~
+Helper function to define |:command-completion-custom| functions.
+Returns what `bash`  would have expanded for {command} + {lead}, when executed
+in the optional {directory}.
+
+It's specially meant for `bash` commands with a completion scheme defined with
+`complete -F`.
+@see also |lh#command#matching_make_completion()| which has been dedicated to
+`make`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#command#matching_make_completion()*  {{{3
+lh#command#matching_make_completion(lead [, directory])~
+Helper function to define |:command-completion-custom| functions.
+Returns what `bash`  would have expanded for `make` + {lead}, when executed
+in the optional {directory}.
+@see the underlying |lh#command#matching_bash_completion()| function.
+
+@note This function caches results until the `Makefile` present in {directory}
+is updated.
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#command#new()*                       {{{3
 Highly Experimental.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                       *lh#command#Fargs2String()*                {{{3
+                                       *lh#command#Fargs2String()*              {{{3
 lh#command#Fargs2String({aList})~
 @param[in,out] aList list of params from <f-args>
 @see tests/lh/test-Fargs2String.vim
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                            *lh#command#complete()*               {{{3
+                                            *lh#command#complete()*                  {{{3
 lh#command#complete({argLead}, {cmdLine}, {cursorPos})~
 Under developpement
 
@@ -3747,7 +3773,7 @@ lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge(
     Just another syntax to do the same thing. Choose what suits you best.
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2016 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2017 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
