@@ -3571,6 +3571,14 @@ But first, we need to define a project (see |:Project--define|, and
 context it means: try to set the related |p:| variable, if the current buffer
 is under no project, then set instead a |b:| variable with the same name.
 
+
+                                                *reserved-p:variable*
+Reserved p:variables~
+Some `p:variables` are reserved:
+- *(bpg):paths.sources* is the root directory of a project.
+- *(bpg):project_sources_dir* configuration variable that help detecting
+  |(bpg):paths.sources|.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *:Project*                       {{{3
 :Project --help~
@@ -3616,6 +3624,10 @@ displayed.
 @pre {dirname} must be a valid directory
 @pre a project (named {prj-name} if specified) must exist.
 @post `p:paths.sources` equals {dirname}
+
+If {dirname} equals `'!'`, the current directory in the current buffer is
+restored to |(bpg):paths.sources|. This is meant as a workaround to a pending bug
+where current paths are changed behing our back.
 
                                                     *:Project-:echo*
 :Project [{prj-name}] :echo {varname}~

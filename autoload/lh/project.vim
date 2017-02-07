@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  01st Dec 2016
+" Last Update:  07th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -218,7 +218,11 @@ function! s:cd_project(prj, path) abort " {{{3
     throw "Cannot apply :cd on non existant projects"
   endif
   let path = expand(a:path)
-  if !isdirectory(path)
+  if a:path == '!'
+    " Reset directory to project directory in current window.
+    exe 'lcd '.lh#option#get('paths.sources')
+    return
+  elseif !isdirectory(path)
     throw "Invalid directory `".path."`!"
   endif
   call lh#dict#add_new(a:prj.variables, {'paths': {}})
@@ -399,7 +403,7 @@ let s:k_usage =
       \ , '  :Project --define <name>     " define a new project/register current buffer'
       \ , '  :Project --which             " list projects to which the current buffer belongs'
       \ , '  :Project [<name>] :ls        " list buffers belonging to the project'
-      \ , '  :Project [<name>] :cd <path> " change directory to <path>'
+      \ , '  :Project [<name>] :cd <path> " change directory to <path> -- "!" -> reset to project directory'
       \ , '  :Project [<name>] :echo      " echo state of a project variable'
       \ , '  :Project [<name>] :let       " set state of a project variable'
       \ , '  :Project [<name>] :bufdo[!]  " execute a command on all buffers belonging to the project'
@@ -536,6 +540,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
     call filter(res, 'isdirectory(v:val)')
+    let res += ['!']
     call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
   elseif     (2 == pos && tokens[1] =~ '\v^:(doonce|bufdo|windo)$')
         \ || (3 == pos && tokens[2] =~ '\v^:=(doonce|bufdo|windo)$')
