@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  06th Feb 2017
+" Last Update:  07th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -168,7 +168,7 @@ endfunction
 " Function: lh#command#matching_bash_completion(command, lead [, dir]) {{{3
 " Requires bash
 function! lh#command#matching_bash_completion(command, lead, ...) abort
-  if !executable('bash')
+  if !executable('bash') || !filereadable('/etc/bash_completion')
     return a:lead
   endif
 
