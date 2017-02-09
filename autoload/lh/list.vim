@@ -22,6 +22,7 @@ let s:k_version = 40000
 "       (*) PERF: Simplify lh#list#uniq()
 "       (*) ENH: Add lh#list#push_if_new_elements()
 "       (*) ENH: Add lh#list#cross()
+"       (*) PERF: Improve #matches() and #match() performances
 "       v3.13.2
 "       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
@@ -221,8 +222,33 @@ function! lh#list#flatten(list) abort
   return res
 endfunction
 
+" Function: lh#list#match(list, to_be_matched [, idx]) {{{3
+if v:version >= 730
+  function! lh#list#match(list, to_be_matched, ...) abort
+    return call('match', [a:list, a:to_be_matched] + a:000)
+  endfunction
+else
+  " I can't remember when |match()| started to support lists
+  function! lh#list#match(list, to_be_matched, ...) abort
+    let idx = (a:0>0) ? a:1 : 0
+    while idx < len(a:list)
+      if match(a:list[idx], a:to_be_matched) != -1
+        return idx
+      endif
+      let idx += 1
+    endwhile
+    return -1
+  endfunction
+endif
+
+function! lh#list#Match(list, to_be_matched, ...) abort
+  let idx = (a:0>0) ? a:1 : 0
+  return lh#list#match(a:list, a:to_be_matched, idx)
+endfunction
+
 " Function: lh#list#match_re(list, to_be_matched [, idx]) {{{3
-" Search first regex that match the parameter
+" @since Version 3.2.4
+" Search first regex that matches the parameter
 function! lh#list#match_re(list, to_be_matched, ...) abort
   let idx = (a:0>0) ? a:1 : 0
   while idx < len(a:list)
@@ -234,35 +260,30 @@ function! lh#list#match_re(list, to_be_matched, ...) abort
   return -1
 endfunction
 
-" Function: lh#list#match(list, to_be_matched [, idx]) {{{3
-function! lh#list#match(list, to_be_matched, ...) abort
-  let idx = (a:0>0) ? a:1 : 0
-  while idx < len(a:list)
-    if match(a:list[idx], a:to_be_matched) != -1
-      return idx
-    endif
-    let idx += 1
-  endwhile
-  return -1
-endfunction
-function! lh#list#Match(list, to_be_matched, ...) abort
-  let idx = (a:0>0) ? a:1 : 0
-  return lh#list#match(a:list, a:to_be_matched, idx)
-endfunction
-
 " Function: lh#list#matches(list, to_be_matched [,idx]) {{{3
 " Return the list of indices that match {to_be_matched}
-function! lh#list#matches(list, to_be_matched, ...) abort
-  let res = []
-  let idx = (a:0>0) ? a:1 : 0
-  while idx < len(a:list)
-    if match(a:list[idx], a:to_be_matched) != -1
-      let res += [idx]
-    endif
-    let idx += 1
-  endwhile
-  return res
-endfunction
+if lh#has#lambda()
+  function! lh#list#matches(list, to_be_matched, ...) abort
+    let start = (a:0>0) ? a:1 : 0
+    " Note: lambdas are not that fast. Still they improve index computations
+    let res = map(a:list[start:], {idx, val -> val =~ a:to_be_matched ? start+idx : -1})
+    " call lh#assert#is_not(res, a:list)
+    call filter(res, 'v:val >= 0')
+    return res
+  endfunction
+else
+  function! lh#list#matches(list, to_be_matched, ...) abort
+    let res = []
+    let idx = (a:0>0) ? a:1 : 0
+    while idx < len(a:list)
+      if match(a:list[idx], a:to_be_matched) != -1
+        let res += [idx]
+      endif
+      let idx += 1
+    endwhile
+    return res
+  endfunction
+endif
 
 " Function: lh#list#Find_if(list, predicate [, predicate-arguments] [, start-pos]) {{{3
 function! lh#list#Find_if(list, predicate, ...) abort
@@ -782,6 +803,32 @@ function! lh#list#cross(rng1, rng2, F) abort
   return res
 endfunction
 
+" Function: lh#list#zip(l1, l2) {{{3
+function! lh#list#zip(l1, l2) abort
+  if len(a:l1) != len(a:l2)
+    throw "Zip operation cannot be performed on lists of different sizes"
+  endif
+  let res = []
+  let idx = range(0, len(a:l1)-1)
+  for i in idx
+    let res += [ a:l1[i], a:l2[i] ]
+  endfor
+  return res
+endfunction
+
+" Function: lh#list#zip_as_dict(l1, l2) {{{3
+function! lh#list#zip_as_dict(l1, l2) abort
+  if len(a:l1) != len(a:l2)
+    throw "Zip operation cannot be performed on lists of different sizes"
+  endif
+  let res = {}
+  let idx = range(0, len(a:l1)-1)
+  for i in idx
+    let res[a:l1[i]] = a:l2[i]
+  endfor
+  return res
+endfunction
+
 " # Private {{{2
 " Function: lh#list#_regular_cmp(lhs, rhs) {{{3
 " Up to vim version 7.4.411
@@ -826,32 +873,6 @@ function! lh#list#_apply_on(list, index, action) abort
   let out = lh#function#execute(a:action, in)
   let a:list[a:index] = out
   return a:list
-endfunction
-
-" Function: lh#list#zip(l1, l2) {{{3
-function! lh#list#zip(l1, l2) abort
-  if len(a:l1) != len(a:l2)
-    throw "Zip operation cannot be performed on lists of different sizes"
-  endif
-  let res = []
-  let idx = range(0, len(a:l1)-1)
-  for i in idx
-    let res += [ a:l1[i], a:l2[i] ]
-  endfor
-  return res
-endfunction
-
-" Function: lh#list#zip_as_dict(l1, l2) {{{3
-function! lh#list#zip_as_dict(l1, l2) abort
-  if len(a:l1) != len(a:l2)
-    throw "Zip operation cannot be performed on lists of different sizes"
-  endif
-  let res = {}
-  let idx = range(0, len(a:l1)-1)
-  for i in idx
-    let res[a:l1[i]] = a:l2[i]
-  endfor
-  return res
 endfunction
 
 " Function: lh#list#_id(a) {{{3

@@ -153,6 +153,22 @@ function! s:TestBinarySearches()
   AssertEquals ([len(v1), len(v1)] ,  lh#list#equal_range(v1, 10))
 endfunction
 
+" Function: s:Test_match() {{{3
+function! s:Test_match() abort
+  let list = [ 'abc', 'bcd', 'cde' ]
+  AssertEquals(match(list, '^bc'), 1)
+  AssertEquals(lh#list#match(list, '^bc'), 1)
+endfunction
+
+" Function: s:Test_matches() {{{3
+function! s:Test_matches() abort
+  let list = [ 'abc', 'bcd', 'cde' ]
+  AssertEquals(lh#list#matches(list, '^bc'), [1])
+  AssertEquals(lh#list#matches(list, 'bc'), [0, 1])
+  AssertEquals(lh#list#matches_fast(list, '^bc'), [1])
+  AssertEquals(lh#list#matches_fast(list, 'bc'), [0, 1])
+endfunction
+
 "------------------------------------------------------------------------
 " accumulate {{{2
 
