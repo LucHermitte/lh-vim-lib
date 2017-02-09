@@ -160,6 +160,13 @@ function! s:Test_match() abort
   AssertEquals(lh#list#match(list, '^bc'), 1)
 endfunction
 
+" Function: s:Test_match_re() {{{3
+function! s:Test_match_re() abort
+  let rx = ['ff', '^bc', 'bc', 'fd']
+  AssertEquals(lh#list#match_re(rx, 'abc'), 2)
+  AssertEquals(lh#list#match_re(rx, 'bca'), 1)
+endfunction
+
 " Function: s:Test_matches() {{{3
 function! s:Test_matches() abort
   let list = [ 'abc', 'bcd', 'cde' ]
