@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  02nd Nov 2016
+" Last Update:  09th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -21,6 +21,7 @@ let s:k_version = 40000
 "       (*) BUG: Add support for empty lists in `lh#list#find_if`
 "       (*) PERF: Simplify lh#list#uniq()
 "       (*) ENH: Add lh#list#push_if_new_elements()
+"       (*) ENH: Add lh#list#cross()
 "       v3.13.2
 "       (*) PERF: Optimize `lh#list#push_if_new`
 "       v3.10.3
@@ -428,6 +429,7 @@ function! lh#list#arg_max(list, ...) abort
 endfunction
 
 " Function: lh#list#arg_min(list [, transfo]) {{{3
+" @since Version 4.0.0
 function! lh#list#arg_min(list, ...) abort
   if empty(a:list) | return -1 | endif
   let Transfo = a:0 > 0 ? a:1 : function(s:getSNR(id))
@@ -541,18 +543,6 @@ else
       endif
     endfor
     return result
-
-    let last = a:list[0]
-    let i = 1
-    let ll = len(a:list)
-    while i < ll
-      if last != a:list[i]
-        let last = a:list[i]
-        call add(result, last)
-      endif
-      let i += 1
-    endwhile
-    return result
   endfunction
 endif
 " Function: lh#list#subset(list, indices) {{{3
@@ -642,6 +632,7 @@ function! lh#list#push_if_new(list, value) abort
 endfunction
 
 " Function: lh#list#push_if_new_elements(list, values) {{{3
+" @since Version 4.0.0
 function! lh#list#push_if_new_elements(list, values) abort
   let new = filter(copy(a:values), 'index(a:list, v:val) < 0')
   call extend(a:list, new)
@@ -778,6 +769,17 @@ function! lh#list#concurrent_for(in1, in2, out1, out2, out_com, ...) abort
   endif
   " echomsg len(a:in1) . " - " .len(a:in2)
   " echomsg len(out1) . " - " .len(out2) . " - " . len(out_com)
+endfunction
+
+" Function: lh#list#cross(rng1, rng2, F) {{{3
+" @since Version 4.0.0
+function! lh#list#cross(rng1, rng2, F) abort
+  let f = type(a:F) == type('') ? a:F : 'a:F(v:val, l:val2)'
+  let res = []
+  for val2 in a:rng2
+    let res += map(copy(a:rng1), f)
+  endfor
+  return res
 endfunction
 
 " # Private {{{2

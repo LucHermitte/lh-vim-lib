@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  02nd Nov 2016
+" Last Update:  09th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -537,6 +537,27 @@ function! s:Test_dict_let() abort
   AssertEquals(d.a.b.z, 42)
   call lh#dict#let(d, 'a.z1.z2.z3', 42)
   AssertEquals(d.a.z1.z2.z3, 42)
+endfunction
+
+" lh#list#cross() {{{2
+" Function: s:Test_cross() {{{3
+function! s:Test_cross() abort
+  let rng1 = [ 'a', 'b', 'c']
+  let rng2 = [ 0, 1, 2]
+
+  if lh#has#lambda()
+    AssertEquals(lh#list#cross(rng1, rng2, {a, b -> a.b}),
+          \ ['a0', 'b0', 'c0', 'a1', 'b1', 'c1', 'a2', 'b2', 'c2'])
+
+    AssertEquals(lh#list#cross(rng2, rng2, {a, b -> a+b}),
+          \ [ 0, 1, 2, 1, 2, 3, 2, 3, 4])
+  endif
+  " Without lambda
+  AssertEquals(lh#list#cross(rng1, rng2, 'v:val.l:val2'),
+        \ ['a0', 'b0', 'c0', 'a1', 'b1', 'c1', 'a2', 'b2', 'c2'])
+
+  AssertEquals(lh#list#cross(rng2, rng2, 'v:val + l:val2'),
+        \ [ 0, 1, 2, 1, 2, 3, 2, 3, 4])
 endfunction
 " }}}1
 "------------------------------------------------------------------------

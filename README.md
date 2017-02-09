@@ -148,6 +148,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#concurrent_for()`       | Concurrently searches for symettric differences and intersection of two sorted sets                               |
 | `lh#list#contain_entity()`       | Tells whether a Dict or List entity is present within a list                                                      |
 | `lh#list#copy_if()`              | Copies the elements from a list that match a predicate                                                            |
+| `lh#list#cross()`                | Cross elements from two lists and produce a new list                                                              |
 | `lh#list#equal_range()`          | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
 | `lh#list#find_if()`              | Searches the first element in a list that verifies a predicate                                                    |
 | `lh#list#flat_extend()`          | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter             |

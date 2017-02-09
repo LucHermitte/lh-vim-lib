@@ -92,6 +92,7 @@ Lists related functions:                                |lhvl#list|
 - |lh#list#concurrent_for()|
 - |lh#list#contain_entity()|
 - |lh#list#copy_if()|
+- |lh#list#cross()|
 - |lh#list#equal_range()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#flat_extend()|
@@ -1474,6 +1475,42 @@ Appends in {output} the elements from {input} that verifies the {predicate}.
                      {predicate} will be appended.
 @param   {predicate} Boolean |lhvl#functor| tested on each element.
 @return              {output}
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#cross()*                  {{{3
+lh#list#cross({range1}, {range2}, {func})~
+Combines elements from {range1} with elements from {range2} thanks to {func}
+
+@param[in] {range1} Input |List|
+@param[in] {range2} Input |List|
+@param[in] {func}   Binary function.
+                    Can be either a binary functions, or a string where
+                    `v:val` represents elements for {range1} and where `l:val2`
+                    represents elements from {range2}.
+@todo Support |lhvl#functor| in{func}
+@since Version 4.0.0
+@return    |List| made as a kind of cross product: >
+    for val1 in range1
+        for val2 in range2
+            res += [ Func(val1, val2)]
+        endfor
+    endfor
+
+This means: >
+    let rng1 = [ 'a', 'b', 'c']
+    let rng2 = [ 0, 1, 2]
+
+    AssertEquals(lh#list#cross(rng1, rng2, {a, b -> a.b}),
+          \ ['a0', 'b0', 'c0', 'a1', 'b1', 'c1', 'a2', 'b2', 'c2'])
+
+    AssertEquals(lh#list#cross(rng2, rng2, {a, b -> a+b}),
+          \ [ 0, 1, 2, 1, 2, 3, 2, 3, 4])
+
+    AssertEquals(lh#list#cross(rng1, rng2, 'v:val.l:val2'),
+          \ ['a0', 'b0', 'c0', 'a1', 'b1', 'c1', 'a2', 'b2', 'c2'])
+
+    AssertEquals(lh#list#cross(rng2, rng2, 'v:val + l:val2'),
+          \ [ 0, 1, 2, 1, 2, 3, 2, 3, 4])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#accumulate()*             {{{3
