@@ -261,11 +261,13 @@ Design by Contract related functions                    |lhvl#DbC|
 - Assertions:
   - |lh#assert#equal()|
   - |lh#assert#false()|
+  - |lh#assert#is()|
+  - |lh#assert#is_not()|
   - |lh#assert#match()|
   - |lh#assert#not_equal()|
   - |lh#assert#true()|
-  - |lh#assert#value().equal()|
   - |lh#assert#value().differ()|
+  - |lh#assert#value().equal()|
   - |lh#assert#value().is_lt()|
   - |lh#assert#value().is_le()|
   - |lh#assert#value().is_gt()|
@@ -3844,6 +3846,8 @@ lh#assert#true({actual} [, {msg}])                     *lh#assert#true()*
 lh#assert#false({actual} [, {msg}])                    *lh#assert#false()*
 lh#assert#equal({expected}, {actual} [, {msg}])        *lh#assert#equal()*
 lh#assert#not_equal({expected}, {actual}  [, {msg}])   *lh#assert#not_equal()*
+lh#assert_is({expected}, {actual} [, {msg}])           *lh#assert#is()* see |expr-is|
+lh#assert_is_not({expected}, {actual} [, {msg}])       *lh#assert#is_not()*
 lh#assert#match({pattern}, {actual} [, {msg}])         *lh#assert#match()*
 
 lh#assert#unexpected([, {msg}])                        *lh#assert#unexpected()*

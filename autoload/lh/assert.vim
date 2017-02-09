@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  11th Jan 2017
+" Last Update:  09th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -99,6 +99,22 @@ endfunction
 function! lh#assert#not_equal(expected, actual, ...) abort
   if a:expected == a:actual
     let msg = a:0 > 0 ? a:1 : 'Expected not '.a:expected.' but got '.a:actual
+    call lh#assert#_trace_assert(msg)
+  endif
+endfunction
+
+" Function: lh#assert#is(expected, actual, ...) {{{3
+function! lh#assert#is(expected, actual, ...) abort
+  if ! (a:expected is a:actual)
+    let msg = a:0 > 0 ? a:1 : 'Expected '.a:expected.' to be identical to '.a:actual
+    call lh#assert#_trace_assert(msg)
+  endif
+endfunction
+
+" Function: lh#assert#is_not(expected, actual, ...) {{{3
+function! lh#assert#is_not(expected, actual, ...) abort
+  if a:expected is a:actual
+    let msg = a:0 > 0 ? a:1 : 'Expected '.a:expected.' to not be identical to '.a:actual
     call lh#assert#_trace_assert(msg)
   endif
 endfunction

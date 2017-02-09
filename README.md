@@ -347,6 +347,8 @@ aim at providing tools to write unit tests.
 | `lh#assert#false()`            | Asserts a value is false                                                                                                       |
 | `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                     |
 | `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
+| `lh#assert#is()`               | Asserts two entities are the same                                                                                              |
+| `lh#assert#is_not()`           | Asserts two entities are not the same                                                                                          |
 | `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
 | `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
 | `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
