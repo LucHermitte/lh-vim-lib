@@ -2,10 +2,10 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.1.3.2.
-let s:k_version = '3132'
+" Version:      4.0.0
+let s:k_version = '400000'
 " Created:      02nd Sep 2016
-" Last Update:  02nd Sep 2016
+" Last Update:  09th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -52,6 +52,11 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 " # Vim features {{{2
+
+" Function: lh#has#lambda() {{{3
+function! lh#has#lambda() abort
+  return has("lambda")
+endfunction
 
 " Function: lh#has#partials() {{{3
 function! lh#has#partials() abort
