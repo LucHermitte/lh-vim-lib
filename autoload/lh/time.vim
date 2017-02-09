@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.14.0
-let s:k_version = '31400'
+" Version:      4.0.0
+let s:k_version = '40000'
 " Created:      01st Dec 2015
-" Last Update:  06th Sep 2016
+" Last Update:  09th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -64,6 +64,15 @@ else
   endfunction
 endif
 
+" Function: lh#time#bench_n(n, F, ...) {{{3
+function! lh#time#bench_n(n, F, ...) abort
+  let tot = 0
+  for i in range(1, a:n)
+    let [res, b] = call('lh#time#bench', [a:F] + a:000)
+    let tot += b
+  endfor
+  return [res, tot]
+endfunction
 " # Stamps {{{2
 " Function: lh#time#date() {{{3
 function! lh#time#date() abort

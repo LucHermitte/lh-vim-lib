@@ -64,6 +64,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#position#extract()|
 - |lh#position#is_before()|
 - |lh#time#bench()|
+- |lh#time#bench_n()|
 - |lh#time#date()|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
@@ -638,6 +639,17 @@ lh#time#bench(Function[, args])~
 @param[in] {Function} is expected to be something like a |function| --
 |lhvl-functor|s are not yet supported.
 @require |reltime()| support (hence, a recent Vim version)
+@since Version 3.14.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#time#bench_n()*                 {{{3
+lh#time#bench_n(n Function[, args])~
+@return the time spent by the execution of `Function()` n times.
+@param[in] {n}        Number of times the function call is benched.
+@param[in] {Function} is expected to be something like a |function| --
+|lhvl-functor|s are not yet supported.
+@require |reltime()| support (hence, a recent Vim version)
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#time#date()*                  {{{3
