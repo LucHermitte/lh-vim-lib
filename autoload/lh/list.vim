@@ -266,7 +266,7 @@ endfunction
 
 " Function: lh#list#matches(list, to_be_matched [,idx]) {{{3
 " Return the list of indices that match {to_be_matched}
-if lh#has#lambda()
+if has('lambda')
   function! lh#list#matches(list, to_be_matched, ...) abort
     let start = (a:0>0) ? a:1 : 0
     " Note: lambdas are not that fast. Still they improve index computations
@@ -576,7 +576,7 @@ function! lh#list#subset(list, indices) abort
 endfunction
 
 " Function: lh#list#mask(list, masks) {{{3
-if lh#has#lambda()
+if has('lambda')
   function! lh#list#mask(list, masks) abort
     let len = len(a:list)
     call lh#assert#equal(len, len(a:masks),
