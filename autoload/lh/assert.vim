@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  09th Feb 2017
+" Last Update:  10th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -230,7 +230,7 @@ function! lh#assert#_trace_assert(msg) abort
       let mode = s:mode
     endif
     if mode ==? 'stop'
-      throw msg
+      throw a:msg
     elseif mode ==? 'debug'
       debug echo "You'll have to play with `:bt`, `:up` and `:echo` to explore the situation"
     endif
