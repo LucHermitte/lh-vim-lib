@@ -3207,7 +3207,7 @@ LOG RELATED FUNCTIONS                                 *lhvl#log*        {{{2
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lhvl-global-logger*              {{{3
 lh-vim-lib provides a global logger since version 3.6.0.
-s_bo
+
 By default, it'll echo everything with |:echomsg| (through |lh#log#echomsg|).
 
 The logging policy can be set thanks to |lh#log#set_logger()|.
