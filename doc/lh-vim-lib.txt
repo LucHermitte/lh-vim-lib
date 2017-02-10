@@ -88,6 +88,8 @@ Functor related functions:                              |lhvl#function|
 - |lh#function#prepare()|
 List related functions:                                 |lhvl#list|
 - |lh#list#accumulate()|
+- |lh#list#Find_if()| and |lh#list#find_if()|
+- |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#arg_min()|, |lh#list#arg_max()|
 - |lh#list#chain_transform()|
 - |lh#list#concurrent_for()|
@@ -95,7 +97,7 @@ List related functions:                                 |lhvl#list|
 - |lh#list#copy_if()|
 - |lh#list#cross()|
 - |lh#list#equal_range()|
-- |lh#list#Find_if()| and |lh#list#find_if()|
+- |lh#list#find_entity()|
 - |lh#list#flat_extend()|
 - |lh#list#for_each_call()|
 - |lh#list#get()|
@@ -106,6 +108,7 @@ List related functions:                                 |lhvl#list|
 - |lh#list#match()|
 - |lh#list#match_re()|
 - |lh#list#matches()|
+- |lh#list#not_contain_entity()|
 - |lh#list#not_found()|
 - |lh#list#possible_values()|
 - |lh#list#push_if_new()|
@@ -114,7 +117,6 @@ List related functions:                                 |lhvl#list|
 - |lh#list#separate()|
 - |lh#list#sort()|
 - |lh#list#subset()|
-- |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#transform_if()|
 - |lh#list#uniq()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
@@ -1266,10 +1268,17 @@ lh#list#match({list},{pattern}[, {start-pos}])~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                         *lh#list#contain_entity()*         {{{3
-lh#list#contain_entity({list}, {entity})~
+                                        *lh#list#not_contain_entity()*
+                                        *lh#list#find_entity()*
+lh#list#contain_entity({list}, {entity})     (1)~
+lh#list#not_contain_entity({list}, {entity}) (2)~
+lh#list#find_entity({list}, {entity})        (3)~
 @param    {list}  |List|
 @param  {entity}  |List| or |Dict| to search within the list with |expr-is|.
-@return Whether an {entity} is present within {list}.
+@return (1) Whether an {entity} is present within {list}
+@return (2) Whether an {entity} is NOT present within {list}
+@return (3) The index of the {entity} in the {list}, -1 is not found
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*               {{{3
@@ -1975,9 +1984,10 @@ Examples: >
     AssertEquals (lh#list#possible_values(list, 'k2'), ['a', 'b', 'c', 15, 42, 8])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#list#zip*                      {{{3
+                                               *lh#list#zip()*                    {{{3
 lh#list#zip({list1}, {list2})~
 @pre both lists shall have the same size.
+@since Version 3.10.0
 Zip two |List|s into one. >
 
   let l1 = ['a', 'b', 'c']
@@ -1986,9 +1996,10 @@ Zip two |List|s into one. >
   AssertThrows(lh#list#zip([1], [1,2]))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#list#zip_as_dict*              {{{3
+                                               *lh#list#zip_as_dict()*            {{{3
 lh#list#zip_as_dict({list1}, {list2})~
 @pre both lists shall have the same size.
+@since Version 3.10.0
 Zip two |List|s into a |Dictionary|. >
 
   let l1 = ['a', 'b', 'c']

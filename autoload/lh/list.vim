@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  09th Feb 2017
+" Last Update:  10th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -660,16 +660,25 @@ function! lh#list#push_if_new_elements(list, values) abort
   return a:list
 endfunction
 
-" Function: lh#list#find_entity(list, value) {{{3
+" Function: lh#list#contain_entity(list, value) {{{3
 " @since 4.0.0
 function! lh#list#contain_entity(list, value) abort
-  for e in a:list
-    if e is a:value
-      return 1
-    endif
-    unlet e
-  endfor
-  return 0
+  let found = map(copy(a:list), 'v:val is a:value')
+  return index(found, 1) >= 0
+endfunction
+
+" Function: lh#list#not_contain_entity(list, value) {{{3
+" @since 4.0.0
+function! lh#list#not_contain_entity(list, value) abort
+  let found = map(copy(a:list), 'v:val is a:value')
+  return index(found, 1) == -1
+endfunction
+
+" Function: lh#list#find_entity(list, value) {{{3
+" @since 4.0.0
+function! lh#list#find_entity(list, value) abort
+  let found = map(copy(a:list), 'v:val is a:value')
+  return index(found, 1)
 endfunction
 
 " Function: lh#list#push_if_new_entity(list, value) {{{3

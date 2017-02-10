@@ -151,6 +151,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#copy_if()`              | Copies the elements from a list that match a predicate                                                            |
 | `lh#list#cross()`                | Cross elements from two lists and produce a new list                                                              |
 | `lh#list#equal_range()`          | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
+| `lh#list#find_entity()`          | Return the index where an entity is within a list, -1 if not found                                                |
 | `lh#list#find_if()`              | Searches the first element in a list that verifies a predicate                                                    |
 | `lh#list#flat_extend()`          | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter             |
 | `lh#list#flatten()`              | Flattens a list                                                                                                   |
@@ -163,6 +164,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#match()`                | Searches the first element in a list that matches a pattern                                                       |
 | `lh#list#match_re()`             | Searches the first pattern in a list that  is matched by a text                                                   |
 | `lh#list#matches()`              | Returns the list of indices of elements that match the pattern                                                    |
+| `lh#list#not_contain_entity()`   | Tells whether a Dict or List entity is not present within a list                                                  |
 | `lh#list#not_found()`            | Returns whether the range returned from `equal_range` is empty (i.e. element not found)                           |
 | `lh#list#possible_values()`      | Returns a sorted list of the values that are stored: in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
 | `lh#list#push_if_new()`          | Adds a elements if not already present in the list                                                                |
