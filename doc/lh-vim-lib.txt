@@ -1282,7 +1282,7 @@ lh#list#find_entity({list}, {entity})        (3)~
 @since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                            *lh#list#find_if()* *lh#list#Find_if()*               {{{3
+                            *lh#list#find_if()* *lh#list#Find_if()*           {{{3
 lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
 lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
 @param             {list}  |List|
@@ -1320,7 +1320,7 @@ rewritten as: >
 NB: Expect the `Find_if()` version to be replaced with the `find_if()` one.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                        *lh#list#lower_bound()* *lh#list#upper_bound()*           {{{3
+                        *lh#list#lower_bound()* *lh#list#upper_bound()*   {{{3
                         *lh#list#equal_range()*
 lh#list#lower_bound({list}, {value} [, {first}][, {last}])~
 lh#list#upper_bound({list}, {value} [, {first}][, {last}])~
@@ -1344,7 +1344,7 @@ Returns whether the {range} is empty. This function can be used to check
 |lh#list#equal_range()| functions results
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                   *lh#list#unique_sort()* *lh#list#unique_sort2()*               {{{3
+                   *lh#list#unique_sort()* *lh#list#unique_sort2()*  {{{3
 lh#list#unique_sort({list} [, {cmp}])~
 lh#list#unique_sort2({list} [, {cmp}])~
 @param[in] {list} |List| to sort
@@ -1362,7 +1362,7 @@ The difference between the two functions is the following:
   keeps only the elements that appear once.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                           *lh#list#uniq*                     {{{3
+                                           *lh#list#uniq()*                   {{{3
 lh#list#uniq({list})~
 @return Emulates |uniq()| when it doesn't exists. Or directly call it
 otherwise.
@@ -1609,7 +1609,7 @@ Examples: >
    720
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                               *lh#list#arg_max()* *lh#list#arg_min()*            {{{3
+                               *lh#list#arg_max()* *lh#list#arg_min()*           {{{3
 lh#list#arg_min({list} [, Transfo])~
 lh#list#arg_min({list} [, Transfo])~
 @since v4.0.0
