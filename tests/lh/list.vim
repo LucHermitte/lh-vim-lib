@@ -248,7 +248,7 @@ function! s:Test_masks() abort
     AssertEquals(lh#list#mask(l, masks), [1, 48, 5, 6])
 endfunction
 
-" subset {{{2
+" subset & remove {{{2
 function! s:Test_subset_list()
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
     :let indices = [ 0, 5, 7, 3 ]
@@ -265,6 +265,13 @@ function! s:Test_subset_dict()
     :let s = lh#dict#subset(d, keys)
     " Comment string(s)
     AssertEquals (s ,  expected)
+endfunction
+
+" Function: s:Test_remove() {{{3
+function! s:Test_remove() abort
+  let l = [ 0, 25, 5, 48, 25, 5, 28, 6]
+  let indices = [ 0, 3, 5, 7 ]
+  AssertEquals (lh#list#remove(l, indices), [ 25, 5, 25, 28 ])
 endfunction
 
 "------------------------------------------------------------------------
