@@ -36,7 +36,9 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#common#error_msg()|
 - |lh#common#rand()|
 - |lh#common#warning_msg()|
+- |lh#encoding#current_character()|
 - |lh#encoding#iconv()|
+- |lh#encoding#previous_character()|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
 - |lh#event#register_for_one_execution_at()|
@@ -697,6 +699,14 @@ Returns the i-th character in a multi-bytes string.
 lh#encoding#strpart({mb_string}, {position}, {length})~
 Returns {length} extracted characters from {position} in a multi-bytes string.
 @param {position} 0-indexed offset.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#encoding#current_character()* {{{3
+                                                *lh#encoding#previous_character()*
+lh#encoding#current_character()~
+lh#encoding#previous_character()~
+Returns The character under/before the current.
+Works even with multi-byte characters
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                  *lh#event#RegisterForOneExecutionAt()*           {{{3

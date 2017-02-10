@@ -7,7 +7,7 @@
 " Version:      3.6.1
 let s:k_version = 361
 " Created:      21st Feb 2008
-" Last Update:  29th Dec 2016
+" Last Update:  10th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
@@ -108,6 +108,15 @@ function! lh#encoding#strlen(mb_string)
   return strlen(substitute(a:mb_string, '.', 'a', 'g'))
 endfunction
 
+" Function: lh#encoding#previous_character() {{{3
+function! lh#encoding#previous_character() abort
+  return matchstr(getline('.'), '.\%'.col('.').'c')
+endfunction
+
+" Function: lh#encoding#current_character() {{{3
+function! lh#encoding#current_character() abort
+  return matchstr(getline('.'), '\%'.col('.').'c.')
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
