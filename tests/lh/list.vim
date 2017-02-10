@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  09th Feb 2017
+" Last Update:  10th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -476,6 +476,24 @@ function! s:Test_push_if_new() abort
 
   AssertEquals(lh#list#push_if_new(copy(list), 5), [1,2,3,5])
   AssertEquals(lh#list#push_if_new(copy(list), 2), [1,2,3])
+endfunction
+
+" Function: s:Test_push_if_new_entity() {{{3
+function! s:Test_push_if_new_entity() abort
+  let e = [1,2,3]
+  let list = [ [1,2,3], [4,5], [7,8] ]
+
+  Assert ! lh#list#contain_entity(list, e)
+  Assert lh#list#not_contain_entity(list, e)
+  AssertEquals(lh#list#find_entity(list, e), -1)
+
+  AssertEquals(lh#list#push_if_new_entity(list, e), [ [1,2,3], [4,5], [7,8], [1,2,3] ])
+
+  Assert lh#list#contain_entity(list, e)
+  Assert ! lh#list#not_contain_entity(list, e)
+  AssertEquals(lh#list#find_entity(list, e), 3)
+
+  AssertEquals(lh#list#push_if_new_entity(list, e), [ [1,2,3], [4,5], [7,8], [1,2,3] ])
 endfunction
 
 "------------------------------------------------------------------------

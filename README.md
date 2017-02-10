@@ -167,8 +167,9 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#not_contain_entity()`   | Tells whether a Dict or List entity is not present within a list                                                  |
 | `lh#list#not_found()`            | Returns whether the range returned from `equal_range` is empty (i.e. element not found)                           |
 | `lh#list#possible_values()`      | Returns a sorted list of the values that are stored: in a flat list, or at a given {index} in the lists from the input {list}, or at a given {key} in the dictionaries from the input {list} |
-| `lh#list#push_if_new()`          | Adds a elements if not already present in the list                                                                |
+| `lh#list#push_if_new()`          | Adds a value if not already present in the list                                                                   |
 | `lh#list#push_if_new_elements()` | Adds elements if not already present in the list                                                                  |
+| `lh#list#push_if_new_entity()`   | Adds an entity if not already present in the list                                                                 |
 | `lh#list#remove()`               | Remove elements from list according to a list of indices                                                          |
 | `lh#list#rotate()`               | Rotate elements from list                                                                                         |
 | `lh#list#separate()`             | Returns the list that matches the predicate and the list that doesn't match it                                    |

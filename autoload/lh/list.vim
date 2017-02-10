@@ -684,7 +684,7 @@ endfunction
 " Function: lh#list#push_if_new_entity(list, value) {{{3
 " @version 4.0.0
 function! lh#list#push_if_new_entity(list, value) abort
-  if !lh#list#contain_entity(a:list, a:value)
+  if lh#list#not_contain_entity(a:list, a:value)
     call add(a:list, a:value)
   endif
   return a:list
@@ -889,7 +889,7 @@ function! lh#list#_id(a) abort
   return a:a
 endfunction
 
-" Fucntion: s:getSNR([func_name]) {{{3
+" Function: s:getSNR([func_name]) {{{3
 function! s:getSNR(...)
   if !exists("s:SNR")
     let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')

@@ -113,6 +113,7 @@ List related functions:                                 |lhvl#list|
 - |lh#list#possible_values()|
 - |lh#list#push_if_new()|
 - |lh#list#push_if_new_elements()|
+- |lh#list#push_if_new_entity()|
 - |lh#list#remove()|
 - |lh#list#separate()|
 - |lh#list#sort()|
@@ -1795,7 +1796,8 @@ lh#list#push_if_new(list, value)~
 @param[in,out] {list} |List| to extend
 @param[in]     {value} Element to insert, if new.
 @return        The {list}
-Adds an element into a list, if not already present
+Adds an element into a list, if not already present. Unlike
+|lh#list#push_if_new_entity()| this function compares values.
 
 Examples: >
 
@@ -1817,6 +1819,31 @@ Examples: >
   let list = [1,2,3]
 
   AssertEquals(lh#list#push_if_new_elements(copy(list), [1, 2, 5, 8]), [1,2,3,5,8])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#push_if_new_entity()*     {{{3
+lh#list#push_if_new_entity(list, entity)~
+@param[in,out] {list} |List| to extend
+@param[in]     {entity} Element to insert, if a new entity.
+@return        The {list}
+Adds an element into a list, if not already present. Unlike
+|lh#list#push_if_new()| this function compares entities.
+Examples: >
+
+  let e = [1,2,3]
+  let list = [ [1,2,3], [4,5], [7,8] ]
+
+  Assert ! lh#list#contain_entity(list, e)
+  Assert lh#list#not_contain_entity(list, e)
+  AssertEquals(lh#list#find_entity(list, e), -1)
+
+  AssertEquals(lh#list#push_if_new_entity(list, e), [ [1,2,3], [4,5], [7,8], [1,2,3] ])
+
+  Assert lh#list#contain_entity(list, e)
+  Assert ! lh#list#not_contain_entity(list, e)
+  AssertEquals(lh#list#find_entity(list, e), 3)
+
+  AssertEquals(lh#list#push_if_new_entity(list, e), [ [1,2,3], [4,5], [7,8], [1,2,3] ])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#remove()*                 {{{3
