@@ -172,8 +172,6 @@ function! s:Test_matches() abort
   let list = [ 'abc', 'bcd', 'cde' ]
   AssertEquals(lh#list#matches(list, '^bc'), [1])
   AssertEquals(lh#list#matches(list, 'bc'), [0, 1])
-  AssertEquals(lh#list#matches_fast(list, '^bc'), [1])
-  AssertEquals(lh#list#matches_fast(list, 'bc'), [0, 1])
 endfunction
 
 "------------------------------------------------------------------------
