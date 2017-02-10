@@ -812,27 +812,17 @@ endfunction
 
 " Function: lh#list#zip(l1, l2) {{{3
 function! lh#list#zip(l1, l2) abort
-  if len(a:l1) != len(a:l2)
-    throw "Zip operation cannot be performed on lists of different sizes"
-  endif
-  let res = []
-  let idx = range(0, len(a:l1)-1)
-  for i in idx
-    let res += [ a:l1[i], a:l2[i] ]
-  endfor
-  return res
+  call lh#assert#equal(len(a:l1), len(a:l2),
+        \ "Zip operation cannot be performed on lists of different sizes")
+  return map(range(len(a:l1)), '[a:l1[v:val], a:l2[v:val]]')
 endfunction
 
 " Function: lh#list#zip_as_dict(l1, l2) {{{3
 function! lh#list#zip_as_dict(l1, l2) abort
-  if len(a:l1) != len(a:l2)
-    throw "Zip operation cannot be performed on lists of different sizes"
-  endif
+  call lh#assert#equal(len(a:l1), len(a:l2),
+        \ "Zip operation cannot be performed on lists of different sizes")
   let res = {}
-  let idx = range(0, len(a:l1)-1)
-  for i in idx
-    let res[a:l1[i]] = a:l2[i]
-  endfor
+  call map(range(len(a:l1)), 'extend(res, {a:l1[v:val]: a:l2[v:val]})')
   return res
 endfunction
 

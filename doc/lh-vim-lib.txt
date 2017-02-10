@@ -2015,11 +2015,13 @@ Examples: >
 lh#list#zip({list1}, {list2})~
 @pre both lists shall have the same size.
 @since Version 3.10.0
+@warning, since version 4.0.0, the behaviour has drastically changed to follow
+Python's one.
 Zip two |List|s into one. >
 
   let l1 = ['a', 'b', 'c']
   let l2 = [1, 2, 3]
-  AssertEquals(lh#list#zip(l1, l2), ['a', 1, 'b', 2, 'c', 3])
+  AssertEquals(lh#list#zip(l1, l2), [['a', 1], ['b', 2], ['c', 3]])
   AssertThrows(lh#list#zip([1], [1,2]))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

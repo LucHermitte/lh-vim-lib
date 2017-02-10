@@ -554,7 +554,7 @@ endfunction
 function! s:Test_zip_lists() abort
   let l1 = ['a', 'b', 'c']
   let l2 = [1, 2, 3]
-  AssertEquals(lh#list#zip(l1, l2), ['a', 1, 'b', 2, 'c', 3])
+  AssertEquals(lh#list#zip(l1, l2), [['a', 1], ['b', 2], ['c', 3]])
   AssertThrows(lh#list#zip([1], [1,2]))
 endfunction
 
