@@ -1729,7 +1729,7 @@ the {input} will be returned.
 Example: >
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
     :let masks = [ 1, 0, 0, 1, 0, 1, 0, 1]
-    :echo lh#list#masks(l, masks)
+    :echo lh#list#mask(l, masks)
     [ 1, 48, 5, 6 ]
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

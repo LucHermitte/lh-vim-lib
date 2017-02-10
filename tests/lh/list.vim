@@ -240,6 +240,14 @@ function! s:Test_copy_if()
 endfunction
 
 "------------------------------------------------------------------------
+" masks {{{2
+" " Function: s:Test_masks() {{{3
+function! s:Test_masks() abort
+    let l = [ 1, 25, 5, 48, 25, 5, 28, 6]
+    let masks = [ 1, 0, 0, 1, 0, 1, 0, 1]
+    AssertEquals(lh#list#mask(l, masks), [1, 48, 5, 6])
+endfunction
+
 " subset {{{2
 function! s:Test_subset_list()
     :let l = [ 1, 25, 5, 48, 25, 5, 28, 6]

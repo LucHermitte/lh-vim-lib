@@ -178,6 +178,10 @@ endfunction
 
 " Function: lh#list#copy_if(input, output, predicate) {{{3
 function! lh#list#copy_if(input, output, predicate) abort
+  " 1% faster
+  let out = filter(copy(a:input), 'lh#function#execute(a:predicate, v:val)')
+  return extend(a:output, out)
+
   for element in a:input
     if lh#function#execute(a:predicate, element)
       call add(a:output, element)
@@ -568,28 +572,31 @@ else
 endif
 " Function: lh#list#subset(list, indices) {{{3
 function! lh#list#subset(list, indices) abort
-  let result=[]
-  for e in a:indices
-    " call add(result, a:list[e])
-    call add(result, get(a:list, e))
-  endfor
-  return result
+  return map(copy(a:indices), 'get(a:list, v:val)')
 endfunction
 
 " Function: lh#list#mask(list, masks) {{{3
-function! lh#list#mask(list, masks) abort
-  let len = len(a:list)
-  if len != len(a:masks)
-    throw "lh#list#mask() needs as many masks as elements in the list"
-  endif
-  let res = []
-  for i in range(len)
-    if a:masks[i]
-      let res += [a:list[i]]
-    endif
-  endfor
-  return res
-endfunction
+if lh#has#lambda()
+  function! lh#list#mask(list, masks) abort
+    let len = len(a:list)
+    call lh#assert#equal(len, len(a:masks),
+          \ "lh#list#mask() needs as many masks as elements in the list")
+    return filter(copy(a:list), {idx, val -> a:masks[idx]})
+  endfunction
+else
+  function! lh#list#mask(list, masks) abort
+    let len = len(a:list)
+    call lh#assert#equal(len, len(a:masks),
+          \ "lh#list#mask() needs as many masks as elements in the list")
+    let res = []
+    for i in range(len)
+      if a:masks[i]
+        let res += [a:list[i]]
+      endif
+    endfor
+    return res
+  endfunction
+endif
 
 " Function: lh#list#remove(list, indices) {{{3
 function! lh#list#remove(list, indices) abort
@@ -696,19 +703,10 @@ function! lh#list#possible_values(list, ...) abort
     return lh#list#unique_sort(a:list)
   elseif a:0 == 1
     let default = a:0 == 2 ? a:2 : lh#option#unset()
-    let dRes = {}
-    for E in a:list
-      if type(E) == type({}) || type(E) == type([])
-        let v = get(E, a:1, default)
-        let dRes[string(v)] = v
-        unlet v
-      endif
-      unlet E
-    endfor
-    " this hack regarding using values and not keys permits to not alter the
-    " type of the elements
-    let res = lh#list#sort(values(dRes))
-    return res
+    " Keeps only list/dict element in the input `a:list`
+    let list_of_lists = filter(copy(a:list), 'type(v:val)==type([])||type(v:val)==type({})')
+    let list = call('lh#list#get', [list_of_lists, a:1, default])
+    return  lh#list#unique_sort(list)
   endif
 endfunction
 
