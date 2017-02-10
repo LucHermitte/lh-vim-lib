@@ -1631,8 +1631,8 @@ This function flattens a list >
   AssertEquals(lh#list#flatten(l), range(7))
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                               *lh#dict#separate()*               {{{3
-lh#dict#separate(list, pred)~
+                                               *lh#list#separate()*               {{{3
+lh#list#separate(list, pred)~
 @param[in] {list} |List| to filter
 @param[in] {pred} |Function| predicate  that takes two parameters (element index, and
 element value)
