@@ -201,7 +201,7 @@ function! lh#exception#say_what() abort
     let e_qf[0].text = substitute(e_qf[0].text, '^\.\.\.', messages[i-2], '')
     call lh#assert#true(!empty(e_qf))
     call extend(qf, reverse(e_qf))
-    if messages[i-2] !~ '^E171:' | break | endif
+    if messages[i-2] !~ '^E171:\|^E170' | break | endif
   endwhile
 
   call setqflist(reverse(qf))
