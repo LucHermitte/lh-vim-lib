@@ -383,7 +383,7 @@ If I want to disable completely all logs, I can execute:
 ```
 
 If I prefer to see my traces on the right side, and in a
-[|quickfix-window|](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
+[|quickfix-window|](http://vimhelp.appspot.com/quickfix.txt.html#quickfix-window)
 in order to trace the files + line numbers along with the message to log, I'll
 execute
 
@@ -411,13 +411,14 @@ developers to detect and eradicate VimL programming errors.
 
 When an assertion fails, we cannot expect the script to go on correctly. There
 IS an error in its logic. We cannot expect anything good after that. That's
-where `lh#assert#*()` functions differs from Vim |test-functions| and my
-[vim-UT](http://github.com/LucHermitte/vim-UT) plugin: these other functions
-aim at providing tools to write unit tests.
+where `lh#assert#*()` functions differs from Vim
+[|test-functions|](http://vimhelp.appspot.com/usr_41.txt.html#test-functions)
+and my [vim-UT](http://github.com/LucHermitte/vim-UT) plugin: these other
+functions aim at providing tools to write unit tests.
 
 | Function                       | Purpose                                                                                                                        |
 |:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`                                                             |
+| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                            |
 | `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
 | `lh#assert#clear()`            | Clears the last known contract failures                                                                                        |
 | `lh#assert#true()`             | Asserts a value is true                                                                                                        |
@@ -475,3 +476,4 @@ Bundle 'LucHermitte/lh-vim-lib'
   * [theonevimlib](http://www.vim.org/scripts/script.php?script_id=1963), initiated by Marc Weber
   * [anwolib](http://www.vim.org/scripts/script.php?script_id=3800), by Andy Wokula
   * [l9](http://www.vim.org/scripts/script.php?script_id=3252), by Takeshi NISHIDA
+  * [maktaba](https://github.com/google/vim-maktaba), by google
