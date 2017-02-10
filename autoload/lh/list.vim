@@ -732,7 +732,10 @@ endfunction
 
 " Function: lh#list#for_each_call(list, action) {{{3
 function! lh#list#for_each_call(list, action) abort
+  let cleanup = lh#on#exit()
+        \.restore('&isk')
   try
+    set isk&vim
     for e in a:list
       let action = substitute(a:action, '\v<v:val>', '\=string(e)', 'g')
       exe 'call '.action
@@ -740,6 +743,8 @@ function! lh#list#for_each_call(list, action) abort
     endfor
   catch /.*/
     throw "lh#list#for_each_call: ".v:exception." in ``".action."''"
+  finally
+    call cleanup.finalize()
   endtry
 endfunction
 
@@ -810,11 +815,15 @@ function! lh#list#cross(rng1, rng2, F) abort
   return res
 endfunction
 
-" Function: lh#list#zip(l1, l2) {{{3
-function! lh#list#zip(l1, l2) abort
-  call lh#assert#equal(len(a:l1), len(a:l2),
+" Function: lh#list#zip(l1 [, ...]) {{{3
+function! lh#list#zip(l1, ...) abort
+  let lists = [a:l1] + a:000
+  let len_min = min(map(copy(lists), 'len(v:val)'))
+  let len_max = max(map(copy(lists), 'len(v:val)'))
+  call lh#assert#equal(len_min, len_max,
         \ "Zip operation cannot be performed on lists of different sizes")
-  return map(range(len(a:l1)), '[a:l1[v:val], a:l2[v:val]]')
+  let func = '[' . join(map(range(len(lists)), '"lists[".v:val."][v:val]"'), ', ') . ']'
+  return map(range(len_min), func)
 endfunction
 
 " Function: lh#list#zip_as_dict(l1, l2) {{{3
