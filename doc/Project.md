@@ -40,7 +40,7 @@ We can do many things actually. For instance:
  - different root directory for sources ;
  - different JSON compilation database ;
 
-To take advantage of this, when a plugin fetch an option that tunes its
+To take advantage of this, when a plugin fetches an option that tunes its
 behaviour, it needs to fetch options with a finer granularity than global
 options, when available.
 
@@ -97,24 +97,27 @@ There are a few use-cases depending you're an end-user who want to configure
 the plugins you use, or whether you're a plugin maintainer who want to have
 project-aware plugins.
 
-## 3.1. You're a end-user
-who want to define the options of your current project.
+## 3.1. You're an end-user
+...who wants to define the options of your current project.
 
 NB: Of course, if the plugins you use don't take advantage of this library, it
-won't help you much. At best, it'll you help organize buffers into projects.
+won't help you much. At best, it'll you help organize buffers into projects and
+provide an automated way to change the current directory to point to project
+root directory.
 
 ### 3.1.1 and you want to define a new project
 
-First things first, you'll have to tell files when they are opened they belong
-to a project.
+First things first, when files are opened, you'll have to tell them that they
+belong to a project.
 
 #### 3.1.1.1 Automagically
 Most project detections may be done implicitly. The conditions to detect all
 the files from a directory hierarchy as part of a same project are:
 
  * At the root, there is a `.svn/` or a `.git/` directory (mercurial is not
-   supported yet, nor other versionning system);
+   supported, yet, nor other versionning systems);
  * You have set in your `.vimrc`:
+
  ```vim
  LetTo g:lh#project.auto_detect = 1
  " or
@@ -128,7 +131,7 @@ to force the project root directory, nor to factorize some settings between
 several subprojects (one per program sub-component for instance).
 
 If you need more control, or if you don't want to activate this automagic
-feature, use one of the following approaches.
+feature, use one of the approaches described next.
 
 Note: See the documentation about blacklists and so on.
 
@@ -378,15 +381,19 @@ Beware, the current buffer will be registered to this project.
 In case there is no project associated to the current buffer,
 `lh#option#unset()` will be returned.
 
-### 3.2.4. Fetch a name of the current project variable
+### 3.2.4. Fetch the name of the current project variable
+This name is the name of the buffer-local variable used to store the project
+configuration associated the current buffer.
+
 ```vim
 :let prj_varname = lh#project#crt_bufvar_name()
 ```
 In case there is no project associated to the current buffer,
 an exception will be thrown.
 
-This will most likely return `b:crt_project`, the exact name depends on
-`g:lh#project#varname` global which can be overridden in your `.vimrc`.
+This will most likely return `"b:crt_project"`, the exact name depends on
+`g:lh#project#varname` global which can be overridden in your `.vimrc` once and
+for all.
 
 ### 3.2.5. Fetch the name under which an option is stored
 ```
@@ -412,7 +419,7 @@ select which inherited project get the settings.
 
 For now, you'll need to obtain the project reference you're interested in
 (hint: use `lh#project#define()` to obtain references), then set the variables
-to what you which:
+to what you wish:
 
 ```vim
 " Vim option, with a project scope
@@ -428,8 +435,24 @@ and you want your plugins to be project-aware:
 
 ### 3.3.1. Get a project variable value:
 ```vim
-:let val = lh#option#get('b:foo.bar.team')
+:let val = lh#option#get('foo.bar.team')
 ```
+
+Note, in order to know whether the option is set, use `lh#option#is_set(val)`
+or `lh#option#is_unset(val)`. When not, you'll may prefer to print its value
+either with lh-vim-lib logging framework
+
+```vim
+:echo lh#fmt#printf("%1", val)
+```
+
+or with
+
+```vim
+:echo lh#object#to_string(lh#option#get('foo.bar.team'))
+```
+
+which will print: `{(unknown option: (bpg):foo.bar.team)}`.
 
 ### 3.3.2. Define toggable project options
 ```vim
@@ -446,6 +469,7 @@ call lh#menu#def_toggle_item(pData)
 
 " And the end-user will be able to execute
 Toggle LHTestsTogMenupbar
+" or to toggle the option with the menus
 ```
 
 ### 3.3.3. Execute an external command while some `p:$ENV` variable are defined:
@@ -485,17 +509,17 @@ prefered setting them on-the-fly and locally only when we need to use them.
 
 ## Miscelleanous stuff
 
- * `lh#project#root()` doesn't not fill `p:paths.sources,` but return a value.
+ * `lh#project#root()` doesn't fill `p:paths.sources,` but returns a value.
    It's up to `lh#project#new()` to fill `p:paths.sources` from
    `lh#project#root()` result.
 
 
 # 5. Compatible plugins
 
-Most of my plugins that use `lh#option#get()` are already compatible with this
-new feature. However some final tweaking will be required to fully take
-advantage of option toggling, `p:$ENV` variables (lh-tags, lh-dev, and
-BuildToolsWrappers are the first I've in mind).
+Most of my plugins, as they use `lh#option#get()`, are already compatible with
+this new _project_ feature. However some final tweaking will be required to
+fully take advantage of option toggling, `p:$ENV` variables (lh-tags, lh-dev,
+and BuildToolsWrappers are the first I've in mind).
 
 # 6. TO DO list
 
@@ -508,17 +532,29 @@ BuildToolsWrappers are the first I've in mind).
  * Have menu priority + menu name in all projects in order to simplify
    toggling definitions
  * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
- * Have lh-tags, lh-dev, BTW, ... use:
+ * Use in plugins:
    * `p:$ENV variables`
+      * [X] lh-tags synchronous (via lh#os#system)
+      * [X] lh-tags asynchronous (via lh#async)
+      * [X] BTW synchronous (via lh#os#make)
+      * [X] BTW asynchronous (via lh#async)
+      * [ ] BTW -> QFImport b:crt_project
+      * [ ] lh-dev
+      * [ ] µTemplate
+      * [ ] Test on windows!
    * `paths.sources`
  * Be able to control which parent is filled with `lh#let#` functions
-     * -> :Project <name> :LetTo var = value
+   * -> `:Project <name> :LetTo var = value`
  * `:call prj.set(plain_variable, value)`
  * Setlocally vim options on new files
  * `:Project <name> :bw` -> with confirmation!
- * Simplify dictionaries -> no `'parents'`,` 'variables'`,` 'env'`, `'options'`
-   when there are none!
+ * Simplify dictionaries
+   * -> no 'parents' when there are none!
+   * -> merge 'variables', 'env', 'options' in `variables`
+ * Fix `find_holder()` to use `update()` code and refactor the later
  * Have let-modeline support p:var, p:&opt, and p:$env
+ * Add convinience functions to fill permission lists
+ * Add VimL Syntax highlight for `LetTo`, `LetIfUndef`, `p:var`
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.
    Expected Caveats:

@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  07th Feb 2017
+" Last Update:  10th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -41,6 +41,7 @@ let s:k_version = '400'
 "     -> Test on windows!
 "   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
+"   -> `:Project <name> :LetTo var = value`
 " - Setlocally vim options on new files
 " - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries
@@ -49,7 +50,7 @@ let s:k_version = '400'
 " - Fix find_holder() to use update() code and refactor the later
 " - Have let-modeline support p:var, p:&opt, and p:$env
 " - Add convinience functions to fill permission lists
-" - Add VimL Syntax highlight from LetTo, LetIfUndef, p:var
+" - Add VimL Syntax highlight for LetTo, LetIfUndef, p:var
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.
 "   Expected Caveats:
