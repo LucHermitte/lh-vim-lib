@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  15th Nov 2016
+" Last Update:  12th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -135,7 +135,7 @@ function! lh#ft#option#inherited_filetypes(fts) abort
   return res
 endfunction
 
-LetIfUndef g:cpp_inherits 'c'
+call lh#let#if_undef('g:cpp_inherits', 'c')
 
 " }}}1
 let &cpo=s:cpo_save
