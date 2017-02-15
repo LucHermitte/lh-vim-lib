@@ -80,24 +80,77 @@ function! lh#mapping#define(mapping_definition)
   silent exe cmd
 endfunction
 
+" Function: lh#mapping#clear() {{{3
+function! lh#mapping#clear() abort
+  let s:issues_notified = {}
+  let s:issues_notified.n = {}
+  let s:issues_notified.v = {}
+  let s:issues_notified.o = {}
+  let s:issues_notified.i = {}
+  let s:issues_notified.c = {}
+  let s:issues_notified.s = {}
+  let s:issues_notified.x = {}
+  let s:issues_notified.l = {}
+  let s:issues_notified[''] = {}
+endfunction
+
 " Function: lh#mapping#plug(keybinding, name, modes) {{{3
-function! lh#mapping#plug(keybinding, name, modes) abort
-  let modes = split(a:modes, '\zs')
+" Function: lh#mapping#plug(map_definition, modes)
+call lh#mapping#clear()
+function! lh#mapping#plug(...) abort
+  if type(a:1) == type({})
+    let mapping = extend(a:1, {'silent': 1, 'unique': 1})
+    let modes = split(a:2, '\zs')
+  else
+    let mapping = {'silent': 1, 'unique': 1, 'lhs': a:1, 'rhs': a:2}
+    let modes = split(a:3, '\zs')
+  endif
+
   for mode in modes
-    if !hasmapto(a:name, mode) && (mapcheck(a:keybinding, mode) == "")
-      try
-        exe mode.'map <silent> <unique> '.a:keybinding.' '.a:name
-      catch /E226:.*/
-        throw 'E226: a ('.mode.')mapping already exists for '.strtrans(a:keybinding)
-      catch /.*/
-        echo lh#exception#callstack(v:throwpoint)
-        throw 'E227: a ('.mode.')mapping already exists for '.strtrans(a:keybinding)
-      endtry
+    let mapping.mode = mode
+    if hasmapto(mapping.rhs, mode)
+      call s:Verbose('There is already a %{1.mode}map to %{1.rhs} -> ignoring', mapping)
+      continue
+    endif
+    let previous_map = maparg(mapping.lhs, mode, 0, 1)
+    if !empty(previous_map)
+      call lh#assert#value(s:issues_notified).has_key(mode)
+      if !has_key(s:issues_notified[mode], mapping.lhs) || s:verbose
+        let s:issues_notified[mode][mapping.lhs] = 1
+        let current = s:callsite()
+        let origin = has_key(previous_map, 'sid') ?  'in '.lh#askvim#scriptname(previous_map.sid) : 'manually'
+        let glob_loc = get(previous_map, 'buffer') ? 'local' : 'global'
+        call lh#common#warning_msg(lh#fmt#printf('Warning: Cannot define %{2.mode}map `%1` to `%{2.rhs}`%3: a previous %5 mapping on `%1` was defined %4.',
+              \ strtrans(mapping.lhs), mapping, current, origin, glob_loc))
+      endif
+    else
+      let m_check = mapcheck(mapping.lhs, mode)
+      if !empty(m_check)
+        let current = s:callsite()
+        " TODO: ask vim which mapping has the same start
+        call lh#common#warning_msg(lh#fmt#printf('Warning: While defining %{2.mode}map `%1` to `%{2.rhs}`%3: there already exists another mapping starting as `%1` to `%4`.',
+              \ strtrans(mapping.lhs), mapping, current, strtrans(m_check)))
+      endif
+      call lh#mapping#define(mapping)
     endif
   endfor
 endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+"
+function! s:callsite()
+  let stack = lh#exception#get_callstack()
+  call stack.__pop() " remove this call site from the callstack
+  if len(stack.callstack) <= 1
+    " manually in the command line
+    let current = ''
+  else
+    " As of vim 8.0-314, the callstack size is always of 1 when
+    " called from a script. See Vim issue#1480
+    let current = lh#fmt#printf(' in %{1.fname}:%{1.lnum}', stack.callstack[1])
+  endif
+  return current
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1
