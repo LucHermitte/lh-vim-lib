@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:version = '4.0.0'
 " Created:      01st Mar 2013
-" Last Update:  08th Nov 2016
+" Last Update:  15th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -51,19 +51,24 @@ endfunction
 " @param mapping_definition is a dictionary witch the same keys than the ones
 " filled by maparg()
 function! lh#mapping#_build_command(mapping_definition)
+  call lh#assert#value(a:mapping_definition)
+        \.has_key('mode')
+        \.has_key('lhs')
+        \.has_key('rhs')
   let cmd = a:mapping_definition.mode
-  if has_key(a:mapping_definition, 'noremap') && a:mapping_definition.noremap
+  if get(a:mapping_definition, 'noremap', 0)
     let cmd .= 'nore'
   endif
   let cmd .= 'map'
-  let specifiers = ['silent', 'expr', 'buffer']
-  for specifier in specifiers
-    if has_key(a:mapping_definition, specifier) && a:mapping_definition[specifier]
-      let cmd .= ' <'.specifier.'>'
-    endif
-  endfor
+  let specifiers = ['silent', 'expr', 'buffer', 'unique', 'nowait']
+  let cmd .= join(map(copy(specifiers), 'get(a:mapping_definition, v:val, 0) ? " <".v:val.">" :""'),'')
+  " for specifier in specifiers
+    " if get(a:mapping_definition, specifier, 0)
+      " let cmd .= ' <'.specifier.'>'
+    " endif
+  " endfor
   let cmd .= ' '.(a:mapping_definition.lhs)
-  let rhs = substitute(a:mapping_definition.rhs, '<SID>', "\<SNR>".(a:mapping_definition.sid).'_', 'g')
+  let rhs = substitute(a:mapping_definition.rhs, '<SID>', "\<SNR>".get(a:mapping_definition, 'sid', 'SID_EXPECTED').'_', 'g')
   let cmd .= ' '.rhs
   return cmd
 endfunction
@@ -71,6 +76,7 @@ endfunction
 " Function: lh#mapping#define(mapping_definition) {{{2
 function! lh#mapping#define(mapping_definition)
   let cmd = lh#mapping#_build_command(a:mapping_definition)
+  call s:Verbose("%1", strtrans(cmd))
   silent exe cmd
 endfunction
 

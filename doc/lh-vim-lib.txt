@@ -394,6 +394,8 @@ Defines a |mapping| from:
 - `"silent"`: 1/[0]
 - `"expr"`  : 1/[0]
 - `"buffer"`: 1/[0]
+- `"unique"`: 1/[0]
+- `"nowait"`: 1/[0]
 - `"lhs"`   : keybinding
 - `"rhs"`   : action bound
 - `"sid"`   : optional number
@@ -401,10 +403,11 @@ Defines a |mapping| from:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#mapping#plug()*               {{{3
 lh#mapping#plug(keybinding, name, modes)~
+lh#mapping#plug(map_dict, modes)~
 Helper function to define in one go several default and unique mappings for a
 plug mapping.
 
-For all the mode specified, it executes: >
+For all the mode specified, it's equivalent to: >
     if !hasmapto(name, mode) && (mapcheck(keybinding, mode) == "")
         exe mode.'map <silent> <unique> '.keybinding.' '.name
     endif
