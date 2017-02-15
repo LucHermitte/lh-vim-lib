@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  10th Feb 2017
+" Last Update:  15th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -159,41 +159,54 @@ function! s:is_lt(ref) dict abort " {{{4
   if ! (self.actual < a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to be lesser than '.a:ref)
   endif
+  return self
 endfunction
 function! s:is_le(ref) dict abort " {{{4
   if ! (self.actual w= a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to be lesser or equal to '.a:ref)
   endif
+  return self
 endfunction
 function! s:is_gt(ref) dict abort " {{{4
   if ! (self.actual > a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to be greater than '.a:ref)
   endif
+  return self
 endfunction
 function! s:is_ge(ref) dict abort " {{{4
   if ! (self.actual >= a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to be greater or equal to '.a:ref)
   endif
+  return self
 endfunction
 function! s:eq(ref) dict abort " {{{4
   if ! (self.actual == a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to equal '.a:ref)
   endif
+  return self
 endfunction
 function! s:diff(ref) dict abort " {{{4
   if ! (self.actual != a:ref)
     call lh#assert#_trace_assert('Expected '.(self.actual).' to differ from '.a:ref)
   endif
+  return self
+endfunction
+function! s:has_key(key) dict abort " {{{4
+  if ! has_key(self.actual, a:key)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to have key '.a:key)
+  endif
+  return self
 endfunction
 
 function! lh#assert#value(actual) abort " {{{4
   let res = lh#object#make_top_type({'actual': a:actual})
-  let res.is_lt = function(s:getSNR('is_lt'))
-  let res.is_le = function(s:getSNR('is_le'))
-  let res.is_gt = function(s:getSNR('is_gt'))
-  let res.is_ge = function(s:getSNR('is_ge'))
-  let res.eq    = function(s:getSNR('eq'))
-  let res.diff  = function(s:getSNR('diff'))
+  let res.is_lt   = function(s:getSNR('is_lt'))
+  let res.is_le   = function(s:getSNR('is_le'))
+  let res.is_gt   = function(s:getSNR('is_gt'))
+  let res.is_ge   = function(s:getSNR('is_ge'))
+  let res.eq      = function(s:getSNR('eq'))
+  let res.diff    = function(s:getSNR('diff'))
+  let res.has_key = function(s:getSNR('has_key'))
   return res
 endfunction
 "------------------------------------------------------------------------

@@ -434,6 +434,7 @@ functions aim at providing tools to write unit tests.
 | `lh#assert#value().is_lt()`    | Asserts actual <  ref                                                                                                          |
 | `lh#assert#value().is_ge()`    | Asserts actual >= ref                                                                                                          |
 | `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                          |
+| `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                 |
 
 
 ### Word Tools
