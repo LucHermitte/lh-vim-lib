@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  10th Feb 2017
+" Last Update:  15th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -121,13 +121,23 @@ function! lh#exception#callstack(throwpoint) abort
   return function_stack
 endfunction
 
-" Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
-function! lh#exception#callstack_as_qf(filter, ...) abort
+" Function: lh#exception#get_callstack() {{{3
+"Note:  As of vim 8.0-314, the callstack size is always of 1 when called from a
+"script. See Vim issue#1480
+function! lh#exception#get_callstack() abort
   try
     throw "dummy"
   catch /.*/
-    return call(lh#exception#decode().as_qf, [a:filter]+a:000)
+    let stack = lh#exception#decode()
+    " ignore current level => [1:]
+    call stack.__pop()
+    return stack
   endtry
+endfunction
+
+" Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
+function! lh#exception#callstack_as_qf(filter, ...) abort
+  return call(lh#exception#get_callstack().as_qf, [a:filter]+a:000)
 endfunction
 
 " Function: lh#exception#decode([throwpoint]) {{{3
@@ -150,11 +160,17 @@ function! s:as_qf(filter, ...) dict abort
   return data
 endfunction
 
+function! s:__pop() dict abort
+  " Don't call lh#assert as assertions rely on lh#exception
+  call remove(self.callstack, 0)
+endfunction
+
 function! lh#exception#decode(...) abort
   let throwpoint = get(a:, 1, v:throwpoint)
   let callstack = lh#exception#callstack(throwpoint)
   let res = lh#object#make_top_type({'callstack': callstack})
   let res.as_qf = function(s:getSNR('as_qf'))
+  let res.__pop = function(s:getSNR('__pop'))
   return res
 endfunction
 

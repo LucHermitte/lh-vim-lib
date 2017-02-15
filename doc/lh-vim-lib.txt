@@ -44,6 +44,8 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
 - |lh#exception#callstack_as_qf()|
+- |lh#exception#decode()|
+- |lh#exception#get_callstack()|
 - |lh#file#new_cache()|
 - |lh#fmt#printf()|
 - |lh#float#min()|, |lh#float#max()|,
@@ -722,6 +724,23 @@ triggered on the current file.
 @param {group} |autocmd-groups| under which the internal autocommand will be
                registered.
 @todo possibility to specify the file pattern
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#exception#get_callstack()*    {{{3
+lh#exception#get_callstack()~
+Extracts the current callstack by throwing a dummy exception in order to
+analyse its |v:throwpoint| with |lh#exception#decode()|.
+@see also |lh#exception#callstack()|, |lh#exception#decode()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#exception#decode()*           {{{3
+lh#exception#decode([throwpoint])~
+Returns an |lh#oo| object storing a decoded callstack (with
+|lh#exception#callstack()|).
+This objects provides the following methods:
+- `__pop()` (internal): remove the first callsite in the callstack (useful to
+  clean noise from intermediary functions)
+- `as_qf()`: return the callstack as a list compatible with |setqflist()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#exception#callstack()*        {{{3
