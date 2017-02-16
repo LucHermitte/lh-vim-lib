@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  07th Feb 2017
+" Last Update:  16th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -131,33 +131,39 @@ function! lh#command#matching_variables(lead, ...) abort
 endfunction
 
 " Function: lh#command#matching_askvim(what, lead) {{{3
-function! lh#command#matching_askvim(what, lead) abort
-  let cleanup = lh#on#exit()
-        \.register('delcom LHAskVimMatchingCompletion')
-  try
-    exe 'command! -complete='.a:what.' -nargs=* LHAskVimMatchingCompletion :echo "<args>"'
-    if exists('*getcmdline')
-      call cleanup
-            \.restore('g:cmds')
-            \.restore_buffer_mapping('µ', 'c')
-            \.restore_mapping_and_clear_now('<c-a>', 'c')
-      cnoremap <buffer> <expr> µ s:register()
-      function! s:register()
-        let g:cmds = split(getcmdline(), ' ')[1:]
-        return ''
-      endfunction
-      silent! exe "norm :LHAskVimMatchingCompletion ".a:lead."\<c-a>µ"
-      return g:cmds
-    else
-      " The following may lead to problem with unescaped quotes => use
-      " getcmdline() when available
-      silent! exe "norm! :LHAskVimMatchingCompletion ".a:lead."\<c-a>\"\<home>let\ cmds=\"\<cr>"
-      return split(cmds, ' ')[1:]
-    endif
-  finally
-    call cleanup.finalize()
-  endtry
-endfunction
+if exists('*getcompletion')
+  function! lh#command#matching_askvim(what, lead) abort
+    return getcompletion(a:lead, a:what)
+  endfunction
+else
+  function! lh#command#matching_askvim(what, lead) abort
+    let cleanup = lh#on#exit()
+          \.register('delcom LHAskVimMatchingCompletion')
+    try
+      exe 'command! -complete='.a:what.' -nargs=* LHAskVimMatchingCompletion :echo "<args>"'
+      if exists('*getcmdline')
+        call cleanup
+              \.restore('g:cmds')
+              \.restore_buffer_mapping('µ', 'c')
+              \.restore_mapping_and_clear_now('<c-a>', 'c')
+        cnoremap <buffer> <expr> µ s:register()
+        function! s:register()
+          let g:cmds = split(getcmdline(), ' ')[1:]
+          return ''
+        endfunction
+        silent! exe "norm :LHAskVimMatchingCompletion ".a:lead."\<c-a>µ"
+        return g:cmds
+      else
+        " The following may lead to problem with unescaped quotes => use
+        " getcmdline() when available
+        silent! exe "norm! :LHAskVimMatchingCompletion ".a:lead."\<c-a>\"\<home>let\ cmds=\"\<cr>"
+        return split(cmds, ' ')[1:]
+      endif
+    finally
+      call cleanup.finalize()
+    endtry
+  endfunction
+endif
 
 " Function: lh#command#matching_for_command(lead) {{{3
 function! lh#command#matching_for_command(lead) abort
