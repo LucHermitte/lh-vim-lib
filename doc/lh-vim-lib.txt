@@ -281,6 +281,7 @@ Design by Contract related functions                    |lhvl#DbC|
   - |lh#assert#value().is_gt()|
   - |lh#assert#value().is_ge()|
   - |lh#assert#value().has_key()|
+  - |lh#assert#value().not()|
   - |lh#assert#unexpected()|
 
 ------------------------------------------------------------------------------
@@ -3954,8 +3955,13 @@ lh#assert#value({actual}).is_le({ref})                 *lh#assert#value().is_le(
 lh#assert#value({actual}).is_gt({ref})                 *lh#assert#value().is_gt()*
 lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge()*
 lh#assert#value({actual}).has_key({key})               *lh#assert#value().has_key()*
+lh#assert#value({actual}).not()                        *lh#assert#value().not()*
     Just another syntax to do the same thing. Choose what suits you best.
-    Note: these function return {actual}
+    Note: these function return {actual}, while `not()` inverse the following
+    tests. 
+    e.g. >
+    call lh#assert#value({'a': 1}).has_key('a')
+    call lh#assert#value({'a': 1}).not().has_key('b')
                                                                      }}}1
 ==============================================================================
  (c) Luc Hermitte, 2001-2017 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
