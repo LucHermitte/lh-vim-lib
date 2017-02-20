@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  17th Feb 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -154,6 +154,22 @@ function! lh#assert#if(cond) abort
   return res
 endfunction
 
+" Function: lh#assert#empty(value, ...) {{{3
+function! lh#assert#empty(value, ...) abort
+  if ! empty(a:value)
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(a:value).' to be empty'
+    call lh#assert#_trace_assert(msg)
+  endif
+endfunction
+
+" Function: lh#assert#not_empty(value, ...) {{{3
+function! lh#assert#not_empty(value, ...) abort
+  if empty(a:value)
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(a:value).' to not empty'
+    call lh#assert#_trace_assert(msg)
+  endif
+endfunction
+
 " Function: lh#assert#value(actual) {{{3
 function! s:__eval(bool) dict abort "{{{4
   return a:bool
@@ -220,6 +236,33 @@ function! lh#assert#value(actual) abort " {{{4
   let res.eq      = function(s:getSNR('eq'))
   let res.diff    = function(s:getSNR('diff'))
   let res.has_key = function(s:getSNR('has_key'))
+  return res
+endfunction
+
+" Function: lh#assert#type(actual) {{{3
+function! s:type_is(expected) dict abort " {{{4
+  let t_actual = type(self.actual)
+  if ! self.__eval(t_actual == type(a:expected))
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be a '.lh#type#name(type(a:expected)).' not a '.lh#type#name(t_actual))
+  endif
+  return self
+endfunction
+function! s:type_belongs_to(...) dict abort " {{{4
+  let t_actual = type(self.actual)
+  let t_expected = map(copy(a:000), 'type(v:val)')
+  if self.__eval(index(t_expected, t_actual) == -1)
+    let s_expected = join(map(t_expected, 'lh#type#name(v:val)'), ', or a ')
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be either a '.s_expected.', but not a '.lh#type#name(t_actual))
+  endif
+  return self
+endfunction
+
+function! lh#assert#type(actual) abort " {{{4
+  let res = lh#object#make_top_type({'actual': a:actual})
+  let res.__eval     = function(s:getSNR('__eval'))
+  let res.not        = function(s:getSNR('not'))
+  let res.is         = function(s:getSNR('type_is'))
+  let res.belongs_to = function(s:getSNR('type_belongs_to'))
   return res
 endfunction
 "------------------------------------------------------------------------

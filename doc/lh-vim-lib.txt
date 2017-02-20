@@ -70,6 +70,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#time#bench()|
 - |lh#time#bench_n()|
 - |lh#time#date()|
+- |lh#type#name()|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
 Option related functions:                               |lhvl#option|
@@ -670,6 +671,11 @@ lh#time#bench_n(n Function[, args])~
                                                 *lh#time#date()*                  {{{3
 lh#time#date()~
 @return the equivalent of `strftime('%D-th %b %Y)`
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#type#name()*                  {{{3
+lh#type#name(type-value)~
+@returns the name that describes best the type associated to the |type()| value provided.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#visual#selection()*           {{{3
@@ -3938,6 +3944,8 @@ lh#assert#not_equal({expected}, {actual}  [, {msg}])   *lh#assert#not_equal()*
 lh#assert_is({expected}, {actual} [, {msg}])           *lh#assert#is()*
 lh#assert_is_not({expected}, {actual} [, {msg}])       *lh#assert#is_not()*
 lh#assert#match({pattern}, {actual} [, {msg}])         *lh#assert#match()*
+lh#assert#empty({actual} [, {msg}])                    *lh#assert#empty()*
+lh#assert#not_empty({actual} [, {msg}])                *lh#assert#not_empty()*
 
 lh#assert#unexpected([, {msg}])                        *lh#assert#unexpected()*
     This one is new: it marks unexpected situations, without the need to call
@@ -3958,10 +3966,17 @@ lh#assert#value({actual}).has_key({key})               *lh#assert#value().has_ke
 lh#assert#value({actual}).not()                        *lh#assert#value().not()*
     Just another syntax to do the same thing. Choose what suits you best.
     Note: these function return {actual}, while `not()` inverse the following
-    tests. 
+    tests.
     e.g. >
     call lh#assert#value({'a': 1}).has_key('a')
     call lh#assert#value({'a': 1}).not().has_key('b')
+
+lh#assert#type({actual}).is({expected})                *lh#assert#type().is()*
+lh#assert#type({actual}).belongs_to({expected}...)     *lh#assert#type().belongs_to()*
+    e.g. >
+    call lh#assert#type([1,2]).is([])
+    call lh#assert#type([1,2]).belongs_to([], {}, '')
+
                                                                      }}}1
 ==============================================================================
  (c) Luc Hermitte, 2001-2017 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1

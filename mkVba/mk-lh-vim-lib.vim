@@ -7,7 +7,7 @@
 " Version:	4.0.0.0
 let s:version = '4.00.0'
 " Created:	06th Nov 2007
-" Last Update:  03rd Feb 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -25,6 +25,7 @@ License.md
 addon-info.json
 autoload/airline/extensions/async.vim
 autoload/lh/askvim.vim
+autoload/lh/assert.vim
 autoload/lh/async.vim
 autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
@@ -60,6 +61,7 @@ autoload/lh/ref.vim
 autoload/lh/stack.vim
 autoload/lh/string.vim
 autoload/lh/syntax.vim
+autoload/lh/type.vim
 autoload/lh/ui.vim
 autoload/lh/vcs.vim
 autoload/lh/visual.vim

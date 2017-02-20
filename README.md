@@ -419,17 +419,19 @@ functions aim at providing tools to write unit tests.
 | Function                       | Purpose                                                                                                                        |
 |:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
 | `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                            |
-| `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
 | `lh#assert#clear()`            | Clears the last known contract failures                                                                                        |
-| `lh#assert#true()`             | Asserts a value is true                                                                                                        |
-| `lh#assert#false()`            | Asserts a value is false                                                                                                       |
+| `lh#assert#empty()`            | Asserts a value is empty                                                                                                       |
 | `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                     |
-| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
+| `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
+| `lh#assert#false()`            | Asserts a value is false                                                                                                       |
+| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
 | `lh#assert#is()`               | Asserts two entities are the same                                                                                              |
 | `lh#assert#is_not()`           | Asserts two entities are not the same                                                                                          |
 | `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
+| `lh#assert#not_empty()`        | Asserts a value is not empty                                                                                                   |
+| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
+| `lh#assert#true()`             | Asserts a value is true                                                                                                        |
 | `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
-| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
 | `lh#assert#value().equal()`    | Asserts actual == ref                                                                                                          |
 | `lh#assert#value().differ()`   | Asserts actual != ref                                                                                                          |
 | `lh#assert#value().is_le()`    | Asserts actual <= ref                                                                                                          |
@@ -438,6 +440,9 @@ functions aim at providing tools to write unit tests.
 | `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                          |
 | `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                 |
 | `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                      |
+| `lh#assert#type().is()`        | Asserts the type of the expression is as expected                                                                              |
+| `lh#assert#type().belongs_to()`| Asserts the type of the expression belongs to the list of data passed                                                          |
+| `lh#assert#type().not()`       | Inverses the logic of the next assertions                                                                                      |
 
 
 ### Word Tools
