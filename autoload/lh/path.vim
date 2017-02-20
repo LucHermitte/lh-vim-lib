@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  03rd Jan 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -255,7 +255,7 @@ endfunction
 " Function: lh#path#common({pathnames}) {{{3
 " Find the common leading path between all pathnames
 function! lh#path#common(pathnames) abort
-  " assert(len(pathnames)) > 1
+  call lh#assert#not_empty(a:pathnames)
   let common = a:pathnames[0]
   let lCommon = lh#path#split(common)
   let i = 1
@@ -288,7 +288,7 @@ endfunction
 " Function: lh#path#strip_common({pathnames}) {{{3
 " Find the common leading path between all pathnames, and strip it
 function! lh#path#strip_common(pathnames) abort
-  " assert(len(pathnames)) > 1
+  call lh#assert#not_empty(a:pathnames)
   let common = lh#path#common(a:pathnames)
   let common = lh#path#to_dirname(common)
   let l = strlen(common)

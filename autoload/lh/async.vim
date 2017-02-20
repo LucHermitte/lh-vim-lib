@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  20th Oct 2016
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -160,7 +160,7 @@ function! s:push_or_start(job) dict abort          " {{{3
 endfunction
 
 function! s:start_next() dict abort                " {{{3
-  call assert_true(!self.is_empty())
+  call lh#assert#true(!self.is_empty())
   " Wait till adding/removing a job has finished (poor man's mutex)
   while get(s:job_queue, 'must_wait', 0)
     :sleep 100m

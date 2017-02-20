@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  10th Feb 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -622,7 +622,7 @@ endfunction
 
 function! s:set(varname, value) dict abort " {{{4
   call s:Verbose('%1.set(%2 <- %3)', self.name, a:varname, a:value)
-  call lh#assert#true(!empty(a:varname))
+  call lh#assert#not_empty(a:varname)
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
     let self.options[varname] = a:value
@@ -642,7 +642,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   " like s:set, but find first where the option is already set (i.e.
   " possibily in a parent project), and update the "old" setting instead of
   " overridding it.
-  call lh#assert#true(!empty(a:varname))
+  call lh#assert#not_empty(a:varname)
   call s:Verbose('%1.set(%2 <- %3, %4)', self.name, a:varname, a:value, a:000)
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{5 -- options
@@ -981,7 +981,7 @@ function! lh#project#_get(name, ...) abort
     endif
   endif
   if lh#project#is_in_a_project()
-    call lh#assert#true(has_key(b:{s:project_varname}, 'get'))
+    call lh#assert#value(b:{s:project_varname}).has_key('get')
     return b:{s:project_varname}.get(a:name)
   else
     return s:k_unset

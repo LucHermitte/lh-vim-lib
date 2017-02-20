@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  15th Feb 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -209,13 +209,13 @@ function! lh#exception#say_what() abort
     endif
     let throwpoint = matchstr(messages[i], rx_err_detected)
     let line = matchstr(messages[i-1], rx_in_line)
-    call lh#assert#true(!empty(line))
+    call lh#assert#not_empty(line)
 
     let throwpoint = printf(po_out_line, throwpoint, line)
 
     let e_qf = lh#exception#decode(throwpoint).as_qf('')
     let e_qf[0].text = substitute(e_qf[0].text, '^\.\.\.', messages[i-2], '')
-    call lh#assert#true(!empty(e_qf))
+    call lh#assert#not_empty(e_qf)
     call extend(qf, reverse(e_qf))
     if messages[i-2] !~ '^E171:\|^E170' | break | endif
   endwhile

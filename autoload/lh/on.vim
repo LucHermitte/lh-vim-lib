@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  20th Jan 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -231,7 +231,7 @@ function! lh#on#_unlet(varname) abort
   " Avoid `silent!` as it messes Vim client-server mode and as a consequence
   " rspecs tests
   " Note: vim options, and environment variables cannot be unset
-  " call assert_true(!empty(a:varname))
+  call lh#assert#not_empty(a:varname)
   if a:varname[0] == '$'
     " Cannot use {a:varname} syntax with environment variables
     if exists(a:varname)

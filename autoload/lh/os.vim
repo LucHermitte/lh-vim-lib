@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  06th Feb 2017
+" Last Update:  20th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -294,7 +294,7 @@ function! s:as_string(value) abort " {{{2
   if type(a:value) == type([])
     return '('.join(map(copy(a:value), 'shellescape(v:val)'), ' ').')'
   else
-    call lh#assert#not_equal(type(a:value), type({}))
+    call lh#assert#type(a:value).not().is({})
     return shellescape(a:value)
   endif
 endfunction
