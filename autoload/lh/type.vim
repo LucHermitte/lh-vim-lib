@@ -49,7 +49,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-" Function: lh#type#name(type) {{{3
+" Function: lh#type#name(type) {{{2
 let s:names =
       \{ type(0)              : 'number'
       \, type('')             : 'string'
@@ -64,6 +64,31 @@ let s:names =
       \ }
 function! lh#type#name(type) abort
   return get(s:names, a:type, 'unknown')
+endfunction
+
+" Function: lh#type#is_dict(value) {{{2
+function! lh#type#is_dict(value) abort
+  return type(a:value) == type({})
+endfunction
+
+" Function: lh#type#is_list(value) {{{2
+function! lh#type#is_list(value) abort
+  return type(a:value) == type([])
+endfunction
+
+" Function: lh#type#is_funcref(value) {{{2
+function! lh#type#is_funcref(value) abort
+  return type(a:value) == type(function('has'))
+endfunction
+
+" Function: lh#type#is_string(value) {{{2
+function! lh#type#is_string(value) abort
+  return type(a:value) == type('')
+endfunction
+
+" Function: lh#type#is_number(value) {{{2
+function! lh#type#is_number(value) abort
+  return type(a:value) == type(0)
 endfunction
 
 "------------------------------------------------------------------------
