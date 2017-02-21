@@ -29,6 +29,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [UI functions](#ui-functions)
   * [Logging framework](#logging-framework)
   * [Design by Contract function](#design-by-contract-functions)
+  * [Project feature](doc/Project.md) -- other web page
 
 ### Miscellaneous functions
 

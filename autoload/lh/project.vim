@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  20th Feb 2017
+" Last Update:  21st Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -26,8 +26,6 @@ let s:k_version = '400'
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
-" - Have menu priority + menu name in all projects in order to simplify
-"   toggling definitions
 " - Completion on :Let* and :Unlet for inherited p:variables
 " - Use in plugins
 "   - p:$ENV variables

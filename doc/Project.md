@@ -477,6 +477,17 @@ Toggle LHTestsTogMenupbar
 :echo lh#os#system('echo $FOOBAR')
 ```
 
+### 3.3.4 Define menu entries in `&Project` top-menu
+You can use for this:
+
+ * `lh#project#menu#def_toggle_itme()`
+ * `lh#project#menu#make()`
+ * `lh#project#menu#remove()`
+
+These functions will execute the `lh#menu#...` equivalent functions from
+lh-vim-lib, in `g:lh#project#menu` context. This dictionary can be overriden in
+a `.vimrc` and contains by default: `{'name': '&Project.', 'priority': '50.'}`.
+
 # 4. Design choices
 
 ## Regarding project file inventory
@@ -529,8 +540,6 @@ and BuildToolsWrappers are the first I've in mind).
  * Toggling:
    * at global level: [a, b, c]
    * at project level: [default value from global VS force [a, b, c]]
- * Have menu priority + menu name in all projects in order to simplify
-   toggling definitions
  * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
  * Use in plugins:
    * `p:$ENV variables`

@@ -191,6 +191,9 @@ Menu related functions:                                 |lhvl#menu|
 - |lh#menu#map_all()|
 - |lh#menu#remove()|
 - |lh#askvim#menu()| (beta version)
+- |lh#project#menu#def_toggle_item()|
+- |lh#project#menu#make()|
+- |lh#project#menu#remove()|
 Buffer related functions:                               |lhvl#buffer|
 - |lh#buffer#get_nr()|
 - |lh#buffer#list()|
@@ -264,6 +267,9 @@ Project related defintions                              |lhvl#project|
 - |lh#project#_get()|
 - |lh#project#crt_bufvar_name()|
 - |lh#project#_crt_var_name()|
+- |lh#project#menu#def_toggle_item()|
+- |lh#project#menu#make()|
+- |lh#project#menu#remove()|
 Design by Contract related functions                    |lhvl#DbC|
 - |lh#assert#mode()|
 - |lh#assert#clear()|
@@ -2482,6 +2488,8 @@ Warning:
 Examples:
    See tests/lh/test-toggle-menu.vim
 
+See also |lh#project#menu#def_toggle_item()|.
+
                                                             *lhvl-:Toggle*
 :Toggle {variable-name} [{text-value}]~
 @param {variable-name}
@@ -2597,11 +2605,15 @@ otherwise it is adapted depending on each {mode}:
 Examples:
    See tests/lh/test-menu-map.vim
 
+See also |lh#project#menu#make()|.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                       *lh#menu#remove()*          {{{3
 lh#menu#remove({modes}, {menu-text})~
 Applies |unmenu| as many times as required to remove the menu from the modes
 specified.
+
+See also |lh#project#menu#remove()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                   *lh#menu#IVN_make()*        {{{3
@@ -3462,7 +3474,6 @@ lh#vcs#is_svn([path])~
 
 ------------------------------------------------------------------------------
 OO HELPERS                                            *lhvl#oo*         {{{2
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Quite a few times I've defined |Dictionaries| that behave as objects, but when
@@ -3620,8 +3631,7 @@ Examples: >
     " or
     call lh#let#unlet('g:dummy_test2.un.deux')
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+------------------------------------------------------------------------------
 PROJECT DEFINITIONS                                   *lhvl#project*    {{{2
 @since Version 4.0.0
 
@@ -3890,7 +3900,24 @@ It'll return:
 - The |string| `lh#project#crt_bufvar_name().variables.{var}` otherwise.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#project#menu*                {{{3
+Helpers functions for defining menu entries in `&Project`~
+All project releated entires will go in the menu `&Project` with a priority of
+50. This default entry point can be overriden in your |.vimrc| (and nowhere
+else) with something like: >
 
+    let g:lh#project.menu = { 'name': '&MyProject.', 'priority': '42.' }
+
+Don't forget the dot at the end.
+
+From here, |lhvl#menu| functions have been overriden to automatically define
+new menu entries along with other project related topics.
+
+*lh#project#menu#def_toggle_item()*  specializes |lh#menu#def_toggle_item()|
+*lh#project#menu#make()*             specializes |lh#menu#make()|
+*lh#project#menu#remove()*           specializes |lh#menu#remove()|
+
+------------------------------------------------------------------------------
 DESIGN BY CONTRACT FUNCTIONS                          *lhvl#DbC*    {{{2
 @since Version 4.0.0
 This set of functions introduce DbC helpers. There are here to help plugin
