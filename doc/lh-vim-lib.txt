@@ -189,6 +189,7 @@ Menu related functions:                                 |lhvl#menu|
 - |lh#menu#IVN_make()|
 - |lh#menu#is_in_visual_mode()|
 - |lh#menu#map_all()|
+- |lh#menu#remove()|
 - |lh#askvim#menu()| (beta version)
 Buffer related functions:                               |lhvl#buffer|
 - |lh#buffer#get_nr()|
@@ -2597,7 +2598,13 @@ Examples:
    See tests/lh/test-menu-map.vim
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                  *lh#menu#IVN_make()*            {{{3
+                                                      *lh#menu#remove()*          {{{3
+lh#menu#remove({modes}, {menu-text})~
+Applies |unmenu| as many times as required to remove the menu from the modes
+specified.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                  *lh#menu#IVN_make()*        {{{3
 Mappings & menus inserting text~
 lh#menu#IVN_make(<priority>, {text}, {key}, {IM-action}, {VM-action}, {NM-action} [, {nore-IM}, {nore-VM}, {nore-NM}])~
 
@@ -2683,7 +2690,7 @@ lh#menu#is_in_visual_mode()~
 NB: this function deprecates the test on `@v`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                   *lh#menu#map_all()*            {{{3
+                                                   *lh#menu#map_all()*         {{{3
 lh#menu#map_all({map-type}[, {map-args...}])~
 This function is a helper function that defines several mappings at once as
 |:amenu| would do.

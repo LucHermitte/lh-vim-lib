@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  04th Jan 2017
+" Last Update:  21st Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -29,6 +29,7 @@ let s:k_version = 4000
 "       v3.1.3: BugFix for CMake options, required by BTW 0.2.1
 "       v3.6.1  ENH: Use new logging framework
 "       v4.0.0  ENH: Extend to work with project p:variables
+"               ENH: Add `lh#menu#remove()`
 " TODO: {{{2
 "       * Should the argument to :Toggle be simplified to use the variable name
 "       instead ? May be a banged :Toggle! could work on the real variable
@@ -658,10 +659,20 @@ function! lh#menu#make(prefix, code, text, binding, ...)
             \ substitute(lh#menu#text(binding), '&', '\0\0', 'g')
     endif
     while strlen(prefix)
+      call s:Verbose(s:BMenu(b) . prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd))
       execute s:BMenu(b) . prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd)
       let prefix = strpart(prefix, 1)
     endwhile
   endif
+endfunction
+
+" Function: lh#menu#remove(modes, name) {{{3
+function! lh#menu#remove(modes, name) abort
+  let name = lh#menu#text(a:name)
+  for mode in split(a:modes, '\zs')
+    call s:Verbose(mode.'unmenu '.name)
+    exe mode.'unmenu '.name
+  endfor
 endfunction
 
 " Function: s:BMenu({b})                                   {{{3
