@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  07th Nov 2016
+" Last Update:  21st Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -64,8 +64,8 @@ function! s:BuildPublicVariableName(var)
     else
       let var = 'b'.a:var[1:]
     endif
-  elseif a:var =~ '^p:'
-    " It's a p:roject variable
+  elseif a:var =~ '\v^p:|^\&p:'
+    " It's a p:roject variable, or a project option
     let var = lh#project#_crt_var_name(a:var)
   else
     let var = a:var
@@ -191,7 +191,7 @@ function! s:LetTo(var, value) abort " {{{4
 endfunction
 
 function! lh#let#to(...) abort " {{{4
-  try
+  " try
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
     if type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
@@ -199,9 +199,9 @@ function! lh#let#to(...) abort " {{{4
     else
       return s:LetTo(var, Value)
     endif
-  catch /.*/
-    throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
-  endtry
+  " catch /.*/
+    " throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+  " endtry
 endfunction
 
 " Function: lh#let#unlet(var) {{{3

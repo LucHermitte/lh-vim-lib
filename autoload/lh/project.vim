@@ -939,18 +939,25 @@ endfunction
 
 " Function: lh#project#_crt_var_name(var) {{{3
 function! lh#project#_crt_var_name(var) abort
-  call lh#assert#match('^p:', a:var)
-  let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
+  if a:var =~ '^p:'
+    call lh#assert#match('^p:', a:var)
+    let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
+  elseif a:var =~ '^&p:'
+    let [all, kind, name; dummy] = matchlist(a:var, '\v^(\&)p:(.*)')
+  else
+    call lh#assert#unexpected('Unexpected variable name '.string(a:var))
+  endif
   if lh#project#is_in_a_project()
+    let varname = kind.name
     if kind == '&'
       return
-            \ { 'name'    : a:var[2:]
+            \ { 'name'    : varname
             \ , 'realname': 'b:'.s:project_varname.'.options.'.name
             \ , 'project' : b:{s:project_varname}
             \ }
     elseif kind == '$'
       return
-            \ { 'name'    : a:var[2:]
+            \ { 'name'    : varname
             \ , 'realname': 'b:'.s:project_varname.'.env.'.name
             \ , 'project' : b:{s:project_varname}
             \ }
