@@ -67,6 +67,7 @@ autoload/lh/ui.vim
 autoload/lh/vcs.vim
 autoload/lh/visual.vim
 autoload/lh/window.vim
+doc/DbC.md
 doc/Dialog.md
 doc/Log.md
 doc/Project.md

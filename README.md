@@ -28,7 +28,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Syntax related functions](#syntax-related-functions)
   * [UI functions](#ui-functions)
   * [Logging framework](doc/Log.md) -- other web page
-  * [Design by Contract functions](#design-by-contract-functions)
+  * [Design by Contract functions](doc/DbC.md) -- other web page
   * [Project feature](doc/Project.md) -- other web page
 
 ### Miscellaneous functions
@@ -331,55 +331,17 @@ function, or a plain text UI function (defined by vim, or emulated)
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
 
 ### Logging Framework
-
 See separate page: [doc/Log.md](doc/Log.md).
 
 ### Design by Contract functions
-This set of functions introduce DbC helpers. There are here to help plugin
-developers to detect and eradicate Vim Scripting programming errors.
-
-When an assertion fails, we cannot expect the script to go on correctly. There
-IS an error in its logic. We cannot expect anything good after that. That's
-where `lh#assert#*()` functions differs from Vim
-[|test-functions|](http://vimhelp.appspot.com/usr_41.txt.html#test-functions)
-and my [vim-UT](http://github.com/LucHermitte/vim-UT) plugin: these other
-functions aim at providing tools to write unit tests.
-
-| Function                       | Purpose                                                                                                                        |
-|:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                            |
-| `lh#assert#clear()`            | Clears the last known contract failures                                                                                        |
-| `lh#assert#empty()`            | Asserts a value is empty                                                                                                       |
-| `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                     |
-| `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
-| `lh#assert#false()`            | Asserts a value is false                                                                                                       |
-| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
-| `lh#assert#is()`               | Asserts two entities are the same                                                                                              |
-| `lh#assert#is_not()`           | Asserts two entities are not the same                                                                                          |
-| `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
-| `lh#assert#not_empty()`        | Asserts a value is not empty                                                                                                   |
-| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
-| `lh#assert#true()`             | Asserts a value is true                                                                                                        |
-| `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
-| `lh#assert#value().equal()`    | Asserts actual == ref                                                                                                          |
-| `lh#assert#value().differ()`   | Asserts actual != ref                                                                                                          |
-| `lh#assert#value().is_le()`    | Asserts actual <= ref                                                                                                          |
-| `lh#assert#value().is_lt()`    | Asserts actual <  ref                                                                                                          |
-| `lh#assert#value().is_ge()`    | Asserts actual >= ref                                                                                                          |
-| `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                          |
-| `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                 |
-| `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                      |
-| `lh#assert#type().is()`        | Asserts the type of the expression is as expected                                                                              |
-| `lh#assert#type().belongs_to()`| Asserts the type of the expression belongs to the list of data passed                                                          |
-| `lh#assert#type().not()`       | Inverses the logic of the next assertions                                                                                      |
-
+See separate page: [doc/DbC.md](doc/DbC.md).
 
 ### Word Tools
 See http://hermitte.free.fr/vim/general.php#expl_words_tools
 
 
 ## Installation
-  * Requirements: Vim 7.4, Vim8 for `lh#async` feature.
+  * Requirements: Vim 7.4, Vim 8 for `lh#async` feature.
   * Clone from the git repository
 ```
 git clone git@github.com:LucHermitte/lh-vim-lib.git
