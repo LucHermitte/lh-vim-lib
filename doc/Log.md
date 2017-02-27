@@ -72,7 +72,7 @@ execute
 
 ## Screencast
 
-![lh-vim-lib logging framework demo](doc/screencast-log.gif "lh-vim-lib logging framework demo")
+![lh-vim-lib logging framework demo](screencast-log.gif "lh-vim-lib logging framework demo")
 
 ##Functions:
 

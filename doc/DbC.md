@@ -41,7 +41,7 @@ endfunction
 echo s:some_other_stuff()
 ```
 
-![lh-vim-lib DbC framework demo](doc/screencast-dbc.gif "lh-vim-lib DbC framework demo")
+![lh-vim-lib DbC framework demo](screencast-dbc.gif "lh-vim-lib DbC framework demo")
 
 Note: In order to always display the correct parameters received, you'll need
 Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
