@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:version = '4.0.0'
 " Created:      01st Mar 2013
-" Last Update:  15th Feb 2017
+" Last Update:  23rd Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -80,7 +80,7 @@ function! lh#mapping#define(mapping_definition)
   silent exe cmd
 endfunction
 
-" Function: lh#mapping#clear() {{{3
+" Function: lh#mapping#clear() {{{2
 function! lh#mapping#clear() abort
   let s:issues_notified = {}
   let s:issues_notified.n = {}
@@ -94,7 +94,7 @@ function! lh#mapping#clear() abort
   let s:issues_notified[''] = {}
 endfunction
 
-" Function: lh#mapping#plug(keybinding, name, modes) {{{3
+" Function: lh#mapping#plug(keybinding, name, modes) {{{2
 " Function: lh#mapping#plug(map_definition, modes)
 call lh#mapping#clear()
 function! lh#mapping#plug(...) abort
