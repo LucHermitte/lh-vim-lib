@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  20th Feb 2017
+" Last Update:  27th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -184,43 +184,43 @@ endfunction
 
 function! s:is_lt(ref) dict abort " {{{4
   if ! self.__eval(self.actual < a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to be lesser than '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be lesser than '.string(a:ref))
   endif
   return self
 endfunction
 function! s:is_le(ref) dict abort " {{{4
   if ! self.__eval(self.actual w= a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to be lesser or equal to '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be lesser or equal to '.string(a:ref))
   endif
   return self
 endfunction
 function! s:is_gt(ref) dict abort " {{{4
   if ! self.__eval(self.actual > a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to be greater than '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be greater than '.string(a:ref))
   endif
   return self
 endfunction
 function! s:is_ge(ref) dict abort " {{{4
   if ! self.__eval(self.actual >= a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to be greater or equal to '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be greater or equal to '.string(a:ref))
   endif
   return self
 endfunction
 function! s:eq(ref) dict abort " {{{4
   if ! self.__eval(self.actual == a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to equal '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to equal '.string(a:ref))
   endif
   return self
 endfunction
 function! s:diff(ref) dict abort " {{{4
   if ! self.__eval(self.actual != a:ref)
-    call lh#assert#_trace_assert('Expected '.(self.actual).' to differ from '.a:ref)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to differ from '.string(a:ref))
   endif
   return self
 endfunction
 function! s:has_key(key) dict abort " {{{4
   if ! self.__eval(has_key(self.actual, a:key))
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to have key '.a:key)
+    call lh#assert#_trace_assert('Expected '.string(self.actual).' to have key '.string(a:key))
   endif
   return self
 endfunction
