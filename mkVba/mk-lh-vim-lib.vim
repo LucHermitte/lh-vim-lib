@@ -7,7 +7,7 @@
 " Version:	4.0.0.0
 let s:version = '4.00.0'
 " Created:	06th Nov 2007
-" Last Update:  21st Feb 2017
+" Last Update:  27th Feb 2017
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -67,6 +67,9 @@ autoload/lh/ui.vim
 autoload/lh/vcs.vim
 autoload/lh/visual.vim
 autoload/lh/window.vim
+doc/Dialog.md
+doc/Log.md
+doc/Project.md
 doc/lh-vim-lib.txt
 mkVba/mk-lh-vim-lib.vim
 plugin/let.vim
