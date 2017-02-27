@@ -16,7 +16,7 @@ CONTENTS                                      *lhvl-contents*      {{{1
 ------------------------------------------------------------------------------
 PRESENTATION                                  *lhvl-presentation*  {{{1
 
-|lh-vim-lib| is a library that defines some common VimL functions I use in my
+|lh-vim-lib| is a library that defines some common Vim functions I use in my
 various plugins and ftplugins.
 This library has been conceived as a suite of |autoload| plugins, and a few
 |macros| plugins. As such, it requires Vim 7+.
@@ -560,7 +560,7 @@ Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
   - `'before_starting_cb'`: optional callback for a function to execute before
     starting any new job. Indeed, things that must be executed before a job
     starts shall not be executed before the previous job has ended. This
-    callback helps to delay operations written in |VimL|.
+    callback helps to delay operations written in vim-script language.
   - `'start_fail_cb'`: optional callback executed when starting the job fails.
 @todo Support for |job_stop()|
 @todo Support multiple queues -> `lh#async#new_queue()`
@@ -1086,7 +1086,7 @@ that were specified in |lh#function#bind()| {arguments} list.
 Examples:~
    See tests/lh/function.vim
 
-Let's suppose Print(...) a VimL variadic function that echoes the arguments it
+Let's suppose Print(...) a Vim variadic function that echoes the arguments it
 receives, i.e. >
    call Print(1,2,"text", ['foo', 'bar'])
 will echo: >
@@ -3087,8 +3087,8 @@ an Unix shell but from Microsoft's files explorer.
 So, as a Vim user having lh-vim-lib installed, you may be interested in
 setting the boolean global variable |g:unix_layer_installed| into your .vimrc.
 
-VimL programmers can know if such an Unix layer has been installed thanks to the
-boolean function: |lh#os#has_unix_layer_installed()|.
+Vim-script language programmers can know if such an Unix layer has been
+installed thanks to the boolean function: |lh#os#has_unix_layer_installed()|.
 
 Note: This old feature has been moved to lh-vim-lib from |system-utils|.
 
@@ -3110,8 +3110,8 @@ The criteria used to detect the system are:
 - otherwise: an error message is raised -> contact me in order to enhance the
   plugin and support other configurations.
 
-VimL programmers can know the system detected thanks to the function
-|lh#os#system_detecte()|.
+Vim-script language programmers can know the system detected thanks to the
+function |lh#os#system_detecte()|.
 
 Note: This old feature has been moved to lh-vim-lib from |system-utils|.
 
@@ -3921,7 +3921,7 @@ new menu entries along with other project related topics.
 DESIGN BY CONTRACT FUNCTIONS                          *lhvl#DbC*    {{{2
 @since Version 4.0.0
 This set of functions introduce DbC helpers. There are here to help plugin
-developers to detect and eradicate VimL programming errors.
+developers to detect and eradicate vim-scripting programming errors.
 When an assertion fails, we cannot expect the script to go on correctly. There
 IS an error in its logic. We cannot expect anything good after that. That's
 where `lh#assert#*()` functions differs from Vim |test-functions| and my
