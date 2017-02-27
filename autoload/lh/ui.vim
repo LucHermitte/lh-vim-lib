@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      03rd Jan 2017
-" Last Update:  03rd Jan 2017
+" Last Update:  27th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -140,7 +140,7 @@ function! lh#ui#GetLikeCTRL_W()
 endfunction
 
 " # Interaction functions {{{2
-" Function: IF(var, then, else) {{{3
+" Function: lh#ui#if(var, then, else) {{{3
 function! lh#ui#if(var,then, else) abort
   let o = s:Opt_type() " {{{4
   if     o =~ 'g\%[ui]\|t\%[ext]' " {{{5
@@ -148,11 +148,11 @@ function! lh#ui#if(var,then, else) abort
   elseif o =~ 'f\%[te]'           " {{{5
     return s:if_fte(a:var, a:then, a:else)
   else                    " {{{5
-    throw "UI-Fns::IF(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#if(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 
-" Function: SWITCH(var, case, action [, case, action] [default_action]) {{{3
+" Function: lh#ui#switch(var, case, action [, case, action] [default_action]) {{{3
 function! lh#ui#switch(var, ...) abort
   let o = s:Opt_type() " {{{4
   if     o =~ 'g\%[ui]\|t\%[ext]' " {{{5
@@ -169,15 +169,15 @@ function! lh#ui#switch(var, ...) abort
   elseif o =~ 'f\%[te]'           " {{{5
     return s:if_fte(a:var, a:then, a:else)
   else                    " {{{5
-    throw "UI-Fns::SWITCH(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#switch(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 
-" Function: CONFIRM(text [, choices [, default [, type]]]) {{{3
+" Function: lh#ui#confirm(text [, choices [, default [, type]]]) {{{3
 function! lh#ui#confirm(text, ...) abort
   " 1- Check parameters {{{4
   if a:0 > 4 " {{{5
-    throw "UI-Fns::CONFIRM(): too many parameters"
+    throw "lh#ui#confirm(): too many parameters"
     return 0
   endif
   " build the parameters string {{{5
@@ -206,15 +206,15 @@ function! lh#ui#confirm(text, ...) abort
   elseif o =~ 'f\%[te]'  " {{{5
       exe 'return s:confirm_fte(a:text,'.params.')'
   else               " {{{5
-    throw "UI-Fns::CONFIRM(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#confirm(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 
-" Function: INPUT(prompt [, default ]) {{{3
+" Function: lh#ui#input(prompt [, default ]) {{{3
 function! lh#ui#input(prompt, ...) abort
   " 1- Check parameters {{{4
   if a:0 > 4 " {{{5
-    throw "UI-Fns::INPUT(): too many parameters"
+    throw "lh#ui#input(): too many parameters"
     return 0
   endif
   " build the parameters string {{{5
@@ -234,15 +234,15 @@ function! lh#ui#input(prompt, ...) abort
   elseif o =~ 'f\%[te]'  " {{{5
       exe 'return s:input_fte(a:prompt,'.params.')'
   else               " {{{5
-    throw "UI-Fns::INPUT(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#input(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 
-" Function: COMBO(prompt, choice [, ... ]) {{{3
+" Function: lh#ui#combo(prompt, choice [, ... ]) {{{3
 function! lh#ui#combo(prompt, ...) abort
   " 1- Check parameters {{{4
   if a:0 > 4 " {{{5
-    throw "UI-Fns::COMBO(): too many parameters"
+    throw "lh#ui#combo(): too many parameters"
     return 0
   endif
   " build the parameters string {{{5
@@ -262,11 +262,11 @@ function! lh#ui#combo(prompt, ...) abort
   elseif o =~ 'f\%[te]'  " {{{5
     exe 'return s:combo_fte(a:prompt,'.params.')'
   else               " {{{5
-    throw "UI-Fns::COMBO(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#combo(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 
-" Function: WHICH(function, prompt, choice [, ... ]) {{{3
+" Function: lh#ui#which(function, prompt, choice [, ... ]) {{{3
 function! lh#ui#which(fn, prompt, ...) abort
   " 1- Check parameters {{{4
   " build the parameters string {{{5
@@ -291,11 +291,11 @@ function! lh#ui#which(fn, prompt, ...) abort
   endif
 endfunction
 
-" Function: CHECK(prompt, choice [, ... ]) {{{3
+" Function: lh#ui#check(prompt, choice [, ... ]) {{{3
 function! lh#ui#check(prompt, ...) abort
   " 1- Check parameters {{{4
   if a:0 > 4 " {{{5
-    throw "UI-Fns::CHECK(): too many parameters"
+    throw "lh#ui#check(): too many parameters"
     return 0
   endif
   " build the parameters string {{{5
@@ -315,7 +315,7 @@ function! lh#ui#check(prompt, ...) abort
   elseif o =~ 'f\%[te]'  " {{{5
       exe 'return s:check_fte(a:prompt,'.params.')'
   else               " {{{5
-    throw "UI-Fns::CHECK(): Unkonwn user-interface style (".o.")"
+    throw "lh#ui#check(): Unkonwn user-interface style (".o.")"
   endif
 endfunction
 

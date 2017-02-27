@@ -8,11 +8,11 @@ This library has been conceived as a suite of [|autoload|](http://vimhelp.appspo
 
 The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/master/doc/lh-vim-lib.txt) can be browsed.
 
-**Important:
+**Important:**
 
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
 - Since version 3.2.7, it's no longer hosted on google-code but on github
-- Version 4.0.0 breaks `lh#let#if_undef()` interface.**
+- Version 4.0.0 breaks `lh#let#if_undef()` interface.
 
 ## Functions
 
@@ -318,15 +318,15 @@ interactive functions. Depending on a configuration variable
 (`(bpg):ui_type`), they will delegate the interaction to a gvim UI
 function, or a plain text UI function (defined by vim, or emulated)
 
-| Function    | Purpose                                                                                                                                     |
-|:------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| `CHECK()`   | Emulates a checbox UI function                                                                                                              |
-| `COMBO()`   | Emulates a combobox UI function                                                                                                             |
-| `CONFIRM()` | Similar to `confirm()`                                                                                                                      |
-| `IF()`      | Acts as the ternary operator                                                                                                                |
-| `INPUT()`   | Calls `inputdialog()` or `input()`                                                                                                          |
-| `SWITCH()`  | Â«Â»                                                                                                                                        |
-| `WHICH()`   | Wrapper around functions like `CONFIRM()` or `COMBO()` that returns the text of the selected item instead of the index of the selected item |
+| Function          | Purpose                                                                                                                                                 |
+|:------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `lh#ui#check()`   | Emulates a checbox UI function                                                                                                                          |
+| `lh#ui#combo()`   | Emulates a combobox UI function                                                                                                                         |
+| `lh#ui#confirm()` | Similar to `confirm()`                                                                                                                                  |
+| `lh#ui#if()`      | Acts as the ternary operator                                                                                                                            |
+| `lh#ui#input()`   | Calls `inputdialog()` or `input()`                                                                                                                      |
+| `lh#ui#switch()`  | Emulates `switch()` in vim-script language                                                                                                              |
+| `lh#ui#which()`   | Wrapper around functions like `lh#ui#confirm()` or `lh#ui#combo()` that returns the text of the selected item instead of the index of the selected item |
 
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
 
