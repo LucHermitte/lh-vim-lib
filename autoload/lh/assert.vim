@@ -173,6 +173,9 @@ function! lh#assert#not_empty(value, ...) abort
 endfunction
 
 " Function: lh#assert#value(actual) {{{3
+function! s:__ignore(...) dict abort "{{{4
+  return self
+endfunction
 function! s:__eval(bool) dict abort "{{{4
   return a:bool
 endfunction
@@ -227,8 +230,9 @@ function! s:has_key(key) dict abort " {{{4
   return self
 endfunction
 
-function! lh#assert#value(actual) abort " {{{4
-  let res = lh#object#make_top_type({'actual': a:actual})
+" Pre-built #value() result
+function! s:pre_build_value() abort " {{{4
+  let res = lh#object#make_top_type({})
   let res.__eval  = function(s:getSNR('__eval'))
   let res.not     = function(s:getSNR('not'))
   let res.is_lt   = function(s:getSNR('is_lt'))
@@ -238,6 +242,24 @@ function! lh#assert#value(actual) abort " {{{4
   let res.eq      = function(s:getSNR('eq'))
   let res.diff    = function(s:getSNR('diff'))
   let res.has_key = function(s:getSNR('has_key'))
+
+  let ignored = lh#object#make_top_type({})
+  let ignored.not     = function(s:getSNR('__ignore'))
+  let ignored.is_lt   = ignored.not
+  let ignored.is_le   = ignored.not
+  let ignored.is_gt   = ignored.not
+  let ignored.is_ge   = ignored.not
+  let ignored.eq      = ignored.not
+  let ignored.diff    = ignored.not
+  let ignored.has_key = ignored.not
+  return [res, ignored]
+endfunction
+let [s:value_default, s:value_ignore] = s:pre_build_value()
+
+function! lh#assert#value(actual) abort " {{{4
+  " We use and modify a global object, but this is not a problem
+  let res = lh#assert#_shall_ignore() ? s:value_ignore : s:value_default
+  let res.actual = a:actual
   return res
 endfunction
 
@@ -258,13 +280,25 @@ function! s:type_belongs_to(...) dict abort " {{{4
   endif
   return self
 endfunction
-
-function! lh#assert#type(actual) abort " {{{4
-  let res = lh#object#make_top_type({'actual': a:actual})
-  let res.__eval     = function(s:getSNR('__eval'))
+function! s:pre_build_type() abort " {{{4
+  let res = lh#object#make_top_type({})
+  let res.__eval     = function(s:getSNR(lh#assert#_shall_ignore() ? '__ignore' : '__eval'))
   let res.not        = function(s:getSNR('not'))
   let res.is         = function(s:getSNR('type_is'))
   let res.belongs_to = function(s:getSNR('type_belongs_to'))
+
+  let ignored = lh#object#make_top_type({})
+  let ignored.not        = function(s:getSNR('__ignore'))
+  let ignored.is         = ignored.not
+  let ignored.belongs_to = ignored.not
+  return [res, ignored]
+endfunction
+let [s:type_default, s:type_ignore] = s:pre_build_type()
+
+function! lh#assert#type(actual) abort " {{{4
+  " We use and modify a global object, but this is not a problem
+  let res = lh#assert#_shall_ignore() ? s:type_ignore : s:type_default
+  let res.actual = a:actual
   return res
 endfunction
 "------------------------------------------------------------------------
@@ -320,6 +354,10 @@ function! lh#assert#_trace_assert(msg) abort
   endif
 endfunction
 
+" Function: lh#assert#_shall_ignore() {{{2
+function! lh#assert#_shall_ignore() abort
+  return g:lh#assert#_mode ==? 'ignore'
+endfunction
 "------------------------------------------------------------------------
 " }}}1
 "------------------------------------------------------------------------

@@ -3944,6 +3944,9 @@ in |dcb-debug|.
 - *dbc-ignore* -- we'll try to go on. But don't (you, the end-user) expect
   miracles, the plugin will certainly fail miserably in a few seconds.
   Pray.
+  Note that unlike C and C++, the tests cannot be avoided with
+  |lh#assert#equal()| & co, but it could be short-circuited with
+  |lh#assert#value()| and |lh#assert#type()| tests.
 - *dbc-abort* -- we'll |:throw| an exception with as much context as possible.
 - *bdc-debug* is a tricky one. This mode is aimed at plugin writers.
   |:debug| mode will be entered. Don't expect to be able to run anything
@@ -4004,14 +4007,17 @@ lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge(
 lh#assert#value({actual}).has_key({key})               *lh#assert#value().has_key()*
 lh#assert#value({actual}).not()                        *lh#assert#value().not()*
     Just another syntax to do the same thing. Choose what suits you best.
-    Note: these function return {actual}, while `not()` inverse the following
-    tests.
+    Notes: 
+    - these functions return {actual}, while `not()` inverse the following tests.
+    - these functions are much faster than the other ones when the current
+      |dbc-mode| is |dbc-ignore|.
     e.g. >
     call lh#assert#value({'a': 1}).has_key('a')
     call lh#assert#value({'a': 1}).not().has_key('b')
 
 lh#assert#type({actual}).is({expected})                *lh#assert#type().is()*
 lh#assert#type({actual}).belongs_to({expected}...)     *lh#assert#type().belongs_to()*
+    They are very similar to |lh#assert#value()| tests, but on types.
     e.g. >
     call lh#assert#type([1,2]).is([])
     call lh#assert#type([1,2]).belongs_to([], {}, '')

@@ -82,8 +82,10 @@ See [`:h lhvl#DbC`](lh-vim-lib.txt) for more information on the topic.
 ## Caveats
 
  * Unlike C or Python assertions, the assertions provided in this framework
-   cannot be neutralized. That means a few objects and a test will always be
-   created/done -- even with after a `:call lh#assert#mode('ignore')`.
+   cannot be complete neutralized. That means a few objects and a test will always be
+   created/done -- even with after a `:call lh#assert#mode('ignore')` with
+   `lh#assert#equals()` & co. However, in _ignore_ mode, tests are
+   short-circuited with `lh#assert#value()` and `lh#assert#type()`.
  * Don't use assertions from a
    [channel-callback](http://vimhelp.appspot.com/channel.txt.html#channel%2dcallback)
    nor from a
@@ -92,9 +94,6 @@ See [`:h lhvl#DbC`](lh-vim-lib.txt) for more information on the topic.
    interacting with the DbC framework.
 
 ## TO DO list
-
- * When mode is `ignore`, have `lh#assert#value()` and `lh#assert#type()`
-   return objects with no-op assertion methods.
 
  * As we have a `lh#assert#value().not()`, define a `lh#assert#value().job()`
    that'll remove the _default_ interacting mode and the `'debug'` mode.
