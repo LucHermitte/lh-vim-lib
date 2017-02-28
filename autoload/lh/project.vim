@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  21st Feb 2017
+" Last Update:  28th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -219,7 +219,7 @@ function! s:cd_project(prj, path) abort " {{{3
   let path = expand(a:path)
   if a:path == '!'
     " Reset directory to project directory in current window.
-    exe 'lcd '.lh#option#get('paths.sources')
+    call s:lcd(lh#option#get('paths.sources'))
     return
   elseif !isdirectory(path)
     throw "Invalid directory `".path."`!"
@@ -235,7 +235,7 @@ function! s:cd_project(prj, path) abort " {{{3
     for w in windows
       call win_gotoid(w)
       " We must use the most precise path.
-      exe 'lcd '.lh#option#get('paths.sources')
+      call s:lcd(lh#option#get('paths.sources'))
     endfor
   finally
     call win_gotoid(crt_win)
@@ -1125,6 +1125,14 @@ function! lh#project#is_eligible(...) abort
   endif
 endfunction
 
+" Function: s:lcd(path) {{{3
+function! s:lcd(path) abort
+  " Need to neutralize several characters like #, %, ...
+  let path = fnameescape(a:path)
+  call s:Verbose("buffer %1 -> `:lcd %2`", bufname('%'), path)
+  exe 'lcd '.path
+endfunction
+
 " # Compatibility functions {{{2
 " s:getSNR([func_name]) {{{3
 function! s:getSNR(...)
@@ -1194,7 +1202,7 @@ function! lh#project#_CheckUpdateCWD() abort " {{{3
     let path = lh#option#get('paths.sources')
     if lh#option#is_set(path) && path != getcwd() && isdirectory(path)
       call s:Verbose('auto prj chdir %1 -> %2', expand('%'), path)
-      exe 'lcd '.path
+      call s:lcd(path)
     endif
   endif
 endfunction
