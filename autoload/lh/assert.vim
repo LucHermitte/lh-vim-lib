@@ -47,6 +47,63 @@ function! lh#assert#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+" s:getSNR([func_name]) {{{2
+function! s:getSNR(...)
+  if !exists("s:SNR")
+    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
+  endif
+  return s:SNR . (a:0>0 ? (a:1) : '')
+endfunction
+
+"------------------------------------------------------------------------
+" ## Internal functions {{{1
+"
+" Function: lh#assert#_trace_assert(msg) {{{2
+function! lh#assert#_trace_assert(msg) abort
+  let cb = lh#exception#callstack_as_qf('', a:msg)
+  " let g:cb = copy(cb)
+  if len(cb) > 2
+    " Public function called from another function
+    let cb[2].text .= ': '.cb[0].text
+    call remove(cb, 0, 1)
+  elseif len(cb) > 1
+    " Public function called from command line
+    let cb[1].text .= ': ' . cb[0].text
+    call remove(cb, 0)
+  endif
+  if !empty(cb)
+    let cb[0].type = 'E'
+    let s:errors += cb
+    call s:Verbose('Assertion failed: %{1.text} -- %{1.filename}:%{1.lnum}', cb[0])
+    if empty(g:lh#assert#_mode)
+      let msg = lh#fmt#printf("Assertion failed:\n-> %{1.text} -- %{1.filename}:%{1.lnum}",cb[0])
+      let mode = lh#ui#which('confirm', msg, "&Ignore\n&Stop\n&Debug\nStack&trace...", 1)
+      if mode ==? 'stacktrace...'
+        call setqflist(cb)
+        if exists(':Copen')
+          Copen
+        else
+          copen
+        endif
+        redraw
+        let mode = lh#ui#which('confirm', msg, "...&Ignore\n...&Stop\n...&Debug", 1)
+        let mode = strpart(mode, 3)
+      endif
+    else
+      let mode = g:lh#assert#_mode
+    endif
+    if mode ==? 'stop'
+      throw a:msg
+    elseif mode ==? 'debug'
+      debug echo "You'll have to play with `:bt`, `:up` and `:echo` to explore the situation"
+    endif
+  endif
+endfunction
+
+" Function: lh#assert#_shall_ignore() {{{2
+function! lh#assert#_shall_ignore() abort
+  return g:lh#assert#_mode ==? 'ignore'
+endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 " # Error list {{{2
@@ -300,63 +357,6 @@ function! lh#assert#type(actual) abort " {{{4
   let res = lh#assert#_shall_ignore() ? s:type_ignore : s:type_default
   let res.actual = a:actual
   return res
-endfunction
-"------------------------------------------------------------------------
-" ## Internal functions {{{1
-"
-" s:getSNR([func_name]) {{{2
-function! s:getSNR(...)
-  if !exists("s:SNR")
-    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
-  endif
-  return s:SNR . (a:0>0 ? (a:1) : '')
-endfunction
-
-" Function: lh#assert#_trace_assert(msg) {{{2
-function! lh#assert#_trace_assert(msg) abort
-  let cb = lh#exception#callstack_as_qf('', a:msg)
-  " let g:cb = copy(cb)
-  if len(cb) > 2
-    " Public function called from another function
-    let cb[2].text .= ': '.cb[0].text
-    call remove(cb, 0, 1)
-  elseif len(cb) > 1
-    " Public function called from command line
-    let cb[1].text .= ': ' . cb[0].text
-    call remove(cb, 0)
-  endif
-  if !empty(cb)
-    let cb[0].type = 'E'
-    let s:errors += cb
-    call s:Verbose('Assertion failed: %{1.text} -- %{1.filename}:%{1.lnum}', cb[0])
-    if empty(g:lh#assert#_mode)
-      let msg = lh#fmt#printf("Assertion failed:\n-> %{1.text} -- %{1.filename}:%{1.lnum}",cb[0])
-      let mode = lh#ui#which('confirm', msg, "&Ignore\n&Stop\n&Debug\nStack&trace...", 1)
-      if mode ==? 'stacktrace...'
-        call setqflist(cb)
-        if exists(':Copen')
-          Copen
-        else
-          copen
-        endif
-        redraw
-        let mode = lh#ui#which('confirm', msg, "...&Ignore\n...&Stop\n...&Debug", 1)
-        let mode = strpart(mode, 3)
-      endif
-    else
-      let mode = g:lh#assert#_mode
-    endif
-    if mode ==? 'stop'
-      throw a:msg
-    elseif mode ==? 'debug'
-      debug echo "You'll have to play with `:bt`, `:up` and `:echo` to explore the situation"
-    endif
-  endif
-endfunction
-
-" Function: lh#assert#_shall_ignore() {{{2
-function! lh#assert#_shall_ignore() abort
-  return g:lh#assert#_mode ==? 'ignore'
 endfunction
 "------------------------------------------------------------------------
 " }}}1
