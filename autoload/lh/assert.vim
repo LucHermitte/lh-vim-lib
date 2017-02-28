@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  27th Feb 2017
+" Last Update:  28th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -290,11 +290,23 @@ function! lh#assert#_trace_assert(msg) abort
     call remove(cb, 0)
   endif
   if !empty(cb)
+    let cb[0].type = 'E'
     let s:errors += cb
     call s:Verbose('Assertion failed: %{1.text} -- %{1.filename}:%{1.lnum}', cb[0])
     if empty(s:mode)
       let msg = lh#fmt#printf("Assertion failed:\n-> %{1.text} -- %{1.filename}:%{1.lnum}",cb[0])
-      let mode = WHICH('confirm', msg, "&Ignore\n&Stop\n&Debug", 1)
+      let mode = lh#ui#which('confirm', msg, "&Ignore\n&Stop\n&Debug\nStack&trace...", 1)
+      if mode ==? 'stacktrace...'
+        call setqflist(cb)
+        if exists(':Copen')
+          Copen
+        else
+          copen
+        endif
+        redraw
+        let mode = lh#ui#which('confirm', msg, "...&Ignore\n...&Stop\n...&Debug", 1)
+        let mode = strpart(mode, 3)
+      endif
     else
       let mode = s:mode
     endif

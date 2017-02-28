@@ -77,6 +77,8 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 | `lh#assert#type().not()`       | Inverses the logic of the next assertions                                                                                                         |
 
 
+See [`:h lhvl#DbC`](lh-vim-lib.txt) for more information on the topic.
+
 ## Caveats
 
  * Unlike C or Python assertions, the assertions provided in this framework
@@ -96,3 +98,5 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 
  * As we have a `lh#assert#value().not()`, define a `lh#assert#value().job()`
    that'll remove the _default_ interacting mode and the `'debug'` mode.
+
+ * Provide a `Toggle` option for DbC mode.

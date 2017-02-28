@@ -3941,11 +3941,11 @@ to run with. The default behaviour will remind things to Windows users: a
 |confirm| box will ask whether we want to |dbc-ignore|, |dbc-abort|, or enter
 in |dcb-debug|.
 
-- |dbc-ignore|, we'll try to go on. But don't (you, the end-user) expect
+- *dbc-ignore* -- we'll try to go on. But don't (you, the end-user) expect
   miracles, the plugin will certainly fail miserably in a few seconds.
   Pray.
-- |dbc-abort|, we'll |:throw| an exception with as much context as possible.
-- |bdc-debug| is a tricky one. This mode is aimed at plugin writers.
+- *dbc-abort* -- we'll |:throw| an exception with as much context as possible.
+- *bdc-debug* is a tricky one. This mode is aimed at plugin writers.
   |:debug| mode will be entered. Don't expect to be able to run anything
   useful that isn't |>bt|, |>up|, |>down| or |:echo|.
   - At the current level, the `cb` variable contains the call stack in a format
@@ -3958,6 +3958,10 @@ information about the backtrace. You should not need it.
   - In order to exist this debugging mode, you have the choice between |>cont|,
   |>next|, |>interrupt| or |>quit| (beware, `>q` will not trigger the
   execution of |:finally| blocks.)
+- *dbc-stacktrace* -- can be accessed only from the default (empty) mode:
+  it'll display the stacktrace associated to the current assertion failure in
+  the quickfix window, and then ask whether we which to `'ignore'`, `'abort'`
+  or `'debug'`.
 
 Executing `lh#assert#mode()` with either `'ignore'`, `'abort'` or `'debug'`
 will force the assertion mode globally. (TODO: provide a |:Toggle| option for
