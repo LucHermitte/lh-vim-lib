@@ -82,7 +82,7 @@ See [`:h lhvl#DbC`](lh-vim-lib.txt) for more information on the topic.
 ## Caveats
 
  * Unlike C or Python assertions, the assertions provided in this framework
-   cannot be complete neutralized. That means a few objects and a test will always be
+   cannot be completely neutralized. That means a few objects and a test will always be
    created/done -- even with after a `:call lh#assert#mode('ignore')` with
    `lh#assert#equals()` & co. However, in _ignore_ mode, tests are
    short-circuited with `lh#assert#value()` and `lh#assert#type()`.
