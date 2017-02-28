@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  21st Feb 2017
+" Last Update:  28th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -115,7 +115,7 @@ endfunction
 " @param[in] Data Menu-item definition
 " @param[in] key  Table from which the result will be fetched
 " @return the current value, or text, whose index is Data.idx_crt_value.
-function! s:Fetch(Data, key)
+function! s:Fetch(Data, key) abort
   let len = len(a:Data[a:key])
   if a:Data.idx_crt_value >= len | let a:Data.idx_crt_value = 0 | endif
   let value = a:Data[a:key][a:Data.idx_crt_value]
@@ -125,7 +125,7 @@ endfunction
 " Function: s:Search({Data},{value})                       {{{3
 " Searches for the index of {value} in {Data.values} list. Return 0 if not
 " found.
-function! s:Search(Data, value)
+function! s:Search(Data, value) abort
   let idx = index(a:Data.values, a:value)
   " echo a:Data.variable . "[".idx."] == " . a:value
   return idx > 0 ? idx : 0 " default is first element
@@ -134,7 +134,7 @@ endfunction
 " Function: s:SearchText({Data},{value})                   {{{3
 " Searches for the index of {value} in {Data.values/text} list.
 " Returns -1 if not found.
-function! s:SearchText(Data, value)
+function! s:SearchText(Data, value) abort
   let labels_key = s:MenuKey(a:Data)
   let list = a:Data[labels_key]
   let idx = index(list, a:value)
@@ -189,7 +189,7 @@ endfunction
 " @return the table name from which the current value name (to display in the
 " menu) must be fetched.
 " Priority is given to the optional "texts" table over the madatory "values" table.
-function! s:MenuKey(Data)
+function! s:MenuKey(Data) abort
   if has_key(a:Data, "texts")
     let menu_id = "texts"
   else
@@ -201,7 +201,7 @@ endfunction
 " Function: s:SetTextValue({Data},{TextValue})             {{{3
 " Force the value of the variable to the one associated to the {TextValue}
 " The menu, and the variable are updated in consequence.
-function! s:SetTextValue(Data, text)
+function! s:SetTextValue(Data, text) abort
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
   " Fetch the old current value
@@ -232,7 +232,7 @@ endfunction
 " Function: s:NextValue({Data})                            {{{3
 " Change the value of the variable to the next in the list of value.
 " The menu, and the variable are updated in consequence.
-function! s:NextValue(Data)
+function! s:NextValue(Data) abort
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
   " Fetch the old current value
@@ -258,7 +258,7 @@ endfunction
 " @param[in] Menu.priority Priority of the new menu-item
 " @param[in] Menu.name     Name of the new menu-item
 " @param[in] text          Text of the previous value of the variable binded
-function! s:ClearMenu(Menu, text)
+function! s:ClearMenu(Menu, text) abort
   if has('gui_running')
     let name = substitute(a:Menu.name, '&', '', 'g')
     let cmd = 'unmenu '.lh#menu#text(name.'<tab>('.a:text.')')
@@ -275,7 +275,7 @@ endfunction
 " @param[in] text          Text of the current value of the variable binded to
 "                          the menu-item
 " @param[in] command       Toggle command to execute when the menu-item is selected
-function! s:UpdateMenu(Menu, text, command)
+function! s:UpdateMenu(Menu, text, command) abort
   if has('gui_running')
     call s:Verbose('nnoremenu <silent> %1 %2<tab>(%3) :%4 %5<cr>', a:Menu.priority, a:Menu.name, a:text, s:k_Toggle_cmd, a:command)
     let cmd = 'nnoremenu <silent> '.a:Menu.priority.' '.
@@ -291,7 +291,7 @@ endfunction
 " automatically generated commands.
 " @return s:data_id
 let s:data_id = 0
-function! s:SaveData(Data)
+function! s:SaveData(Data) abort
   let s:Data{s:data_id} = a:Data
   let id = s:data_id
   let s:data_id += 1
@@ -312,7 +312,7 @@ function! s:val_id() dict abort
   return self.idx_crt_value
 endfunction
 
-function! lh#menu#def_toggle_item(Data)
+function! lh#menu#def_toggle_item(Data) abort
   call s:Verbose('Def toggle menu: %1', a:Data)
   let a:Data.eval   = function(s:getSNR('eval'))
   let a:Data.val_id = function(s:getSNR('val_id'))
@@ -354,7 +354,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " :Toggle support functions                                {{{3
-function! s:Toggle(cmdName, ...)
+function! s:Toggle(cmdName, ...) abort
   if !has_key(s:toggle_commands, a:cmdName)
     throw "toggle-menu: unknown toggable variable ".a:cmdName
   endif
@@ -366,7 +366,7 @@ function! s:Toggle(cmdName, ...)
   endif
 endfunction
 
-function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos)
+function! lh#menu#_toggle_complete(ArgLead, CmdLine, CursorPos) abort
   let cmdline = split(a:CmdLine)
   call s:Verbose('cmd line: %1 # %2',cmdline, a:CmdLine =~' $')
   let nb_args = len(cmdline)
@@ -395,7 +395,7 @@ endfunction
 " @param[in] Data Menu-item definition
 " @param[in] key  Table table from which the result will be fetched
 " @return the current value
-function! s:VarFetch(Data, key)
+function! s:VarFetch(Data, key) abort
   call s:Verbose('Fetching variable <%1> for menu', a:Data.variable)
   if lh#ref#is_bound(a:Data.variable)
     return a:Data.variable.resolve()
@@ -414,7 +414,7 @@ endfunction
 "
 " Sets the global variable associated to the menu item according to the item's
 " current value.
-function! s:VarSet(Data, value)
+function! s:VarSet(Data, value) abort
   let variable = a:Data.variable
   let value = a:value
   if lh#ref#is_bound(variable)
@@ -443,7 +443,7 @@ endfunction
 " Function: s:VarSetTextValue({Data},{TextValue})          {{{3
 " Force the value of the variable to the one associated to the {TextValue}
 " The menu, and the variable are updated in consequence.
-function! s:VarSetTextValue(Data, text)
+function! s:VarSetTextValue(Data, text) abort
   " Where the texts for values must be fetched
   let labels_key = s:MenuKey(a:Data)
   " Fetch the old current value
@@ -472,7 +472,7 @@ endfunction
 " @param[in] text          Text of the current value of the variable binded to
 "                          the menu-item
 " @param[in] command       Toggle command to execute when the menu-item is selected
-function! s:VarUpdateMenu(Menu, text, command)
+function! s:VarUpdateMenu(Menu, text, command) abort
   if has('gui_running')
     let cmd = 'nnoremenu '.a:Menu.priority.' '.
           \ lh#menu#text(a:Menu.name.'<tab>('.a:text.')').
@@ -487,7 +487,7 @@ endfunction
 " @param Data.menu        == { name:, position: }
 "
 " Sets a string-variable defined by {Data}.
-function! lh#menu#def_string_item(Data)
+function! lh#menu#def_string_item(Data) abort
   " Add evaluation function
   function! a:Data.eval() dict
     let key = s:MenuKey(self)
@@ -526,7 +526,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " Function: s:SetVariableFromCommand(all_in_string)          {{{3
-function! s:SetVariableFromCommand(all_in_string)
+function! s:SetVariableFromCommand(all_in_string) abort
   let [dummy, cmdName, value ; dummy2] = matchlist(a:all_in_string, '\(\S\+\)\s\+\(.*\)')
   if !has_key(s:set_string_commands, cmdName)
     throw "set_string-menu: unknown variable ".cmdName
@@ -536,7 +536,7 @@ function! s:SetVariableFromCommand(all_in_string)
 endfunction
 
 " Function: lh#menu#_string_complete(ArgLead, CmdLine, CursorPos) {{{3
-function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos)
+function! lh#menu#_string_complete(ArgLead, CmdLine, CursorPos) abort
   let cmdline = split(a:CmdLine)
   call s:Verbose('cmd line: %1 # %2',cmdline, a:CmdLine =~' $')
   let nb_args = len(cmdline)
@@ -557,19 +557,19 @@ endfunction
 " Function: s:CTRL_O({cmd})                                {{{3
 " Build the command (sequence of ':ex commands') to be executed from
 " INSERT-mode.
-function! s:CTRL_O(cmd)
+function! s:CTRL_O(cmd) abort
   return substitute(a:cmd, '\(^\|<CR>\):', '\1\<C-O>:', 'g')
 endfunction
 
 " Function: lh#menu#is_in_visual_mode()                    {{{3
 function! lh#menu#is_in_visual_mode()
-  return exists('s:is_in_visual_mode') && s:is_in_visual_mode
+  return get(s:, 'is_in_visual_mode', 0)
 endfunction
 
 " Function: lh#menu#_CMD_and_clear_v({cmd})                 {{{3
 " Internal function that executes the command and then clears the @v buffer
 " todo: save and restore @v,
-function! lh#menu#_CMD_and_clear_v(cmd)
+function! lh#menu#_CMD_and_clear_v(cmd) abort
   try
     let s:is_in_visual_mode = 1
     exe a:cmd
@@ -581,7 +581,7 @@ endfunction
 
 " Function: s:Build_CMD({prefix},{cmd})                    {{{3
 " build the exact command to execute regarding the mode it is dedicated
-function! s:Build_CMD(prefix, cmd)
+function! s:Build_CMD(prefix, cmd) abort
   if a:cmd[0] != ':' | return ' ' . a:cmd
   endif
   if     a:prefix[0] == "i"  | return ' ' . <SID>CTRL_O(a:cmd)
@@ -602,7 +602,7 @@ endfunction
 
 " Function: lh#menu#map_all({map_type}, [{map args}...)   {{{3
 " map the command to all the modes required
-function! lh#menu#map_all(map_type,...)
+function! lh#menu#map_all(map_type,...) abort
   let nore   = (match(a:map_type, '[aincv]*noremap') != -1) ? "nore" : ""
   let prefix = matchstr(substitute(a:map_type, nore, '', ''), '[aincv]*')
   if a:1 == "<buffer>" | let i = 3 | let binding = a:1 . ' ' . a:2
@@ -627,7 +627,7 @@ endfunction
 
 " Function: lh#menu#make({prefix},{code},{text},{binding},...) {{{3
 " Build the menu and map its associated binding to all the modes required
-function! lh#menu#make(prefix, code, text, binding, ...)
+function! lh#menu#make(prefix, code, text, binding, ...) abort
   let nore    = (match(a:prefix, '[aincvsx]*nore') != -1) ? "nore" : ""
   let prefix  = matchstr(substitute(a:prefix, nore, '', ''), '[aincvsx]*')
   let b       = (a:1 == '<buffer>') ? 1 : 0
@@ -678,7 +678,7 @@ endfunction
 " Function: s:BMenu({b})                                   {{{3
 " If <buffermenu.vim> is installed and the menu should be local, then the
 " apropriate string is returned.
-function! s:BMenu(b)
+function! s:BMenu(b) abort
   let res = (a:b && exists(':Bmenu')
         \     && (1 == lh#option#get("want_buffermenu_or_global_disable", 1, "bg"))
         \) ? 'B' : ''
@@ -687,7 +687,7 @@ function! s:BMenu(b)
 endfunction
 
 " Function: lh#menu#IVN_make(...)                          {{{3
-function! lh#menu#IVN_make(code, text, binding, i_cmd, v_cmd, n_cmd, ...)
+function! lh#menu#IVN_make(code, text, binding, i_cmd, v_cmd, n_cmd, ...) abort
   " nore options
   let nore_i = (a:0 > 0) ? ((a:1 != 0) ? 'nore' : '') : ''
   let nore_v = (a:0 > 1) ? ((a:2 != 0) ? 'nore' : '') : ''
