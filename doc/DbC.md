@@ -48,31 +48,51 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 
 ## Function list
 
-| Function                       | Purpose                                                                                                                        |
-|:-------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                            |
-| `lh#assert#clear()`            | Clears the last known contract failures                                                                                        |
-| `lh#assert#empty()`            | Asserts a value is empty                                                                                                       |
-| `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                     |
-| `lh#assert#errors()`           | Returns the last known contract failures                                                                                       |
-| `lh#assert#false()`            | Asserts a value is false                                                                                                       |
-| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                          |
-| `lh#assert#is()`               | Asserts two entities are the same                                                                                              |
-| `lh#assert#is_not()`           | Asserts two entities are not the same                                                                                          |
-| `lh#assert#match()`            | Asserts a pattern matches a value                                                                                              |
-| `lh#assert#not_empty()`        | Asserts a value is not empty                                                                                                   |
-| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                 |
-| `lh#assert#true()`             | Asserts a value is true                                                                                                        |
-| `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                |
-| `lh#assert#value().equal()`    | Asserts actual == ref                                                                                                          |
-| `lh#assert#value().differ()`   | Asserts actual != ref                                                                                                          |
-| `lh#assert#value().is_le()`    | Asserts actual <= ref                                                                                                          |
-| `lh#assert#value().is_lt()`    | Asserts actual <  ref                                                                                                          |
-| `lh#assert#value().is_ge()`    | Asserts actual >= ref                                                                                                          |
-| `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                          |
-| `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                 |
-| `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                      |
-| `lh#assert#type().is()`        | Asserts the type of the expression is as expected                                                                              |
-| `lh#assert#type().belongs_to()`| Asserts the type of the expression belongs to the list of data passed                                                          |
-| `lh#assert#type().not()`       | Inverses the logic of the next assertions                                                                                      |
+| Function                       | Purpose                                                                                                                                           |
+|:-------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                                               |
+| `lh#assert#clear()`            | Clears the last known contract failures                                                                                                           |
+| `lh#assert#empty()`            | Asserts a value is empty                                                                                                                          |
+| `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                                        |
+| `lh#assert#errors()`           | Returns the last known contract failures -- meant to be fed directly to [`setqflist()`](http://vimhelp.appspot.com/eval.txt.html#setqflist%28%29) |
+| `lh#assert#false()`            | Asserts a value is false                                                                                                                          |
+| `lh#assert#if().then_expect()` | Asserts condition1 implies condition2                                                                                                             |
+| `lh#assert#is()`               | Asserts two entities are the same                                                                                                                 |
+| `lh#assert#is_not()`           | Asserts two entities are not the same                                                                                                             |
+| `lh#assert#match()`            | Asserts a pattern matches a value                                                                                                                 |
+| `lh#assert#not_empty()`        | Asserts a value is not empty                                                                                                                      |
+| `lh#assert#not_equal()`        | Asserts a value differs from a reference value                                                                                                    |
+| `lh#assert#true()`             | Asserts a value is true                                                                                                                           |
+| `lh#assert#unexpected()`       | Signals an unexpected situation                                                                                                                   |
+| `lh#assert#value().equal()`    | Asserts actual == ref                                                                                                                             |
+| `lh#assert#value().differ()`   | Asserts actual != ref                                                                                                                             |
+| `lh#assert#value().is_le()`    | Asserts actual <= ref                                                                                                                             |
+| `lh#assert#value().is_lt()`    | Asserts actual <  ref                                                                                                                             |
+| `lh#assert#value().is_ge()`    | Asserts actual >= ref                                                                                                                             |
+| `lh#assert#value().is_gt()`    | Asserts actual >  ref                                                                                                                             |
+| `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                                    |
+| `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                                         |
+| `lh#assert#type().is()`        | Asserts the type of the expression is as expected                                                                                                 |
+| `lh#assert#type().belongs_to()`| Asserts the type of the expression belongs to the list of data passed                                                                             |
+| `lh#assert#type().not()`       | Inverses the logic of the next assertions                                                                                                         |
 
+
+## Caveats
+
+ * Unlike C or Python assertions, the assertions provided in this framework
+   cannot be neutralized. That means a few objects and a test will always be
+   created/done -- even with after a `:call lh#assert#mode('ignore')`.
+ * Don't use assertions from a
+   [channel-callback](http://vimhelp.appspot.com/channel.txt.html#channel%2dcallback)
+   nor from a
+   [job-callback](http://vimhelp.appspot.com/channel.txt.html#job%2dcallback).
+   Indeed, you'll see your callback being called again and again while
+   interacting with the DbC framework.
+
+## TO DO list
+
+ * When mode is `ignore`, have `lh#assert#value()` and `lh#assert#type()`
+   return objects with no-op assertion methods.
+
+ * As we have a `lh#assert#value().not()`, define a `lh#assert#value().job()`
+   that'll remove the _default_ interacting mode and the `'debug'` mode.

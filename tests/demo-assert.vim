@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      27th Feb 2017
-" Last Update:  27th Feb 2017
+" Last Update:  28th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Demonstrate lh-vim-lib DbC framework
@@ -23,7 +23,7 @@ endfunction
 
 " Some buggy function (as `sin(x) - 1` may be negative)
 function! s:my_computation(x)
-  return s:my_sqrt(1 - sin(a:x))
+  return s:my_sqrt(sin(a:x) - 1)
 endfunction
 
 " Some function that innocently trusted the buggy function
