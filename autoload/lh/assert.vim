@@ -63,11 +63,13 @@ function! lh#assert#errors() abort
 endfunction
 
 " # Assertion mode {{{2
-let s:mode = get(s:, 'mode', '')
+let g:lh#assert#_mode = get(g:, 'lh#assert#_mode', '')
 " Function: lh#assert#mode(...) {{{3
 function! lh#assert#mode(...) abort
-  if a:0 > 0 | let s:mode = a:1 | endif
-  return s:mode
+  if a:0 > 0
+    exe 'Toggle PluginAssertmode '.a:1
+  endif
+  return g:lh#assert#_mode
 endfunction
 
 " # Assertions {{{2
@@ -268,7 +270,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 "
-" s:getSNR([func_name]) {{{3
+" s:getSNR([func_name]) {{{2
 function! s:getSNR(...)
   if !exists("s:SNR")
     let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
@@ -276,7 +278,7 @@ function! s:getSNR(...)
   return s:SNR . (a:0>0 ? (a:1) : '')
 endfunction
 
-" Function: lh#assert#_trace_assert(msg) {{{3
+" Function: lh#assert#_trace_assert(msg) {{{2
 function! lh#assert#_trace_assert(msg) abort
   let cb = lh#exception#callstack_as_qf('', a:msg)
   " let g:cb = copy(cb)
@@ -293,7 +295,7 @@ function! lh#assert#_trace_assert(msg) abort
     let cb[0].type = 'E'
     let s:errors += cb
     call s:Verbose('Assertion failed: %{1.text} -- %{1.filename}:%{1.lnum}', cb[0])
-    if empty(s:mode)
+    if empty(g:lh#assert#_mode)
       let msg = lh#fmt#printf("Assertion failed:\n-> %{1.text} -- %{1.filename}:%{1.lnum}",cb[0])
       let mode = lh#ui#which('confirm', msg, "&Ignore\n&Stop\n&Debug\nStack&trace...", 1)
       if mode ==? 'stacktrace...'
@@ -308,7 +310,7 @@ function! lh#assert#_trace_assert(msg) abort
         let mode = strpart(mode, 3)
       endif
     else
-      let mode = s:mode
+      let mode = g:lh#assert#_mode
     endif
     if mode ==? 'stop'
       throw a:msg

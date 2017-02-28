@@ -3964,11 +3964,12 @@ information about the backtrace. You should not need it.
   or `'debug'`.
 
 Executing `lh#assert#mode()` with either `'ignore'`, `'abort'` or `'debug'`
-will force the assertion mode globally. (TODO: provide a |:Toggle| option for
-this mode). To go back to the |confirm| box, call the function with an empty
-string.
+will force the assertion mode globally. To go back to the |confirm| box, call
+the function with an empty string.
 Calling the function with no argument will permit to know which mode is the
 current one.
+You may also use `:Toggle PluginAssertionmode [{value}]` to change its value
+with |lhvl-:Toggle|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#assert#X()*     {{{3

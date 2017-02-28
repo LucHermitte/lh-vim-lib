@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:	4.0.0
 " Created:	27th Apr 2010
-" Last Update:	18th Oct 2016
+" Last Update:	28th Feb 2017
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -25,7 +25,7 @@
 "=============================================================================
 
 " Avoid global reinclusion {{{1
-let s:k_version = 3112
+let s:k_version = 4000
 if &cp || (exists("g:loaded_lhvl")
       \ && (g:loaded_lhvl >= s:k_version)
       \ && !exists('g:force_reload_lhvl'))
@@ -36,7 +36,7 @@ let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
-" Commands and Mappings {{{1
+" ## Commands and Mappings {{{1
 " Moved from lh-cpp
 command! PopSearch :call histdel('search', -1)| let @/=histget('search',-1)
 
@@ -52,10 +52,17 @@ command! -nargs=1
       \ -complete=customlist,lh#async#_complete_job_names
       \ StopBGExecution call lh#async#stop(<q-args>)
 
-" Commands and Mappings }}}1
 "------------------------------------------------------------------------
-" Functions {{{1
-" Functions }}}1
+" ## Options {{{1
+let s:toggle_assert =
+      \ { 'variable': 'lh#assert#_mode'
+      \ , 'values': ['', 'ignore', 'stop', 'debug' ]
+      \ , 'texts':  ['default', 'ignore', 'stop', 'debug']
+      \ , 'menu' : {'priority': '500.100', 'name': '&Plugin.Assert &mode'}
+      \ }
+call lh#menu#def_toggle_item(s:toggle_assert)
+
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

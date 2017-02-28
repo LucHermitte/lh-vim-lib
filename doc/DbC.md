@@ -50,7 +50,7 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 
 | Function                       | Purpose                                                                                                                                           |
 |:-------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`)                                                                               |
+| `lh#assert#mode()`             | Sets the assertion mode (default, `'debug'`, `'ignore'`, `'abort'`) -- can be toggled with `:Toggle PluginAssertmode [{value}]`                   |
 | `lh#assert#clear()`            | Clears the last known contract failures                                                                                                           |
 | `lh#assert#empty()`            | Asserts a value is empty                                                                                                                          |
 | `lh#assert#equal()`            | Asserts a value equals to what is expected                                                                                                        |
@@ -98,5 +98,3 @@ See [`:h lhvl#DbC`](lh-vim-lib.txt) for more information on the topic.
 
  * As we have a `lh#assert#value().not()`, define a `lh#assert#value().job()`
    that'll remove the _default_ interacting mode and the `'debug'` mode.
-
- * Provide a `Toggle` option for DbC mode.
