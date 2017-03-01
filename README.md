@@ -372,10 +372,23 @@ Bundle 'LucHermitte/lh-vim-lib'
   * Many other I've forgotten :(
 
 ## Some other Vim Scripting libraries
-  * [genutils](http://www.vim.org/scripts/script.php?script_id=197)
-  * [pathogen](http://www.vim.org/scripts/script.php?script_id=2332)
-  * [Tom Link's tlib](http://www.vim.org/scripts/script.php?script_id=1863)
-  * [theonevimlib](http://www.vim.org/scripts/script.php?script_id=1963), initiated by Marc Weber
-  * [anwolib](http://www.vim.org/scripts/script.php?script_id=3800), by Andy Wokula
-  * [l9](http://www.vim.org/scripts/script.php?script_id=3252), by Takeshi NISHIDA
+
+### The ones that seem to be still activelly maintainded
+  * [ingo-library](http://www.vim.org/scripts/script.php?script_id=4433), by
+    Ingo Karkat
   * [maktaba](https://github.com/google/vim-maktaba), by google
+  * [tlib](http://www.vim.org/scripts/script.php?script_id=1863), by Tom Link
+  * [vim-misc](https://github.com/xolox/vim-misc), by Peter Odding 
+  * [vital](https://github.com/vim-jp/vital.vim), by the Japanese Vim User
+    Group
+
+### The other ones
+  * [anwolib](http://www.vim.org/scripts/script.php?script_id=3800), by Andy Wokula
+  * [cecutil](http://www.vim.org/scripts/script.php?script_id=1066), by Charles
+    "DrChip" Campbell
+  * [genutils](http://www.vim.org/scripts/script.php?script_id=197), by Hari
+    Krishna Dara
+  * [l9](http://www.vim.org/scripts/script.php?script_id=3252), by Takeshi NISHIDA
+  * [theonevimlib](http://www.vim.org/scripts/script.php?script_id=1963), initiated by Marc Weber
+  * [underscore](http://www.vim.org/scripts/script.php?script_id=5149), by
+    haya14busa
