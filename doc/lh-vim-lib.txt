@@ -3632,6 +3632,29 @@ lh#object#is_an_object(var)~
 `'__lhvl_oo_type'` field which is automatically added to objects built through
 |lh#object#make_top_type()|.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#inject()*       {{{3
+lh#object#inject({object}, {method-name}, {function-name}, {snr})~
+@since Version 4.0.0
+Adds a method named {method-name} to {object}. The method will point to the
+|local-function| (in the script of id {snr}, or named {snr}) named
+{function-name}.
+
+This function is meant to be used by plugin writers while in maintenance.
+
+My typical scenario is: I get an object through something like >
+  " autoload/lh/foo.vim
+  if !exists('s:obj')
+    let s:obj = lh#foo#make_bar()
+  endif
+
+This function binds several methods to `s:obj`.
+I keep the object around even when I |:source| `autoload/lh/foo.vim` again.
+I modify `lh#foo#make_bar()` in order to bind a new method `x()` to `s:obj`.
+Problem: I can't run the function again as the object isn't modified, but I
+want to test/use the new function. Here comes to rescue: >
+  :call lh#object#inject(s:obj, 'x', 'get_x', 'autoload/lh/foo.vim')
+
 ------------------------------------------------------------------------------
 VARIABLE HELPERS                                      *lhvl#variables*  {{{2
 

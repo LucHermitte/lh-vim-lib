@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      12th Sep 2016
-" Last Update:  13th Oct 2016
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       OO functions and helpers
@@ -91,6 +91,17 @@ endfunction
 " Function: lh#object#to_string(object) {{{3
 function! lh#object#to_string(object) abort
   return lh#object#_to_string(a:object, [])
+endfunction
+
+" # Reflection       {{{2
+" Function: lh#object#inject(object, method_name, function_name, snr) {{{3
+function! lh#object#inject(object, method_name, function_name, snr) abort
+  if type(a:snr) == type('')
+    let snr = lh#askvim#scriptid(a:snr)
+  else
+    let snr = a:snr
+  endif
+  let a:object[a:method_name] = function('<SNR>'.snr.'_'.a:function_name)
 endfunction
 
 "------------------------------------------------------------------------
