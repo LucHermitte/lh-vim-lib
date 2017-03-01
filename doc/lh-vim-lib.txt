@@ -28,6 +28,7 @@ FUNCTIONS                                    *lhvl-functions*     {{{1
 Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#askvim#exe()|
 - |lh#askvim#execute()|
+- |lh#askvim#scriptid()|
 - |lh#askvim#scriptnames()|
 - |lh#askvim#scriptname()|
 - |lh#askvim#where_is_function_defined()|
@@ -513,16 +514,23 @@ If *lh#askvim#_beware_running_through_client_server()* has been called, and if
 `lh#askvim#execute()` will return an empty list.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#askvim#scriptnames()*         {{{3
-lh#askvim#scriptnames()~
-@return |:scriptnames| result as a list of [script_id, name] arrays.
-@internal `s:scripts` variables is updated
+                                                *lh#askvim#scriptid()*            {{{3
+lh#askvim#scriptid(name)~
+@return the id of the script associate to {name}.
+@internal Lazily updates `s:scripts`.
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#scriptname()*          {{{3
 lh#askvim#scriptname(id)~
 @return the name of the script associate to {id}.
 @internal Lazily updates `s:scripts`.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#askvim#scriptnames()*         {{{3
+lh#askvim#scriptnames()~
+@return |:scriptnames| result as a list of [script_id, name] arrays.
+@internal `s:scripts` variables is updated
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#where_is_function_defined()* {{{3
