@@ -21,6 +21,7 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Doc
+"   - prj.get_names()
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:
@@ -686,6 +687,14 @@ function! s:children() dict abort " {{{4
   return lh#list#flat_extend(children, filter(map(copy(children), 'v:val.children()'), '!empty(v:val)'))
 endfunction
 
+function! s:get_names() dict abort " {{{4
+  let local_variables = keys(self.variables)
+        \ + map(keys(self.env), '"$".v:val')
+        \ + map(keys(self.options), '"&".v:val')
+  "TODO: see whether we could avoid lh#list#flatten()
+  return lh#list#flatten(local_variables + map(copy(self.parents), 'v:val.get_names()'))
+endfunction
+
 function! s:set(varname, value) dict abort " {{{4
   call s:Verbose('%1.set(%2 <- %3)', self.name, a:varname, a:value)
   call lh#assert#not_empty(a:varname)
@@ -915,6 +924,7 @@ function! lh#project#new(params) abort
   let project.apply           = function(s:getSNR('apply'))
   let project.map             = function(s:getSNR('map'))
   let project.find_holder     = function(s:getSNR('find_holder'))
+  let project.get_names       = function(s:getSNR('get_names'))
   let project._update_option  = function(s:getSNR('_update_option'))
   let project._use_options    = function(s:getSNR('_use_options'))
   let project._remove_buffer  = function(s:getSNR('_remove_buffer'))

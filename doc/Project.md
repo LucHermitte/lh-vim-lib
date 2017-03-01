@@ -617,11 +617,12 @@ fully take advantage of option toggling, `p:$ENV` variables
 [lh-dev](http://github.com/LucHermitte/lh-dev)
 , and
 [BuildToolsWrapper](http://github.com/LucHermitte/vim-build-tools-wrapper) are
-the first I've in mind).
+the firsts I've in mind).
 
 # 6. TO DO list
 
  * Doc
+   * `prj.get_names()`
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
  * Toggling:
@@ -648,7 +649,7 @@ the first I've in mind).
    * -> merge 'variables', 'env', 'options' in `variables`
  * Fix `find_holder()` to use `update()` code and refactor the later
  * Have let-modeline support p:var, p:&opt, and p:$env
- * Add convinience functions to fill permission lists
+ * Add convenience functions to fill permission lists
  * Add VimL Syntax highlight for `LetTo`, `LetIfUndef`, `p:var`
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.
