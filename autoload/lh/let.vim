@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  21st Feb 2017
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -260,23 +260,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
-" # PushOptions {{{2
-"
-" Function: lh#let#_push_options(variable, ...) {{{3
-function! lh#let#_push_options(variable, ...) abort
-  let var = lh#let#if_undef(a:variable, [])
-  for val in a:000
-    call lh#list#push_if_new(var, val)
-  endfor
-  return var
-endfunction
-
-" Function: lh#let#_pop_options(variable, ...) {{{3
-function! lh#let#_pop_options(variable, ...) abort
-  let options = '\v^'.join(a:000, '|').'$'
-  return filter(eval(a:variable), 'v:val !~ options')
-endfunction
-
+" # Common helpers {{{2
 " Function: lh#let#_list_all_variables_in_scope(scope) {{{3
 function! lh#let#_list_all_variables_in_scope(scope) abort
   if a:scope == 'p:'
@@ -294,7 +278,7 @@ function! lh#let#_list_all_variables_in_scope(scope) abort
   return vars
 endfunction
 
-" Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
+" Function: s:IsDictOrList(var) {{{3
 function! s:IsDictOrList(var)
   " call assert_true(type(a:var) == type(''))
   if a:var =~ '^p:'
@@ -318,6 +302,7 @@ function! s:IsDictOrList(var)
   endif
 endfunction
 
+" Function: s:IsDict(var) {{{3
 function! s:IsDict(var)
   " call assert_true(type(a:var) == type(''))
   if a:var =~ '^p:'
@@ -336,6 +321,7 @@ function! s:IsDict(var)
   endif
 endfunction
 
+" Function: lh#let#_list_all_list_variables_in_scope(scope) {{{3
 function! lh#let#_list_all_list_variables_in_scope(scope) abort
   let vars = lh#let#_list_all_variables_in_scope(a:scope)
   " Keep only lists and dictionaries
@@ -388,6 +374,23 @@ function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
   " Add dot to identified dictionaries
   call map(vars, 'v:val. (s:IsDict(v:val)?".":"")')
   return vars
+endfunction
+
+" # PushOptions {{{2
+"
+" Function: lh#let#_push_options(variable, ...) {{{3
+function! lh#let#_push_options(variable, ...) abort
+  let var = lh#let#if_undef(a:variable, [])
+  for val in a:000
+    call lh#list#push_if_new(var, val)
+  endfor
+  return var
+endfunction
+
+" Function: lh#let#_pop_options(variable, ...) {{{3
+function! lh#let#_pop_options(variable, ...) abort
+  let options = '\v^'.join(a:000, '|').'$'
+  return filter(eval(a:variable), 'v:val !~ options')
 endfunction
 
 " Function: lh#let#_push_options_complete(ArgLead, CmdLine, CursorPos) {{{3
