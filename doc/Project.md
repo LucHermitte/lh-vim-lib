@@ -331,6 +331,18 @@ Project ProjectName :bufdo echo bufname('%')
 Project :bufdo echo bufname('%')
 ```
 
+#### Remove a project from the list of known project
+```vim
+Project ProjectName :bd
+" or
+Project ProjectName :bw
+```
+
+This will apply [`:bd`](http://vimhelp.appspot.com/windows.txt.html#%3abd), or
+[`:bw`](http://vimhelp.appspot.com/windows.txt.html#%3abw) on all buffers
+associated to the specified project, and remove the project and its subprojects
+from the list of all known projects.
+
 ## 3.2. Power User
 
 Here are a few other use cases and alternative ways of doing things in case you
@@ -535,6 +547,7 @@ and BuildToolsWrappers are the first I've in mind).
 # 6. TO DO list
 
  * Doc
+   * permission lists
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
  * Toggling:
@@ -556,7 +569,6 @@ and BuildToolsWrappers are the first I've in mind).
    * -> `:Project <name> :LetTo var = value`
  * `:call prj.set(plain_variable, value)`
  * Setlocally vim options on new files
- * `:Project <name> :bw` -> with confirmation!
  * Simplify dictionaries
    * -> no 'parents' when there are none!
    * -> merge 'variables', 'env', 'options' in `variables`

@@ -3845,6 +3845,15 @@ project. A temporary window is opened for the occasion (contrary to
 |:bufdo| which uses the current window) .
 @pre the project shall have listed buffers.
 
+                                                    *:Project-:bdelete*
+                                                    *:Project-:bwipeout*
+:Project {prj-name} :bd[elete]~
+:Project {prj-name} :bw[ipeout]~
+Executes |:bdelete| (/resp. |:bwipeout|) to all buffers associated to the
+specified project.
+Also, remove the project (as its all sub-projects) from the list of all known
+project.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#new()*               {{{3
 lh#project#new(options)~

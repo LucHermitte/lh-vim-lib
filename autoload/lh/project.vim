@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  28th Feb 2017
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -21,6 +21,7 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Doc
+"    - permission lists
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:
@@ -41,7 +42,6 @@ let s:k_version = '400'
 " - Be able to control which parent is filled with lh#let# functions
 "   -> `:Project <name> :LetTo var = value`
 " - Setlocally vim options on new files
-" - :Project <name> :bw -> with confirmation!
 " - Simplify dictionaries
 "   -> no 'parents' when there are none!
 "   -> merge 'variables', 'env', 'options' in `variables`
@@ -116,6 +116,9 @@ function! lh#project#_make_project_list() abort
   let res.get                  = function(s:getSNR('get_project'))
   let res.clear                = function(s:getSNR('clear_projects'))
   let res.clear_empty_projects = function(s:getSNR('clear_empty_projects'))
+  let res.unload               = function(s:getSNR('unload_project'))
+  let res.wipeout              = function(s:getSNR('wipeout_project'))
+  let res._remove              = function(s:getSNR('_remove_project'))
   return res
 endfunction
 
@@ -185,6 +188,47 @@ endfunction
 function! s:clear_empty_projects() dict abort " {{{4
   " remove empty projects
   call filter(self.projects, '!empty(v:val.buffers)')
+endfunction
+
+function! s:_remove_project(prj, how, buffers) dict abort " {{{4
+  " TODO: see whether it really makes sense to tell which buffers shall be
+  " removed...
+  let s:k_messages = { 'bw': 'wiping out', 'bd': 'unloading'}
+  if empty(a:buffers)
+    let can_proceed = lh#ui#confirm("You're on the verge of ".s:k_messages[a:how]." files belonging to `".(a:prj.name)."` project\nDo you confirm the removal?", "&Yes\n&No", 2)
+    if can_proceed != '1' | return | endif
+    " Don't apply to inherited buffers!!!
+    let buffers = a:prj.buffers
+
+    " We still analyse BufUnload event even when the project is removed. Indeed
+    " the project being removed may only be a sub-project and not a parent
+    " project. In that case, we still need to unregister the buffer from the
+    " parent project.
+  endif
+  call s:Verbose('%1 %2', a:how, buffers)
+  exe a:how.' '.join(buffers, ' ')
+  if empty(a:buffers)
+    " if the project has children, remove the subprojects as well,
+    " recursivelly!
+    let children = a:prj.children()
+    let children_names = lh#list#get(children, 'name')
+    call s:Verbose("'%1' children are %2", a:prj.name, children_names)
+    let project_names = children_names + [a:prj.name]
+    call filter(self.projects, 'index(project_names, v:key) < 0')
+    call s:Verbose('Remaining projects are %1', keys(self.projects))
+  endif
+endfunction
+
+function! s:unload_project(prj, buffers) dict abort " {{{4
+  call s:Verbose("Unload `%1` project", a:prj)
+  " return self._remove(a:prj, 'bd', a:buffers)
+  return self._remove(a:prj, 'bd', [])
+endfunction
+
+function! s:wipeout_project(prj, buffers) dict abort " {{{4
+  call s:Verbose("Wipeout `%1` project", a:prj)
+  " return self._remove(a:prj, 'bw', a:buffers)
+  return self._remove(a:prj, 'bw', [])
 endfunction
 
 " # :Project Command definition {{{2
@@ -395,6 +439,20 @@ function! s:show_related_projects(...) abort " {{{3
   endfor
 endfunction
 
+function! s:bd_project(prj, buffers) abort " {{{3
+  " TODO: see whether it really makes sense to tell which buffers shall be
+  " removed...
+  call lh#assert#true(lh#option#is_unset(a:prj), "Project expected")
+  call s:project_list.unload(a:prj, a:buffers)
+endfunction
+
+function! s:bw_project(prj, buffers) abort " {{{3
+  " TODO: see whether it really makes sense to tell which buffers shall be
+  " removed...
+  call lh#assert#true(lh#option#is_unset(a:prj), "Project expected")
+  call s:project_list.wipeout(a:prj, a:buffers)
+endfunction
+
 " Function: lh#project#_command([prjname]) abort {{{3
 let s:k_usage =
       \ [ ':Project USAGE:'
@@ -408,6 +466,8 @@ let s:k_usage =
       \ , '  :Project [<name>] :bufdo[!]  " execute a command on all buffers belonging to the project'
       \ , '  :Project [<name>] :windo[!]  " execute a command on all opened windows belonging to the project'
       \ , '  :Project [<name>] :doonce    " execute a command on the first opened window found which belongs to the project'
+      \ , '  :Project <name>   :bdelete   " unload all buffers related to a project, and remove the project'
+      \ , '  :Project <name>   :bwipeout  " wipeout all buffers related to a project, and remove the project'
       \ ]
 function! lh#project#_command(...) abort
   " TODO: Merge cases.
@@ -434,41 +494,41 @@ function! lh#project#_command(...) abort
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
     endif
-    if     a:1 =~ '\v^:l%[s]$'     " {{{5
+    if     a:1 =~ '\v^:l%[s]$'      " {{{5
       call s:ls_project(prj)
-    elseif a:1 =~ '\v^:echo$'      " {{{5
+    elseif a:1 =~ '\v^:echo$'       " {{{5
       if a:0 != 2
         throw "Not enough arguments to `:Project :echo`"
       endif
       call s:echo_project(prj, a:2)
-    elseif a:1 =~ '\v^:let$'       " {{{5
+    elseif a:1 =~ '\v^:let$'        " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project :let`"
       endif
       call s:let_project(prj, a:2, a:000[2:])
-    elseif a:1 =~ '\v^:cd$'        " {{{5
+    elseif a:1 =~ '\v^:cd$'         " {{{5
       if a:0 != 2
         throw "Not enough arguments to `:Project :cd`"
       endif
       call s:cd_project(prj, a:2)
-    elseif a:1 =~ '\v^:doonce'     " {{{5
+    elseif a:1 =~ '\v^:doonce'      " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :doonce`"
       endif
       call s:doonce_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:bufdo'      " {{{5
+    elseif a:1 =~ '\v^:bufdo'       " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :bufdo`"
       endif
       call s:bufdo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:windo'      " {{{5
+    elseif a:1 =~ '\v^:windo'       " {{{5
       if a:0 < 2
         throw "Not enough arguments to `:Project :windo`"
       endif
       call s:windo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^--define$'   " {{{5
+    elseif a:1 =~ '\v^--define$'    " {{{5
       call s:define_project(a:2)
-    else                           " -- unknown command {{{5
+    else                            " -- unknown command {{{5
       throw "Unexpected `:Project ".a:1."` subcommand"
     endif
   else                          " -- project name specified {{{4
@@ -481,39 +541,43 @@ function! lh#project#_command(...) abort
     if a:0 < 2
       throw "Not enough arguments to `:Project name`"
     endif
-    if     a:2 =~ '\v^:=l%[s]$'    " {{{5
+    if     a:2 =~ '\v^:=l%[s]$'      " {{{5
       call s:ls_project(prj)
-    elseif a:2 =~ '\v^:=echo$'     " {{{5
+    elseif a:2 =~ '\v^:=echo$'       " {{{5
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :echo`"
       endif
       call s:echo_project(prj, a:3)
-    elseif a:2 =~ '\v^:=let$'      " {{{5
+    elseif a:2 =~ '\v^:=let$'        " {{{5
       if a:0 < 4
         throw "Not enough arguments to `:Project <name> :let`"
       endif
       call s:let_project(prj, a:3, a:000[3:])
-    elseif a:2 =~ '\v^:=cd$'       " {{{5
+    elseif a:2 =~ '\v^:=cd$'         " {{{5
       if a:0 != 3
         throw "Not enough arguments to `:Project <name> :cd`"
       endif
       call s:cd_project(prj, a:3)
-    elseif a:2 =~ '\v^:=doonce$'   " {{{5
+    elseif a:2 =~ '\v^:=doonce$'     " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :doonce`"
       endif
       call s:doonce_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=bufdo$'    " {{{5
+    elseif a:2 =~ '\v^:=bufdo$'      " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :bufdo`"
       endif
       call s:bufdo_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=windo$'    " {{{5
+    elseif a:2 =~ '\v^:=windo$'      " {{{5
       if a:0 < 3
         throw "Not enough arguments to `:Project <name> :windo`"
       endif
       call s:windo_project(prj, a:000[2:])
-    else                           " -- unknown command {{{5
+    elseif a:2 =~ '\v^:bd%[elete]$'  " {{{5
+      call s:bd_project(prj, a:000[3:])
+    elseif a:2 =~ '\v^:bw%[ipeout]$' " {{{5
+      call s:bw_project(prj, a:000[3:])
+    else                            " -- unknown command {{{5
       throw "Unexpected `:Project ".a:2."` subcommand"
     endif
   endif
@@ -549,7 +613,7 @@ function! lh#project#_complete_command(ArgLead, CmdLine, CursorPos) abort
     let lead = matchstr(a:CmdLine[: a:CursorPos-1], '\v^.{-}:=(doonce|bufdo|windo)\s*\zs.*')
     let res = lh#command#matching_for_command(lead)
   elseif 2 == pos
-    let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', 'windo']
+    let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', ':windo', ':bdelete', ':bwipeout']
   else
     let res = []
   endif
@@ -616,6 +680,11 @@ endfunction
 
 function! s:depth() dict abort " {{{4
   return 1 + max(map(copy(self.parents), 'v:val.depth()'))
+endfunction
+
+function! s:children() dict abort " {{{4
+  let children = filter(copy(values(s:project_list.projects)), 'lh#list#find_entity(v:val.parents, self) >= 0')
+  return lh#list#flat_extend(children, filter(map(copy(children), 'v:val.children()'), '!empty(v:val)'))
 endfunction
 
 function! s:set(varname, value) dict abort " {{{4
@@ -843,6 +912,7 @@ function! lh#project#new(params) abort
   let project.exists          = function(s:getSNR('exists'))
   let project.environment     = function(s:getSNR('environment'))
   let project.depth           = function(s:getSNR('depth'))
+  let project.children        = function(s:getSNR('children'))
   let project.apply           = function(s:getSNR('apply'))
   let project.map             = function(s:getSNR('map'))
   let project.find_holder     = function(s:getSNR('find_holder'))
