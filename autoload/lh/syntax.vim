@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	3.6.1
-let s:k_version = 361
+" Version:	4.0.0
+let s:k_version = 400
 " Created:	05th Sep 2007
-" Last Update:	03rd Jan 2017
+" Last Update:	01st Mar 2017
 "------------------------------------------------------------------------
 " Description:	«description»
 "
@@ -149,11 +149,9 @@ endfunction
 function! lh#syntax#is_a_comment_at(l,c) abort
   try
     let stack = synstack(a:l, a:c)
-    for syn in stack
-      if synIDattr(syn, 'name') =~? 'comment\|doxygen'
-        return 1
-      endif
-    endfor
+    let names = map(stack, 'synIDattr(v:val, "name")')
+    let idx = match(names, '\c\vcomment|doxygen')
+    return idx >= 0
   catch /.*/
     throw "Cannot fetch synstack at line:".a:l.", col:".a:c
   endtry
