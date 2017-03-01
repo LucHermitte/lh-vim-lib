@@ -4,9 +4,9 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "		<URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/Licence.md>
-" Version:      3.13.2
+" Version:      4.0.0
 " Created:      28th May 2009
-" Last Update:  02nd Sep 2016
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for autoload/lh/path.vim
@@ -38,11 +38,11 @@ function! s:Test_simplify()
 endfunction
 
 function! s:Test_split()
-  AssertEquals(['home', 'me', 'foo', 'bar'], lh#path#split('/home/me/foo/bar'))
-  AssertEquals(['home', 'me', 'foo', 'bar'], lh#path#split('/home/me/foo/bar/'))
-  AssertEquals(['home'], lh#path#split('/home'))
-  AssertEquals(['home'], lh#path#split('/home/'))
-  AssertEquals([], lh#path#split('/'))
+  AssertEquals(['', 'home', 'me', 'foo', 'bar'], lh#path#split('/home/me/foo/bar'))
+  AssertEquals(['', 'home', 'me', 'foo', 'bar'], lh#path#split('/home/me/foo/bar/'))
+  AssertEquals(['', 'home'], lh#path#split('/home'))
+  AssertEquals(['', 'home'], lh#path#split('/home/'))
+  AssertEquals([''], lh#path#split('/'))
   AssertEquals([], lh#path#split(''))
 endfunction
 

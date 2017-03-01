@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  20th Feb 2017
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -67,7 +67,7 @@ let s:k_version = 40000
 "       sequence. This fixes a bug in Mu-Template: the filetype of
 "       template-files wasn't always correctly working.
 "       v 3.1.12
-"       (*) New function: lh#path#add_if_exists()
+"       (*) New function: lh#path#add_path_if_exists()
 "       v 3.1.14
 "       (*) New functions: lh#path#split() and lh#path#join()
 "       (*) lh#path#common() fixed as matchstr('^\zs\(.*\)\ze.\{-}@@\1.*$')
@@ -107,6 +107,7 @@ let s:k_version = 40000
 "       (*) Add `lh#path#is_distant_or_scratch()`
 "       (*) Add `lh#path#is_up_to_date()`
 "       (*) Improve `lh#path#strip_start()` performances
+"       (*) lh#path#split('/foo') will now return 2 elements
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -237,7 +238,8 @@ endfunction
 " Function: lh#path#split(pathname) {{{3
 " Split pathname parts: "/home/me/foo/bar" -> [ "home", "me", "foo", "bar" ]
 function! lh#path#split(pathname) abort
-  let parts = split(a:pathname, '[/\\]')
+  let parts = (strpart(a:pathname, 0, 1) =~ '[/\\]' ? [''] : [])
+        \ + split(a:pathname, '[/\\]')
   return parts
 endfunction
 
@@ -583,7 +585,7 @@ endfunction
 function! lh#path#add_path_if_exists(listname, path) abort
   let path = substitute(a:path, '[/\\]\*\*$', '', '')
   if isdirectory(path)
-    if a:listname =~ '^p:'
+    if type(a:listname) == type('') && a:listname =~ '^p:'
       let var = lh#project#_get(a:listname[2:])
       let var += [a:path]
     else
@@ -597,7 +599,7 @@ function! lh#path#shellslash() abort
   return exists('+shellslash') && !&ssl ? '\' : '/'
 endfunction
 
-" Function: lh#path#find_in_parents(paths, kinds, last_valid_path) {{{3
+" Function: lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path) {{{3
 " @param {last_valid_path} will likelly contain a REGEX pattern aimed at
 " identifying things like $HOME
 let s:indent = 1
