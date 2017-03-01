@@ -629,6 +629,9 @@ the firsts I've in mind).
    * at global level: [a, b, c]
    * at project level: [default value from global VS force [a, b, c]]
  * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
+   *  Means that `:Let*` shall overwrite the already existing variable in
+      priority?
+      Or should we overload in the subproject?
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)

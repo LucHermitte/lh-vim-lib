@@ -268,9 +268,7 @@ function! lh#let#_list_all_variables_in_scope(scope) abort
     if lh#option#is_unset(prj)
       return a:scope
     endif
-    let vars = keys(prj.variables)
-          \ + map(keys(prj.env), '"$".v:val')
-          \ + map(keys(prj.options), '"&".v:val')
+    let vars = prj.get_names()
   else
     let vars = keys({a:scope})
   endif
@@ -282,20 +280,8 @@ endfunction
 function! s:IsDictOrList(var)
   " call assert_true(type(a:var) == type(''))
   if a:var =~ '^p:'
-    " TODO: find inherited variables
-    let vname = lh#project#crt_bufvar_name() . '.'
-    if     a:var[:2] == 'p:&'
-      let vname .= 'options.'
-      let sub    = a:var[3:]
-    elseif a:var[:2] == 'p:$'
-      let vname .= 'env.'
-      let sub    = a:var[3:]
-    else
-      let vname .= 'variables.'
-      let sub    = a:var[2:]
-    endif
-
-    return s:IsDictOrList(vname.sub)
+    let instance = lh#project#_get(a:var[2:])
+    return type(instance) == type([]) || type(instance) == type({})
   else
     let Val = eval(a:var)
     return type(Val) == type([]) || type(Val) == type({})
@@ -309,11 +295,8 @@ function! s:IsDict(var)
     if a:var =~ '^p:[$&]'
       return 0
     elseif a:var =~ '^p:'
-      " TODO: find inherited variables
-      let vname = lh#project#crt_bufvar_name() . '.'
-      let vname .= 'variables.'
       let sub    = a:var[2:]
-      return s:IsDict(vname.sub)
+      return lh#type#is_dict(lh#project#_get(sub))
     endif
   else
     let Val = eval(a:var)
@@ -346,9 +329,11 @@ function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
     let sDict = sDict0
     if sDict =~ '^p:'
       " TODO: find inherited variables
-      let sDict = substitute(sDict, 'p:', lh#project#crt_bufvar_name().'.variables.', '')
+      " let sDict = substitute(sDict, 'p:', lh#project#crt_bufvar_name().'.variables.', '')
+      let dict = lh#project#_get(sDict[2:])
+    else
+      let dict = eval(sDict)
     endif
-    let dict = eval(sDict)
     let vars = keys(dict)
     if a:keep_only_dicts_and_lists
       call filter(vars, 's:IsDictOrList(sDict.".".v:val)')
