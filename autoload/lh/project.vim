@@ -21,7 +21,6 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Doc
-"    - permission lists
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:

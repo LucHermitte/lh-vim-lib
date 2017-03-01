@@ -25,7 +25,7 @@ This library has been conceived as a suite of |autoload| plugins, and a few
 ==============================================================================
 FUNCTIONS                                    *lhvl-functions*     {{{1
                                                                         {{{2Functions list~
-Miscellanous functions:                                 |lhvl#misc|
+Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#askvim#exe()|
 - |lh#askvim#execute()|
 - |lh#askvim#scriptnames()|
@@ -73,7 +73,7 @@ Miscellanous functions:                                 |lhvl#misc|
 - |lh#type#name()|
 - |lh#visual#cut()|
 - |lh#visual#selection()|
-Option related functions:                               |lhvl#option|
+Option related functions:                               |lhvl#option|     {{{2
 - |lh#option#exists_in_buf()|
 - |lh#option#get()|
 - |lh#option#get_non_empty()|
@@ -87,11 +87,11 @@ Option related functions:                               |lhvl#option|
 - |lh#ft#option#get_all()|
 - |lh#ref#bind()|
 - |lh#ref#is_bound()|
-Functor related functions:                              |lhvl#function|
+Functor related functions:                              |lhvl#function|   {{{2
 - |lh#function#bind()|
 - |lh#function#execute()|
 - |lh#function#prepare()|
-List related functions:                                 |lhvl#list|
+List related functions:                                 |lhvl#list|       {{{2
 - |lh#list#accumulate()|
 - |lh#list#Find_if()| and |lh#list#find_if()|
 - |lh#list#Transform()| and |lh#list#transform()|
@@ -127,12 +127,12 @@ List related functions:                                 |lhvl#list|
 - |lh#list#uniq()|
 - |lh#list#unique_sort()| and |lh#list#unique_sort2()|
 - |lh#list#zip()|, and |lh#list#zip_as_dict()|
-Dict related functions:                                 |lhvl#dict|
+Dict related functions:                                 |lhvl#dict|       {{{2
 - |lh#dict#add_new()|
 - |lh#dict#get_composed()|
 - |lh#dict#key()|
 - |lh#dict#subset()|
-Stack related functions:                                |lhvl#stack|
+Stack related functions:                                |lhvl#stack|      {{{2
 - |lh#stack#push()|
 - |lh#stack#pop()|
 - |lh#stack#top()|
@@ -142,36 +142,44 @@ Stack related functions:                                |lhvl#stack|
     - |lh#stack-pop()|
     - |lh#stack-top()|
     - |lh#stack-top_or()|
-String related functions:                               |lhvl#string|
+String related functions:                               |lhvl#string|     {{{2
 - |lh#string#as()|
 - |lh#string#matches()|
 - |lh#string#substitute_unless()|
 - |lh#string#trim()|
-Graph related functions:                                |lhvl#graph|
+Graph related functions:                                |lhvl#graph|      {{{2
 - |lh#graph#tsort#depth()|
 - |lh#graph#tsort#breadth()|
-Path related functions:                                 |lhvl#path|
+Path related functions:                                 |lhvl#path|       {{{2
+- |lh#path#add_path_if_exists()|
 - |lh#path#common()|
 - |lh#path#depth()|
 - |lh#path#exists()|
+- |lh#path#find()|
+- |lh#path#find_in_parents()|
 - |lh#path#fix()|
 - |lh#path#glob_as_list()|
 - |lh#path#is_absolute_path()|
 - |lh#path#is_distant_or_scratch()|
 - |lh#path#is_in()|
+- |lh#path#is_up_to_date()|
 - |lh#path#is_url()|
+- |lh#path#join()|
+- |lh#path#munge()|
 - |lh#path#new_permission_lists()|
 - |lh#path#readlink()|
 - |lh#path#relative_to()|
 - |lh#path#remove_dir_mark()|
 - |lh#path#select_one()|
 - |lh#path#simplify()|
+- |lh#path#split()|
 - |lh#path#strip_common()|
 - |lh#path#strip_start()|
 - |lh#path#to_dirname()|
 - |lh#path#to_regex()|
 - |lh#path#to_relative()|
-Command related functions:                              |lhvl#command|
+- |lh#path#vimfiles()|
+Command related functions:                              |lhvl#command|    {{{2
 - |lh#command#analyse_args()|
 - |lh#command#matching_variables()|
 - |lh#command#matching_askvim()|
@@ -181,7 +189,7 @@ Command related functions:                              |lhvl#command|
 - |lh#command#new()| (alpha version)
 - |lh#command#Fargs2String()| (alpha version)
 - |lh#command#complete()| (alpha version)
-Menu related functions:                                 |lhvl#menu|
+Menu related functions:                                 |lhvl#menu|       {{{2
 - |lh#menu#def_string_item()|
 - |lh#menu#def_toggle_item()|
 - |lh#menu#text()|
@@ -194,7 +202,7 @@ Menu related functions:                                 |lhvl#menu|
 - |lh#project#menu#def_toggle_item()|
 - |lh#project#menu#make()|
 - |lh#project#menu#remove()|
-Buffer related functions:                               |lhvl#buffer|
+Buffer related functions:                               |lhvl#buffer|     {{{2
 - |lh#buffer#get_nr()|
 - |lh#buffer#list()|
 - |lh#buffer#find()|
@@ -206,11 +214,11 @@ Buffer related functions:                               |lhvl#buffer|
     - |lh#buffer#dialog#select()|
     - |lh#buffer#dialog#quit()|
     - |lh#buffer#dialog#update()|
-Window related functions:                               |lhvl#window|
+Window related functions:                               |lhvl#window|     {{{2
 - |lh#window#create_window_with()|
 - |lh#window#new()|
 - |lh#window#split()|
-Syntax related functions:                               |lhvl#syntax|
+Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#is_a_comment()|
 - |lh#syntax#is_a_comment_at()|
 - |lh#syntax#getline_without()|
@@ -222,7 +230,7 @@ Syntax related functions:                               |lhvl#syntax|
 - |lh#syntax#skip_at_mark()|
 - |lh#syntax#list_raw()|
 - |lh#syntax#list()|
-OS/System related functions:                            |lhvl#os|
+OS/System related functions:                            |lhvl#os|         {{{2
 - |lh#async#queue()|
 - |:Jobs|
 - |:JobUnpause|
@@ -235,18 +243,18 @@ OS/System related functions:                            |lhvl#os|
 - |lh#os#sys_cd()|
 - |lh#os#cpu_number()|
 - |lh#os#cpu_cores_number()|
-Completion related functions                            |lhvl#completion|
+Completion related functions                            |lhvl#completion| {{{2
 - |lh#icomplete#new()|
 - |lh#icomplete#new_on()|
 - |lh#icomplete#run()|
-Log related functions                                   |lhvl#log|
+Log related functions                                   |lhvl#log|        {{{2
 - |:LHLog|, |lh#log#set_logger()|
 - |lh#log#new()|
 - |lh#log#none()|
 - |lh#log#callstack()||
 - |lh#log#exception()||
 - |lh#log#this()||
-Version Control System functions                        |lhvl#vcs|
+Version Control System functions                        |lhvl#vcs|        {{{2
 - |lh#vcs#get_svn_root()|
 - |lh#vcs#get_git_root()|
 - |lh#vcs#is_svn()|
@@ -255,15 +263,15 @@ Version Control System functions                        |lhvl#vcs|
 - |lh#vcs#get_url()|
 - |lh#vcs#decode_github_url()|
 - |lh#vcs#as_http()|
-OO helpers                                              |lhvl#oo|
+OO helpers                                              |lhvl#oo|         {{{2
 - |lh#object#make_top_type()|
 - |lh#object#to_string()|
 - |lh#object#_to_string()|
-Variable helper functions                               |lhvl#variable|
+Variable helper functions                               |lhvl#variable|   {{{2
 - |lh#let#if_undef()|
 - |lh#let#to()|
 - |lh#let#undef()|
-Project related defintions                              |lhvl#project|
+Project related defintions                              |lhvl#project|    {{{2
 - |p:| |project-variable|
 - |:Project|
 - |lh#project#define()|
@@ -274,7 +282,7 @@ Project related defintions                              |lhvl#project|
 - |lh#project#menu#def_toggle_item()|
 - |lh#project#menu#make()|
 - |lh#project#menu#remove()|
-Design by Contract related functions                    |lhvl#DbC|
+Design by Contract related functions                    |lhvl#DbC|        {{{2
 - |lh#assert#mode()|
 - |lh#assert#clear()|
 - |lh#assert#errors()|
@@ -2116,6 +2124,29 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
 PATH RELATED FUNCTIONS                                *lhvl#path*       {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                    *lh#path#add_path_if_exists()*    {{{3
+lh#path#add_path_if_exists(listname, path)~
+@param[in,out] {lisname} |List| of pathnames to complete, or |p:var|iable that
+                         designates a |List|.
+@param[in]     {path}    a pathname
+@return Nothing
+@see also |lh#path#munge()|
+
+The {path} may end in `/**` which will be ignored.
+If {path} is a directory, it'll be added to {listname}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                    *lh#path#common()*                {{{3
+lh#path#common({pathnames})~
+@param[in] {pathnames} |List| of pathnames to analyse
+@return the common leading path between all {pathnames}
+
+e.g.: >
+ :echo lh#path#common(['foo/bar/file','foo/file', 'foo/foo/file'])
+echoes >
+ foo/
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                    *lh#path#depth()*                 {{{3
 lh#path#depth({dirname})~
 Returns the depth of a directory name.
@@ -2136,17 +2167,37 @@ buffer exists with that name (see |bufexists()|).
 @since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#to_dirname()*            {{{3
-lh#path#to_dirname({dirname})~
-Ensures the returned directory name ends with a '`/`' or a '`\`'.
+                                                    *lh#path#find()*                  {{{3
+lh#path#find({pathslist}, {regex})~
+@param[in] {pathslist} List of paths which can be received as a |List| or as a
+                       string made of coma separated paths.
+@return the path that matches the given {regex}
 
-@todo On windows, it should take 'shellslash' into account to decide the
-      character to append.
+e.g.: >
+ let expected_win = $HOME . '/vimfiles'
+ let expected_nix = $HOME . '/.vim'
+ let what =  lh#path#to_regex($HOME.'/').'\(vimfiles\|.vim\)'
+ let z = lh#path#find(&rtp,what)
+ if has('win16')||has('win32')||has('win64')
+   Assert z == expected_win
+ else
+   Assert z == expected_nix
+ endif
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#remove_dir_mark()*       {{{3
-lh#path#remove_dir_mark({dirname})~
-Remove the trailing 'shellslash' character ('`/`' or a '`\`') from {dirname}.
+                                                    *lh#path#find_in_parents()*       {{{3
+lh#path#find_in_parents({path}, {path-patterns}, {kinds}, {last-valid-path})~
+Internal recursive function used by |local_vimrc|.
+
+@param[in]            {path} Current path being analysed.
+@param[in]   {path-patterns} Single (|expr-string|) or |List| of filename(s) or
+                             dirname to search.
+@param[in]           {kinds} What is looked for. Could be `'file'`, `'dir'` or `'file,dir'`.
+@param[in] {last-valid-path} |regex| used to stop the recursion. Typical
+                             value: `!empty(s:home) ? ('^'.s:home.'$') : ''`
+
+@return a |List| of pathname to file and/or directories that match
+{path-patterns} up to {last-valid-path}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#fix()*                   {{{3
@@ -2192,67 +2243,18 @@ Exemples~
 Note: Unlike |fnameescape()|, |lh#path#fix()| will work even under the Windows native flavour of gvim, whichever the |'shellslash'| is, and whichever the |'shell'| is.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#Simplify()*              {{{3
-lh#path#Simplify({pathname})  (*deprecated*)~
-                                                *lh#path#simplify()*
-lh#path#simplify({pathname} [{make_relative_to_pwd])~
-Simplifies a path by getting rid of useless '../' and './'.
-
-@param {pathname}             Pathname to simplify
-@param {make_relative_to_pwd} The {pathname} is made relative to pwd when set
-@return the simplified pathname
-
-This function works like |simplify()|, except that it also strips the leading
-"`./`".
-
-Note: when vim is compiled for unix, it seems unable to |simplify()| paths
-containing "`..\`". (It likelly works this way when vim is compiled without
-'shellslash' support)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#common()*                {{{3
-lh#path#common({pathnames})~
-@param[in] {pathnames} |List| of pathnames to analyse
-@return the common leading path between all {pathnames}
-
-e.g.: >
- :echo lh#path#common(['foo/bar/file','foo/file', 'foo/foo/file'])
-echoes >
- foo/
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#StripCommon()*           {{{3
-lh#path#StripCommon({pathnames})  (*deprecated*)~
-                                                *lh#path#strip_common()*
-lh#path#strip_common({pathnames})~
-@param[in,out] {pathnames} |List| of pathnames to simplify
-@return the simplified pathnames
-
-This function strips all pathnames from their common leading part. The
-compuation of the common leading part is ensured by |lh#path#common()|
-thank.
-e.g.: >
- :echo lh#path#strip_common(['foo/bar/file','foo/file', 'foo/foo/file'])
-echoes >
- ['bar/file','file', 'foo/file']
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#StripStart()*            {{{3
-lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
-                                                 *lh#path#strip_start()*
-lh#path#strip_start({pathname}, {pathslist})~
-@param[in] {pathname}  name to simplify
-@param[in] {pathslist} list of pathname (can be a |string| of pathnames
-                       separated by "`,`", of a |List|).
-
-Strips {pathname} from any path from {pathslist}.
-
-e.g.: >
- :echo lh#path#strip_start($HOME.'/.vim/template/bar.template',
-   \ ['/home/foo/.vim', '/usr/local/share/vim/'])
- :echo lh#path#strip_start($HOME.'/.vim/template/bar.template',&rtp)
-echoes >
- template/bar.template
+                                                *lh#path#glob_as_list()*          {{{3
+                                                *lh#path#GlobAsList()*
+lh#path#glob_as_list({pathslist}, {expr} [,{must_sort}])~
+lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
+@param[in] {pathslist} list (|List|, or comma separated list) of paths where
+                       to search.
+@param[in] {expr}      glob expression of the files to search.
+@param[in] {mustSort}  tells whether the results shall be sorted per
+                     {pathslist}, default: true.
+@return |globpath()|'s result, but formatted as a list of matching pathnames.
+In case {expr} is a |List|, |globpath()| is applied on each expression in
+{expr}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#is_absolute_path()*      {{{3
@@ -2273,6 +2275,21 @@ lh#path#is_distant_or_scratch({path})~
 - or whether it's an UNC path, i.e. starting with either `"//"` or `"\\"`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#is_in()*                 {{{3
+lh#path#is_in({file}, {path})~
+Tells whether a {file} is within a directory tree.
+The function first tries to check whether the names match, then it tries again
+but on resolved pathnames (with |lh#path#readlink()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#is_up_to_date()*         {{{3
+lh#path#is_up_to_date({file1}, {file2})~
+@param[in] {file1} filename
+@param[in] {file2} filename
+@return whether |getftime()| of {file1} is lesser than or equal to the one of
+{file2}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#is_url()*                {{{3
 lh#path#is_url({path})~
                                                 *lh#path#IsURL()*
@@ -2283,101 +2300,14 @@ lh#path#IsURL({path})  (*deprecated*)~
 rsynch://, scp://
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#SelectOne()*             {{{3
-lh#path#SelectOne({pathnames},{prompt})  (*deprecated*)~
-                                                *lh#path#select_one()*
-lh#path#select_one({pathnames},{prompt})~
-@param[in] {pathnames} |List| of pathname
-@param     {prompt}     Prompt for the dialog box
-
-@return "" if len({pathnames}) == 0
-@return {pathnames}[0] if len({pathnames}) == 1
-@return the selected pathname otherwise
-
-Asks the end-user to choose a pathname among a list of pathnames.
-The pathnames displayed will be simplified thanks to |lh#path#strip_common()|
--- the pathname returned is the "full" original pathname matching the
-simplified pathname selected.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#ToRelative()*            {{{3
-lh#path#ToRelative({pathname})  (*deprecated*)~
-                                                *lh#path#to_relative()*
-lh#path#to_relative({pathname})~
-@param {pathname} Pathname to convert
-@return the simplified {pathname} in its relative form as it would be seen
-        from the current directory.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#relative_to()*           {{{3
-lh#path#relative_to({from}, {to})~
-Returns the relative directory that indentifies {to} from {from} location.
-@param {from} origin directory
-@param {to}   destination directory
-@return the simplified pathname {to} in its relative form as it would be seen
-        from the {from} directory.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#readlink()*              {{{3
-lh#path#readlink({pathname})~
-Resolves any symbolic links in pathnames.
-Where the *nix command readlink is available, it returns >
-    readlink -f {pathname}
-elsewhere it returns {pathname}.
-@param[in] pathslist to resolve
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#GlobAsList()*            {{{3
-lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
-                                                *lh#path#glob_as_list()*
-lh#path#glob_as_list({pathslist}, {expr} [,{must_sort}])~
-@param[in] {pathslist} list (|List|, or comma separated list) of paths where
-                       to search.
-@param[in] {expr}      glob expression of the files to search.
-@param[in] {mustSort}  tells whether the results shall be sorted per
-                     {pathslist}, default: true.
-@return |globpath()|'s result, but formatted as a list of matching pathnames.
-In case {expr} is a |List|, |globpath()| is applied on each expression in
-{expr}.
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#find()*                  {{{3
-lh#path#find({pathslist}, {regex})~
-@param[in] {pathslist} List of paths which can be received as a |List| or as a
-                       string made of coma separated paths.
-@return the path that matches the given {regex}
-
-e.g.: >
- let expected_win = $HOME . '/vimfiles'
- let expected_nix = $HOME . '/.vim'
- let what =  lh#path#to_regex($HOME.'/').'\(vimfiles\|.vim\)'
- let z = lh#path#find(&rtp,what)
- if has('win16')||has('win32')||has('win64')
-   Assert z == expected_win
- else
-   Assert z == expected_nix
- endif
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#to_regex()*              {{{3
-lh#path#to_regex({pathname})~
-Transforms the {pathname} to separate each node-name by the string '`[/\\]`'
-
-The rationale behind this function is to build system independant regex
-pattern to use on pathnames as sometimes pathnames are built by appending
-'`/stuff/like/this`' without taking 'shellslash' into account.
-
-e.g.: >
- echo lh#path#to_regex('/home/luc/').'\(vimfiles\|.vim\)'
-echoes >
- [/\\]home[/\\]luc[/\\]\(vimfiles\|.vim\)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_in()*                 {{{3
-lh#path#is_in({file}, {path})~
-Tells whether a {file} is within a directory tree.
-The function first tries to check whether the names match, then it tries again
-but on resolved pathnames (with |lh#path#readlink()|.
+                                                *lh#path#join()*                  {{{3
+lh#path#join({pathparts} [, {path-separator}])~
+@param[in] {pathparts} Parts to pathanme to join
+@param[in] {path-separator} Joining character to use. Default depends on |'shellslash'|
+Join pathname parts
+@see also |lh#path#split()|
+i.e. >
+    AssertEquals(lh#path#join([ "home", "me", "foo", "bar" ]), "home/me/foo/bar")
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#new_permission_lists()*  {{{3
@@ -2400,6 +2330,151 @@ Prepares a permission lists object.
   - *is_file_accepted()* -- internal
 @since v4.0.0
 @see |local_vimrc| documentation for more details.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#readlink()*              {{{3
+lh#path#readlink({pathname})~
+Resolves any symbolic links in pathnames.
+Where the *nix command readlink is available, it returns >
+    readlink -f {pathname}
+elsewhere it returns {pathname}.
+@param[in] pathslist to resolve
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#relative_to()*           {{{3
+lh#path#relative_to({from}, {to})~
+Returns the relative directory that indentifies {to} from {from} location.
+@param {from} origin directory
+@param {to}   destination directory
+@return the simplified pathname {to} in its relative form as it would be seen
+        from the {from} directory.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#path#remove_dir_mark()*       {{{3
+lh#path#remove_dir_mark({dirname})~
+Remove the trailing 'shellslash' character ('`/`' or a '`\`') from {dirname}.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#select_one()*            {{{3
+                                                *lh#path#SelectOne()*
+lh#path#select_one({pathnames},{prompt})~
+lh#path#SelectOne({pathnames},{prompt})  (*deprecated*)~
+@param[in] {pathnames} |List| of pathname
+@param     {prompt}     Prompt for the dialog box
+
+@return "" if len({pathnames}) == 0
+@return {pathnames}[0] if len({pathnames}) == 1
+@return the selected pathname otherwise
+
+Asks the end-user to choose a pathname among a list of pathnames.
+The pathnames displayed will be simplified thanks to |lh#path#strip_common()|
+-- the pathname returned is the "full" original pathname matching the
+simplified pathname selected.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#shellslash()*            {{{3
+lh#path#shellslash()~
+@return `'/'` or `'\'` depending on the current OS, or on |'ssl'| state.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#simplify()*              {{{3
+                                                *lh#path#Simplify()*
+lh#path#simplify({pathname} [{make_relative_to_pwd])~
+lh#path#Simplify({pathname})  (*deprecated*)~
+Simplifies a path by getting rid of useless '../' and './'.
+
+@param {pathname}             Pathname to simplify
+@param {make_relative_to_pwd} The {pathname} is made relative to pwd when set
+@return the simplified pathname
+
+This function works like |simplify()|, except that it also strips the leading
+"`./`".
+
+Note: when vim is compiled for unix, it seems unable to |simplify()| paths
+containing "`..\`". (It likelly works this way when vim is compiled without
+'shellslash' support)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#split()*                 {{{3
+lh#path#split({path})~
+@param[in] {path} Path to split at `[/\\]`
+Split pathname parts
+@see also |lh#path#join()|
+i.e. >
+    AssertEquals(lh#path#split("/home/me/foo/bar"), [ "home", "me", "foo", "bar" ])
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#strip_common()*          {{{3
+                                                *lh#path#StripCommon()*
+lh#path#strip_common({pathnames})~
+lh#path#StripCommon({pathnames})  (*deprecated*)~
+@param[in,out] {pathnames} |List| of pathnames to simplify
+@return the simplified pathnames
+
+This function strips all pathnames from their common leading part. The
+compuation of the common leading part is ensured by |lh#path#common()|
+thank.
+e.g.: >
+ :echo lh#path#strip_common(['foo/bar/file','foo/file', 'foo/foo/file'])
+echoes >
+ ['bar/file','file', 'foo/file']
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#path#strip_start()*           {{{3
+                                                 *lh#path#StripStart()*
+lh#path#strip_start({pathname}, {pathslist})~
+lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
+@param[in] {pathname}  name to simplify
+@param[in] {pathslist} list of pathname (can be a |string| of pathnames
+                       separated by "`,`", of a |List|).
+
+Strips {pathname} from any path from {pathslist}.
+
+e.g.: >
+ :echo lh#path#strip_start($HOME.'/.vim/template/bar.template',
+   \ ['/home/foo/.vim', '/usr/local/share/vim/'])
+ :echo lh#path#strip_start($HOME.'/.vim/template/bar.template',&rtp)
+echoes >
+ template/bar.template
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#path#to_dirname()*            {{{3
+lh#path#to_dirname({dirname})~
+Ensures the returned directory name ends with a '`/`' or a '`\`'.
+
+@todo On windows, it should take 'shellslash' into account to decide the
+      character to append.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#to_relative()*           {{{3
+                                                *lh#path#ToRelative()*
+lh#path#to_relative({pathname})~
+lh#path#ToRelative({pathname})  (*deprecated*)~
+@param {pathname} Pathname to convert
+@return the simplified {pathname} in its relative form as it would be seen
+        from the current directory.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#to_regex()*              {{{3
+lh#path#to_regex({pathname})~
+Transforms the {pathname} to separate each node-name by the string '`[/\\]`'
+
+The rationale behind this function is to build system independant regex
+pattern to use on pathnames as sometimes pathnames are built by appending
+'`/stuff/like/this`' without taking 'shellslash' into account.
+
+e.g.: >
+ echo lh#path#to_regex('/home/luc/').'\(vimfiles\|.vim\)'
+echoes >
+ [/\\]home[/\\]luc[/\\]\(vimfiles\|.vim\)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#vimfiles()*              {{{3
+lh#path#vimfiles()~
+Function that I use to find either `$HOME/.vim/` or the equivalent on windows.
+This function got a very internal and personal variation point: if `$LUCHOME`
+exists, it's used instead of `$HOME` -- In the past, I've been given access to
+shared accounts where my real `$HOME` was something like `$HOME/luc/`...
 
 ------------------------------------------------------------------------------
 MENU RELATED FUNCTIONS                                *lhvl#menu*       {{{2
@@ -3730,10 +3805,28 @@ Specifies whitelist, blacklist, asklist and sandboxlist of pathnames to be
 used when trying to automagically find projects with |g:lh#project.auto_detect|.
 Default values for:
 - *g:lh#project.permissions.whitelist*   : []
-- *g:lh#project.permissions.asklist*     : [$HOME]
-- *g:lh#project.permissions.blacklist*   : ['/']
+- *g:lh#project.permissions.asklist*     : [$HOME] // unless found in another list
+- *g:lh#project.permissions.blacklist*   : ['/']   // always forced!
 - *g:lh#project.permissions.sandboxlist* : []
 
+For instance, they can be overriden in the |.vimrc| with: >
+
+    LetIfUndef g:lh#project.permissions             {}
+    LetIfUndef g:lh#project.permissions.whitelist   []
+    LetIfUndef g:lh#project.permissions.asklist     []
+    LetIfUndef g:lh#project.permissions.blacklist   []
+
+    " $HOME/.vim/addons is where VAM stores the plugin it manages
+    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/.vim/addons')
+    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/workspace')
+    call lh#path#munge(g:lh#project.permissions.asklist,   $HOME.'/3rdparties')
+    call lh#path#munge(g:lh#project.permissions.blacklist, $HOME)
+    call lh#path#munge(g:lh#project.permissions.blacklist, '/')
+    " Remove $HOME from asklist in case it was already there
+    call filter(g:lh#project.permissions.asklist, 'v:val == $HOME')
+
+See also |lh#path#new_permission_lists()|, which is used internally to manage
+these lists.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *p:* *project-variable*          {{{3
