@@ -5,13 +5,14 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      27th Feb 2017
-" Last Update:  28th Feb 2017
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Demonstrate lh-vim-lib DbC framework
 " }}}1
 "=============================================================================
 
+if exists(':UTAssert') | finish | endif
 runtime autoload/lh/assert.vim
 
 "------------------------------------------------------------------------
