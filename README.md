@@ -294,10 +294,12 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 ### Syntax related functions
 | Function                                                         | Purpose                                                                                                                                |
 |:-----------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
+| `lh#syntax#getline_without()`                                    | Extracts a line without the characters matching a given syntax ID pattern                                                              |
 | `lh#syntax#is_a_comment()`                                       | Tells the syntax kind of the character at the given mark is a comment                                                                  |
 | `lh#syntax#is_a_comment_at()`                                    | Tells the syntax kind of the character at the given position is a comment                                                              |
 | `lh#syntax#list()`                                               | Like `lh#syntax#list_raw()`, but reinterprets the results (experimental)                                                               |
 | `lh#syntax#list_raw()`                                           | Returns the result of "`syn list {group-name}`" as a string                                                                            |
+| `lh#syntax#match_at()`                                           | Tells whether the syntax kind of the character at the given position matches a pattern                                                 |
 | `lh#syntax#name_at()`                                            | Tells the syntax kind of the character at the given position                                                                           |
 | `lh#syntax#name_at_mark()`                                       | Tells the syntax kind of the character at the given mark                                                                               |
 | `lh#syntax#name_at_mark()`                                       | Tells the syntax kind of the character at the given mark                                                                               |

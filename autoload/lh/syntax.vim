@@ -53,7 +53,7 @@ endfunction
 "=============================================================================
 " ## Functions {{{1
 " # Public {{{2
-" Functions: Show name of the syntax kind of a character {{{3
+" Functions: Show name of the syntax kind of a character               {{{3
 function! lh#syntax#name_at(l,c, ...)
   let what = a:0 > 0 ? a:1 : 0
   return synIDattr(synID(a:l, a:c, what),'name')
@@ -72,7 +72,7 @@ function! lh#syntax#NameAtMark(mark, ...)
   return lh#syntax#name_at_mark(a:mark, what)
 endfunction
 
-" Functions: skip string, comment, character, doxygen {{{3
+" Functions: skip string, comment, character, doxygen                  {{{3
 func! lh#syntax#skip_at(l,c)
   return lh#syntax#name_at(a:l,a:c) =~? 'string\|comment\|character\|doxygen'
 endfun
@@ -94,14 +94,14 @@ func! lh#syntax#SkipAtMark(mark)
   return lh#syntax#skip_at_mark(a:mark)
 endfun
 
-" Command: :SynShow Show current syntax kind                      {{{3
+" Command: :SynShow Show current syntax kind                           {{{3
 command! SynShow echo 'hi<'.lh#syntax#name_at_mark('.',1).'> trans<'
       \ lh#syntax#name_at_mark('.',0).'> lo<'.
       \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>   ## '
       \ lh#list#transform(synstack(line("."), col(".")), [], 'synIDattr(v:1_, "name")')
 
 
-" Function: lh#syntax#list_raw(name) : string                     {{{3
+" Function: lh#syntax#list_raw(name) : string                          {{{3
 function! lh#syntax#list_raw(name)
   let a_save = @a
   try
@@ -115,7 +115,7 @@ function! lh#syntax#list_raw(name)
   return res
 endfunction
 
-" Function: lh#syntax#list(name) : List                           {{{3
+" Function: lh#syntax#list(name) : List                                {{{3
 function! lh#syntax#list(name)
   let raw = lh#syntax#list_raw(a:name)
   let res = []
@@ -139,18 +139,13 @@ function! lh#syntax#list(name)
   return res
 endfunction
 
-" Function: lh#syntax#is_a_comment(mark) : bool                   {{{3
-function! lh#syntax#is_a_comment(mark) abort
-  return lh#syntax#is_a_comment_at(line(a:mark), col(a:mark))
-endfunction
-
-
-" Function: lh#syntax#is_a_comment_at(l,c) : bool                  {{{3
-function! lh#syntax#is_a_comment_at(l,c) abort
+" Function: lh#syntax#match_at(syn_pattern, l, c) : bool               {{{3
+" @since Version 4.0.0
+function! lh#syntax#match_at(syn_pattern, l, c) abort
   try
     let stack = synstack(a:l, a:c)
     let names = map(stack, 'synIDattr(v:val, "name")')
-    let idx = match(names, '\c\vcomment|doxygen')
+    let idx = match(names, a:syn_pattern)
     return idx >= 0
   catch /.*/
     throw "Cannot fetch synstack at line:".a:l.", col:".a:c
@@ -158,8 +153,17 @@ function! lh#syntax#is_a_comment_at(l,c) abort
   return 0
 endfunction
 
+" Function: lh#syntax#is_a_comment(mark) : bool                        {{{3
+function! lh#syntax#is_a_comment(mark) abort
+  return lh#syntax#is_a_comment_at(line(a:mark), col(a:mark))
+endfunction
 
-" Function: lh#syntax#next_hl({name},[{trans}=1]) {{{3
+" Function: lh#syntax#is_a_comment_at(l,c) : bool                      {{{3
+function! lh#syntax#is_a_comment_at(l,c) abort
+  return lh#syntax#match_at('\c\vcomment|doxygen', a:l, a:c)
+endfunction
+
+" Function: lh#syntax#next_hl({name},[{trans}=1])                      {{{3
 " @param {name}    Name of the highlight group
 " @param {trans}   See |synID()| -> {trans} ; default = 1
 " @return 1 if found, 0 otherwose
@@ -194,7 +198,7 @@ function! lh#syntax#next_hl(name, ...) abort
   return 1
 endfunction
 
-" Function: lh#syntax#prev_hl({name},[{trans}=1]) {{{3
+" Function: lh#syntax#prev_hl({name},[{trans}=1])                      {{{3
 " @param {name}    Name of the highlight group
 " @param {trans}   See |synID()| -> {trans} ; default = 1
 " @return 1 if found, 0 otherwose
@@ -226,6 +230,19 @@ function! lh#syntax#prev_hl(name, ...) abort
     endif
   endwhile
   return 1
+endfunction
+
+" Function: lh#syntax#getline_without(linenr, syn_pattern) : string {{{3
+" @since Version 4.0.0
+" @warning col(['.', '$']) doesn't work!, so linenr shall be a number
+function! lh#syntax#getline_without(linenr, syn_pattern) abort
+  call lh#assert#type(a:linenr).is(42)
+  let valid =  map(range(col([a:linenr, '$'])-1), '! lh#syntax#match_at(a:syn_pattern, a:linenr, v:val+1) ? v:val : -1')
+  call filter(valid, 'v:val >= 0')
+  let line = getline(a:linenr)
+  " join is required to merge bytes back into multibyte-characters
+  let res = join(map(copy(valid), 'line[v:val]'), '')
+  return res
 endfunction
 " Functions }}}1
 "------------------------------------------------------------------------
