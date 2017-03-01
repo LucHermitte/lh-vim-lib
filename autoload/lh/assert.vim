@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  28th Feb 2017
+" Last Update:  01st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -240,8 +240,9 @@ function! s:__negate(bool) dict abort "{{{4
   return ! a:bool
 endfunction
 function! s:not() dict abort " {{{4
-  let self.__eval = function(s:getSNR('__negate'))
-  return self
+  let res = copy(self)
+  let res.__eval = function(s:getSNR('__negate'))
+  return res
 endfunction
 
 function! s:is_lt(ref) dict abort " {{{4
