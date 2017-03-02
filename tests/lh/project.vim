@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  10th Oct 2016
+" Last Update:  02nd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -86,7 +86,7 @@ function! s:Test_create() " {{{2
     call lh#on#_unlet(s:prj_varname)
     call lh#on#_unlet('g:test')
     call lh#on#_unlet('b:test')
-    let p = lh#project#new({'name': 'UT'})
+    let p = lh#project#new({'name': 'ut'})
     AssertIs(p, {s:prj_varname})
     AssertEquals(p.depth(), 1)
 
@@ -239,6 +239,38 @@ function! s:Test_create_ENV() " {{{2
   endtry
 endfunction
 
+" Function: s:Test_best_varname_match() {{{2
+function! s:Test_best_varname_match() abort
+  call lh#on#_unlet(s:prj_varname)
+  let parent = lh#project#new({'name': 'UT1'})
+  AssertIs(parent, {s:prj_varname})
+  AssertEquals(parent.depth(), 1)
+  let child = lh#project#new({'name': 'UT2'})
+  AssertEquals(child.depth(), 2)
+  AssertIs(parent, child.parents[0])
+  AssertIs(child, {s:prj_varname})
+
+  call parent.set('shared.shdprnt', 42)
+  call parent.set('parent', {})
+  call child.set('shared.shdchld', {})
+
+  let expected_child   = s:prj_varname.'.variables.'
+  let expected_parents = s:prj_varname.'.parents[0].variables.'
+  AssertEquals(lh#project#_best_varname_match('p:newchld'),                expected_child.'newchld')
+  AssertEquals(lh#project#_best_varname_match('p:newchld.k'),              expected_child.'newchld.k')
+  AssertEquals(lh#project#_best_varname_match('p:shared'),                 expected_child.'shared')
+  AssertEquals(lh#project#_best_varname_match('p:shared.newkey'),          expected_child.'shared.newkey')
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld'),         expected_child.'shared.shdchld')
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld.newkey'),  expected_child.'shared.shdchld.newkey')
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld.new.key'), expected_child.'shared.shdchld.new.key')
+
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt'),         expected_parents.'shared.shdprnt')
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt.newkey'),  expected_parents.'shared.shdprnt.newkey')
+  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt.new.key'), expected_parents.'shared.shdprnt.new.key')
+  AssertEquals(lh#project#_best_varname_match('p:parent'),                 expected_parents.'parent')
+  AssertEquals(lh#project#_best_varname_match('p:parent.newkey'),          expected_parents.'parent.newkey')
+  AssertEquals(lh#project#_best_varname_match('p:parent.newkey.subkey'),   expected_parents.'parent.newkey.subkey')
+endfunction
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

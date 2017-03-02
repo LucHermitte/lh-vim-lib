@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  01st Mar 2017
+" Last Update:  02nd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -42,6 +42,7 @@ let s:k_version = '400'
 " - Be able to control which parent is filled with lh#let# functions
 "   -> `:Project <name> :LetTo var = value`
 " - Setlocally vim options on new files
+" - split autoload/lh/project.vim into several files
 " - Simplify dictionaries
 "   -> no 'parents' when there are none!
 "   -> merge 'variables', 'env', 'options' in `variables`
@@ -880,6 +881,27 @@ function! s:find_holder(varname) dict abort " {{{4
   return s:k_unset
 endfunction
 
+function! s:find_holder_name(varname) dict abort " {{{4
+  if     a:varname[0] == '$'
+    return '.env.'
+  else
+    let r0 = lh#dict#get_composed(self.variables, a:varname)
+    if lh#option#is_set(r0)
+    " if has_key(self.variables, a:varname)
+      " if varname is made of multiple part, has_key cannot work!
+      return '.variables.'
+    else
+      for p in range(len(self.parents))
+        let h = self.parents[p].find_holder_name(a:varname)
+        if !empty(h)
+          return '.parents['.p.']'.h
+        endif
+      endfor
+    endif
+  endif
+  return ''
+endfunction
+
 function! s:__lhvl_oo_type() dict abort " {{{4
   return 'project'
 endfunction
@@ -912,23 +934,24 @@ function! lh#project#new(params) abort
     let project.name = s:project_list.new_name()
   endif
 
-  let project.inherit         = function(s:getSNR('inherit'))
-  let project.register_buffer = function(s:getSNR('register_buffer'))
-  let project.set             = function(s:getSNR('set'))
-  let project.update          = function(s:getSNR('update'))
-  let project.get             = function(s:getSNR('get'))
-  let project.exists          = function(s:getSNR('exists'))
-  let project.environment     = function(s:getSNR('environment'))
-  let project.depth           = function(s:getSNR('depth'))
-  let project.children        = function(s:getSNR('children'))
-  let project.apply           = function(s:getSNR('apply'))
-  let project.map             = function(s:getSNR('map'))
-  let project.find_holder     = function(s:getSNR('find_holder'))
-  let project.get_names       = function(s:getSNR('get_names'))
-  let project._update_option  = function(s:getSNR('_update_option'))
-  let project._use_options    = function(s:getSNR('_use_options'))
-  let project._remove_buffer  = function(s:getSNR('_remove_buffer'))
-  let project.__lhvl_oo_type  = function(s:getSNR('__lhvl_oo_type'))
+  let project.inherit          = function(s:getSNR('inherit'))
+  let project.register_buffer  = function(s:getSNR('register_buffer'))
+  let project.set              = function(s:getSNR('set'))
+  let project.update           = function(s:getSNR('update'))
+  let project.get              = function(s:getSNR('get'))
+  let project.exists           = function(s:getSNR('exists'))
+  let project.environment      = function(s:getSNR('environment'))
+  let project.depth            = function(s:getSNR('depth'))
+  let project.children         = function(s:getSNR('children'))
+  let project.apply            = function(s:getSNR('apply'))
+  let project.map              = function(s:getSNR('map'))
+  let project.find_holder      = function(s:getSNR('find_holder'))
+  let project.find_holder_name = function(s:getSNR('find_holder_name'))
+  let project.get_names        = function(s:getSNR('get_names'))
+  let project._update_option   = function(s:getSNR('_update_option'))
+  let project._use_options     = function(s:getSNR('_use_options'))
+  let project._remove_buffer   = function(s:getSNR('_remove_buffer'))
+  let project.__lhvl_oo_type   = function(s:getSNR('__lhvl_oo_type'))
 
   " Let's automatically register the current buffer
   call project.register_buffer()
@@ -1090,6 +1113,49 @@ function! lh#project#exists(var) abort
   endif
 endfunction
 
+" Function: lh#project#_best_varname_match(varname) {{{3
+" Given:
+" - p{parent}:foo.bar = ...
+" - p{parent}:d2      = ...
+" - p{crt}:foo.b2     = ...
+" Then:
+" - lh#project#_best_varname_match('foo') -> crt
+" - lh#project#_best_varname_match('foo.b2') -> crt
+" - lh#project#_best_varname_match('toto') -> crt
+" - lh#project#_best_varname_match('foo.bar') -> parent
+" - lh#project#_best_varname_match('d2') -> parent
+" - lh#project#_best_varname_match('d2.l2') -> parent
+function! lh#project#_best_varname_match(varname) abort
+  if a:varname =~ '^p:'
+    call lh#assert#match('^p:', a:varname)
+    let [all, kind, name; dummy] = matchlist(a:varname, '\v^p:([&$])=(.*)')
+  elseif a:varname =~ '^&p:'
+    let [all, kind, name; dummy] = matchlist(a:varname, '\v^(\&)p:(.*)')
+  else
+    call lh#assert#unexpected('Unexpected variable name '.string(a:varname))
+  endif
+  if lh#project#is_in_a_project()
+    " let varname = kind.name
+    " TODO: test kind -> options, env
+    let varname = '.variables.'.name
+    let absvarname = 'b:'.s:project_varname.varname
+    let prj = b:{s:project_varname}
+    let holded_name = prj.find_holder_name(name)
+    if !empty(holded_name)
+      return 'b:'.s:project_varname.holded_name.name
+    else
+      let parts = split(a:varname, '\.')
+      if len(parts) == 1
+        return absvarname
+      else
+        return lh#project#_best_varname_match(join(parts[:-2], '.')).'.'.parts[-1]
+      endif
+    endif
+    return 'b:'.s:project_varname.'.variables.'.name
+  else
+    return s:k_unset
+  endif
+endfunction
 " # Find project root {{{2
 let s:project_roots = get(s:, 'project_roots', [])
 " Function: lh#project#root() {{{3
