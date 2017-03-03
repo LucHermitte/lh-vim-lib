@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  02nd Mar 2017
+" Last Update:  03rd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -242,17 +242,19 @@ endfunction
 " Function: s:Test_best_varname_match() {{{2
 function! s:Test_best_varname_match() abort
   call lh#on#_unlet(s:prj_varname)
-  let parent = lh#project#new({'name': 'UT1'})
+  let parent = lh#project#new({'name': 'UT_prnt'})
   AssertIs(parent, {s:prj_varname})
   AssertEquals(parent.depth(), 1)
-  let child = lh#project#new({'name': 'UT2'})
+  let child = lh#project#new({'name': 'UT_chld'})
   AssertEquals(child.depth(), 2)
   AssertIs(parent, child.parents[0])
   AssertIs(child, {s:prj_varname})
 
-  call parent.set('shared.shdprnt', 42)
+  call parent.set('shared.shdprnt', {})
   call parent.set('parent', {})
   call child.set('shared.shdchld', {})
+  let g:ut_parent = parent
+  let g:ut_child = child
 
   let expected_child   = s:prj_varname.'.variables.'
   let expected_parents = s:prj_varname.'.parents[0].variables.'
@@ -272,14 +274,14 @@ function! s:Test_best_varname_match() abort
   AssertEquals(lh#project#_best_varname_match('', 'parent.newkey.subkey').realname,   expected_parents.'parent.newkey.subkey')
 
   " Now the same thing with LetTo
-  LetTo p:newchld.k = 10
-  LetTo p:shared.newkey = 11
-  LetTo p:shared.shdchld.newkey = 12
-  LetTo p:shared.shdchld.new.key = 13
+  LetTo --overwrite p:newchld.k = 10
+  LetTo --overwrite p:shared.newkey = 11
+  LetTo --overwrite p:shared.shdchld.newkey = 12
+  LetTo --overwrite p:shared.shdchld.new.key = 13
 
-  LetTo p:shared.shdprnt.newkey = 14
-  LetTo p:shared.shdprnt.new.key = 15
-  LetTo p:parent.newkey.subkey = 16
+  LetTo --overwrite p:shared.shdprnt.newkey = 14
+  LetTo --overwrite p:shared.shdprnt.new.key = 15
+  LetTo --overwrite p:parent.newkey.subkey = 16
 
   AssertEquals(parent.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}}, 'parent': {'newkey': {'subkey': 16}}})
   AssertEquals(child.variables, {'shared': {'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}}}, 'newchld': {'k': 10}})

@@ -22,12 +22,12 @@ let s:k_version = '400'
 " TODO:
 " - Doc
 "   - prj.get_names()
+"   - lh#project#_best_varname_match()
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
 " - Toggling:
 "   - at global level: [a, b, c]
 "   - at project level: [default value from global VS force [a, b, c]]
-" - Completion on :Let* and :Unlet for inherited p:variables
 " - Use in plugins
 "   - p:$ENV variables
 "     - [X] lh-tags synchronous (via lh#os#system)
@@ -56,6 +56,8 @@ let s:k_version = '400'
 "   - How to insert a comment near each variable serialized
 "   - How to computed value at the last moment (e.g. path relative to current
 "     directory, and have the variable hold an absolute path)
+" - Without permission lists + _local_vimrc, it seems to try to detect project
+"   root each time we change buffer, hide_or_overwrite.
 " }}}1
 "=============================================================================
 
@@ -963,25 +965,26 @@ function! lh#project#new(params) abort
   if has_key(project, 'auto_discover_root')
     " The option can be forced through #define parameter
     let auto_discover_root = project.auto_discover_root
-    call s:Verbose("prj#new: auto_discover_root set in options: %1", auto_discover_root)
+    call s:Verbose("prj#new(%2): auto_discover_root set in options: %1", auto_discover_root, project.name)
     unlet project.auto_discover_root
   else
     let auto_discover_root = lh#project#_auto_discover_root()
-    call s:Verbose("prj#new: auto_discover_root computed: %1", auto_discover_root)
+    call s:Verbose("prj#new(%2): auto_discover_root computed: %1", auto_discover_root, project.name)
   endif
 
   if type(auto_discover_root) == type({}) && has_key(auto_discover_root, 'value')
-    call s:Verbose("prj#new: auto_discover_root set in options: %1", auto_discover_root.value)
+    call s:Verbose("prj#new(%2): auto_discover_root set in options: %1", auto_discover_root.value, project.name)
     call lh#let#if_undef('p:paths.sources', fnamemodify(auto_discover_root.value, ':p'))
   elseif auto_discover_root !~? '\v^(n%[o]|0)$'
     if ! lh#project#exists('p:paths.sources')
       let root = lh#project#root()
-      call s:Verbose("prj#new: root found: %1", root)
+      call s:Verbose("prj#new(%2): root found: %1", root, project.name)
       if !empty(root)
         call lh#let#if_undef('p:paths.sources', fnamemodify(root[:-2], ':p'))
       endif
     endif
   endif
+  call s:Verbose("prj#new => %1", project)
   return project
 endfunction
 
@@ -1041,7 +1044,7 @@ function! lh#project#crt_bufvar_name() abort
   endif
 endfunction
 
-" Function: lh#project#_crt_var_name(var) {{{3
+" Function: lh#project#_crt_var_name(var [, hide_or_overwrite]) {{{3
 " @return a string for variables, p:local, or b:local
 " @return a dict for p:&opt, and p:$ENV
 " @return a string for b:&opt
@@ -1051,7 +1054,7 @@ let s:k_store_for =
       \ , '&': 'options'
       \ , '$': 'env'
       \ }
-function! lh#project#_crt_var_name(var) abort
+function! lh#project#_crt_var_name(var, ...) abort
   if a:var =~ '^p:'
     let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
   elseif a:var =~ '^&p:'
@@ -1060,20 +1063,25 @@ function! lh#project#_crt_var_name(var) abort
     call lh#assert#unexpected('Unexpected variable name '.string(a:var))
   endif
   if lh#project#is_in_a_project()
+    let hide_or_overwrite = get(a:, 1, '') " empty <=> 'hide'
+    call lh#assert#value(hide_or_overwrite).match('\v\c(hide|overwrite|)')
+    let shall_overwrite = hide_or_overwrite =~? 'overwrite'
     " TODO: Breaks old test => need to make a choice, or intrduce a new command ...
-    " let best_name = lh#project#_best_varname_match(kind, name)
-    let realname = 'b:'.s:project_varname.'.'.s:k_store_for[kind].'.'.name
+    if shall_overwrite
+      let best_name = lh#project#_best_varname_match(kind, name)
+    else
+      let realname = 'b:'.s:project_varname.'.'.s:k_store_for[kind].'.'.name
+    endif
     if kind == ''
-      " return best_name.realname
-      return realname
+      return shall_overwrite ? best_name.realname : realname
     else
       let varname = kind.name
-      " return extend(best_name, {'name': varname})
-      return
-            \ { 'name'    : varname
-            \ , 'realname': realname
-            \ , 'project' : b:{s:project_varname}
-            \ }
+      return shall_overwrite
+            \ ? extend(best_name, {'name': varname})
+            \ : { 'name'    : varname
+            \   , 'realname': realname
+            \   , 'project' : b:{s:project_varname}
+            \   }
     endif
   else
     if kind == '&'
@@ -1297,13 +1305,15 @@ endfunction
 " # Post local vimrc hook {{{2
 " Function: lh#project#_post_local_vimrc() {{{3
 function! lh#project#_post_local_vimrc() abort
-  call s:Verbose('lh#project#_post_local_vimrc()')
+  call s:Verbose('lh#project#_post_local_vimrc() {')
   call lh#project#_auto_detect_project()
   call lh#project#_UseProjectOptions()
+  call s:Verbose('lh#project#_post_local_vimrc() }')
 endfunction
 
 " Function: lh#project#_auto_detect_project() {{{3
 function! lh#project#_auto_detect_project() abort
+  call s:Verbose('lh#project#_auto_detect_project')
   let auto_detect_projects = lh#option#get('lh#project.auto_detect', 0, 'g')
   " If there already is a project defined
   " Or if this is the quickfix window
@@ -1326,6 +1336,7 @@ function! lh#project#_auto_detect_project() abort
 endfunction
 
 function! lh#project#_UseProjectOptions() " {{{3
+  call s:Verbose('lh#project#_UseProjectOptions')
   " # New buffer => update options
   let prj = lh#project#crt()
   if lh#option#is_set(prj)

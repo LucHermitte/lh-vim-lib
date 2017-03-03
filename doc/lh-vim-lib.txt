@@ -3704,12 +3704,13 @@ Examples: >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                  *lh#let#to()*        *:LetTo*      {{{3
-lh#let#to({varname}, {value})~
-:LetTo {varname} {value}~
-:LetTo {varname} = {value}~
+lh#let#to({varname}, {value}[, {hide-or-overwrite}])~
+:LetTo [--hide|--overwrite] {varname} {value}~
+:LetTo [--hide|--overwrite] {varname} = {value}~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |P:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value} assigned, must no be quoted
+@param[in] {hide-or-overwrite} see below
 @return variable built
 
 @note |command-completion| is supported on {varname}.
@@ -3723,6 +3724,21 @@ lh#let#to({varname}, {value})~
     variables must be explictly global, buffer-, windows-, or tab-local.  |s:|
     variables won't give the correct result, nor expressions like
     `expand('<sfile>')`.
+
+{hide-or-overwrite} parameter makes sense only for |p:variables| when there is
+a hierarchy of projects. Its possible values are `"overwrite"` or `"hide"`. By
+default (empty), `"hide"` is assumed.
+
+This permits to chose between:
+- hiding any preexisting occurence(s) of `p:foobar` in parent projects by
+  defining the new `p:foobar` variable at current (leaf) project scope ;
+- and overwriting any preexisting occurence of `p:foobar` in parent projects
+  with a new value -- if there was none, the `p:foobar` variable will be
+  stored in the current (leaf) project.
+
+In order to properly see how dictionaries are handled, refer to
+`s:Test_best_varname_match()` from `tests/lh/project.vim`, and to
+|lh#project#_best_varname_match()|.
 
 lh#let#to({assignment-string})~
 Flavour meant to be used internally by |:LetTo|
