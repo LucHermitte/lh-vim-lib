@@ -74,6 +74,7 @@ function! lh#dict#let(dict, key, value) abort
     endif
     call lh#dict#let(a:dict[key], subkey, a:value)
   endif
+  return a:dict[key]
 endfunction
 " # Dictionary in read-only {{{2
 
