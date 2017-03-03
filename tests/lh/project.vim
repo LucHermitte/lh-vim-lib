@@ -239,8 +239,8 @@ function! s:Test_create_ENV() " {{{2
   endtry
 endfunction
 
-" Function: s:Test_best_varname_match() {{{2
-function! s:Test_best_varname_match() abort
+" Function: s:Test_let_to_best_varname_match() {{{2
+function! s:Test_let_to_best_varname_match() abort
   call lh#on#_unlet(s:prj_varname)
   let parent = lh#project#new({'name': 'UT_prnt'})
   AssertIs(parent, {s:prj_varname})
@@ -252,6 +252,7 @@ function! s:Test_best_varname_match() abort
 
   call parent.set('shared.shdprnt', {})
   call parent.set('parent', {})
+  call parent.set('twice', 42)
   call child.set('shared.shdchld', {})
   let g:ut_parent = parent
   let g:ut_child = child
@@ -274,17 +275,135 @@ function! s:Test_best_varname_match() abort
   AssertEquals(lh#project#_best_varname_match('', 'parent.newkey.subkey').realname,   expected_parents.'parent.newkey.subkey')
 
   " Now the same thing with LetTo
-  LetTo --overwrite p:newchld.k = 10
-  LetTo --overwrite p:shared.newkey = 11
-  LetTo --overwrite p:shared.shdchld.newkey = 12
+  LetTo --overwrite p:newchld.k              = 10
+  LetTo --overwrite p:shared.newkey          = 11
+  LetTo --overwrite p:shared.shdchld.newkey  = 12
   LetTo --overwrite p:shared.shdchld.new.key = 13
 
-  LetTo --overwrite p:shared.shdprnt.newkey = 14
+  LetTo --overwrite p:shared.shdprnt.newkey  = 14
   LetTo --overwrite p:shared.shdprnt.new.key = 15
-  LetTo --overwrite p:parent.newkey.subkey = 16
+  LetTo --overwrite p:parent.newkey.subkey   = 16
+  LetTo --overwrite p:twice                  = 142
 
-  AssertEquals(parent.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}}, 'parent': {'newkey': {'subkey': 16}}})
-  AssertEquals(child.variables, {'shared': {'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}}}, 'newchld': {'k': 10}})
+  AssertEquals(parent.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}} }, 'parent': {'newkey': {'subkey': 16}}, 'twice': 142})
+  AssertEquals(child.variables, {'shared': {'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13} }}, 'newchld': {'k': 10}})
+endfunction
+
+" Function: s:Test_let_to_hide_varname() {{{2
+function! s:Test_let_to_hide_varname() abort
+  " Same test as s:Test_let_tobest_varname_match() but with the default 'hide'
+  " policy.
+  call lh#on#_unlet(s:prj_varname)
+  let parent = lh#project#new({'name': 'UT_prnt'})
+  AssertIs(parent, {s:prj_varname})
+  AssertEquals(parent.depth(), 1)
+  let child = lh#project#new({'name': 'UT_chld'})
+  AssertEquals(child.depth(), 2)
+  AssertIs(parent, child.parents[0])
+  AssertIs(child, {s:prj_varname})
+
+  call parent.set('shared.shdprnt', {})
+  call parent.set('parent', {})
+  call parent.set('twice', 42)
+  call child.set('shared.shdchld', {})
+  let g:ut_parent = parent
+  let g:ut_child = child
+
+  LetTo --hide p:newchld.k              = 10
+  LetTo --hide p:shared.newkey          = 11
+  LetTo --hide p:shared.shdchld.newkey  = 12
+  LetTo --hide p:shared.shdchld.new.key = 13
+
+  LetTo --hide p:shared.shdprnt.newkey  = 14
+  LetTo --hide p:shared.shdprnt.new.key = 15
+  LetTo --hide p:parent.newkey.subkey   = 16
+  LetTo --hide p:twice                  = 142
+
+  AssertEquals(parent.variables, {'shared': {'shdprnt': {}}, 'parent': {}, 'twice': 42})
+  AssertEquals(child.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}, 'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}} }, 'newchld': {'k': 10}, 'parent': {'newkey': {'subkey': 16}}, 'twice': 142})
+endfunction
+" Function: s:Test_let_if_undef_best_varname_match() {{{2
+function! s:Test_let_if_undef_best_varname_match() abort
+  call lh#on#_unlet(s:prj_varname)
+  let parent = lh#project#new({'name': 'UT_prnt'})
+  AssertIs(parent, {s:prj_varname})
+  AssertEquals(parent.depth(), 1)
+  let child = lh#project#new({'name': 'UT_chld'})
+  AssertEquals(child.depth(), 2)
+  AssertIs(parent, child.parents[0])
+  AssertIs(child, {s:prj_varname})
+
+  call parent.set('shared.shdprnt', {})
+  call parent.set('parent', {})
+  call parent.set('twice', 42)
+  call child.set('shared.shdchld', {})
+  let g:ut_parent = parent
+  let g:ut_child = child
+
+  let expected_child   = s:prj_varname.'.variables.'
+  let expected_parents = s:prj_varname.'.parents[0].variables.'
+  AssertEquals(lh#project#_best_varname_match('', 'newchld').realname,                expected_child.'newchld')
+  AssertEquals(lh#project#_best_varname_match('', 'newchld.k').realname,              expected_child.'newchld.k')
+  AssertEquals(lh#project#_best_varname_match('', 'shared').realname,                 expected_child.'shared')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.newkey').realname,          expected_child.'shared.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld').realname,         expected_child.'shared.shdchld')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld.newkey').realname,  expected_child.'shared.shdchld.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld.new.key').realname, expected_child.'shared.shdchld.new.key')
+
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt').realname,         expected_parents.'shared.shdprnt')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt.newkey').realname,  expected_parents.'shared.shdprnt.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt.new.key').realname, expected_parents.'shared.shdprnt.new.key')
+  AssertEquals(lh#project#_best_varname_match('', 'parent').realname,                 expected_parents.'parent')
+  AssertEquals(lh#project#_best_varname_match('', 'parent.newkey').realname,          expected_parents.'parent.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'parent.newkey.subkey').realname,   expected_parents.'parent.newkey.subkey')
+
+  " Now the same thing with LetIfUndef
+  LetIfUndef --overwrite p:newchld.k              = 10
+  LetIfUndef --overwrite p:shared.newkey          = 11
+  LetIfUndef --overwrite p:shared.shdchld.newkey  = 12
+  LetIfUndef --overwrite p:shared.shdchld.new.key = 13
+
+  LetIfUndef --overwrite p:shared.shdprnt.newkey  = 14
+  LetIfUndef --overwrite p:shared.shdprnt.new.key = 15
+  LetIfUndef --overwrite p:parent.newkey.subkey   = 16
+  LetIfUndef --overwrite p:twice                  = 142
+
+  AssertEquals(parent.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}} }, 'parent': {'newkey': {'subkey': 16}}, 'twice': 42})
+  AssertEquals(child.variables, {'shared': {'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13} }}, 'newchld': {'k': 10}})
+endfunction
+
+" Function: s:Test_let_if_undef_hide_varname() {{{2
+function! s:Test_let_if_undef_hide_varname() abort
+  " Same test as s:Test_let_if_undef_best_varname_match() but with the default 'hide'
+  " policy.
+  call lh#on#_unlet(s:prj_varname)
+  let parent = lh#project#new({'name': 'UT_prnt'})
+  AssertIs(parent, {s:prj_varname})
+  AssertEquals(parent.depth(), 1)
+  let child = lh#project#new({'name': 'UT_chld'})
+  AssertEquals(child.depth(), 2)
+  AssertIs(parent, child.parents[0])
+  AssertIs(child, {s:prj_varname})
+
+  call parent.set('shared.shdprnt', {})
+  call parent.set('parent', {})
+  call parent.set('twice', 42)
+  call child.set('shared.shdchld', {})
+  let g:ut_parent = parent
+  let g:ut_child = child
+
+  LetIfUndef --hide p:newchld.k              = 10
+  LetIfUndef --hide p:shared.newkey          = 11
+  LetIfUndef --hide p:shared.shdchld.newkey  = 12
+  LetIfUndef --hide p:shared.shdchld.new.key = 13
+
+  LetIfUndef --hide p:shared.shdprnt.newkey  = 14
+  LetIfUndef --hide p:shared.shdprnt.new.key = 15
+  LetIfUndef --hide p:parent.newkey.subkey   = 16
+  LetIfUndef --hide p:twice                  = 142
+
+  AssertEquals(parent.variables, {'shared': {'shdprnt': {}}, 'parent': {}, 'twice': 42})
+  AssertEquals(child.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}, 'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}} }, 'newchld': {'k': 10}, 'parent': {'newkey': {'subkey': 16}}})
 endfunction
 " }}}1
 "------------------------------------------------------------------------
