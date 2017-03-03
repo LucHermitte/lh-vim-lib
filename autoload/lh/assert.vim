@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  01st Mar 2017
+" Last Update:  03rd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -245,45 +245,66 @@ function! s:not() dict abort " {{{4
   return res
 endfunction
 
-function! s:is_lt(ref) dict abort " {{{4
+function! s:is_lt(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual < a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be lesser than '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to be lesser than '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:is_le(ref) dict abort " {{{4
+function! s:is_le(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual w= a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be lesser or equal to '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to be lesser or equal to '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:is_gt(ref) dict abort " {{{4
+function! s:is_gt(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual > a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be greater than '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to be greater than '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:is_ge(ref) dict abort " {{{4
+function! s:is_ge(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual >= a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be greater or equal to '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to be greater or equal to '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:eq(ref) dict abort " {{{4
+function! s:eq(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual == a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to equal '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to equal '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:diff(ref) dict abort " {{{4
+function! s:diff(ref, ...) dict abort " {{{4
   if ! self.__eval(self.actual != a:ref)
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to differ from '.string(a:ref))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to differ from '.string(a:ref)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
-function! s:has_key(key) dict abort " {{{4
+function! s:match(pattern, ...) dict abort " {{{4
+  if self.__eval(self.actual !~ a:pattern)
+    let msg = a:0 > 0 ? a:1 : 'Pattern '.string(a:pattern).' does not match '.string(self.actual)
+    call lh#assert#_trace_assert(msg)
+  endif
+endfunction
+function! s:has_key(key, ...) dict abort " {{{4
   if ! self.__eval(has_key(self.actual, a:key))
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to have key '.string(a:key))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to have key '.string(a:key)
+    call lh#assert#_trace_assert(msg)
+  endif
+  return self
+endfunction
+
+function! s:empty(...) dict abort " {{{4
+  if ! self.__eval(empty(self.actual))
+    let msg = a:0 > 0 ? a:1 : 'Variable is not empty but contain: '.string(a:pattern)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction
@@ -299,7 +320,9 @@ function! s:pre_build_value() abort " {{{4
   let res.is_ge   = function(s:getSNR('is_ge'))
   let res.eq      = function(s:getSNR('eq'))
   let res.diff    = function(s:getSNR('diff'))
+  let res.match   = function(s:getSNR('match'))
   let res.has_key = function(s:getSNR('has_key'))
+  let res.empty   = function(s:getSNR('empty'))
 
   let ignored = lh#object#make_top_type({})
   let ignored.not     = function(s:getSNR('__ignore'))
@@ -309,7 +332,9 @@ function! s:pre_build_value() abort " {{{4
   let ignored.is_ge   = ignored.not
   let ignored.eq      = ignored.not
   let ignored.diff    = ignored.not
+  let ignored.match   = ignored.not
   let ignored.has_key = ignored.not
+  let ignored.empty   = ignored.not
   return [res, ignored]
 endfunction
 let [s:value_default, s:value_ignore] = s:pre_build_value()

@@ -295,6 +295,7 @@ Design by Contract related functions                    |lhvl#DbC|        {{{2
   - |lh#assert#match()|
   - |lh#assert#not_equal()|
   - |lh#assert#true()|
+  - |lh#assert#value().empty()|
   - |lh#assert#value().equal()|
   - |lh#assert#value().differ()|
   - |lh#assert#value().is_lt()|
@@ -302,6 +303,7 @@ Design by Contract related functions                    |lhvl#DbC|        {{{2
   - |lh#assert#value().is_gt()|
   - |lh#assert#value().is_ge()|
   - |lh#assert#value().has_key()|
+  - |lh#assert#value().match()|
   - |lh#assert#value().not()|
   - |lh#assert#unexpected()|
 
@@ -4158,14 +4160,16 @@ lh#assert#if({cond1}).then_expect({cond2} [, {msg}])   *lh#assert#if().then_expe
     i.e. it asserts that {cond2} is True when {cond1} is True.
     `lh#assert#if(context_applies).then_expect(stuff)`
 
-lh#assert#value({actual}).equal({ref})                 *lh#assert#value().equal()*
-lh#assert#value({actual}).differ({ref})                *lh#assert#value().differ()*
-lh#assert#value({actual}).is_lt({ref})                 *lh#assert#value().is_lt()*
-lh#assert#value({actual}).is_le({ref})                 *lh#assert#value().is_le()*
-lh#assert#value({actual}).is_gt({ref})                 *lh#assert#value().is_gt()*
-lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge()*
-lh#assert#value({actual}).has_key({key})               *lh#assert#value().has_key()*
-lh#assert#value({actual}).not()                        *lh#assert#value().not()*
+lh#assert#value({actual}).equal({ref}[, {msg}])                 *lh#assert#value().equal()*
+lh#assert#value({actual}).differ({ref}[, {msg}])                *lh#assert#value().differ()*
+lh#assert#value({actual}).is_lt({ref}[, {msg}])                 *lh#assert#value().is_lt()*
+lh#assert#value({actual}).is_le({ref}[, {msg}])                 *lh#assert#value().is_le()*
+lh#assert#value({actual}).is_gt({ref}[, {msg}])                 *lh#assert#value().is_gt()*
+lh#assert#value({actual}).is_ge({ref}[, {msg}])                 *lh#assert#value().is_ge()*
+lh#assert#value({actual}).empty([, {msg}])                      *lh#assert#value().empty()*
+lh#assert#value({actual}).has_key({key}[, {msg}])               *lh#assert#value().has_key()*
+lh#assert#value({actual}).match({pattern}[, {msg}])             *lh#assert#value().match()*
+lh#assert#value({actual}).not([, {msg}])                        *lh#assert#value().not()*
     Just another syntax to do the same thing. Choose what suits you best.
     Notes:
     - these functions return {actual}, while `not()` inverse the following tests.
