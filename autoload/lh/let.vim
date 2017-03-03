@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  01st Mar 2017
+" Last Update:  03rd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -55,7 +55,7 @@ function! s:BuildPublicVariableName(var)
   if a:var !~ '\v^[wbptgP]:|[$&]'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^P:'
-    " It's either a project variable if there is a project, or a buffer
+    " P: -> It's either a project variable if there is a project, or a buffer
     " variable otherwise
     if lh#project#is_in_a_project()
       let var = lh#project#_crt_var_name('p'.a:var[1:])
@@ -140,17 +140,17 @@ endfunction
 
 function! lh#let#if_undef(...) abort " {{{4
   call s:Verbose('let_if_undef(%1)', a:000)
-  try
+  " try
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
     if type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
-      call var.project.set(Value)
+      return var.project.set(var.name, Value)
     else
       return s:LetIfUndef(var, Value)
     endif
-  catch /.*/
-    throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
-  endtry
+  " catch /.*/
+    " throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+  " endtry
 endfunction
 
 " Function: lh#let#to(var, value) {{{3
