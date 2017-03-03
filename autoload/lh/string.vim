@@ -7,7 +7,7 @@
 " Version:      3.9.0.
 let s:k_version = '3900'
 " Created:      08th Dec 2015
-" Last Update:  03rd Jan 2017
+" Last Update:  03rd Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -87,6 +87,8 @@ function! lh#string#as(val) abort
     if has_key(a:val, '_to_string')
       return a:val._to_string()
     endif
+    return string(a:val)
+  elseif type(a:val) == type(function('has'))
     return string(a:val)
   endif
   return a:val
