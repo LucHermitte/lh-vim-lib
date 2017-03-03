@@ -233,7 +233,8 @@ function! lh#let#unlet(var) abort " {{{4
       " It's a p:roject variable
       let prj = lh#project#crt()
       if lh#option#is_unset(prj)
-        throw "Current buffer isn't under a project. => There is no ".a:var." variable found to be unlet!"
+        call s:Verbose("Current buffer isn't under a project. => There is no ".a:var." variable found to be unlet!")
+        return
       endif
       let suffix = a:var[2:]
       if empty(suffix)
@@ -241,7 +242,8 @@ function! lh#let#unlet(var) abort " {{{4
       endif
       let h = prj.find_holder(suffix)
       if lh#option#is_unset(h)
-        throw "No ".a:var." variable found to be unlet!"
+        call s:Verbose("No ".a:var." variable found to be unlet!")
+        return
       endif
       unlet h[suffix[0] == '$' ? suffix[1:] : suffix]
       call s:Verbose("unlet %1.%2", h, suffix)
