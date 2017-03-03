@@ -256,20 +256,33 @@ function! s:Test_best_varname_match() abort
 
   let expected_child   = s:prj_varname.'.variables.'
   let expected_parents = s:prj_varname.'.parents[0].variables.'
-  AssertEquals(lh#project#_best_varname_match('p:newchld'),                expected_child.'newchld')
-  AssertEquals(lh#project#_best_varname_match('p:newchld.k'),              expected_child.'newchld.k')
-  AssertEquals(lh#project#_best_varname_match('p:shared'),                 expected_child.'shared')
-  AssertEquals(lh#project#_best_varname_match('p:shared.newkey'),          expected_child.'shared.newkey')
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld'),         expected_child.'shared.shdchld')
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld.newkey'),  expected_child.'shared.shdchld.newkey')
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdchld.new.key'), expected_child.'shared.shdchld.new.key')
+  AssertEquals(lh#project#_best_varname_match('', 'newchld').realname,                expected_child.'newchld')
+  AssertEquals(lh#project#_best_varname_match('', 'newchld.k').realname,              expected_child.'newchld.k')
+  AssertEquals(lh#project#_best_varname_match('', 'shared').realname,                 expected_child.'shared')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.newkey').realname,          expected_child.'shared.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld').realname,         expected_child.'shared.shdchld')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld.newkey').realname,  expected_child.'shared.shdchld.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdchld.new.key').realname, expected_child.'shared.shdchld.new.key')
 
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt'),         expected_parents.'shared.shdprnt')
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt.newkey'),  expected_parents.'shared.shdprnt.newkey')
-  AssertEquals(lh#project#_best_varname_match('p:shared.shdprnt.new.key'), expected_parents.'shared.shdprnt.new.key')
-  AssertEquals(lh#project#_best_varname_match('p:parent'),                 expected_parents.'parent')
-  AssertEquals(lh#project#_best_varname_match('p:parent.newkey'),          expected_parents.'parent.newkey')
-  AssertEquals(lh#project#_best_varname_match('p:parent.newkey.subkey'),   expected_parents.'parent.newkey.subkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt').realname,         expected_parents.'shared.shdprnt')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt.newkey').realname,  expected_parents.'shared.shdprnt.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'shared.shdprnt.new.key').realname, expected_parents.'shared.shdprnt.new.key')
+  AssertEquals(lh#project#_best_varname_match('', 'parent').realname,                 expected_parents.'parent')
+  AssertEquals(lh#project#_best_varname_match('', 'parent.newkey').realname,          expected_parents.'parent.newkey')
+  AssertEquals(lh#project#_best_varname_match('', 'parent.newkey.subkey').realname,   expected_parents.'parent.newkey.subkey')
+
+  " Now the same thing with LetTo
+  LetTo p:newchld.k = 10
+  LetTo p:shared.newkey = 11
+  LetTo p:shared.shdchld.newkey = 12
+  LetTo p:shared.shdchld.new.key = 13
+
+  LetTo p:shared.shdprnt.newkey = 14
+  LetTo p:shared.shdprnt.new.key = 15
+  LetTo p:parent.newkey.subkey = 16
+
+  AssertEquals(parent.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}}, 'parent': {'newkey': {'subkey': 16}}})
+  AssertEquals(child.variables, {'shared': {'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}}}, 'newchld': {'k': 10}})
 endfunction
 " }}}1
 "------------------------------------------------------------------------
