@@ -58,10 +58,13 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous)
     " P: -> It's either a project variable if there is a project, or a buffer
     " variable otherwise
     if lh#project#is_in_a_project()
-      if a:must_keep_previous && lh#option#is_set(lh#project#crt().get(a:var))
-        call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
-        return lh#option#unset()
-        " No need to check anything,
+      if a:must_keep_previous
+        let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+        if lh#option#is_set(value)
+          call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
+          return extend(copy(lh#option#unset()), {'_value': value})
+          " No need to check anything,
+        endif
       endif
       let var = lh#project#_crt_var_name('p'.a:var[1:], a:hide_or_overwrite)
     elseif a:var =~ '^P:[&$]'
@@ -71,10 +74,13 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous)
     endif
   elseif a:var =~ '\v^p:|^\&p:'
     " It's a p:roject variable, or a project option
-    if a:must_keep_previous && lh#option#is_set(lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*')))
-      call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
-      return lh#option#unset()
-      " No need to check anything,
+    if a:must_keep_previous
+      let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+      if lh#option#is_set(value)
+        call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
+        return extend(copy(lh#option#unset()), {'_value': value})
+        " No need to check anything,
+      endif
     endif
     let var = lh#project#_crt_var_name(a:var, a:hide_or_overwrite)
   else
@@ -171,6 +177,8 @@ function! lh#let#if_undef(...) abort " {{{4
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', [1] + a:000)
     if lh#option#is_unset(var)
       call s:Verbose("Notification that %1 is already set, receive => abort let#if_undef", a:000)
+      " but this return the value
+      return var._value
     elseif type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
       return var.project.set(var.name, Value)
