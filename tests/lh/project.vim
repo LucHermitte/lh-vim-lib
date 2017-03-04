@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  03rd Mar 2017
+" Last Update:  04th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -400,7 +400,10 @@ function! s:Test_let_if_undef_hide_varname() abort
   LetIfUndef --hide p:shared.shdprnt.newkey  = 14
   LetIfUndef --hide p:shared.shdprnt.new.key = 15
   LetIfUndef --hide p:parent.newkey.subkey   = 16
+  " Verbose let project
   LetIfUndef --hide p:twice                  = 142
+  " LetIfUndef --overwrite p:twice                  = 142
+  " Verbose! let project
 
   AssertEquals(parent.variables, {'shared': {'shdprnt': {}}, 'parent': {}, 'twice': 42})
   AssertEquals(child.variables, {'shared': {'shdprnt': {'newkey':14, 'new': {'key': 15}}, 'newkey': 11, 'shdchld': {'newkey': 12, 'new': {'key': 13}} }, 'newchld': {'k': 10}, 'parent': {'newkey': {'subkey': 16}}})

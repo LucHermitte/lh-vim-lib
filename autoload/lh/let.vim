@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  03rd Mar 2017
+" Last Update:  04th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -50,14 +50,19 @@ endfunction
 " ## Exported functions {{{1
 "
 " # Let* {{{2
-" Function: s:BuildPublicVariableName(var, hide_or_overwrite) {{{3
-function! s:BuildPublicVariableName(var, hide_or_overwrite)
+" Function: s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) {{{3
+function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous)
   if a:var !~ '\v^[wbptgP]:|[$&]'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^P:'
     " P: -> It's either a project variable if there is a project, or a buffer
     " variable otherwise
     if lh#project#is_in_a_project()
+      if a:must_keep_previous && lh#option#is_set(lh#project#crt().get(a:var))
+        call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
+        return lh#option#unset()
+        " No need to check anything,
+      endif
       let var = lh#project#_crt_var_name('p'.a:var[1:], a:hide_or_overwrite)
     elseif a:var =~ '^P:[&$]'
       throw "Options and environment variable names like `".a:var."` are not supported. Use `p:` or plain variables."
@@ -66,6 +71,11 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite)
     endif
   elseif a:var =~ '\v^p:|^\&p:'
     " It's a p:roject variable, or a project option
+    if a:must_keep_previous && lh#option#is_set(lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*')))
+      call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
+      return lh#option#unset()
+      " No need to check anything,
+    endif
     let var = lh#project#_crt_var_name(a:var, a:hide_or_overwrite)
   else
     let var = a:var
@@ -73,9 +83,9 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite)
   return var
 endfunction
 
-" Function: s:BuildPublicVariableNameAndValue(string|var, value) {{{3
+" Function: s:BuildPublicVariableNameAndValue(must_keep_previous ; string|var, value) {{{3
 let s:k_hide_or_overwite = '--(hide|overwrite)'
-function! s:BuildPublicVariableNameAndValue(...)
+function! s:BuildPublicVariableNameAndValue(must_keep_previous, ...)
   if len(a:000) == 1
     " Strip --overwrite/--hide option
     let [all, hide_or_overwrite, expr ; tail] = matchlist(a:1, '\v^%('.s:k_hide_or_overwite.'\s*)=(.*)$')
@@ -103,7 +113,7 @@ function! s:BuildPublicVariableNameAndValue(...)
     let hide_or_overwrite = get(a:, 3, '')
     " let value = string(a:2)
   endif
-  let resvar = s:BuildPublicVariableName(var, hide_or_overwrite)
+  let resvar = s:BuildPublicVariableName(var, hide_or_overwrite, a:must_keep_previous)
   return [resvar, l:Value]
 endfunction
 
@@ -128,8 +138,10 @@ function! s:LetIfUndef(var, value) abort " {{{4
       let dict2 = s:LetIfUndef(dict, {})
       if !has_key(dict2, key)
         " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        call s:Verbose("let %1.%2 = %3", dict, key, a:value)
         let dict2[key] = a:value
-        call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
+      else
+        call s:Verbose("(LetIfUndef) %1.%2 exists => abort recursion", dict, key)
       endif
       return dict2[key]
     else
@@ -139,11 +151,14 @@ function! s:LetIfUndef(var, value) abort " {{{4
           " Environment variables are not supposed to receive anything but
           " strings. And they don't support `let {var} = value`
           exe 'let '.a:var.' = '.string(a:value)
+          call s:Verbose("let %1 = %2", a:var, a:value)
         else
           " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
           let {a:var} = a:value
           call s:Verbose("let %1 = %2", a:var, {a:var})
         endif
+      else
+        call s:Verbose("(LetIfUndef) %1 exists => abort recursion", a:var)
       endif
       exe 'return '.a:var
       " return {a:var} " syntax not supported with environment variables
@@ -153,8 +168,10 @@ endfunction
 function! lh#let#if_undef(...) abort " {{{4
   call s:Verbose('let_if_undef(%1)', a:000)
   " try
-    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    if type(var) == type({}) && has_key(var, 'project')
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', [1] + a:000)
+    if lh#option#is_unset(var)
+      call s:Verbose("Notification that %1 is already set, receive => abort let#if_undef", a:000)
+    elseif type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
       return var.project.set(var.name, Value)
     else
@@ -208,7 +225,8 @@ endfunction
 function! lh#let#to(...) abort " {{{4
   call s:Verbose('let_to(%1)', a:000)
   " try
-    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', [0] + a:000)
+    call lh#assert#true(lh#option#is_set(var))
     if type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
       call var.project.set(var.name, Value)
