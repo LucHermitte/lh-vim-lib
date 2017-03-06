@@ -75,6 +75,7 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 | `lh#assert#value().empty()`    | Asserts `empty(actual)`                                                                                                                           |
 | `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                                    |
 | `lh#assert#value().match()`    | Asserts `actual =~ pattern`                                                                                                                       |
+| `lh#assert#value().verifies()` | Asserts the predicate passed evaluates to true with the specified parameters                                                                      |
 | `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                                         |
 | `lh#assert#type().is()`        | Asserts the type of the expression is as expected                                                                                                 |
 | `lh#assert#type().belongs_to()`| Asserts the type of the expression belongs to the list of data passed                                                                             |

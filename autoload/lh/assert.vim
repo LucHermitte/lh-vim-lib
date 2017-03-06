@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  04th Mar 2017
+" Last Update:  06th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -236,19 +236,12 @@ endfunction
 function! s:__eval(bool) dict abort "{{{4
   return a:bool
 endfunction
-function! s:__lazyeval(func, ...) dict abort "{{{4
-  return call(a:func, a:000)
-endfunction
 function! s:__negate(bool) dict abort "{{{4
   return ! a:bool
-endfunction
-function! s:__lazynegate(func, ...) dict abort "{{{4
-  return ! call(a:func, a:000)
 endfunction
 function! s:not() dict abort " {{{4
   let res = copy(self)
   let res.__eval = function(s:getSNR('__negate'))
-  let res.__lazyeval = function(s:getSNR('__lazynegate'))
   return res
 endfunction
 function! s:is_lt(ref, ...) dict abort " {{{4
@@ -329,10 +322,17 @@ function! s:is_unset(...) dict abort " {{{4
   return self
 endfunction
 " Pre-built #value() result
+function! s:verifies(func, ...) dict abort "{{{4
+  let args = get(a:, 1, [])
+  if ! self.__eval( (type(a:func)==type('') && lh#type#is_dict(self.actual) && has_key(self.actual, a:func)) ? call(self.actual[a:func], args, self.actual) : call(a:func, [self.actual]+args))
+    let msg = a:0 > 0 ? a:2 : lh#string#as(self.actual)." doesn't verify: ".a:func
+    call lh#assert#_trace_assert(msg)
+  endif
+  return self
+endfunction
 function! s:pre_build_value() abort " {{{4
   let res = lh#object#make_top_type({})
   let res.__eval     = function(s:getSNR('__eval'))
-  let res.__lazyeval = function(s:getSNR('__lazyeval'))
   let res.not        = function(s:getSNR('not'))
   let res.is_lt      = function(s:getSNR('is_lt'))
   let res.is_le      = function(s:getSNR('is_le'))
@@ -345,6 +345,7 @@ function! s:pre_build_value() abort " {{{4
   let res.empty      = function(s:getSNR('empty'))
   let res.is_set     = function(s:getSNR('is_set'))
   let res.is_unset   = function(s:getSNR('is_unset'))
+  let res.verifies   = function(s:getSNR('verifies'))
 
   let ignored = lh#object#make_top_type({})
   let ignored.not      = function(s:getSNR('__ignore'))
@@ -359,6 +360,7 @@ function! s:pre_build_value() abort " {{{4
   let ignored.empty    = ignored.not
   let ignored.is_set   = ignored.not
   let ignored.is_unset = ignored.not
+  let ignored.verifies = ignored.not
   return [res, ignored]
 endfunction
 let [s:value_default, s:value_ignore] = s:pre_build_value()
