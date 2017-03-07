@@ -5,9 +5,9 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Version:      4.0.0
-let s:k_version = '4.0.00'
+let s:k_version = '4.0.0'
 " Created:      20th Nov 2015
-" Last Update:  02nd Nov 2016
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Formatting functions
@@ -65,7 +65,7 @@ function! lh#fmt#printf(format, ...) abort
   endfor
   " let args = map(args, 'lh#string#as(v:val)')
   let res = substitute(a:format, '\v\%(\d+)', '\=args[submatch(1)-1]', 'g')
-  let res = substitute(res, '\v\%\{(\d+)\.(\k{-})\}', '\=lh#string#as(a:000[submatch(1)-1][submatch(2)])', 'g')
+  let res = substitute(res, '\v\%\{(\d+)\.(%(\k|\.){-})\}', '\=lh#string#as(lh#dict#get_composed(a:000[submatch(1)-1], submatch(2)))', 'g')
   return res
 endfunction
 
