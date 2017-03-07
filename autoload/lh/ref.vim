@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      09th Sep 2016
-" Last Update:  13th Oct 2016
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -55,7 +55,11 @@ endfunction
 " - Methods {{{3
 function! s:resolve() dict abort " {{{4
   if     type(self.to) == type({})
-    return lh#dict#get_composed(self.to, self.key)
+    if lh#project#is_a_project(self.to)
+      return self.to.get(self.key)
+    else
+      return lh#dict#get_composed(self.to, self.key)
+    endif
   elseif self.to =~ '^p:'
     return lh#project#_get(self.to[2:])
   elseif self.to =~ ':'
@@ -68,7 +72,11 @@ endfunction
 
 function! s:assign(value) dict abort " {{{4
   if     type(self.to) == type({})
-    return lh#dict#let(self.to, self.key, a:value)
+    if lh#project#is_a_project(self.to)
+      return (self.to).update(self.key, a:value)
+    else
+      return lh#dict#let(self.to, self.key, a:value)
+    endif
   else
     call lh#let#to(self.to, a:value)
   endif
@@ -84,7 +92,11 @@ function! s:to_string(...) dict abort " {{{4
   if has_key(self, 'fmt')
     return lh#fmt#printf(self.fmt, self)
   elseif has_key(self, 'key')
-    return '{ref->(dict['.self.key.']): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+    if lh#project#is_a_project(self.to)
+      return '{ref->(p:{'.(self.to.name).'}['.self.key.']): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+    else
+      return '{ref->(dict['.self.key.']): '.lh#object#_to_string(self.resolve(), handled_list).'}'
+    endif
   else
     return '{ref->('.(self.to).'): '.lh#object#_to_string(self.resolve(), handled_list).'}'
   endif
@@ -106,13 +118,13 @@ function! lh#ref#bind(varname, ...) abort
   return res
 endfunction
 
-" # Private {{{2
-let s:bind = get(s:, 'bind', {})
-
 " Function: lh#ref#is_bound(var) {{{3
 function! lh#ref#is_bound(var) abort
   return type(a:var) == type({}) && get(a:var, 'type', 42) is s:bind
 endfunction
+
+" # Private {{{2
+let s:bind = get(s:, 'bind', {})
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
