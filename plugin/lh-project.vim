@@ -52,9 +52,9 @@ let s:toggle_auto_chdir =
 call lh#menu#def_toggle_item(s:toggle_auto_chdir)
 
 " ## Commands {{{1
-command! -nargs=* -complete=customlist,lh#project#_complete_command
+command! -nargs=* -complete=customlist,lh#project#cmd#_complete
       \ Project
-      \ call lh#project#_command(<f-args>)
+      \ call lh#project#cmd#execute(<f-args>)
 
 " ## Auto commands {{{1
 augroup LH_PROJECT

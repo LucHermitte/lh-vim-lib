@@ -647,6 +647,7 @@ the firsts I've in mind).
  * Be able to control which parent is filled with `lh#let#` functions
    * [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
    * [ ] `:Project <name> :LetTo var = value`
+ * Factorize `:Project` code for command & completion
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)
@@ -660,6 +661,8 @@ the firsts I've in mind).
    * Have let-modeline support p:var, p:&opt, and p:$env
  * Add convenience functions to fill permission lists
  * Split autoload/lh/project.vim into several files
+   *  [/] command -> project/cmd.vim
+   *  [ ] list -> project/list.vim ?
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
