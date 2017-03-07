@@ -663,7 +663,7 @@ let s:buffers = get(s:, 'buffers', {})
 function! s:register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
   if !empty(bufname(bid))
-    let s:buffers[bid] = bufname(bid).' -- ft:'.getbufvar(bid, '&ft', '???')
+    let s:buffers[bid] = bufname(bid).' -- ft:'.lh#option#getbufvar(bid, '&ft', '???')
   endif
   " if there is already a (different project), then inherit from it
   let inherited = lh#option#getbufvar(bid, s:project_varname)
@@ -1284,7 +1284,7 @@ endfunction
 " Function: lh#project#is_eligible([bid]) {{{3
 function! lh#project#is_eligible(...) abort
   if a:0 > 0
-    return (getbufvar(a:1, '&ft') != 'qf') && ! lh#path#is_distant_or_scratch(bufname(a:1))
+    return (lh#option#getbufvar(a:1, '&ft') != 'qf') && ! lh#path#is_distant_or_scratch(bufname(a:1))
   else
     return (&ft != 'qf') && ! lh#path#is_distant_or_scratch(expand('%:p'))
   endif

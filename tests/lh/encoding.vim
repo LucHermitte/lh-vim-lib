@@ -5,7 +5,7 @@
 " Version:      3.8.1.
 let s:k_version = '381'
 " Created:      01st Mar 2016
-" Last Update:  29th Dec 2016
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       UT for lh#encoding#*() functions
@@ -57,7 +57,7 @@ function! s:Test_strpart() abort
   while i != len(chars)
     let j = i
     while j != len(chars)
-      AssertEqual(lh#encoding#strpart(string, i, j-i+1), join(chars[i:j], ''))
+      AssertEqual(lh#encoding#strpart(string, i, j-i+1), join(chars[i : j], ''))
       let j += 1
     endwhile
     let i += 1
