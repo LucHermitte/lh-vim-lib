@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:version = '4.0.0'
 " Created:      01st Mar 2013
-" Last Update:  23rd Feb 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -91,7 +91,9 @@ function! lh#mapping#clear() abort
   let s:issues_notified.s = {}
   let s:issues_notified.x = {}
   let s:issues_notified.l = {}
-  let s:issues_notified[''] = {}
+  if has("patch-7.4-1707")
+    let s:issues_notified[''] = {}
+  endif
 endfunction
 
 " Function: lh#mapping#plug(keybinding, name, modes) {{{2

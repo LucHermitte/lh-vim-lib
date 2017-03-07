@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  03rd Mar 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -1049,11 +1049,19 @@ endfunction
 " @return a dict for p:&opt, and p:$ENV
 " @return a string for b:&opt
 " @throw for b:$ENV
-let s:k_store_for =
-      \ { '': 'variables'
-      \ , '&': 'options'
-      \ , '$': 'env'
-      \ }
+if has("patch-7.4-1707")
+  " Accept empty keys...
+  let s:k_store_for =
+        \ { '': 'variables'
+        \ , '&': 'options'
+        \ , '$': 'env'
+        \ }
+else
+  let s:k_store_for =
+        \ { '&': 'options'
+        \ , '$': 'env'
+        \ }
+endif
 function! lh#project#_crt_var_name(var, ...) abort
   if a:var =~ '^p:'
     let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
@@ -1070,7 +1078,7 @@ function! lh#project#_crt_var_name(var, ...) abort
     if shall_overwrite
       let best_name = lh#project#_best_varname_match(kind, name)
     else
-      let realname = 'b:'.s:project_varname.'.'.s:k_store_for[kind].'.'.name
+      let realname = 'b:'.s:project_varname.'.'.get(s:k_store_for, kind, 'variables').'.'.name
     endif
     if kind == ''
       return shall_overwrite ? best_name.realname : realname

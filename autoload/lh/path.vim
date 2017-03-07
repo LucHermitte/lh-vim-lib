@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  01st Mar 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -551,10 +551,9 @@ endfunction
 
 " Function: lh#path#vimfiles() {{{3
 function! lh#path#vimfiles() abort
-  let HOME = exists('$LUCHOME') ? $LUCHOME : $HOME
-  let expected_win = HOME . '/vimfiles'
-  let expected_nix = HOME . '/.vim'
-  let what =  lh#path#to_regex(HOME.'/').'\(vimfiles\|.vim\)'
+  let re_HOME = lh#path#to_regex($HOME.'/')
+  let re_LUCHOME = exists('$LUCHOME') ? '\|'.lh#path#to_regex($LUCHOME.'/'): ''
+  let what =  '\%('.re_HOME.re_LUCHOME.'\)'.'\(vimfiles\|.vim\)'
   " Comment what
   let z = lh#path#find(&rtp,what)
   return z
