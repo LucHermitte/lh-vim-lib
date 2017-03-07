@@ -4007,13 +4007,33 @@ Prefer |:Project--define| or |lh#project#define()|.
 @post A project without an explicit name will be provided one automatically.
 
 Reserved fields:
-- "name"      <- Project name   *lhvl-project_name*
-- "parents"
-- "paths.root" ? TODO!!
-- "buffers"
-- "variables" <- where p:foobar will be stored
-- "options"   <- where altered vim options will be stored
-- "env"       <- where $ENV variables will be stored
+- `"name"`      <- Project name   *lhvl-project_name*
+- `"parents"`   <- List of parent projects
+- `"buffers"`   <- buffer ids that belongs to the project
+- `"variables"` <- where p:foobar will be stored
+- `"options"`   <- where altered vim options will be stored
+- `"env"`       <- where $ENV variables will be stored
+
+Avoid depending on these fields.
+
+and functions:
+- _`inherit()`         <- registers a new parent project (internal)
+- `_register_buffer()` <- registers a buffer to a project (internal)
+- `_remove_buffer()`   <- removes a buffers from "`buffer`" list
+- `_update_option()`   <- propagates an option value in all project buffers ; don't change current buffer
+- `_use_options()`     <- propagates all options to all project buffers
+- `apply()`            <- applies |Funcref| to all project buffers
+- `children()`         <- returns list of children projects
+- `depth()`            <- returns the maximum project hierarchy depth
+- `environment()`      <- aggregates all $ENV defined at current and parent levels
+- `exists()`           <- tells whether a variable is defined at current/parent level
+- `find_holder()`      <- returns |dict| that holds a given var/opt/env
+- `find_holder_name()` <- returns public fullname to a project var/opt/env
+- `get()`              <- returns the value of a var/opt/env at project/parent level
+- `get_names()`        <- returns the |list| of all variables and options stored at this project level
+- `map()`              <- returns `map(copy(self.buffers), a:action)`
+- `set()`              <- sets a new value to a var/opt/env, at project level
+- `update()`           <- updates the value of a var/opt/new, at the project level that holds the data
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#define()*            {{{3

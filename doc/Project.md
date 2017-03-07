@@ -622,7 +622,6 @@ the firsts I've in mind).
 # 6. TO DO list
 
  * Doc
-   * `prj.get_names()`
    * `lh#project#_best_varname_match()`
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
@@ -639,10 +638,9 @@ the firsts I've in mind).
       * [ ] lh-dev
       * [ ] µTemplate
       * [ ] Test on windows!
-   * `paths.sources`
  * Be able to control which parent is filled with `lh#let#` functions
-   * -> `:Project <name> :LetTo var = value`
- * `:call prj.set(plain_variable, value)`
+   * [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
+   * [ ] `:Project <name> :LetTo var = value`
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!

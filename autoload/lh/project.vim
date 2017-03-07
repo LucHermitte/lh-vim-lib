@@ -38,7 +38,6 @@ let s:k_version = '400'
 "     - [ ] lh-dev
 "     - [ ] µTemplate
 "     -> Test on windows!
-"   - paths.sources
 " - Be able to control which parent is filled with lh#let# functions
 "   -> `:Project <name> :LetTo var = value`
 " - Setlocally vim options on new files
@@ -420,7 +419,7 @@ function! s:define_project(prjname) abort " {{{3
 
   let new_prj = s:project_list.get(a:prjname)
   if lh#option#is_set(new_prj)
-    call new_prj.register_buffer()
+    call new_prj._register_buffer()
   else
     " If there is already a project, register_buffer (called by #new) will
     " automatically inherit from it.
@@ -660,7 +659,7 @@ endfunction
 " - Methods {{{3
 " s:buffers is debug variable used to track disapearing buffers
 let s:buffers = get(s:, 'buffers', {})
-function! s:register_buffer(...) dict abort " {{{4
+function! s:_register_buffer(...) dict abort " {{{4
   let bid = a:0 > 0 ? a:1 : bufnr('%')
   if !empty(bufname(bid))
     let s:buffers[bid] = bufname(bid).' -- ft:'.lh#option#getbufvar(bid, '&ft', '???')
@@ -670,14 +669,14 @@ function! s:register_buffer(...) dict abort " {{{4
   if  lh#option#is_set(inherited)
         \ && inherited isnot self
         \ && !lh#list#contain_entity(lh#list#flatten(self.parents), inherited)
-    call self.inherit(inherited)
+    call self._inherit(inherited)
     " and then override with new value
   endif
   call setbufvar(bid, s:project_varname, self)
   call lh#list#push_if_new(self.buffers, bid)
 endfunction
 
-function! s:inherit(parent) dict abort " {{{4
+function! s:_inherit(parent) dict abort " {{{4
   call lh#list#push_if_new(self.parents, a:parent)
 endfunction
 
@@ -757,7 +756,7 @@ function! s:update(varname, value, ...) dict abort " {{{4
   return 0
 endfunction
 
-function! s:do_update_option(bid, varname, value) " {{{4
+function! s:do_update_option(bid, varname, value) abort " {{{4
   if     a:value =~ '^+='
     let lValue = split(getbufvar(a:bid, a:varname), ',')
     call lh#list#push_if_new_elements(lValue, split(a:value[2:], ','))
@@ -916,7 +915,6 @@ endfunction
 " Reserved fields:
 " - "name"
 " - "parents"
-" - "paths.root" ?
 " - "buffers"
 " - "variables" <- where p:foobar will be stored
 "   - "paths"
@@ -938,8 +936,8 @@ function! lh#project#new(params) abort
     let project.name = s:project_list.new_name()
   endif
 
-  let project.inherit          = function(s:getSNR('inherit'))
-  let project.register_buffer  = function(s:getSNR('register_buffer'))
+  let project._inherit          = function(s:getSNR('_inherit'))
+  let project._register_buffer  = function(s:getSNR('_register_buffer'))
   let project.set              = function(s:getSNR('set'))
   let project.update           = function(s:getSNR('update'))
   let project.get              = function(s:getSNR('get'))
@@ -958,7 +956,7 @@ function! lh#project#new(params) abort
   let project.__lhvl_oo_type   = function(s:getSNR('__lhvl_oo_type'))
 
   " Let's automatically register the current buffer
-  call project.register_buffer()
+  call project._register_buffer()
 
   call s:project_list.add_project(project)
 
@@ -996,7 +994,7 @@ function! lh#project#define(s, params, ...) abort
   if !has_key(a:s, name)
     let a:s[name] = lh#project#new(a:params)
   else
-    call a:s[name].register_buffer()
+    call a:s[name]._register_buffer()
   endif
   return a:s[name]
 endfunction
