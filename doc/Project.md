@@ -540,21 +540,40 @@ unreadable `{'_to_string': function('<SNR>43_unset_to_string'), '__lhvl_oo_type'
 
 ### 3.3.2. Define toggable project options
 ```vim
+" Define a global variable, g:bar, that can be toggled
+let Data = {
+      \ "variable": "bar",
+      \ "idx_crt_value": 1,
+      \ "values": [ 'a', 'b', 'c', 'd' ],
+      \ "menu": { "priority": '42.50.10', "name": '&LH-Tests.&TogMenu.&bar'}
+      \}
+call lh#menu#def_toggle_item(Data)
+
+" Define a project variable, p:bar, that can be toggled,
+" and that has a default value coming from the global variable
 let p1 = lh#project#new({'name': 'Menu'})
 let pData = {
     \ "variable": "p:bar",
     \ "idx_crt_value": 1,
     \ "values": [lh#ref#bind('g:bar')] + g:Data.values,
     \ "texts": ['default'] + g:Data.values,
-    \ "menu": { "priority": '42.50.11', "name": '&LH-Tests.&TogMenu.&p:bar'}
+    \ "menu": { "priority": '42.50.11', "name": '&LH-Tests.&TogMenu.&Project Foo p:bar'}
     \}
 Assert! lh#ref#is_bound(pData.values[0])
 call lh#menu#def_toggle_item(pData)
 
 " And the end-user will be able to execute
-Toggle LHTestsTogMenupbar
+Toggle LHTestsTogMenuProjectFoopbar
 " or to toggle the option with the menus
+" to toggle the p:bar variable,
+
+" and to execute
+Toggle LHTestsTogMenubar
+" to toggle the g:bar variable
 ```
+
+**Beware**, toggling `p:bar` with `:Toggle` can be done anywhere, but it'll
+only apply to the option from one specific project!
 
 ### 3.3.3. Execute an external command while some `p:$ENV` variable are defined:
 ```vim
@@ -625,9 +644,9 @@ the firsts I've in mind).
    * `lh#project#_best_varname_match()`
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
- * Toggling:
-   * at global level: [a, b, c]
-   * at project level: [default value from global VS force [a, b, c]]
+ * Be able to control which parent is filled with `lh#let#` functions
+   * [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
+   * [ ] `:Project <name> :LetTo var = value`
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)
@@ -638,16 +657,14 @@ the firsts I've in mind).
       * [ ] lh-dev
       * [ ] µTemplate
       * [ ] Test on windows!
- * Be able to control which parent is filled with `lh#let#` functions
-   * [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
-   * [ ] `:Project <name> :LetTo var = value`
+   * Have let-modeline support p:var, p:&opt, and p:$env
+ * Add convenience functions to fill permission lists
+ * Split autoload/lh/project.vim into several files
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
    * -> merge 'variables', 'env', 'options' in `variables`
  * Fix `find_holder()` to use `update()` code and refactor the later
- * Have let-modeline support p:var, p:&opt, and p:$env
- * Add convenience functions to fill permission lists
  * Add VimL Syntax highlight for `LetTo`, `LetIfUndef`, `p:var`
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.

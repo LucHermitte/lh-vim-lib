@@ -21,13 +21,12 @@ let s:k_version = '400'
 " @since v4.0.0
 " TODO:
 " - Doc
-"   - prj.get_names()
 "   - lh#project#_best_varname_match()
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
-" - Toggling:
-"   - at global level: [a, b, c]
-"   - at project level: [default value from global VS force [a, b, c]]
+" - Be able to control which parent is filled with lh#let# functions
+"   - [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
+"   - [ ] `:Project <name> :LetTo var = value`
 " - Use in plugins
 "   - p:$ENV variables
 "     - [X] lh-tags synchronous (via lh#os#system)
@@ -38,16 +37,14 @@ let s:k_version = '400'
 "     - [ ] lh-dev
 "     - [ ] µTemplate
 "     -> Test on windows!
-" - Be able to control which parent is filled with lh#let# functions
-"   -> `:Project <name> :LetTo var = value`
+"   - Have let-modeline support p:var, p:&opt, and p:$env
+" - Add convinience functions to fill permission lists
+" - Split autoload/lh/project.vim into several files
 " - Setlocally vim options on new files
-" - split autoload/lh/project.vim into several files
 " - Simplify dictionaries
 "   -> no 'parents' when there are none!
 "   -> merge 'variables', 'env', 'options' in `variables`
 " - Fix find_holder() to use update() code and refactor the later
-" - Have let-modeline support p:var, p:&opt, and p:$env
-" - Add convinience functions to fill permission lists
 " - Add VimL Syntax highlight for LetTo, LetIfUndef, p:var
 " - Serialize and deserialize options from a file that'll be maintained
 "   alongside a _vimrc_local.vim file.

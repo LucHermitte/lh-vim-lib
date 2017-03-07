@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      17th Apr 2007
-" Last Update:  10th Oct 2016
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh-vim-lib . lh#menu#def_toggle_item()

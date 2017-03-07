@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  28th Feb 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -30,6 +30,9 @@ let s:k_version = 4000
 "       v3.6.1  ENH: Use new logging framework
 "       v4.0.0  ENH: Extend to work with project p:variables
 "               ENH: Add `lh#menu#remove()`
+"               ENH: toggle-menu on `p:var` always refers to the exact same
+"               variable from the current project at the moment the menu is
+"               defined.
 " TODO: {{{2
 "       * Should the argument to :Toggle be simplified to use the variable name
 "       instead ? May be a banged :Toggle! could work on the real variable
@@ -226,7 +229,7 @@ function! s:SetTextValue(Data, text) abort
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo lh#object#to_string(a:Data.variable).'='.string(value)
+  echo lh#object#to_string(a:Data.variable).'='.lh#object#to_string(value)
 endfunction
 
 " Function: s:NextValue({Data})                            {{{3
@@ -249,7 +252,7 @@ function! s:NextValue(Data) abort
   call s:UpdateMenu(a:Data.menu, new, a:Data.command)
   " Update the binded global variable
   let value = s:Set(a:Data)
-  echo lh#object#to_string(a:Data.variable).'='.string(value)
+  echo lh#object#to_string(a:Data.variable).'='.lh#object#to_string(value)
 endfunction
 
 " Function: s:ClearMenu({Menu}, {text})                    {{{3
@@ -318,6 +321,17 @@ function! lh#menu#def_toggle_item(Data) abort
   let a:Data.val_id = function(s:getSNR('val_id'))
   " Save the menu data as an internal script variable
   let id = s:SaveData(a:Data)
+
+  " If the variable is a p:variable, then we need to bound it to the exact
+  " internal variable in order to alway point to the right variable, even from
+  " a buffer that doesn't belong to the project
+  if type(a:Data.variable) == type('') && a:Data.variable =~ '^p:'
+    let variable = lh#project#crt()
+    let key      = a:Data.variable[2:]
+    let a:Data.variable = lh#ref#bind(variable, key)
+    " let's also override the stringify method to something simplier
+    call a:Data.variable.print_with_fmt('p:{%{1.to.name}}.%{1.key}')
+  endif
 
   " If the index of the current value hasn't been set, fetch it from the
   " associated variable
