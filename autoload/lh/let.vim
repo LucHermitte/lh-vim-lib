@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  04th Mar 2017
+" Last Update:  06th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -74,7 +74,7 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous)
     endif
   elseif a:var =~ '\v^p:|^\&p:'
     " It's a p:roject variable, or a project option
-    if a:must_keep_previous
+    if a:must_keep_previous && lh#project#is_in_a_project()
       let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
       if lh#option#is_set(value)
         call s:Verbose("%1 is defined somewhere => non need to build its name, let's abort", a:var)
