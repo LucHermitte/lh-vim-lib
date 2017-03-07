@@ -134,6 +134,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(export p:$ENV &amp;&amp; command))`                             |
 | `lh#os#cpu_number()`               | Returns the number of processors on the machine                                             |
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                                  |
+| `lh#os#lcd()`                      | Executes `:lcd fnameescape({path})`                                                         |
 
 ### Lists and dictionaries related functions
 | Function                         | Purpose                                                                                                           |

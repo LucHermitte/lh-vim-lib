@@ -244,6 +244,7 @@ OS/System related functions:                            |lhvl#os|         {{{2
 - |lh#os#sys_cd()|
 - |lh#os#cpu_number()|
 - |lh#os#cpu_cores_number()|
+- |lh#os#lcd()|
 Completion related functions                            |lhvl#completion| {{{2
 - |lh#icomplete#new()|
 - |lh#icomplete#new_on()|
@@ -3306,12 +3307,18 @@ It will use /proc/cpuinfo when it exists, or $NUMBER_OF_PROCESSORS on Windows.
 -1 is returned otherwise.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                              *lh#os#cpu_core_number()*           {{{3
-lh#os#cpu_core_number()~
+                                              *lh#os#cpu_cores_number()*          {{{3
+lh#os#cpu_cores_number()~
 Returns the number of cores of the current machine.
 
 It will use /proc/cpuinfo when it exists.
 -1 is returned otherwise. (This is not supported, yet, on Windows)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#os#lcd()*                       {{{3
+lh#os#lcd(path)~
+Executes `:lcd fnameescape({path})` and log the command along the way.
+See |:lcd|, |fnameescape()|.
 
 ------------------------------------------------------------------------------
 COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2
