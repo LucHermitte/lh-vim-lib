@@ -33,7 +33,6 @@ let s:toggle_auto_discover_root =
       \ , 'values': ['in_doubt_ask', 'no', 'yes', 'in_doubt_ignore', 'in_doubt_improvise' ]
       \ , 'menu' : {'priority': '500.110.20', 'name': '&Plugin.&Project.auto discover &root'}
       \ }
-echomsg string(g:lh#project)
 call lh#menu#def_toggle_item(s:toggle_auto_discover_root)
 
 let s:toggle_auto_detect_project =
