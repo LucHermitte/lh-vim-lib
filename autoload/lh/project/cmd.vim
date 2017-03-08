@@ -54,7 +54,7 @@ endfunction
 function! s:As_ls(bid) abort " {{{2
   let name = bufname(a:bid)
   if empty(name)
-    let name = 'Used to be known as: '.lh#project#_buffer(a:bid)
+    let name = 'Used to be known as: '.lh#project#__buffer(a:bid)
   endif
   return printf('%3d%s %s'
         \ , a:bid

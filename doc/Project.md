@@ -171,7 +171,7 @@ the files from a directory hierarchy as part of a same project are:
 
  * At the root, there is a `.svn/` or a `.git/` directory (mercurial is not
    supported, yet, nor other versionning systems);
- * You have set in your `.vimrc`:
+ * You have to set in your `.vimrc`:
 
  ```vim
  LetTo g:lh#project.auto_detect = 1
@@ -660,9 +660,6 @@ the firsts I've in mind).
       * [ ] Test on windows!
    * Have let-modeline support p:var, p:&opt, and p:$env
  * Add convenience functions to fill permission lists
- * Split autoload/lh/project.vim into several files
-   *  [/] command -> project/cmd.vim
-   *  [ ] list -> project/list.vim ?
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!

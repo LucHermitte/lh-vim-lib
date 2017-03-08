@@ -49,16 +49,6 @@ function! lh#project#list#debug(expr) abort
   return eval(a:expr)
 endfunction
 
-" # Misc    {{{2
-" s:getSNR([func_name]) {{{3
-function! s:getSNR(...)
-  if !exists("s:SNR")
-    let s:SNR=matchstr(expand('<sfile>'), '<SNR>\d\+_\zegetSNR$')
-  endif
-  return s:SNR . (a:0>0 ? (a:1) : '')
-endfunction
-
-"------------------------------------------------------------------------
 " ## Public API         {{{1
 
 " Function: lh#project#list#_save() {{{2
