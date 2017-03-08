@@ -31,7 +31,10 @@
       * [3.2.5. Fetch the name under which an option is stored](#325-fetch-the-name-under-which-an-option-is-stored)
       * [3.2.6. Register a buffer to the project](#326-register-a-buffer-to-the-project)
       * [3.2.7. Get a variable under the project](#327-get-a-variable-under-the-project)
-      * [3.2.8. Set a variable in a precise project](#328-set-a-variable-in-a-precise-project)
+      * [3.2.8. Set a variable in a precise project...](#328-set-a-variable-in-a-precise-project)
+        * [...through project references](#through-project-references)
+        * [...through `:Project :let`](#through-project-let)
+        * [...through `:LetTo`](#through-letto)
     * [3.3. You're a plugin maintainer](#33-youre-a-plugin-maintainer)
       * [3.3.1. Get a project variable value:](#331-get-a-project-variable-value)
       * [3.3.2. Define toggable project options](#332-define-toggable-project-options)
@@ -382,6 +385,17 @@ Project ProjectName :doonce echo bufname('%')
 Project :doonce echo bufname('%')
 ```
 
+The best way to execute `:make` on a project is with this subcommand. This way,
+it makes sure all variables related to the project are correctly set when
+compiling.
+
+```vim
+Project ProjectName :doonce make %<
+```
+
+Note that `:Project :doonce command` is strictly equivalent to `:command` and
+doesn't really make any sense.
+
 #### Execute a command in all opened windows associated a project
 ```vim
 Project ProjectName :windo echo bufname('%')
@@ -682,8 +696,6 @@ the firsts I've in mind).
 
  * Doc
    * `lh#project#_best_varname_match()`
- * `:Project [<name>] :make`
-   -> rely on `:Make` if it exists
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)

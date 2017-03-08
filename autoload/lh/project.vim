@@ -22,8 +22,6 @@ let s:k_version = '400'
 " TODO:
 " - Doc
 "   - lh#project#_best_varname_match()
-" - :Project [<name>] :make
-"   -> rely on `:Make` if it exists, `:make` otherwise
 " - Use in plugins
 "   - p:$ENV variables
 "     - [X] lh-tags synchronous (via lh#os#system)

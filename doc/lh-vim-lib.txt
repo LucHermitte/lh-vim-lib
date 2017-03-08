@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 03rd Feb 2017
+                        For Vim version 7+      Last change: 08th Mar 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4026,6 +4026,15 @@ Executes {cmd} in the first window found that is associated to specified
 (or current) project. If no buffer from the project is opened in a window, we
 try to open one (which'll be automatically discarded).
 @pre the project shall have listed buffers.
+
+The best way to execute |:make| on a project is with this subcommand. This way,
+it makes sure all variables related to the project are correctly set when
+compiling. >
+
+    :Project ProjectName :doonce make %<
+
+Note that `:Project :doonce command` is strictly equivalent to `:command` and
+doesn't really make any sense.
 
                                                     *:Project-:windo*
 :Project [{prj-name}] :windo {cmd}~
