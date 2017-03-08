@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/cmd.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.0.0.
+let s:k_version = '400'
 " Created:      07th Mar 2017
-" Last Update:  07th Mar 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define support functions for :Project
@@ -234,7 +234,7 @@ function! s:define_project(prjname) abort " {{{2
   " => create a new project
   " => and register the buffer
 
-  let new_prj = lh#project#_get_prj(a:prjname)
+  let new_prj = lh#project#list#_get(a:prjname)
   if lh#option#is_set(new_prj)
     call new_prj._register_buffer()
   else
@@ -261,15 +261,15 @@ endfunction
 function! s:bd_project(prj, buffers) abort " {{{2
   " TODO: see whether it really makes sense to tell which buffers shall be
   " removed...
-  call lh#assert#true(lh#option#is_unset(a:prj), "Project expected")
-  call lh#project#_unload_prj(a:prj, a:buffers)
+  call lh#assert#value(a:prj).is_set("Project expected")
+  call lh#project#list#_unload_prj(a:prj, a:buffers)
 endfunction
 
 function! s:bw_project(prj, buffers) abort " {{{2
   " TODO: see whether it really makes sense to tell which buffers shall be
   " removed...
-  call lh#assert#true(lh#option#is_unset(a:prj), "Project expected")
-  call lh#project#_wipeout_prj(a:prj, a:buffers)
+  call lh#assert#value(a:prj).is_set("Project expected")
+  call lh#project#list#_wipeout_prj(a:prj, a:buffers)
 endfunction
 
 " ## :Project command definition {{{1
@@ -296,7 +296,7 @@ function! lh#project#cmd#execute(...) abort
   elseif a:1 =~ '-\+h\%[elp]'
     help :Project
   elseif a:1 =~ '^-\+l\%[ist]$' " {{{3
-    let projects = lh#project#_get_all_prjs()
+    let projects = lh#project#list#_get_all_prjs()
     if empty(projects)
       echo "(no project defined)"
     else
@@ -354,7 +354,7 @@ function! lh#project#cmd#execute(...) abort
   else                          " -- project name specified {{{3
 
     let prj_name = a:1
-    let prj = lh#project#_get_prj(prj_name)
+    let prj = lh#project#list#_get(prj_name)
     if lh#option#is_unset(prj)
       throw "There is no project named `".prj_name."`"
     endif
@@ -411,14 +411,14 @@ function! lh#project#cmd#_complete(ArgLead, CmdLine, CursorPos) abort
   let [pos, tokens; dummy] = lh#command#analyse_args(a:ArgLead, a:CmdLine, a:CursorPos)
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(lh#project#_get_all_prjs())), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(lh#project#list#_get_all_prjs())), 'escape(v:val, " ")')
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
-    let prj = lh#project#_get_prj(pos == 3 ? tokens[pos-2] : s:k_unset)
+    let prj = lh#project#list#_get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:let$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=let$')
-    let prj = lh#project#_get_prj(pos == 3 ? tokens[pos-2] : s:k_unset)
+    let prj = lh#project#list#_get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
   elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
         \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')

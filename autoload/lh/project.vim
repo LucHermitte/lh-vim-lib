@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  07th Mar 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -104,156 +104,6 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-" # Project list {{{2
-
-" Function: lh#project#_make_project_list() {{{3
-function! lh#project#_make_project_list() abort
-  let res = lh#object#make_top_type(
-        \ { 'name': 'project_list'
-        \ , 'projects': {}
-        \ , '_next_id': 1
-        \ })
-  let res.new_name             = function(s:getSNR('new_name'))
-  let res.add_project          = function(s:getSNR('add_project'))
-  let res.get                  = function(s:getSNR('get_project'))
-  let res.clear                = function(s:getSNR('clear_projects'))
-  let res.clear_empty_projects = function(s:getSNR('clear_empty_projects'))
-  let res.unload               = function(s:getSNR('unload_project'))
-  let res.wipeout              = function(s:getSNR('wipeout_project'))
-  let res._remove              = function(s:getSNR('_remove_project'))
-  return res
-endfunction
-
-" Function: lh#project#_save_prj_list() {{{3
-" Meant to be used from Unit Tests
-function! lh#project#_save_prj_list() abort
-  return s:project_list
-endfunction
-
-" Function: lh#project#_restore_prj_list(prj_list) {{{3
-" Meant to be used from Unit Tests
-function! lh#project#_restore_prj_list(prj_list) abort
-  let s:project_list = a:prj_list
-endfunction
-
-" Function: lh#project#_clear_prj_list() {{{3
-function! lh#project#_clear_prj_list() abort
-  call s:project_list.clear()
-endfunction
-
-" Function: lh#project#_clear_empty_projects() {{{3
-function! lh#project#_clear_empty_projects() abort
-  call s:project_list.clear_empty_projects()
-endfunction
-
-" Function: lh#project#_get_all_prjs() {{{3
-function! lh#project#_get_all_prjs() abort
-  return s:project_list.get()
-endfunction
-
-" Function: lh#project#_get_prj(prjname) {{{3
-function! lh#project#_get_prj(prjname) abort
-  return s:project_list.get(a:prjname)
-endfunction
-
-" Function: lh#project#_unload_prj(prj, buffers) {{{3
-function! lh#project#_unload_prj(prj, buffers) abort
-  call s:project_list.unload(a:prj, a:buffers)
-endfunction
-
-" Function: lh#project#_wipeout_prj(prj, buffers) {{{3
-function! lh#project#_wipeout_prj(prj, buffers) abort
-  call s:project_list.wipeout(a:prj, a:buffers)
-endfunction
-
-" - Methods {{{3
-function! s:new_name() dict abort " {{{4
-  let name = 'project'. self._next_id
-  let self._next_id += 1
-  return name
-endfunction
-
-function! s:add_project(project) dict abort " {{{4
-  let name = a:project.name
-  if !has_key(self.projects, name)
-    let self.projects[name] = a:project
-  endif
-endfunction
-
-function! s:get_project(...) dict abort " {{{4
-  if a:0 == 0
-    return self.projects
-  else
-    if lh#option#is_unset(a:1)
-      return lh#project#crt()
-    else
-      return get(self.projects, a:1, s:k_unset)
-    endif
-  endif
-endfunction
-
-function! s:clear_projects() dict abort " {{{4
-  " remove all projects
-  for p in self.projects
-    for b in p.buffers
-      let b = getbufvar(b, '')
-      " Avoid `silent!` as it messes Vim client-server mode and as a
-      " consequence rspecs tests
-      if has_key(b, s:project_varname)
-        unlet b[s:project_varname]
-      endif
-    endfor
-  endfor
-  let self.projects = []
-endfunction
-
-function! s:clear_empty_projects() dict abort " {{{4
-  " remove empty projects
-  call filter(self.projects, '!empty(v:val.buffers)')
-endfunction
-
-function! s:_remove_project(prj, how, buffers) dict abort " {{{4
-  " TODO: see whether it really makes sense to tell which buffers shall be
-  " removed...
-  let s:k_messages = { 'bw': 'wiping out', 'bd': 'unloading'}
-  if empty(a:buffers)
-    let can_proceed = lh#ui#confirm("You're on the verge of ".s:k_messages[a:how]." files belonging to `".(a:prj.name)."` project\nDo you confirm the removal?", "&Yes\n&No", 2)
-    if can_proceed != '1' | return | endif
-    " Don't apply to inherited buffers!!!
-    let buffers = a:prj.buffers
-
-    " We still analyse BufUnload event even when the project is removed. Indeed
-    " the project being removed may only be a sub-project and not a parent
-    " project. In that case, we still need to unregister the buffer from the
-    " parent project.
-  endif
-  call s:Verbose('%1 %2', a:how, buffers)
-  exe a:how.' '.join(buffers, ' ')
-  if empty(a:buffers)
-    " if the project has children, remove the subprojects as well,
-    " recursivelly!
-    let children = a:prj.children()
-    let children_names = lh#list#get(children, 'name')
-    call s:Verbose("'%1' children are %2", a:prj.name, children_names)
-    let project_names = children_names + [a:prj.name]
-    call filter(self.projects, 'index(project_names, v:key) < 0')
-    call s:Verbose('Remaining projects are %1', keys(self.projects))
-  endif
-endfunction
-
-function! s:unload_project(prj, buffers) dict abort " {{{4
-  call s:Verbose("Unload `%1` project", a:prj)
-  " return self._remove(a:prj, 'bd', a:buffers)
-  return self._remove(a:prj, 'bd', [])
-endfunction
-
-function! s:wipeout_project(prj, buffers) dict abort " {{{4
-  call s:Verbose("Wipeout `%1` project", a:prj)
-  " return self._remove(a:prj, 'bw', a:buffers)
-  return self._remove(a:prj, 'bw', [])
-endfunction
-
-" # :Project Command definition {{{2
 " # Define a new project {{{2
 " - Methods {{{3
 " s:buffers is debug variable used to track disapearing buffers
@@ -284,7 +134,7 @@ function! s:depth() dict abort " {{{4
 endfunction
 
 function! s:children() dict abort " {{{4
-  let children = filter(copy(values(s:project_list.projects)), 'lh#list#find_entity(v:val.parents, self) >= 0')
+  let children = filter(copy(values(lh#project#list#_get_all_prjs())), 'lh#list#find_entity(v:val.parents, self) >= 0')
   return lh#list#flat_extend(children, filter(map(copy(children), 'v:val.children()'), '!empty(v:val)'))
 endfunction
 
@@ -532,7 +382,7 @@ function! lh#project#new(params) abort
         \ })
   " If no name is provided, generate one on the fly
   if empty(get(project, 'name', ''))
-    let project.name = s:project_list.new_name()
+    let project.name = lh#project#list#_new_name()
   endif
 
   let project._inherit          = function(s:getSNR('_inherit'))
@@ -557,7 +407,7 @@ function! lh#project#new(params) abort
   " Let's automatically register the current buffer
   call project._register_buffer()
 
-  call s:project_list.add_project(project)
+  call lh#project#list#_add_project(project)
 
   if has_key(project, 'auto_discover_root')
     " The option can be forced through #define parameter
@@ -992,7 +842,6 @@ call lh#path#munge(g:lh#project.permissions.blacklist, fnamemodify('/', ':p'))
 " whitelist
 
 " # Internal globals {{{2
-let s:project_list = get(s:, 'project_list', lh#project#_make_project_list())
 let s:permission_lists = lh#path#new_permission_lists(g:lh#project.permissions)
 
 "------------------------------------------------------------------------

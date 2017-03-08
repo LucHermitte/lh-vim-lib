@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  04th Mar 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -40,12 +40,12 @@ let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 "------------------------------------------------------------------------
 " ## Fixture {{{1
 function! s:Setup() " {{{2
-  let s:prj_list = copy(lh#project#_save_prj_list())
+  let s:prj_list = copy(lh#project#list#_save())
   let s:cleanup = lh#on#exit()
         \.restore('b:'.s:prj_varname)
         \.restore('s:prj_varname')
         \.restore('g:lh#project.auto_discover_root')
-        " \.register({-> lh#project#_restore_prj_list(s:prj_list)})
+        " \.register({-> lh#project#list#_restore(s:prj_list)})
   let g:lh#project = { 'auto_discover_root': 'no' }
   if exists('b:'.s:prj_varname)
     exe 'unlet b:'.s:prj_varname
@@ -54,7 +54,7 @@ endfunction
 
 function! s:Teardown() " {{{2
   call s:cleanup.finalize()
-  call lh#project#_restore_prj_list(s:prj_list)
+  call lh#project#list#_restore(s:prj_list)
 endfunction
 
 " ## Tests {{{1
