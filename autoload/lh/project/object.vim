@@ -20,7 +20,10 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 let s:k_unset            = lh#option#unset()
-let s:k_script_name      = expand('<sfile>:p')
+function! s:getSID() abort
+  return eval(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_getSID$'))
+endfunction
+let s:k_script_name      = s:getSID()
 
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
