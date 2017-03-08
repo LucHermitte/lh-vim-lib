@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      17th Apr 2007
-" Last Update:  01st Mar 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -86,6 +86,7 @@ endif
 function! lh#askvim#scriptnames() abort
   let scripts = lh#askvim#execute('scriptnames')
   let s:scripts = map(copy(scripts), 'split(v:val, "\\v:=\\s+")')
+  call lh#list#map_on(s:scripts, 1, 'fnamemodify(v:val, ":p")')
   return s:scripts
 endfunction
 
@@ -100,16 +101,21 @@ function! lh#askvim#scriptname(id) abort
   return s:scripts[a:id - 1][1]
 endfunction
 
-" Function: lh#askvim#scriptid(id) {{{3
-function! lh#askvim#scriptid(name) abort
-  if !exists('s:scripts')
+" Function: lh#askvim#scriptid(name) {{{3
+function! lh#askvim#scriptid(name, ...) abort
+  let last_change = get(a:, 1, 0)
+  if last_change || !exists('s:scripts')
     call lh#askvim#scriptnames()
   endif
   let matches = filter(copy(s:scripts), 'v:val[1] =~ a:name')
   if len(matches) > 1
     throw "Too many scripts match `".a:name."`: ".string(matches)
   elseif empty(matches)
-    throw "No script match `".a:name."`"
+    if last_change
+      throw "No script match `".a:name."`"
+    else
+      return lh#askvim#scriptid(a:name, 1)
+    endif
   endif
   return matches[0][0]
 endfunction
