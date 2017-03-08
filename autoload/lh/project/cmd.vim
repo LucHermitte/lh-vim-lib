@@ -290,7 +290,6 @@ let s:k_usage =
       \ , '  :Project <name>   :bwipeout  " wipeout all buffers related to a project, and remove the project'
       \ ]
 function! lh#project#cmd#execute(...) abort
-  " TODO: Merge cases.
   if     a:1 =~ '-\+u\%[sage]'  " {{{3
     call lh#common#warning_msg(s:k_usage)
   elseif a:1 =~ '-\+h\%[elp]'
@@ -314,45 +313,8 @@ function! lh#project#cmd#execute(...) abort
     if lh#option#is_unset(prj)
       throw "The current buffer doesn't belong to any project"
     endif
-    if     a:1 =~ '\v^:l%[s]$'      " {{{4
-      call s:ls_project(prj)
-    elseif a:1 =~ '\v^:echo$'       " {{{4
-      if a:0 != 2
-        throw "Not enough arguments to `:Project :echo`"
-      endif
-      call s:echo_project(prj, a:2)
-    elseif a:1 =~ '\v^:let$'        " {{{4
-      if a:0 < 3
-        throw "Not enough arguments to `:Project :let`"
-      endif
-      call s:let_project(prj, a:2, a:000[2:])
-    elseif a:1 =~ '\v^:cd$'         " {{{4
-      if a:0 != 2
-        throw "Not enough arguments to `:Project :cd`"
-      endif
-      call s:cd_project(prj, a:2)
-    elseif a:1 =~ '\v^:doonce'      " {{{4
-      if a:0 < 2
-        throw "Not enough arguments to `:Project :doonce`"
-      endif
-      call s:doonce_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:bufdo'       " {{{4
-      if a:0 < 2
-        throw "Not enough arguments to `:Project :bufdo`"
-      endif
-      call s:bufdo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^:windo'       " {{{4
-      if a:0 < 2
-        throw "Not enough arguments to `:Project :windo`"
-      endif
-      call s:windo_project(prj, a:000[1:])
-    elseif a:1 =~ '\v^--define$'    " {{{4
-      call s:define_project(a:2)
-    else                            " -- unknown command {{{4
-      throw "Unexpected `:Project ".a:1."` subcommand"
-    endif
+    call s:dispatch_cmd_on_project(prj, '', a:000)
   else                          " -- project name specified {{{3
-
     let prj_name = a:1
     let prj = lh#project#list#_get(prj_name)
     if lh#option#is_unset(prj)
@@ -361,44 +323,12 @@ function! lh#project#cmd#execute(...) abort
     if a:0 < 2
       throw "Not enough arguments to `:Project name`"
     endif
-    if     a:2 =~ '\v^:=l%[s]$'      " {{{4
-      call s:ls_project(prj)
-    elseif a:2 =~ '\v^:=echo$'       " {{{4
-      if a:0 != 3
-        throw "Not enough arguments to `:Project <name> :echo`"
-      endif
-      call s:echo_project(prj, a:3)
-    elseif a:2 =~ '\v^:=let$'        " {{{4
-      if a:0 < 4
-        throw "Not enough arguments to `:Project <name> :let`"
-      endif
-      call s:let_project(prj, a:3, a:000[3:])
-    elseif a:2 =~ '\v^:=cd$'         " {{{4
-      if a:0 != 3
-        throw "Not enough arguments to `:Project <name> :cd`"
-      endif
-      call s:cd_project(prj, a:3)
-    elseif a:2 =~ '\v^:=doonce$'     " {{{4
-      if a:0 < 3
-        throw "Not enough arguments to `:Project <name> :doonce`"
-      endif
-      call s:doonce_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=bufdo$'      " {{{4
-      if a:0 < 3
-        throw "Not enough arguments to `:Project <name> :bufdo`"
-      endif
-      call s:bufdo_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:=windo$'      " {{{4
-      if a:0 < 3
-        throw "Not enough arguments to `:Project <name> :windo`"
-      endif
-      call s:windo_project(prj, a:000[2:])
-    elseif a:2 =~ '\v^:bd%[elete]$'  " {{{4
+    if     a:2 =~ '\v^:=bd%[elete]$'  " {{{4
       call s:bd_project(prj, a:000[3:])
-    elseif a:2 =~ '\v^:bw%[ipeout]$' " {{{4
+    elseif a:2 =~ '\v^:=bw%[ipeout]$' " {{{4
       call s:bw_project(prj, a:000[3:])
-    else                            " -- unknown command {{{4
-      throw "Unexpected `:Project ".a:2."` subcommand"
+    else                             " -- dispatch {{{4
+      call s:dispatch_cmd_on_project(prj, prj_name.' ', a:000[1:])
     endif
   endif
 
@@ -477,6 +407,51 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+
+" # :Project command definition {{{2
+function! s:dispatch_cmd_on_project(prj, lead, args) " {{{3
+  let nb_args = len(a:args)
+  call lh#assert#value(nb_args).is_gt(0)
+  let cmd     = a:args[0]
+
+  if     cmd =~ '\v^:=l%[s]$'      " {{{4
+    call s:ls_project(a:prj)
+  elseif cmd =~ '\v^:=echo$'       " {{{4
+    if nb_args != 2
+      throw "Not enough arguments to `:Project ".a:lead.":echo`"
+    endif
+    call s:echo_project(a:prj, a:args[1])
+  elseif cmd =~ '\v^:=let$'        " {{{4
+    if nb_args < 3
+      throw "Not enough arguments to `:Project ".a:lead.":let`"
+    endif
+    call s:let_project(a:prj, a:args[1], a:args[2:])
+  elseif cmd =~ '\v^:=cd$'         " {{{4
+    if nb_args != 2
+      throw "Not enough arguments to `:Project ".a:lead.":cd`"
+    endif
+    call s:cd_project(a:prj, a:args[1])
+  elseif cmd =~ '\v^:=doonce'      " {{{4
+    if nb_args < 2
+      throw "Not enough arguments to `:Project ".a:lead.":doonce`"
+    endif
+    call s:doonce_project(a:prj, a:args[1:])
+  elseif cmd =~ '\v^:=bufdo'       " {{{4
+    if nb_args < 2
+      throw "Not enough arguments to `:Project ".a:lead.":bufdo`"
+    endif
+    call s:bufdo_project(a:prj, a:args[1:])
+  elseif cmd =~ '\v^:=windo'       " {{{4
+    if nb_args < 2
+      throw "Not enough arguments to `:Project ".a:lead.":windo`"
+    endif
+    call s:windo_project(a:prj, a:args[1:])
+  elseif cmd =~ '\v^--define$'    " {{{4
+    call s:define_project(a:args[1])
+  else                            " -- unknown command {{{4
+    throw "Unexpected `:Project ".a:lead.cmd."` subcommand"
+  endif
+endfunction
 
 "------------------------------------------------------------------------
 " }}}1
