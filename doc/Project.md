@@ -497,13 +497,18 @@ This internal function is used by `lh#let#*` functions.
 :let val = lh#project#_get('foo.bar.team')
 ```
 
-### 3.2.8. Set a variable in a precise project
-When a buffer belongs to several projects, it's not easily possible (yet) to
-select which inherited project get the settings.
+### 3.2.8. Set a variable in a precise project...
+When a buffer belongs to several projects, we'll want to select which inherited
+project get the settings.
 
-For now, you'll need to obtain the project reference you're interested in
-(hint: use `lh#project#define()` to obtain references), then set the variables
-to what you wish:
+Two approaches are possibles:
+
+#### ...through project references
+
+You may obtain a reference to the project you're interested in (hint: use
+`lh#project#define()` to obtain references, or `lh#project#crt()`, or
+`lh#project#list#_get()`), then set the variables to what you wish with
+`set()` method:
 
 ```vim
 " Vim option, with a project scope
@@ -512,6 +517,40 @@ to what you wish:
 " Environment variable, with a project scope
 :call prj.set('$FOOBAR', 42)
 
+" Set p:foo.bar in the current project
+let crt_prj  = lh#project#crt()
+:call crt_prj.set('foo.bar', 42)
+" or in its first parents
+:call crt_prj.parents[0].set('foo.bar', 43)
+
+" Or in a named project
+let foo_prj  = lh#project#list#_get('FooProject')
+:call foo_prj.set('foo.bar', 12)
+```
+
+#### ...through `:Project :let`
+You could also specify the target project with `:Project` first argument:
+
+```vim
+" In the current project
+:Project :let foo.bar = 42
+
+" Or in a named project
+:Project FooProject :let foo.bar = 12
+```
+
+#### ...through `:LetTo`
+`:LetTo` (and `lh#let#to()`) has two special options that permits to select the
+target project of the current buffer.
+
+```vim
+" Set p:foo.bar at current project level
+LetTo --hide      p:foo.bar = 42
+
+" Replace any previous definition of `p:foo.bar` in parent projects with the
+" new one, if there was one.
+" Or define the value in the current project namespace if it didn't exist.
+LetTo --overwrite p:foo.bar = 43
 ```
 
 ## 3.3. You're a plugin maintainer
@@ -645,9 +684,6 @@ the firsts I've in mind).
    * `lh#project#_best_varname_match()`
  * `:Project [<name>] :make`
    -> rely on `:Make` if it exists
- * Be able to control which parent is filled with `lh#let#` functions
-   * [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
-   * [ ] `:Project <name> :LetTo var = value`
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)

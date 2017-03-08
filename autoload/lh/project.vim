@@ -24,9 +24,6 @@ let s:k_version = '400'
 "   - lh#project#_best_varname_match()
 " - :Project [<name>] :make
 "   -> rely on `:Make` if it exists, `:make` otherwise
-" - Be able to control which parent is filled with lh#let# functions
-"   - [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
-"   - [ ] `:Project <name> :LetTo var = value`
 " - Use in plugins
 "   - p:$ENV variables
 "     - [X] lh-tags synchronous (via lh#os#system)
