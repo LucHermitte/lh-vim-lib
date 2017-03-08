@@ -38,7 +38,6 @@ let s:k_version = '400'
 "     - [ ] µTemplate
 "     -> Test on windows!
 "   - Have let-modeline support p:var, p:&opt, and p:$env
-" - Add convinience functions to fill permission lists
 " - Setlocally vim options on new files
 " - Simplify dictionaries
 "   -> no 'parents' when there are none!
@@ -385,6 +384,22 @@ function! s:GetPlausibleRoot() abort " {{{3
   call s:Verbose('s:GetPlausibleRoot -> %1', prj_dirname)
   return prj_dirname
 endfunction
+
+" # Permission lists management {{{2
+" Function: lh#project#lists() {{{3
+function! lh#project#permission_lists() abort
+  return g:lh#project.permissions
+endfunction
+
+" Function: lh#project#munge(listname, path) {{{3
+function! lh#project#munge(listname, path) abort
+  return lh#path#munge(g:lh#project.permissions[a:listname], a:path)
+endfunction
+
+" Function: lh#project#filter_list(listname, expr) {{{3
+function! lh#project#filter_list(listname, expr) abort
+  return filter(g:lh#project.permissions[a:listname], a:expr)
+endfunction
 " }}}1
 
 "------------------------------------------------------------------------
@@ -504,9 +519,9 @@ LetIfUndef g:lh#project.permissions._action_name = 'recognize a project at'
 if         index(g:lh#project.permissions.whitelist, $HOME)   < 0
       \ && index(g:lh#project.permissions.blacklist, $HOME)   < 0
       \ && index(g:lh#project.permissions.sandboxlist, $HOME) < 0
-  call lh#path#munge(g:lh#project.permissions.asklist, $HOME)
+  call lh#project#munge('asklist', $HOME)
 endif
-call lh#path#munge(g:lh#project.permissions.blacklist, fnamemodify('/', ':p'))
+call lh#project#munge('blacklist', fnamemodify('/', ':p'))
 " TODO: add other disks in windows
 
 " The directories where projects (we trust) are stored shall be added into

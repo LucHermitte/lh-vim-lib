@@ -3902,21 +3902,26 @@ Default values for:
 - *g:lh#project.permissions.blacklist*   : ['/']   // always forced!
 - *g:lh#project.permissions.sandboxlist* : []
 
+These lists are best handled with:
+- *lh#project#permission_lists()* to obtain the current value
+- *lh#project#munge()* to add a new path to a list
+- *lh#project#filter_list()* to filter paths in a list
+Indeed, these functions make sure the `g:lh#project.permissions` variable has
+been defined before doing any thing on it.
+
 For instance, they can be overriden in the |.vimrc| with: >
 
-    LetIfUndef g:lh#project.permissions             {}
-    LetIfUndef g:lh#project.permissions.whitelist   []
-    LetIfUndef g:lh#project.permissions.asklist     []
-    LetIfUndef g:lh#project.permissions.blacklist   []
-
-    " $HOME/.vim/addons is where VAM stores the plugin it manages
-    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/.vim/addons')
-    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/workspace')
-    call lh#path#munge(g:lh#project.permissions.asklist,   $HOME.'/3rdparties')
-    call lh#path#munge(g:lh#project.permissions.blacklist, $HOME)
-    call lh#path#munge(g:lh#project.permissions.blacklist, '/')
+    " Req: the following expects lh-vim-lib to have already been activated
+    " by your plugin manager.
+    "
+    " $HOME/.vim/addons is where VAM stores the plugins it manages
+    call lh#project#munge('whitelist', $HOME.'/.vim/addons')
+    call lh#project#munge('whitelist', $HOME.'/workspace')
+    call lh#project#munge('asklist',   $HOME.'/3rdparties')
+    call lh#project#munge('blacklist', $HOME)
+    call lh#project#munge('blacklist', '/')
     " Remove $HOME from asklist in case it was already there
-    call filter(g:lh#project.permissions.asklist, 'v:val == $HOME')
+    call lh#project#filter_list('asklist', 'v:val != $HOME')
 
 See also |lh#path#new_permission_lists()|, which is used internally to manage
 these lists.

@@ -188,7 +188,8 @@ several subprojects (one per program sub-component for instance).
 If you need more control, or if you don't want to activate this automagic
 feature, use one of the approaches described next.
 
-Note: You'll want to read the documentation about blacklists and so on.
+Note: You'll want to read the documentation about blacklists and so on:
+`:h g:lh#project.permissions`.
 
 #### 3.1.1.2. From your `.lvimrc` or `_vimrc_local.vim`
 If you don't want to automagically detect projects, or if you need more control
@@ -658,7 +659,6 @@ the firsts I've in mind).
       * [ ] µTemplate
       * [ ] Test on windows!
    * Have let-modeline support p:var, p:&opt, and p:$env
- * Add convenience functions to fill permission lists
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
