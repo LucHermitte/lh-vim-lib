@@ -27,7 +27,6 @@ let s:k_version = '400'
 " - Be able to control which parent is filled with lh#let# functions
 "   - [X] `:LetTo` and `LetIfUndef` have `--overwrite` and `--hide` options
 "   - [ ] `:Project <name> :LetTo var = value`
-" - Factorize `:Project` code for command & completion
 " - Use in plugins
 "   - p:$ENV variables
 "     - [X] lh-tags synchronous (via lh#os#system)

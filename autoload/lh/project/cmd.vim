@@ -342,22 +342,15 @@ function! lh#project#cmd#_complete(ArgLead, CmdLine, CursorPos) abort
 
   if     1 == pos
     let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(lh#project#list#_get_all_prjs())), 'escape(v:val, " ")')
-  elseif     (2 == pos && tokens[pos-1] =~ '\v^:echo$')
-        \ || (3 == pos && tokens[pos-1] =~ '\v^:=echo$')
+  elseif s:token_matches(tokens, pos, '(echo|let)')
     let prj = lh#project#list#_get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
-  elseif     (2 == pos && tokens[pos-1] =~ '\v^:let$')
-        \ || (3 == pos && tokens[pos-1] =~ '\v^:=let$')
-    let prj = lh#project#list#_get(pos == 3 ? tokens[pos-2] : s:k_unset)
-    let res = s:list_var_for_complete(prj, a:ArgLead)
-  elseif     (2 == pos && tokens[pos-1] =~ '\v^:cd$')
-        \ || (3 == pos && tokens[pos-1] =~ '\v^:=cd$')
+  elseif s:token_matches(tokens, pos, 'cd')
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
     call filter(res, 'isdirectory(v:val)')
     let res += ['!']
     call map(res, 'lh#path#strip_start(v:val, [getcwd()])')
-  elseif     (2 == pos && tokens[1] =~ '\v^:(doonce|bufdo|windo)$')
-        \ || (3 == pos && tokens[2] =~ '\v^:=(doonce|bufdo|windo)$')
+  elseif s:token_matches(tokens, pos, '(doonce|bufdo|windo)')
     let res = lh#command#matching_askvim('command', a:ArgLead)
   elseif     (2 <  pos && tokens[1] =~ '\v^:(doonce|bufdo|windo)$')
         \ || (3 <  pos && tokens[2] =~ '\v^:=(doonce|bufdo|windo)$')
@@ -372,40 +365,6 @@ function! lh#project#cmd#_complete(ArgLead, CmdLine, CursorPos) abort
   return res
 endfunction
 
-function! s:list_var_for_complete(prj, ArgLead) " {{{2
-  let prj = a:prj
-  if !empty(a:ArgLead) && a:ArgLead[0] == '$'
-    let vars = map(keys(prj.env), '"$".v:val')
-  elseif !empty(a:ArgLead) && a:ArgLead[0] == '&'
-    let vars = map(keys(prj.options), '"&".v:val')
-  elseif stridx(a:ArgLead, '.') < 0
-    let sDict = 'prj.variables'
-    let dict = eval(sDict)
-    let vars = keys(dict)
-    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
-    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
-  else
-    let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
-    let sDict = 'prj.variables.'.sDict0
-    let dict = eval(sDict)
-    let vars = keys(dict)
-    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
-    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
-    call map(vars, 'sDict0.".".v:val')
-    let l = len(a:ArgLead) - 1
-    call filter(vars, 'v:val[:l] == a:ArgLead')
-  endif
-  if empty(a:ArgLead)
-    let vars += s:list_var_for_complete(a:prj, '$')
-    let vars += s:list_var_for_complete(a:prj, '&')
-  endif
-  let res = vars
-  " TODO: support var.sub.sub and inherited projects
-  return vars
-endfunction
-
-
-"------------------------------------------------------------------------
 " ## Internal functions {{{1
 
 " # :Project command definition {{{2
@@ -452,6 +411,46 @@ function! s:dispatch_cmd_on_project(prj, lead, args) " {{{3
     throw "Unexpected `:Project ".a:lead.cmd."` subcommand"
   endif
 endfunction
+
+"------------------------------------------------------------------------
+" # :Project command completion {{{2
+function! s:token_matches(tokens, pos, what) " {{{3
+  return     (2 == a:pos && a:tokens[a:pos-1] =~ '\v^:'.a:what.'$')
+        \ || (3 == a:pos && a:tokens[a:pos-1] =~ '\v^:='.a:what.'$')
+endfunction
+
+function! s:list_var_for_complete(prj, ArgLead) " {{{3
+  let prj = a:prj
+  if !empty(a:ArgLead) && a:ArgLead[0] == '$'
+    let vars = map(keys(prj.env), '"$".v:val')
+  elseif !empty(a:ArgLead) && a:ArgLead[0] == '&'
+    let vars = map(keys(prj.options), '"&".v:val')
+  elseif stridx(a:ArgLead, '.') < 0
+    let sDict = 'prj.variables'
+    let dict = eval(sDict)
+    let vars = keys(dict)
+    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+  else
+    let [all, sDict0, key ; trail] = matchlist(a:ArgLead, '\v(.*)(\..*)')
+    let sDict = 'prj.variables.'.sDict0
+    let dict = eval(sDict)
+    let vars = keys(dict)
+    call filter(vars, 'type(dict[v:val]) != type(function("has"))')
+    call map(vars, 'v:val. (type(dict[v:val])==type({})?".":"")')
+    call map(vars, 'sDict0.".".v:val')
+    let l = len(a:ArgLead) - 1
+    call filter(vars, 'v:val[:l] == a:ArgLead')
+  endif
+  if empty(a:ArgLead)
+    let vars += s:list_var_for_complete(a:prj, '$')
+    let vars += s:list_var_for_complete(a:prj, '&')
+  endif
+  let res = vars
+  " TODO: support var.sub.sub and inherited projects
+  return vars
+endfunction
+
 
 "------------------------------------------------------------------------
 " }}}1
