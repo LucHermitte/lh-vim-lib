@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      12th Sep 2016
-" Last Update:  01st Mar 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       OO functions and helpers
@@ -104,6 +104,19 @@ function! lh#object#inject(object, method_name, function_name, snr) abort
   let a:object[a:method_name] = function('<SNR>'.snr.'_'.a:function_name)
 endfunction
 
+" Function: lh#object#inject_methods(object, snr, ...) {{{3
+function! lh#object#inject_methods(object, snr, ...) abort
+  if type(a:snr) == type('')
+    let snr = lh#askvim#scriptid(a:snr)
+  else
+    let snr = a:snr
+  endif
+  call lh#assert#value(a:0).is_gt(0, "At least one method name is expected")
+  let method_names = lh#type#is_list(a:1) ? a:1 : a:000
+  let methods = {}
+  call map(copy(method_names), 'extend(methods, { v:val : function("<SNR>".snr."_".v:val) })')
+  return extend(a:object, methods)
+endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 " # Stringification {{{2

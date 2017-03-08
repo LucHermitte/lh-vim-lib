@@ -267,6 +267,8 @@ Version Control System functions                        |lhvl#vcs|        {{{2
 - |lh#vcs#as_http()|
 OO helpers                                              |lhvl#oo|         {{{2
 - |lh#object#make_top_type()|
+- |lh#object#inject()|
+- |lh#object#inject_methods()|
 - |lh#object#to_string()|
 - |lh#object#_to_string()|
 Variable helper functions                               |lhvl#variable|   {{{2
@@ -3604,7 +3606,7 @@ For the moment only stringification is addressed, may be other services will
 be provided in the future. I can't tell.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#make_top_type()* {{{3
+                                                 *lh#object#make_top_type()*   {{{3
 lh#object#make_top_type(dict-params)~
 Creates a |Dictionary| that implements:
 - *__lhvl_oo_type()*
@@ -3619,7 +3621,7 @@ to an implementation that fits your needs. You may need to use
 issues.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#to_string()* {{{3
+                                                 *lh#object#to_string()*       {{{3
 lh#object#to_string(data)~
 This function will work as `:echo data`, i.e. multiple occurrences of a same
 object will be shorten to `[...]` or `{...}`, but it will also hide methods
@@ -3630,26 +3632,27 @@ Internally, it relies on |lh#object#_to_string()| to build the string to
 display. Actually, it's just a call to: >
     lh#object#_to_string(a:data, [])
 <
-                                                 *lh#object#_to_string()* {{{3
+                                                 *lh#object#_to_string()*      {{{3
 lh#object#to_string(data, list_of_already_handled_data)~
 This is the internal function used to print objects once. Unless you're
 defining your own `_to_string()` overload, don't use it. See
 autoload/lh/object.vim `s:to_string()` implementation to see how to use it.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#is_an_object()* {{{3
+                                                 *lh#object#is_an_object()*    {{{3
 lh#object#is_an_object(var)~
 @return whether the {var} is an object. It tests whether it contains a
 `'__lhvl_oo_type'` field which is automatically added to objects built through
 |lh#object#make_top_type()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#inject()*       {{{3
+                                                 *lh#object#inject()*          {{{3
 lh#object#inject({object}, {method-name}, {function-name}, {snr})~
 @since Version 4.0.0
 Adds a method named {method-name} to {object}. The method will point to the
 |local-function| (in the script of id {snr}, or named {snr}) named
 {function-name}.
+@see also |lh#object#inject_methods()|
 
 This function is meant to be used by plugin writers while in maintenance.
 
@@ -3665,6 +3668,38 @@ I modify `lh#foo#make_bar()` in order to bind a new method `x()` to `s:obj`.
 Problem: I can't run the function again as the object isn't modified, but I
 want to test/use the new function. Here comes to rescue: >
   :call lh#object#inject(s:obj, 'x', 'get_x', 'autoload/lh/foo.vim')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#inject_methods()*  {{{3
+lh#object#inject_methods({object}, {snr}, {method-names...})~
+@since Version 4.0.0
+Adds a method named {method-name} to {object}. The method will point to the
+|local-function| (in the script of id {snr}, or named {snr}) named
+{function-name}.
+@see also |lh#object#inject()|
+
+This function is meant to help define new objets. Given the script
+|local-function|s `s:get()`, `s:set()`, `s:name()`, etc., instead of defining
+a `s:getSNR()` function and a new object with: >
+
+    " autoload/lh/foo/bar.vim
+    function! lh#foo#bar#new() abort
+      let res = lh#object#make_top_type({})
+      let res.get  = function(s:getSNR('get'))
+      let res.set  = function(s:getSNR('set'))
+      let res.name = function(s:getSNR('name'))
+      ...
+      return res
+    endfunction
+
+we could in one call: >
+    " autoload/lh/foo/bar.vim
+    let s:k_script_name = expand('<sfile>:p')
+    function! lh#foo#bar#new() abort
+      let res = lh#object#make_top_type({})
+      call lh#object#inject_methods(res, s:k_script_name, ['get', 'set', 'name'...])
+      return res
+    endfunction
 
 ------------------------------------------------------------------------------
 VARIABLE HELPERS                                      *lhvl#variables*  {{{2
