@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  02nd Mar 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -89,15 +89,7 @@ endfunction
 
 " Function: lh#dict#subset(dict, keys) {{{3
 function! lh#dict#subset(dict, keys) abort
-  let result={}
-  for e in a:keys
-    let Val = get(a:dict, e, s:k_unset)
-    if lh#option#is_set(Val)
-      let result[e] = Val
-    endif
-    unlet Val
-  endfor
-  return result
+  return filter(copy(a:dict), 'index(a:keys, v:key) >= 0')
 endfunction
 
 " Function: lh#dict#get_composed(dst, key[, def]) {{{3
