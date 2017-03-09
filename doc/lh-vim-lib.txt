@@ -94,7 +94,7 @@ Functor related functions:                              |lhvl#function|   {{{2
 - |lh#function#prepare()|
 List related functions:                                 |lhvl#list|       {{{2
 - |lh#list#accumulate()|
-- |lh#list#Find_if()| and |lh#list#find_if()|
+- |lh#list#Find_if()|, |lh#list#find_if()|, and |lh#list#find_if_fast()|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#arg_min()|, |lh#list#arg_max()|
 - |lh#list#chain_transform()|
@@ -1357,8 +1357,10 @@ lh#list#find_entity({list}, {entity})        (3)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*           {{{3
-lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
-lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
+                            *lh#list#find_if_fast()*
+lh#list#Find_if({list}, {string-predicate} [, {pred-parameters}][, {start-pos}])~
+lh#list#find_if({list}, {functor-predicate} [, {pred-parameters}][, {start-pos}])~
+lh#list#find_if_fast({list}, {simple-predicate} [, {start-pos}])~
 @param             {list}  |List|
 @param      {*-predicate}  Predicate to evaluate
 @param {pred-parameters}]  |List| of Parameters to bind to special arguments in
@@ -1378,6 +1380,10 @@ The {string-predicate} recognizes some special arguments:
   This particular feature permits to pass any type of variable to the
   predicate: a |expr-string|, a |List|, a |Dictionary|, ...
 
+The {simple-predicate} only recognizes |v:val| and |v:key| arguments.
+`lh#list#find_if_fast()` is something like 100 times faster than
+`lh#list#find_if()` on the example below.
+
 e.g.: >
     :let b = { 'min': 12, 'max': 42 }
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
@@ -1389,8 +1395,9 @@ The {functor-predicate} is a |lhvl#function|. The same example can be
 rewritten as: >
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let i = lh#list#find_if(l, 'v:1_>12  && v:1_<42 && v:1_%2==0')
-    :echo l[i]
-    28
+    :let j = lh#list#find_if(l, 'v:val>12  && v:val<42 && v:val%2==0')
+    :echo l[i] . ' -- ' . l[j]
+    28 -- 28
 NB: Expect the `Find_if()` version to be replaced with the `find_if()` one.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

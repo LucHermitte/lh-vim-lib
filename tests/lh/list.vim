@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  10th Feb 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -39,6 +39,15 @@ endfunction
 function! s:Test_Find_If_functor_predicate()
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let i = lh#list#find_if(l, 'v:1_>12  && v:1_<42 && v:1_%2==0')
+    " echo i . '/' . len(l)
+    AssertEquals (i ,  5)
+    AssertEquals (l[i] ,  28)
+    " :echo l[i]
+endfunction
+
+function! s:Test_Find_If_fast_functor_predicate()
+    :let l = [ 1, 5, 48, 25, 5, 28, 6]
+    :let i = lh#list#find_if_fast(l, 'v:val>12  && v:val<42 && v:val%2==0')
     " echo i . '/' . len(l)
     AssertEquals (i ,  5)
     AssertEquals (l[i] ,  28)

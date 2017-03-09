@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  10th Feb 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -344,6 +344,13 @@ function! lh#list#find_if(list, predicate, ...) abort
     let idx += 1
   endwhile
   return -1
+endfunction
+
+" Function: lh#list#find_if_fast(list, predicate [, start-pos]) {{{3
+function! lh#list#find_if_fast(list, predicate, ...) abort
+  let start = get(a:, 1, 0)
+  let matches = map(copy(a:list), a:predicate)
+  return index(matches, 1, start)
 endfunction
 
 " Function: lh#list#lower_bound(sorted_list, value  [, first[, last]]) {{{3
