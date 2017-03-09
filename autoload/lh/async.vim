@@ -89,7 +89,9 @@ endfunction
 function! lh#async#_unpause_jobs() abort
   let s:job_queue.state = 'active'
   call s:ui_update()
-  call s:job_queue.start_next()
+  if !s:job_queue.is_empty()
+    call s:job_queue.start_next()
+  endif
 endfunction
 
 " Function: lh#async#_do_clear_queue() {{{3
@@ -124,11 +126,8 @@ endfunction
 
 function! s:push_or_start(job) dict abort          " {{{3
   let job_args = lh#dict#subset(a:job, s:k_job_methods)
-  while get(s:job_queue, 'must_wait', 0)
-    :sleep 100m
-  endwhile
-  let self.must_wait = 1
   try
+    let self.interrupted = 0
     " let g:list = deepcopy(self.list)
     " let g:job = deepcopy(a:job)
 
@@ -136,13 +135,15 @@ function! s:push_or_start(job) dict abort          " {{{3
     call s:Verbose('Found another task in job queue at index %1', idx)
     if idx >= 0
       let txt = get(a:job, 'txt', a:job.cmd)
-      let choice = CONFIRM("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
+      let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
       redraw
       if choice == 3
         call s:Verbose('Ignore the new job')
         return
       elseif choice == 2
         call s:Verbose('Remplate old job by the new job')
+        let idx -= self.interrupted " we could be interrupted here...
+        let self.interrupted = 0
         let shall_update_ui = self._unsafe_stop_job(idx, len(self.list))
       else
         call s:Verbose('Queue the new redundant job')
@@ -151,7 +152,7 @@ function! s:push_or_start(job) dict abort          " {{{3
     let self.list += [ extend(copy(a:job), {'args': job_args}) ]
     call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
   finally
-    let self.must_wait = 0
+    unlet self.interrupted
   endtry
   call s:ui_update()
   if len(self.list) == 1
@@ -164,12 +165,12 @@ function! s:push_or_start(job) dict abort          " {{{3
 endfunction
 
 function! s:start_next() dict abort                " {{{3
+  if get(self, 'interrupted', 0)
+    call s:Verbose("Don't start next job automatically, as we have finished one while doing something else")
+    return
+  endif
   call lh#assert#true(!self.is_empty())
-  " Wait till adding/removing a job has finished (poor man's mutex)
-  while get(s:job_queue, 'must_wait', 0)
-    :sleep 100m
-  endwhile
-  let self.must_wait = 1
+
   let s:job_queue.state = 'active'
   let job = self.list[0]
   try
@@ -219,7 +220,6 @@ function! s:start_next() dict abort                " {{{3
       endif
       call s:ui_update()
     endif
-    unlet self.must_wait
   endtry
 endfunction
 
@@ -228,55 +228,59 @@ function! s:default_close_cb(channel, ...)         " {{{3
 endfunction
 
 function! s:close_cb(user_close_cb, channel) abort " {{{3
+  " Unlike usual MT applicatins, we cannot yield until we'are ready to handle
+  " the close callback.
+  " So we need to know whether there is interleaving...
+  " What's possible is that close_sb interrupts anything:
+  " - job_registration (that can become job starting)
+  " - job cancelling
+  "
   " TODO: bind this function to s:job_queue
   " Wait till adding/removing a job has finished (poor man's mutex)
-  while get(s:job_queue, 'must_wait', 0)
-    :sleep 100m
-  endwhile
-  let s:job_queue.must_wait = 1
-  try
-    let job = remove(s:job_queue.list, 0)
-    let last_job_status = copy(job_info(job.job))
-    call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
-    try
-      if has_key(job, 'runner_script')
-        call job.runner_script.finalize()
-      endif
-    catch /.*/
-    endtry
-    call call(a:user_close_cb, [a:channel, job_info(job.job)])
-    call s:ui_update()
-  finally
-    unlet s:job_queue.must_wait
-    " TODO: Fix this lock! I need a reentrant lock here.
+  if has_key(s:job_queue, 'interrupted')
+    " Notifies we have have interrupted the current action, and remove the
+    " first entry in the list
+    let s:job_queue.interrupted += 1
+  endif
 
-    " Be sure, we always launch the next job
-    if !s:job_queue.is_empty()
-      if last_job_status.exitval != 0
-        let go_on = CONFIRM("Last `".job.txt."` job failed.\n Shall we -> ", ["&Go on with the ".len(s:job_queue.list)." remaining jobs?", "&Pause?", "&Clear the job queue?"], 2)
-        if     go_on == 3
-          let sure = CONFIRM("Do you confirm to what to clear the following pending jobs ()", ["&Yes", "No"], 2)
-          if sure == 2
-            call lh#async#_do_clear_queue()
-          endif
-        elseif go_on != 1
-          let s:job_queue.state = 'paused'
-          call lh#common#warning_msg('To unpause the pending jobs, please execute `:JobUnpause` or use the `:Jobs`  console')
-          call s:ui_update()
-          redrawstatus
-          return
-        endif
-      endif
-      call s:job_queue.start_next()
+  let job = remove(s:job_queue.list, 0)
+  let last_job_status = copy(job_info(job.job))
+  call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
+  try
+    if has_key(job, 'runner_script')
+      call job.runner_script.finalize()
     endif
-    " And get sure airline is refreshed
-    redrawstatus
+  catch /.*/
   endtry
+  call call(a:user_close_cb, [a:channel, job_info(job.job)])
+  call s:ui_update()
+
+  " Be sure, we always launch the next job
+  if !s:job_queue.is_empty()
+    if last_job_status.exitval != 0
+      let go_on = lh#ui#confirm("Last `".job.txt."` job failed.\n Shall we -> ", ["&Go on with the ".len(s:job_queue.list)." remaining jobs?", "&Pause?", "&Clear the job queue?"], 2)
+      if     go_on == 3
+        let sure = lh#ui#confirm("Do you confirm you want to clear the following pending jobs ()", ["&Yes", "No"], 2)
+        if sure == 2
+          call lh#async#_do_clear_queue()
+        endif
+      elseif go_on != 1
+        let s:job_queue.state = 'paused'
+        call lh#common#warning_msg('To unpause the pending jobs, please execute `:JobUnpause` or use the `:Jobs`  console')
+        call s:ui_update()
+        redrawstatus
+        return
+      endif
+    endif
+    call s:job_queue.start_next() " will automatically wait if we were doing something else
+  endif
+  " And get sure airline is refreshed
+  redrawstatus
 endfunction
 
 function! s:_unsafe_stop_job(idx, nb_jobs) dict abort                " {{{3
   " Return whether we must update ui
-  call assert_true(self.must_wait)
+  call assert_true(has_key(self,'interrupted'))
   call assert_inrange(0, len(self.list), a:idx)
 
   let job = self.list[a:idx]
@@ -284,15 +288,20 @@ function! s:_unsafe_stop_job(idx, nb_jobs) dict abort                " {{{3
   " a:nb_jobs is a security in case the list size changes while the function is
   " executed
   if a:idx == 0 && a:nb_jobs == len(self.list) && has_key(job, 'job')
-    let st = job_stop(job.job)
-    if st == 0
-      throw "Cannot stop the background execution of ".job.txt
+    if get(self, 'interrupted', 0) == 0
+      let st = job_stop(job.job)
+      if st == 0
+        throw "Cannot stop the background execution of ".job.txt
+      else
+        call lh#common#warning_msg("Background execution of ".(job.txt)." stopped.")
+      endif
     else
-      call lh#common#warning_msg("Background execution of ".(job.txt)." stopped.")
+      call s:Verbose("Job finished in the mean time... => do nothing more")
+      " TODO: shall we pause ?
     endif
     return 0 " don't update
   elseif a:nb_jobs == len(self.list)
-    call remove(self.list, a:idx)
+    call remove(self.list, a:idx - self.interrupted)
     call lh#common#warning_msg("Background execution of ".(job.txt)." aborted.")
     return 1
   else
@@ -302,11 +311,8 @@ endfunction
 
 function! s:stop_job(id) dict abort                " {{{3
   " Wait till adding/finishing a job has finished (poor man's mutex)
-  while get(s:job_queue, 'must_wait', 0)
-      :sleep 100m
-  endwhile
-  let self.must_wait = 1
   try
+    let self.interrupted = 0
     let l = len(self.list)
     if l == 0
       throw "No pending job to cancel"
@@ -316,24 +322,26 @@ function! s:stop_job(id) dict abort                " {{{3
     if idx == -1
       throw "No pending job matching ".a:id
     endif
+    let idx -= self.interrupted " well... interruption may happen in between...
+    let self.interrupted = 0
     let shall_update_ui = self._unsafe_stop_job(idx, l)
     if shall_update_ui
       call s:ui_update()
     endif
   finally
-    unlet self.must_wait
+    unlet self.interrupted
   endtry
 endfunction
 
 " Define job_queue global variable                   {{{3
 let s:default_queue = lh#object#make_top_type({ 'list': [], 'state': 'active' })
 let s:job_queue = get(s:, 'job_queue', s:default_queue)
-let s:job_queue.is_running       = function('s:is_running')
-let s:job_queue.is_empty         = function('s:is_empty')
-let s:job_queue.push_or_start    = function('s:push_or_start')
-let s:job_queue.start_next       = function('s:start_next')
-let s:job_queue.stop             = function('s:stop_job')
-let s:job_queue._unsafe_stop_job = function('s:_unsafe_stop_job')
+let s:job_queue.is_running         = function('s:is_running')
+let s:job_queue.is_empty           = function('s:is_empty')
+let s:job_queue.push_or_start      = function('s:push_or_start')
+let s:job_queue.start_next         = function('s:start_next')
+let s:job_queue.stop               = function('s:stop_job')
+let s:job_queue._unsafe_stop_job   = function('s:_unsafe_stop_job')
 
 " Example of Use                                     {{{3
 " function! TestCb(...)
@@ -458,10 +466,7 @@ function! s:ui_update() abort " {{{3
 endfunction
 
 function! s:ui_cancel_jobs() abort " {{{3
-  while get(s:job_queue, 'must_wait', 0)
-    :sleep 100m
-  endwhile
-  let s:job_queue.must_wait = 1
+  let self.interrupted = 0
   let l = len(s:job_queue.list)
 
   try
@@ -471,6 +476,7 @@ function! s:ui_cancel_jobs() abort " {{{3
       " call s:Verbose("Cancelling: %1", map(copy(selected), 'get(s:job_queue.list[v:val], "txt", s:job_ui.list[v:val].cmd'))
       let shall_update_ui = 0
       for j in reverse(selected)
+        " TODO: check what to do with self.interrupted here...
         let shall_update_ui += s:job_queue._unsafe_stop_job(j, l)
         let l -= 1
       endfor
@@ -479,7 +485,7 @@ function! s:ui_cancel_jobs() abort " {{{3
       endif
     endif
   finally
-    let s:job_queue.must_wait = 0
+    unlet self.interrupted
   endtry
 endfunction
 " }}}1
