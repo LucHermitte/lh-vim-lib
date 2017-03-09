@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      29th Sep 2016
-" Last Update:  07th Mar 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -28,6 +28,8 @@ set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " ## Options {{{1
+let g:lh#project = get(g:, 'lh#project', {})
+
 let s:toggle_auto_discover_root =
       \ { 'variable': 'lh#project.auto_discover_root'
       \ , 'values': ['in_doubt_ask', 'no', 'yes', 'in_doubt_ignore', 'in_doubt_improvise' ]
