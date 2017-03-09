@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  20th Feb 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -79,7 +79,7 @@ function! lh#async#_unpause_jobs() abort
   call s:job_queue.start_next()
 endfunction
 
-" Function: lh#async#do_clear_queue() {{{3
+" Function: lh#async#_do_clear_queue() {{{3
 " Debugging purpose, avoid using this function!!!
 " If a job is really running, errors are to be expected
 function! lh#async#_do_clear_queue() abort
