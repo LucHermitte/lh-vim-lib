@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  06th Mar 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -51,7 +51,7 @@ endfunction
 "
 " # Let* {{{2
 " Function: s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) {{{3
-function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous)
+function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) abort
   if a:var !~ '\v^[wbptgP]:|[$&]'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^P:'
@@ -91,7 +91,7 @@ endfunction
 
 " Function: s:BuildPublicVariableNameAndValue(must_keep_previous ; string|var, value) {{{3
 let s:k_hide_or_overwite = '--(hide|overwrite)'
-function! s:BuildPublicVariableNameAndValue(must_keep_previous, ...)
+function! s:BuildPublicVariableNameAndValue(must_keep_previous, ...) abort
   if len(a:000) == 1
     " Strip --overwrite/--hide option
     let [all, hide_or_overwrite, expr ; tail] = matchlist(a:1, '\v^%('.s:k_hide_or_overwite.'\s*)=(.*)$')
@@ -234,7 +234,7 @@ function! lh#let#to(...) abort " {{{4
   call s:Verbose('let_to(%1)', a:000)
   " try
     let [var,Value] = call('s:BuildPublicVariableNameAndValue', [0] + a:000)
-    call lh#assert#true(lh#option#is_set(var))
+    call lh#assert#value(var).is_set(var)
     if type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
       call var.project.set(var.name, Value)

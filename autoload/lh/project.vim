@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  08th Mar 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -164,19 +164,11 @@ endfunction
 " @return a dict for p:&opt, and p:$ENV
 " @return a string for b:&opt
 " @throw for b:$ENV
-if has("patch-7.4-1707")
-  " Accept empty keys...
-  let s:k_store_for =
-        \ { '': 'variables'
-        \ , '&': 'options'
-        \ , '$': 'env'
-        \ }
-else
-  let s:k_store_for =
-        \ { '&': 'options'
-        \ , '$': 'env'
-        \ }
-endif
+let s:k_store_for =
+      \ { 'v': 'variables'
+      \ , '&': 'options'
+      \ , '$': 'env'
+      \ }
 function! lh#project#_crt_var_name(var, ...) abort
   if a:var =~ '^p:'
     let [all, kind, name; dummy] = matchlist(a:var, '\v^p:([&$])=(.*)')
@@ -184,6 +176,10 @@ function! lh#project#_crt_var_name(var, ...) abort
     let [all, kind, name; dummy] = matchlist(a:var, '\v^(\&)p:(.*)')
   else
     call lh#assert#unexpected('Unexpected variable name '.string(a:var))
+  endif
+  if  empty(kind)
+    " In order to resist !has("patch-7.4-1707")
+    let kind = 'v'
   endif
   if lh#project#is_in_a_project()
     let hide_or_overwrite = get(a:, 1, '') " empty <=> 'hide'
@@ -195,7 +191,7 @@ function! lh#project#_crt_var_name(var, ...) abort
     else
       let realname = 'b:'.s:project_varname.'.'.get(s:k_store_for, kind, 'variables').'.'.name
     endif
-    if kind == ''
+    if kind == 'v'
       return shall_overwrite ? best_name.realname : realname
     else
       let varname = kind.name
@@ -268,11 +264,12 @@ endfunction
 function! lh#project#_best_varname_match(kind, name) abort
   call lh#assert#true(lh#project#is_in_a_project())
 
-  let varname = '.'.s:k_store_for[a:kind].'.'.a:name
+  let store = get(s:k_store_for, a:kind, 'variables')
+  let varname = '.'.store.'.'.a:name
   let absvarname = 'b:'.s:project_varname.varname
   let prj = b:{s:project_varname}
   let res = {'project': prj}
-  let holded_name = prj.find_holder_name(a:name, s:k_store_for[a:kind])
+  let holded_name = prj.find_holder_name(a:name, store)
   if !empty(holded_name)
     let res.realname = 'b:'.s:project_varname.holded_name.a:name
     " return 'b:'.s:project_varname.holded_name.a:name
