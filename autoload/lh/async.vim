@@ -57,6 +57,19 @@ if ! s:has_jobs
 endif
 
 "------------------------------------------------------------------------
+" ## Constants          {{{1
+let s:k_job_methods = [
+      \ 'close_cb', 'in_cb', 'out_cb', 'err_cb', 'exit_cb', 'callback',
+      \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit',
+      \ 'in_mode', 'out_mode', 'err_mode',
+      \ 'term', 'channel',
+      \ 'in_io', 'in_top', 'in_bot', 'in_name', 'in_buf',
+      \ 'out_io', 'out_top', 'out_bot', 'out_name', 'out_buf', 'out_modiiable',
+      \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modiiable',
+      \ 'block_write'
+      \ ]
+
+"------------------------------------------------------------------------
 " ## Exported functions {{{1
 " # Job queue {{{2
 
@@ -110,16 +123,7 @@ function! s:is_empty() dict abort                  " {{{3
 endfunction
 
 function! s:push_or_start(job) dict abort          " {{{3
-  let job_args = lh#dict#subset(a:job, [
-        \ 'close_cb', 'in_cb', 'out_cb', 'err_cb', 'exit_cb', 'callback',
-        \ 'timeout', 'out_timeout', 'err_timeout', 'stoponexit',
-        \ 'in_mode', 'out_mode', 'err_mode',
-        \ 'term', 'channel',
-        \ 'in_io', 'in_top', 'in_bot', 'in_name', 'in_buf',
-        \ 'out_io', 'out_top', 'out_bot', 'out_name', 'out_buf', 'out_modiiable',
-        \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modiiable',
-        \ 'block_write'
-        \ ])
+  let job_args = lh#dict#subset(a:job, s:k_job_methods)
   while get(s:job_queue, 'must_wait', 0)
     :sleep 100m
   endwhile
@@ -128,7 +132,7 @@ function! s:push_or_start(job) dict abort          " {{{3
     " let g:list = deepcopy(self.list)
     " let g:job = deepcopy(a:job)
 
-    let idx = lh#list#find_if(self.list, string(a:job.cmd) . ' == v:val.cmd')
+    let idx = lh#list#find_if_fast(self.list, string(a:job.cmd) . ' == v:val.cmd')
     call s:Verbose('Found another task in job queue at index %1', idx)
     if idx >= 0
       let txt = get(a:job, 'txt', a:job.cmd)
@@ -279,7 +283,7 @@ function! s:_unsafe_stop_job(idx, nb_jobs) dict abort                " {{{3
   call s:Verbose('Found job #%1: %2', a:idx, job)
   " a:nb_jobs is a security in case the list size changes while the function is
   " executed
-  if a:idx == 0 && a:nb_jobs == len(self.list)
+  if a:idx == 0 && a:nb_jobs == len(self.list) && has_key(job, 'job')
     let st = job_stop(job.job)
     if st == 0
       throw "Cannot stop the background execution of ".job.txt
@@ -321,6 +325,7 @@ function! s:stop_job(id) dict abort                " {{{3
     unlet self.must_wait
   endtry
 endfunction
+
 " Define job_queue global variable                   {{{3
 let s:default_queue = lh#object#make_top_type({ 'list': [], 'state': 'active' })
 let s:job_queue = get(s:, 'job_queue', s:default_queue)
