@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	3.6.1
-let s:k_version = 361
+" Version:	4.0.0
+let s:k_version = 400
 " Created:	08th Sep 2008
-" Last Update:	08th Jan 2016
+" Last Update:	09th Mar 2017
 "------------------------------------------------------------------------
 " 	Helpers functions releated to the visual mode
 "
@@ -53,7 +53,7 @@ endfunction
 function! lh#visual#selection() abort
   try
     let a_save = @a
-    normal! gv"ay
+    silent! normal! gv"ay
     return @a
   finally
     let @a = a_save
