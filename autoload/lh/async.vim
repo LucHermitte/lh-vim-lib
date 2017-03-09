@@ -312,8 +312,7 @@ function! s:stop_job(id) dict abort                " {{{3
       throw "No pending job to cancel"
       return
     endif
-    let indices = map(copy(self.list), {idx, val -> get(val, 'txt', val.cmd) =~ a:id})
-    let idx = index(indices, 1)
+    let idx = lh#list#find_if_fast(self.list, 'get(v:val, "txt", v:val.cmd) =~ a:id')
     if idx == -1
       throw "No pending job matching ".a:id
     endif
