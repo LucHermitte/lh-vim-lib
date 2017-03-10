@@ -8,7 +8,7 @@
 " Version:	4.0.0
 let s:k_version = '40000'
 " Created:	23rd Jan 2007
-" Last Update:	02nd Dec 2016
+" Last Update:	10th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -118,7 +118,7 @@ endfunction
 function! lh#buffer#scratch(bname, where) abort
   try
     set modifiable
-    call lh#window#create_window_with(a:where.' sp '.escape(substitute(a:bname, '\*', '...', 'g'), '#%'))
+    call lh#window#create_window_with(a:where.' sp '.fnameescape(substitute(a:bname, '\*', '...', 'g')))
   catch /.*/
     throw "Can't open a buffer named '".a:bname."'!"
   endtry
