@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  09th Mar 2017
+" Last Update:  10th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -87,10 +87,14 @@ endfunction
 " Function: lh#async#_unpause_jobs() {{{3
 " TODO: check whether a lock is required
 function! lh#async#_unpause_jobs() abort
-  let s:job_queue.state = 'active'
-  call s:ui_update()
-  if !s:job_queue.is_empty()
-    call s:job_queue.start_next()
+  if lh#async#_is_queue_paused()
+    let s:job_queue.state = 'active'
+    call s:ui_update()
+    if !s:job_queue.is_empty()
+      call s:job_queue.start_next()
+    endif
+  else
+    call s:Verbose("The queue isn't paused => ignore unpause event")
   endif
 endfunction
 
@@ -116,6 +120,9 @@ endfunction
 " ## Internal functions {{{1
 " # Job queue {{{2
 " @invariant Running element has index 0
+" @invariant If self.interrupted is defined, this means a function like, push,
+" stop/cancel or pause has been called. If it gets incremented, this means the
+" `close_cb` has been called before the variable was relaxed.
 function! s:is_running() dict abort                " {{{3
   return !empty(self.list)
 endfunction
@@ -135,15 +142,16 @@ function! s:push_or_start(job) dict abort          " {{{3
     call s:Verbose('Found another task in job queue at index %1', idx)
     if idx >= 0
       let txt = get(a:job, 'txt', a:job.cmd)
-      let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
+      let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ",
+            \ ["&Queue the new (redundant task)",
+            \  "&Cancel the previous job and queue this one instead?",
+            \  "&Keep the previous job and dump the new one?"])
       redraw
       if choice == 3
         call s:Verbose('Ignore the new job')
         return
       elseif choice == 2
         call s:Verbose('Remplate old job by the new job')
-        let idx -= self.interrupted " we could be interrupted here...
-        let self.interrupted = 0
         let shall_update_ui = self._unsafe_stop_job(idx, len(self.list))
       else
         call s:Verbose('Queue the new redundant job')
@@ -152,24 +160,36 @@ function! s:push_or_start(job) dict abort          " {{{3
     let self.list += [ extend(copy(a:job), {'args': job_args}) ]
     call s:Verbose('Push or start job: %1 at %2-th position', self.list[-1], len(self.list))
   finally
+    if self.interrupted
+      " We could be interrupted just after the test. In that case, the old job
+      " won't be removed and it's get executed twice...
+      call remove(self.list, 0)
+      let interrupted = self.interrupted
+    endif
     unlet self.interrupted
   endtry
   call s:ui_update()
-  if len(self.list) == 1
+  call self._check_start_next(exists('interrupted')) " cannot be interrupted anymore?
+endfunction
+
+function! s:_check_start_next(...) dict abort      " {{{3
+  let has_been_interrupted = get(a:, 1, 0)
+  if self.state == 'paused'
+    call lh#common#warning_msg('The jobs are currently paused. Please unpause them to launch the one you have just queued')
+  elseif len(self.list) == 1 || has_been_interrupted
     " Can't start and remove simultaneously => don't wait here
     " There was nothing, the new job is to be started
     call self.start_next()
-  elseif self.state == 'paused'
-    call lh#common#warning_msg('The jobs are currently paused. Please unpause them to launch the one you have just queued')
   endif
 endfunction
 
 function! s:start_next() dict abort                " {{{3
-  if get(self, 'interrupted', 0)
-    call s:Verbose("Don't start next job automatically, as we have finished one while doing something else")
-    return
-  endif
+  " This function should never be interrupted as:
+  " - it's either run by push_or_start if there was no previous job
+  " - or it's run by close_cb, which is the only possible interruption
+  call lh#assert#value(self).not().has_key('interrupted')
   call lh#assert#true(!self.is_empty())
+  " call lh#assert#value(self.state).differ('paused')
 
   let s:job_queue.state = 'active'
   let job = self.list[0]
@@ -228,7 +248,7 @@ function! s:default_close_cb(channel, ...)         " {{{3
 endfunction
 
 function! s:close_cb(user_close_cb, channel) abort " {{{3
-  " Unlike usual MT applicatins, we cannot yield until we'are ready to handle
+  " Unlike usual MT applications, we cannot yield until we'are ready to handle
   " the close callback.
   " So we need to know whether there is interleaving...
   " What's possible is that close_sb interrupts anything:
@@ -241,9 +261,13 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
     " Notifies we have have interrupted the current action, and remove the
     " first entry in the list
     let s:job_queue.interrupted += 1
+    let job = s:job_queue.list[0]
+    " The removal will be done in interrupted functions
+  else
+    call lh#assert#value(s:job_queue.list).not().empty("Expects job queue to contain elements")
+    let job = remove(s:job_queue.list, 0)
   endif
 
-  let job = remove(s:job_queue.list, 0)
   let last_job_status = copy(job_info(job.job))
   call s:Verbose('Job finished %1 -- %2', job.job, job_info(job.job))
   try
@@ -272,7 +296,11 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
         return
       endif
     endif
-    call s:job_queue.start_next() " will automatically wait if we were doing something else
+    if has_key(s:job_queue, 'interrupted')
+      call s:Verbose("Don't start next job automatically, as we have finished one while doing something else")
+    else
+      call s:job_queue.start_next() " will automatically wait if we were doing something else
+    endif
   endif
   " And get sure airline is refreshed
   redrawstatus
@@ -301,7 +329,7 @@ function! s:_unsafe_stop_job(idx, nb_jobs) dict abort                " {{{3
     endif
     return 0 " don't update
   elseif a:nb_jobs == len(self.list)
-    call remove(self.list, a:idx - self.interrupted)
+    call remove(self.list, a:idx)
     call lh#common#warning_msg("Background execution of ".(job.txt)." aborted.")
     return 1
   else
@@ -322,13 +350,17 @@ function! s:stop_job(id) dict abort                " {{{3
     if idx == -1
       throw "No pending job matching ".a:id
     endif
-    let idx -= self.interrupted " well... interruption may happen in between...
-    let self.interrupted = 0
     let shall_update_ui = self._unsafe_stop_job(idx, l)
     if shall_update_ui
       call s:ui_update()
     endif
   finally
+    if self.interrupted
+      " We could be interrupted just after the test. In that case, the old job
+      " won't be removed and it's get executed twice...
+      call remove(self.list, 0)
+      call self._check_start_next() " cannot be interrupted anymore
+    endif
     unlet self.interrupted
   endtry
 endfunction
@@ -342,6 +374,7 @@ let s:job_queue.push_or_start      = function('s:push_or_start')
 let s:job_queue.start_next         = function('s:start_next')
 let s:job_queue.stop               = function('s:stop_job')
 let s:job_queue._unsafe_stop_job   = function('s:_unsafe_stop_job')
+let s:job_queue._check_start_next  = function('s:_check_start_next')
 
 " Example of Use                                     {{{3
 " function! TestCb(...)
@@ -403,7 +436,7 @@ function! lh#async#_jobs_console() abort
   if lh#async#_is_queue_paused()
     let title .= '    --> PAUSED <--'
   endif
-  silent let s:job_ui = lh#buffer#dialog#new('----<Jobs>----', title, '', 1, '', s:ui_build_lines())
+  silent let s:job_ui = lh#buffer#dialog#new('jobs://list', title, '', 1, '', s:ui_build_lines())
   " Cancellation mappings
   nnoremap <silent> <buffer> x     :call <sid>ui_cancel_jobs()<cr>
   nnoremap <silent> <buffer> <del> :call <sid>ui_cancel_jobs()<cr>
@@ -476,7 +509,6 @@ function! s:ui_cancel_jobs() abort " {{{3
       " call s:Verbose("Cancelling: %1", map(copy(selected), 'get(s:job_queue.list[v:val], "txt", s:job_ui.list[v:val].cmd'))
       let shall_update_ui = 0
       for j in reverse(selected)
-        " TODO: check what to do with self.interrupted here...
         let shall_update_ui += s:job_queue._unsafe_stop_job(j, l)
         let l -= 1
       endfor
@@ -485,6 +517,12 @@ function! s:ui_cancel_jobs() abort " {{{3
       endif
     endif
   finally
+    if self.interrupted
+      " We could be interrupted just after the test. In that case, the old job
+      " won't be removed and it's get executed twice...
+      call remove(self.list, 0)
+      call self._check_start_next() " cannot be interrupted anymore
+    endif
     unlet self.interrupted
   endtry
 endfunction
