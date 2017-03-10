@@ -1,4 +1,4 @@
-﻿# lh-vim-lib v4.0.0 [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+﻿# lh-vim-lib v4.0.0 [![Version](https://img.shields.io/badge/version-4.0.0RC9-blue.svg)](https://github.com/LucHermitte/lh-vim-lib/releases/tag/4.0.0rc9) [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
 
 ## Introduction
 
