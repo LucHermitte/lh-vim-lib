@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  06th Mar 2017
+" Last Update:  10th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -302,7 +302,7 @@ endfunction
 
 function! s:empty(...) dict abort " {{{4
   if ! self.__eval(empty(self.actual))
-    let msg = a:0 > 0 ? a:1 : 'Variable is not empty but contain: '.string(a:pattern)
+    let msg = a:0 > 0 ? a:1 : 'Variable is not empty but contain: '.string(self.actual)
     call lh#assert#_trace_assert(msg)
   endif
   return self
