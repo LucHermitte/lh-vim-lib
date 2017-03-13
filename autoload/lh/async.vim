@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  09th Mar 2017
+" Last Update:  13th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -136,7 +136,7 @@ function! s:push_or_start(job) dict abort          " {{{3
     call s:Verbose('Found another task in job queue at index %1', idx)
     if idx >= 0
       let txt = get(a:job, 'txt', a:job.cmd)
-      let choice = CONFIRM("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
+      let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ", ["&Queue the new (redundant task)", "&Cancel the previous job and queue this one instead?", "&Keep the previous job and dump the new one?"])
       redraw
       if choice == 3
         call s:Verbose('Ignore the new job')
@@ -253,9 +253,9 @@ function! s:close_cb(user_close_cb, channel) abort " {{{3
     " Be sure, we always launch the next job
     if !s:job_queue.is_empty()
       if last_job_status.exitval != 0
-        let go_on = CONFIRM("Last `".job.txt."` job failed.\n Shall we -> ", ["&Go on with the ".len(s:job_queue.list)." remaining jobs?", "&Pause?", "&Clear the job queue?"], 2)
+        let go_on = lh#ui#confirm("Last `".job.txt."` job failed.\n Shall we -> ", ["&Go on with the ".len(s:job_queue.list)." remaining jobs?", "&Pause?", "&Clear the job queue?"], 2)
         if     go_on == 3
-          let sure = CONFIRM("Do you confirm to what to clear the following pending jobs ()", ["&Yes", "No"], 2)
+          let sure = lh#ui#confirm("Do you confirm to what to clear the following pending jobs ()", ["&Yes", "No"], 2)
           if sure == 2
             call lh#async#_do_clear_queue()
           endif

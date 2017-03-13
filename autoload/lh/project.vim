@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  09th Mar 2017
+" Last Update:  13th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -361,7 +361,7 @@ function! s:GetPlausibleRoot() abort " {{{3
   call s:Verbose('s:GetPlausibleRoot() -- auto discover root: %1', auto_discover_root)
   if auto_discover_root == 'in_doubt_ask'
     if s:permission_lists.check_paths([ expand('%:p:h')])
-      let prj_dirname = INPUT("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
+      let prj_dirname = lh#ui#input("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
     else
       let prj_dirname = ''
     endif

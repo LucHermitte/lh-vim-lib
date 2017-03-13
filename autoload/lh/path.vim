@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  07th Mar 2017
+" Last Update:  13th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -786,7 +786,7 @@ function! s:lists_handle_file(file, permission) dict abort
     call s:Verbose('Path %1 has already been validated for this session.', a:file)
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
-    let choice = CONFIRM('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No\n&Always\nNe&ver", 1)
+    let choice = lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No\n&Always\nNe&ver", 1)
     if choice == 3 " Always
       call s:Verbose("Add %1 to current session whitelist", a:file)
       call lh#path#munge(self.valided_paths, a:file)
@@ -834,7 +834,7 @@ function! s:lists_is_file_accepted(file, permission) dict abort
     call s:Verbose('Path %1 has already been validated.')
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
-    if CONFIRM('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No", 1) != 1
+    if lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No", 1) != 1
       call lh#path#munge(self.rejected_paths, a:file)
       return 0
     endif

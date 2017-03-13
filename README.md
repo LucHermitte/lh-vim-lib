@@ -12,7 +12,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
 - Since version 3.2.7, it's no longer hosted on google-code but on github
-- Version 4.0.0 breaks `lh#let#if_undef()` interface.
+- Version 4.0.0 breaks `lh#let#if_undef()` interface, deprecates `CONFIRM()`«»
 
 ## Functions
 
