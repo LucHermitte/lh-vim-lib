@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      21st Sep 2007
-" Last Update:  14th Oct 2016
+" Last Update:  13th Mar 2017
 "------------------------------------------------------------------------
 " Description:  «description»
 "
@@ -150,7 +150,7 @@ endfunction
 
 function! lh#buffer#dialog#update(dialog) abort " {{{3
   set noro
-  silent! exe (s:Help_NbL()+1).',$d_'
+  silent! exe (s:Help_NbL()+2).',$d_'
   silent! call append('$', map(copy(a:dialog.choices), '"  ".v:val'))
   set ro
 endfunction
