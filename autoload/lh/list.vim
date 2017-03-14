@@ -625,16 +625,46 @@ function! lh#list#flat_extend(list, rhs) abort
 endfunction
 
 " Function: lh#list#separate(list, Cond) {{{3
-function! lh#list#separate(list, Cond) abort
-  let yes = []
-  let no = []
-  if type(a:Cond) == type(function('has'))
-    call map(copy(a:list), {idx, val -> add(a:Cond(idx,val)?yes:no, val)})
-  else
-    call map(copy(a:list), 'add((('.a:Cond.')?yes:no), v:val)')
-  endif
-  return [yes, no]
+function! s:has_add_ternary()
+  let a = []
+  let b = []
+  for i in range(4)
+    call add((i%2 ? a : b), i)
+  endfor
+  return a == [1, 3] && b == [0, 2]
 endfunction
+
+if s:has_add_ternary()
+  function! lh#list#separate(list, Cond) abort
+    let yes = []
+    let no = []
+    if type(a:Cond) == type(function('has'))
+      " call map(copy(a:list), {idx, val -> add(a:Cond(idx,val)?yes:no, val)})
+      call map(copy(a:list), 'add(a:Cond(v:key,v:val)?yes:no, v:val)')
+    else
+      call map(copy(a:list), 'add((('.a:Cond.')?(yes):(no)), v:val)')
+    endif
+    return [yes, no]
+  endfunction
+else
+  let s:k_assoc = { 'v:key' : 'idx', 'v:val': 'e'}
+  function! lh#list#separate(list, Cond) abort
+    " call lh#assert#type(a:Cond).belongs_to('', function('has'))
+    let predicate_is_a_function = type(a:Cond) == type(function('has'))
+    let yes = []
+    let no = []
+    let idx = 0
+    for e in a:list
+      if predicate_is_a_function ? a:Cond(idx, e) : eval(substitute(a:Cond, '\vv:val|v:key', '\=s:k_assoc[submatch(0)]', 'g'))
+        let yes += [e]
+      else
+        let no += [e]
+      endif
+      let idx += 1
+    endfor
+    return [yes, no]
+  endfunction
+endif
 
 " Function: lh#list#push_if_new(list, value) {{{3
 function! lh#list#push_if_new(list, value) abort
