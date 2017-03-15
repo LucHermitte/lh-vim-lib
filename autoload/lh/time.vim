@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '40000'
 " Created:      01st Dec 2015
-" Last Update:  09th Feb 2017
+" Last Update:  14th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -68,7 +68,7 @@ endif
 function! lh#time#bench_n(n, F, ...) abort
   let tot = 0
   for i in range(1, a:n)
-    let [res, b] = call('lh#time#bench', [a:F] + a:000)
+    let [res, b] = call('lh#time#bench', [a:F] + deepcopy(a:000))
     let tot += b
   endfor
   return [res, tot]
