@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  13th Mar 2017
+" Last Update:  15th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -108,6 +108,7 @@ let s:k_version = 40000
 "       (*) Add `lh#path#is_up_to_date()`
 "       (*) Improve `lh#path#strip_start()` performances
 "       (*) lh#path#split('/foo') will now return 2 elements
+"       (*) Recognize empty name buffer as scratch/distant
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -331,7 +332,7 @@ endfunction
 
 " Function: lh#path#is_distant_or_scratch(path) {{{3
 function! lh#path#is_distant_or_scratch(path) abort
-  return a:path =~ '\v://|^//|^\\\\'
+  return a:path =~ '\v://|^//|^\\\\|^$'
         \ || getbufvar(bufnr(a:path), '&buftype') =~ 'nofile\|quickfix'
 endfunction
 
