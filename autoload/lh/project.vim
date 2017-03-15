@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  13th Mar 2017
+" Last Update:  15th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -412,7 +412,7 @@ endfunction
 " Function: lh#project#is_eligible([bid]) {{{3
 function! lh#project#is_eligible(...) abort
   if a:0 > 0
-    return (lh#option#getbufvar(a:1, '&ft') != 'qf') && ! lh#path#is_distant_or_scratch(bufname(a:1))
+    return (lh#option#getbufvar(a:1, '&ft', '') != 'qf') && ! lh#path#is_distant_or_scratch(bufname(a:1))
   else
     return (&ft != 'qf') && ! lh#path#is_distant_or_scratch(expand('%:p'))
   endif
