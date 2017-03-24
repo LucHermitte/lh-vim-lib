@@ -5,7 +5,7 @@
 " Version:      3.4.0.
 let s:k_version = '340'
 " Created:      15th Dec 2015
-" Last Update:  03rd Jan 2017
+" Last Update:  24th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       UT for lh#string#*() functions
@@ -27,6 +27,11 @@ function! s:Test_matches() " {{{2
 endfunction
 
 function! s:Test_trim_text() " {{{2
+  AssertEquals(lh#string#trim('foobar'), 'foobar')
+  AssertEquals(lh#string#trim('  foobar'), 'foobar')
+  AssertEquals(lh#string#trim("\t foobar  "), 'foobar')
+  AssertEquals(lh#string#trim('foobar  '), 'foobar')
+
   AssertEquals(lh#string#trim_text_right('foobar', 'foo'), 'bar')
   AssertEquals(lh#string#trim_text_right('foobar', 'fobo'), 'foobar')
   AssertEquals(lh#string#trim_text_right('foobar', 'bar'), 'foobar')

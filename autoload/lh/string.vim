@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.9.0.
-let s:k_version = '3900'
+" Version:      4.0.0.
+let s:k_version = '4000'
 " Created:      08th Dec 2015
-" Last Update:  03rd Jan 2017
+" Last Update:  24th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -52,7 +52,7 @@ endfunction
 " Function: lh#string#trim(string) {{{3
 " @version 3.4.0
 function! lh#string#trim(string) abort
-  return matchstr('^\v\s*\zs.{-}\ze\s*$', a:string)
+  return matchstr(a:string, '^\v\s*\zs.{-}\ze\s*$')
 endfunction
 
 " Function: lh#string#trim_text_right(string, ) {{{3
