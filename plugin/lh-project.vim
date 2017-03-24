@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      29th Sep 2016
-" Last Update:  24th Nov 2016
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -27,10 +27,36 @@ let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
+" ## Options {{{1
+let g:lh#project = get(g:, 'lh#project', {})
+
+let s:toggle_auto_discover_root =
+      \ { 'variable': 'lh#project.auto_discover_root'
+      \ , 'values': ['in_doubt_ask', 'no', 'yes', 'in_doubt_ignore', 'in_doubt_improvise' ]
+      \ , 'menu' : {'priority': '500.110.20', 'name': '&Plugin.&Project.auto discover &root'}
+      \ }
+call lh#menu#def_toggle_item(s:toggle_auto_discover_root)
+
+let s:toggle_auto_detect_project =
+      \ { 'variable': 'lh#project.auto_detect'
+      \ , 'values': [0, 1]
+      \ , 'texts': ['no', 'yes']
+      \ , 'menu' : {'priority': '500.110.40', 'name': '&Plugin.&Project.auto detect &project'}
+      \ }
+call lh#menu#def_toggle_item(s:toggle_auto_detect_project)
+
+let s:toggle_auto_chdir =
+      \ { 'variable': 'lh#project.auto_chdir'
+      \ , 'values': [0, 1]
+      \ , 'texts': ['no', 'yes']
+      \ , 'menu' : {'priority': '500.110.40', 'name': '&Plugin.&Project.auto &chdir'}
+      \ }
+call lh#menu#def_toggle_item(s:toggle_auto_chdir)
+
 " ## Commands {{{1
-command! -nargs=* -complete=customlist,lh#project#_complete_command
+command! -nargs=* -complete=customlist,lh#project#cmd#_complete
       \ Project
-      \ call lh#project#_command(<f-args>)
+      \ call lh#project#cmd#execute(<f-args>)
 
 " ## Auto commands {{{1
 augroup LH_PROJECT

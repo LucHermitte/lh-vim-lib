@@ -1,4 +1,4 @@
-﻿# lh-vim-lib v4.0.0 [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+﻿# lh-vim-lib v4.0.0 [![Version](https://img.shields.io/badge/version-4.0.0RC9-blue.svg)](https://github.com/LucHermitte/lh-vim-lib/releases/tag/4.0.0rc9) [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
 
 ## Introduction
 
@@ -12,7 +12,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
 - Since version 3.2.7, it's no longer hosted on google-code but on github
-- Version 4.0.0 breaks `lh#let#if_undef()` interface.
+- Version 4.0.0 breaks `lh#let#if_undef()` interface, deprecates `CONFIRM()`«»
 
 ## Functions
 
@@ -81,6 +81,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#mapping#plug()`                            | Defines a series of default mappings associated to a plug mapping                                                                                                        |
 | `lh#on#exit()`                                 | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions                                                    |
 | `lh#object#inject()`                           | Injects a new method in an existing object. Meant to simplify maintenance task.                                                                                          |
+| `lh#object#inject_methods()`                   | Injects several methods in an existing object.                                                                                                                           |
 | `lh#object#is_an_object()`                     | Tells whether the parameter is an object built with `lh#object#make_top_type()`                                                                                          |
 | `lh#object#make_top_type()`                    | Creates a new object                                                                                                                                                     |
 | `lh#object#to_string()`                        | Stringifies a data -- hide objects methods                                                                                                                               |
@@ -134,6 +135,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#os#system(cmd)`                | Returns `lh#os#chomp(system(export p:$ENV &amp;&amp; command))`                             |
 | `lh#os#cpu_number()`               | Returns the number of processors on the machine                                             |
 | `lh#os#cpu_cores_number()`         | Returns the number of cores on the machine                                                  |
+| `lh#os#lcd()`                      | Executes `:lcd fnameescape({path})`                                                         |
 
 ### Lists and dictionaries related functions
 | Function                         | Purpose                                                                                                           |
@@ -155,6 +157,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#equal_range()`          | See C++ [`std::equal_range`](http://en.cppreference.com/w/cpp/algorithm/equal_range)                              |
 | `lh#list#find_entity()`          | Return the index where an entity is within a list, -1 if not found                                                |
 | `lh#list#find_if()`              | Searches the first element in a list that verifies a predicate                                                    |
+| `lh#list#find_if_fast()`         | Searches the first element in a list that verifies a simple predicate only relying on `v:val` or `v:key`          |
 | `lh#list#flat_extend()`          | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter             |
 | `lh#list#flatten()`              | Flattens a list                                                                                                   |
 | `lh#list#for_each_call()`        | Calls a function of all elements from a list                                                                      |

@@ -31,7 +31,10 @@
       * [3.2.5. Fetch the name under which an option is stored](#325-fetch-the-name-under-which-an-option-is-stored)
       * [3.2.6. Register a buffer to the project](#326-register-a-buffer-to-the-project)
       * [3.2.7. Get a variable under the project](#327-get-a-variable-under-the-project)
-      * [3.2.8. Set a variable in a precise project](#328-set-a-variable-in-a-precise-project)
+      * [3.2.8. Set a variable in a precise project...](#328-set-a-variable-in-a-precise-project)
+        * [...through project references](#through-project-references)
+        * [...through `:Project :let`](#through-project-let)
+        * [...through `:LetTo`](#through-letto)
     * [3.3. You're a plugin maintainer](#33-youre-a-plugin-maintainer)
       * [3.3.1. Get a project variable value:](#331-get-a-project-variable-value)
       * [3.3.2. Define toggable project options](#332-define-toggable-project-options)
@@ -171,7 +174,7 @@ the files from a directory hierarchy as part of a same project are:
 
  * At the root, there is a `.svn/` or a `.git/` directory (mercurial is not
    supported, yet, nor other versionning systems);
- * You have set in your `.vimrc`:
+ * You have to set in your `.vimrc`:
 
  ```vim
  LetTo g:lh#project.auto_detect = 1
@@ -188,7 +191,8 @@ several subprojects (one per program sub-component for instance).
 If you need more control, or if you don't want to activate this automagic
 feature, use one of the approaches described next.
 
-Note: You'll want to read the documentation about blacklists and so on.
+Note: You'll want to read the documentation about blacklists and so on:
+`:h g:lh#project.permissions`.
 
 #### 3.1.1.2. From your `.lvimrc` or `_vimrc_local.vim`
 If you don't want to automagically detect projects, or if you need more control
@@ -381,6 +385,17 @@ Project ProjectName :doonce echo bufname('%')
 Project :doonce echo bufname('%')
 ```
 
+The best way to execute `:make` on a project is with this subcommand. This way,
+it makes sure all variables related to the project are correctly set when
+compiling.
+
+```vim
+Project ProjectName :doonce make %<
+```
+
+Note that `:Project :doonce command` is strictly equivalent to `:command` and
+doesn't really make any sense.
+
 #### Execute a command in all opened windows associated a project
 ```vim
 Project ProjectName :windo echo bufname('%')
@@ -496,13 +511,18 @@ This internal function is used by `lh#let#*` functions.
 :let val = lh#project#_get('foo.bar.team')
 ```
 
-### 3.2.8. Set a variable in a precise project
-When a buffer belongs to several projects, it's not easily possible (yet) to
-select which inherited project get the settings.
+### 3.2.8. Set a variable in a precise project...
+When a buffer belongs to several projects, we'll want to select which inherited
+project get the settings.
 
-For now, you'll need to obtain the project reference you're interested in
-(hint: use `lh#project#define()` to obtain references), then set the variables
-to what you wish:
+Two approaches are possibles:
+
+#### ...through project references
+
+You may obtain a reference to the project you're interested in (hint: use
+`lh#project#define()` to obtain references, or `lh#project#crt()`, or
+`lh#project#list#_get()`), then set the variables to what you wish with
+`set()` method:
 
 ```vim
 " Vim option, with a project scope
@@ -511,6 +531,40 @@ to what you wish:
 " Environment variable, with a project scope
 :call prj.set('$FOOBAR', 42)
 
+" Set p:foo.bar in the current project
+let crt_prj  = lh#project#crt()
+:call crt_prj.set('foo.bar', 42)
+" or in its first parents
+:call crt_prj.parents[0].set('foo.bar', 43)
+
+" Or in a named project
+let foo_prj  = lh#project#list#_get('FooProject')
+:call foo_prj.set('foo.bar', 12)
+```
+
+#### ...through `:Project :let`
+You could also specify the target project with `:Project` first argument:
+
+```vim
+" In the current project
+:Project :let foo.bar = 42
+
+" Or in a named project
+:Project FooProject :let foo.bar = 12
+```
+
+#### ...through `:LetTo`
+`:LetTo` (and `lh#let#to()`) has two special options that permits to select the
+target project of the current buffer.
+
+```vim
+" Set p:foo.bar at current project level
+LetTo --hide      p:foo.bar = 42
+
+" Replace any previous definition of `p:foo.bar` in parent projects with the
+" new one, if there was one.
+" Or define the value in the current project namespace if it didn't exist.
+LetTo --overwrite p:foo.bar = 43
 ```
 
 ## 3.3. You're a plugin maintainer
@@ -540,21 +594,40 @@ unreadable `{'_to_string': function('<SNR>43_unset_to_string'), '__lhvl_oo_type'
 
 ### 3.3.2. Define toggable project options
 ```vim
+" Define a global variable, g:bar, that can be toggled
+let Data = {
+      \ "variable": "bar",
+      \ "idx_crt_value": 1,
+      \ "values": [ 'a', 'b', 'c', 'd' ],
+      \ "menu": { "priority": '42.50.10', "name": '&LH-Tests.&TogMenu.&bar'}
+      \}
+call lh#menu#def_toggle_item(Data)
+
+" Define a project variable, p:bar, that can be toggled,
+" and that has a default value coming from the global variable
 let p1 = lh#project#new({'name': 'Menu'})
 let pData = {
     \ "variable": "p:bar",
     \ "idx_crt_value": 1,
     \ "values": [lh#ref#bind('g:bar')] + g:Data.values,
     \ "texts": ['default'] + g:Data.values,
-    \ "menu": { "priority": '42.50.11', "name": '&LH-Tests.&TogMenu.&p:bar'}
+    \ "menu": { "priority": '42.50.11', "name": '&LH-Tests.&TogMenu.&Project Foo p:bar'}
     \}
 Assert! lh#ref#is_bound(pData.values[0])
 call lh#menu#def_toggle_item(pData)
 
 " And the end-user will be able to execute
-Toggle LHTestsTogMenupbar
+Toggle LHTestsTogMenuProjectFoopbar
 " or to toggle the option with the menus
+" to toggle the p:bar variable,
+
+" and to execute
+Toggle LHTestsTogMenubar
+" to toggle the g:bar variable
 ```
+
+**Beware**, toggling `p:bar` with `:Toggle` can be done anywhere, but it'll
+only apply to the option from one specific project!
 
 ### 3.3.3. Execute an external command while some `p:$ENV` variable are defined:
 ```vim
@@ -622,13 +695,7 @@ the firsts I've in mind).
 # 6. TO DO list
 
  * Doc
-   * `prj.get_names()`
- * `:Project [<name>] :make`
-   -> rely on `:Make` if it exists
- * Toggling:
-   * at global level: [a, b, c]
-   * at project level: [default value from global VS force [a, b, c]]
- * Completion on `:Let*` and `:Unlet` for inherited `p:`variables
+   * `lh#project#_best_varname_match()`
  * Use in plugins:
    * `p:$ENV variables`
       * [X] lh-tags synchronous (via lh#os#system)
@@ -639,17 +706,12 @@ the firsts I've in mind).
       * [ ] lh-dev
       * [ ] µTemplate
       * [ ] Test on windows!
-   * `paths.sources`
- * Be able to control which parent is filled with `lh#let#` functions
-   * -> `:Project <name> :LetTo var = value`
- * `:call prj.set(plain_variable, value)`
+   * Have let-modeline support p:var, p:&opt, and p:$env
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
    * -> merge 'variables', 'env', 'options' in `variables`
  * Fix `find_holder()` to use `update()` code and refactor the later
- * Have let-modeline support p:var, p:&opt, and p:$env
- * Add convenience functions to fill permission lists
  * Add VimL Syntax highlight for `LetTo`, `LetIfUndef`, `p:var`
  * Serialize and deserialize options from a file that'll be maintained
    alongside a `_vimrc_local.vim` file.

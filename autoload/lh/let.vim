@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  01st Mar 2017
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -50,15 +50,23 @@ endfunction
 " ## Exported functions {{{1
 "
 " # Let* {{{2
-" Function: s:BuildPublicVariableName(var) {{{3
-function! s:BuildPublicVariableName(var)
+" Function: s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) {{{3
+function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) abort
   if a:var !~ '\v^[wbptgP]:|[$&]'
     throw "Invalid variable name `".a:var."`: It should be scoped like in g:foobar"
   elseif a:var =~ '^P:'
-    " It's either a project variable if there is a project, or a buffer
+    " P: -> It's either a project variable if there is a project, or a buffer
     " variable otherwise
     if lh#project#is_in_a_project()
-      let var = lh#project#_crt_var_name('p'.a:var[1:])
+      if a:must_keep_previous
+        let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+        if lh#option#is_set(value)
+          call s:Verbose("%1 is defined somewhere => no need to build its name, let's abort", a:var)
+          return extend(copy(lh#option#unset()), {'_value': value})
+          " No need to check anything,
+        endif
+      endif
+      let var = lh#project#_crt_var_name('p'.a:var[1:], a:hide_or_overwrite)
     elseif a:var =~ '^P:[&$]'
       throw "Options and environment variable names like `".a:var."` are not supported. Use `p:` or plain variables."
     else
@@ -66,22 +74,34 @@ function! s:BuildPublicVariableName(var)
     endif
   elseif a:var =~ '\v^p:|^\&p:'
     " It's a p:roject variable, or a project option
-    let var = lh#project#_crt_var_name(a:var)
+    if a:must_keep_previous && lh#project#is_in_a_project()
+      let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+      if lh#option#is_set(value)
+        call s:Verbose("%1 is defined somewhere => no need to build its name, let's abort", a:var)
+        return extend(copy(lh#option#unset()), {'_value': value})
+        " No need to check anything,
+      endif
+    endif
+    let var = lh#project#_crt_var_name(a:var, a:hide_or_overwrite)
   else
     let var = a:var
   endif
   return var
 endfunction
 
-" Function: s:BuildPublicVariableNameAndValue(string|var, value) {{{3
-function! s:BuildPublicVariableNameAndValue(...)
+" Function: s:BuildPublicVariableNameAndValue(must_keep_previous ; string|var, value) {{{3
+let s:k_hide_or_overwite = '--(hide|overwrite)'
+function! s:BuildPublicVariableNameAndValue(must_keep_previous, ...) abort
   if len(a:000) == 1
-    if a:1 =~ '^p:&'
+    " Strip --overwrite/--hide option
+    let [all, hide_or_overwrite, expr ; tail] = matchlist(a:1, '\v^%('.s:k_hide_or_overwite.'\s*)=(.*)$')
+    " Analyse the expression
+    if expr =~ '^p:&'
       " options need a special handling
-      let [all, var, assign, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})\s*([+-]=\=)\s*(.*)')
+      let [all, var, assign, value0 ; dummy] = matchlist(expr, '^\v(\S{-})\s*([+-]=\=)\s*(.*)')
       let l:Value = assign.value0
     else
-      let [all, var, value0 ; dummy] = matchlist(a:1, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
+      let [all, var, value0 ; dummy] = matchlist(expr, '^\v(\S{-})%(\s*\=\s*|\s+)(.*)')
       " string+eval loses references, and it doesn't seem required.
 
       " Handle comments and assign value
@@ -94,11 +114,12 @@ function! s:BuildPublicVariableNameAndValue(...)
       "    :LetIfUndef g:c_import_pattern      '^#\s*include\s*["<]${module}\>'
     endif
   else
-    let var = a:1
-    let l:Value = a:2
+    let var               = a:1
+    let l:Value           = a:2
+    let hide_or_overwrite = get(a:, 3, '')
     " let value = string(a:2)
   endif
-  let resvar = s:BuildPublicVariableName(var)
+  let resvar = s:BuildPublicVariableName(var, hide_or_overwrite, a:must_keep_previous)
   return [resvar, l:Value]
 endfunction
 
@@ -109,15 +130,24 @@ endfunction
 " Syntax use by :LetIfUndef
 " @param[in] string: 'var = value'
 function! s:LetIfUndef(var, value) abort " {{{4
-    let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
-    call s:Verbose('%1 --> dict=%2 --- key=%3', a:var, dict, key)
-    if !empty(key)
+    " let [all, dict, key, subscript ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
+    let [all, dict, key, subscript ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]{-})%(\[(.{-})\])=)=$')
+    call s:Verbose('%1 --> dict=%2 --- key=%3 --- subscript=%4', a:var, dict, key, subscript)
+    if !empty(subscript)
+      " Corner case found. Expect an already initialized array => don't
+      " populated it on the fly yet
+      call lh#assert#value({dict}).has_key(key)
+      call lh#assert#type({dict}[key]).is([])
+      return {dict}[key][subscript]
+    elseif !empty(key)
       " Dictionaries
       let dict2 = s:LetIfUndef(dict, {})
       if !has_key(dict2, key)
         " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+        call s:Verbose("let %1.%2 = %3", dict, key, a:value)
         let dict2[key] = a:value
-        call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
+      else
+        call s:Verbose("(LetIfUndef) %1.%2 exists => abort recursion", dict, key)
       endif
       return dict2[key]
     else
@@ -127,11 +157,14 @@ function! s:LetIfUndef(var, value) abort " {{{4
           " Environment variables are not supposed to receive anything but
           " strings. And they don't support `let {var} = value`
           exe 'let '.a:var.' = '.string(a:value)
+          call s:Verbose("let %1 = %2", a:var, a:value)
         else
           " let {a:var} = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
           let {a:var} = a:value
           call s:Verbose("let %1 = %2", a:var, {a:var})
         endif
+      else
+        call s:Verbose("(LetIfUndef) %1 exists => abort recursion", a:var)
       endif
       exe 'return '.a:var
       " return {a:var} " syntax not supported with environment variables
@@ -140,17 +173,21 @@ endfunction
 
 function! lh#let#if_undef(...) abort " {{{4
   call s:Verbose('let_if_undef(%1)', a:000)
-  try
-    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
-    if type(var) == type({}) && has_key(var, 'project')
+  " try
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', [1] + a:000)
+    if lh#option#is_unset(var)
+      call s:Verbose("Notification that %1 is already set, receive => abort let#if_undef", a:000)
+      " but this return the value
+      return var._value
+    elseif type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
-      call var.project.set(Value)
+      return var.project.set(var.name, Value)
     else
       return s:LetIfUndef(var, Value)
     endif
-  catch /.*/
-    throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
-  endtry
+  " catch /.*/
+    " throw "Cannot set ".string(a:000).": ".(v:exception .' @ '. v:throwpoint)
+  " endtry
 endfunction
 
 " Function: lh#let#to(var, value) {{{3
@@ -163,14 +200,19 @@ endfunction
 " @since v4.0.0
 function! s:LetTo(var, value) abort " {{{4
   " Here, project variables have already been resolved.
-  let [all, dict, key ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]+))=$')
-  " echomsg a:var." --> dict=".dict." --- key=".key
+  let [all, dict, key, subscript ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^\[.]{-})%(\[(.{-})\])=)=$')
+  call lh#assert#value(subscript).empty("Case not yet handled")
   if !empty(key)
     " Dictionaries
     let dict2 = s:LetIfUndef(dict, {}) " Don't override the dict w/ s:LetTo()!
+    " call lh#assert#type(dict2).belongs_to({}, []) " We cannot expect this, as it may be an error from the end user...
+
     " let dict2[key] = type(a:value) == type(function('has')) ? (a:value) : eval(a:value)
+    call s:Verbose("let %1.%2 = %3 %4 // %1=%5", dict, key, a:value, !empty(subscript) ? '@['.subscript.']' : '', dict2)
+    if ! lh#type#is_dict(dict2)
+      throw "E689: Type mismatch: Can only index a List or Dictionary."
+    endif
     let dict2[key] = a:value
-    call s:Verbose("let %1.%2 = %3", dict, key, dict2[key])
     return dict2[key]
   elseif a:var =~ '^\$'
     " Environment variables are not supposed to receive anything but
@@ -191,8 +233,10 @@ function! s:LetTo(var, value) abort " {{{4
 endfunction
 
 function! lh#let#to(...) abort " {{{4
+  call s:Verbose('let_to(%1)', a:000)
   " try
-    let [var,Value] = call('s:BuildPublicVariableNameAndValue', a:000)
+    let [var,Value] = call('s:BuildPublicVariableNameAndValue', [0] + a:000)
+    call lh#assert#value(var).is_set(var)
     if type(var) == type({}) && has_key(var, 'project')
       " Special case for p:& options (and may be someday to p:$var)
       call var.project.set(var.name, Value)
@@ -233,7 +277,8 @@ function! lh#let#unlet(var) abort " {{{4
       " It's a p:roject variable
       let prj = lh#project#crt()
       if lh#option#is_unset(prj)
-        throw "Current buffer isn't under a project. => There is no ".a:var." variable found to be unlet!"
+        call s:Verbose("Current buffer isn't under a project. => There is no ".a:var." variable found to be unlet!")
+        return
       endif
       let suffix = a:var[2:]
       if empty(suffix)
@@ -241,7 +286,8 @@ function! lh#let#unlet(var) abort " {{{4
       endif
       let h = prj.find_holder(suffix)
       if lh#option#is_unset(h)
-        throw "No ".a:var." variable found to be unlet!"
+        call s:Verbose("No ".a:var." variable found to be unlet!")
+        return
       endif
       unlet h[suffix[0] == '$' ? suffix[1:] : suffix]
       call s:Verbose("unlet %1.%2", h, suffix)
@@ -268,9 +314,7 @@ function! lh#let#_list_all_variables_in_scope(scope) abort
     if lh#option#is_unset(prj)
       return a:scope
     endif
-    let vars = keys(prj.variables)
-          \ + map(keys(prj.env), '"$".v:val')
-          \ + map(keys(prj.options), '"&".v:val')
+    let vars = prj.get_names()
   else
     let vars = keys({a:scope})
   endif
@@ -282,20 +326,8 @@ endfunction
 function! s:IsDictOrList(var)
   " call assert_true(type(a:var) == type(''))
   if a:var =~ '^p:'
-    " TODO: find inherited variables
-    let vname = lh#project#crt_bufvar_name() . '.'
-    if     a:var[:2] == 'p:&'
-      let vname .= 'options.'
-      let sub    = a:var[3:]
-    elseif a:var[:2] == 'p:$'
-      let vname .= 'env.'
-      let sub    = a:var[3:]
-    else
-      let vname .= 'variables.'
-      let sub    = a:var[2:]
-    endif
-
-    return s:IsDictOrList(vname.sub)
+    let instance = lh#project#_get(a:var[2:])
+    return type(instance) == type([]) || type(instance) == type({})
   else
     let Val = eval(a:var)
     return type(Val) == type([]) || type(Val) == type({})
@@ -309,11 +341,8 @@ function! s:IsDict(var)
     if a:var =~ '^p:[$&]'
       return 0
     elseif a:var =~ '^p:'
-      " TODO: find inherited variables
-      let vname = lh#project#crt_bufvar_name() . '.'
-      let vname .= 'variables.'
       let sub    = a:var[2:]
-      return s:IsDict(vname.sub)
+      return lh#type#is_dict(lh#project#_get(sub))
     endif
   else
     let Val = eval(a:var)
@@ -346,9 +375,11 @@ function! lh#let#_list_variables(lead, keep_only_dicts_and_lists) abort
     let sDict = sDict0
     if sDict =~ '^p:'
       " TODO: find inherited variables
-      let sDict = substitute(sDict, 'p:', lh#project#crt_bufvar_name().'.variables.', '')
+      " let sDict = substitute(sDict, 'p:', lh#project#crt_bufvar_name().'.variables.', '')
+      let dict = lh#project#_get(sDict[2:])
+    else
+      let dict = eval(sDict)
     endif
-    let dict = eval(sDict)
     let vars = keys(dict)
     if a:keep_only_dicts_and_lists
       call filter(vars, 's:IsDictOrList(sDict.".".v:val)')
@@ -451,17 +482,22 @@ endfunction
 " :LetIfUndef -> only dicts
 " :Unlet: only one parameter
 function! lh#let#_complete_let(ArgLead, CmdLine, CursorPos) abort
-  let tmp = substitute(a:CmdLine, '\s*\S*', 'Z', 'g')
-  let pos = strlen(tmp)
+  let [pos, tokens, ArgLead, CmdLine, CursorPos] = lh#command#analyse_args(a:ArgLead, a:CmdLine, a:CursorPos)
 
-  call s:Verbose(':call lh#let#_complete_let("%1", "%2", "%3")', a:ArgLead, a:CmdLine, a:CursorPos)
-  " call s:Verbose('complete(lead="%1", cmdline="%2", cursorpos=%3, pos=%4)', a:ArgLead, a:CmdLine, a:CursorPos, pos)
+  let is_dest_specified = (pos >= 2) && (tokens[1] =~ '^--')
+  let relpos = pos - is_dest_specified
 
-  if     2 == pos
+  if     (1 == relpos)
     " First argument: a variable name
     if a:CmdLine =~ '\vLetI%[fUndef]'
       " todo: don't return the final '.'
       let vars = lh#let#_list_variables(a:ArgLead, 1)
+    elseif a:CmdLine =~ '\vLetT%[o]'
+      let vars = lh#let#_list_variables(a:ArgLead, 0)
+      " return any variable starting with Arglead, without the final '.'?
+      if  (1==pos) && lh#project#is_in_a_project() && (lh#project#crt().depth() > 1)
+        let vars = filter(['--hide', '--overwrite'], 'v:val =~ "^".ArgLead.".*"') + vars
+      endif
     else " :LetTo and Unlet
       let vars = lh#let#_list_variables(a:ArgLead, 0)
       " return any variable starting with Arglead, without the final '.'?
@@ -469,11 +505,10 @@ function! lh#let#_complete_let(ArgLead, CmdLine, CursorPos) abort
     return vars
   elseif a:CmdLine =~ '\vUnl%[et]'
     return ''
-  elseif pos >= 3
+  elseif relpos >= 2
     " Doesn't handle 'foo\ bar', but we don't need this to fetch a variable
     " name
-    let args = split(a:CmdLine, '\s\+')
-    let varname = args[1]
+    let varname = tokens[1+is_dest_specified]
     call s:Verbose('complete: varname=%1', varname)
     return eval(varname)
 

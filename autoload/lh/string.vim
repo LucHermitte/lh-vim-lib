@@ -88,6 +88,8 @@ function! lh#string#as(val) abort
       return a:val._to_string()
     endif
     return string(a:val)
+  elseif type(a:val) == type(function('has'))
+    return string(a:val)
   endif
   return a:val
 endfunction

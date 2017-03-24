@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0.0
+" Version:      4.0.0
 let s:k_version = '40000'
 " Created:      26th Nov 2015
-" Last Update:  28th Oct 2016
+" Last Update:  09th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -74,6 +74,7 @@ function! lh#dict#let(dict, key, value) abort
     endif
     call lh#dict#let(a:dict[key], subkey, a:value)
   endif
+  return a:dict[key]
 endfunction
 " # Dictionary in read-only {{{2
 
@@ -88,15 +89,7 @@ endfunction
 
 " Function: lh#dict#subset(dict, keys) {{{3
 function! lh#dict#subset(dict, keys) abort
-  let result={}
-  for e in a:keys
-    let Val = get(a:dict, e, s:k_unset)
-    if lh#option#is_set(Val)
-      let result[e] = Val
-    endif
-    unlet Val
-  endfor
-  return result
+  return filter(copy(a:dict), 'index(a:keys, v:key) >= 0')
 endfunction
 
 " Function: lh#dict#get_composed(dst, key[, def]) {{{3
@@ -105,7 +98,7 @@ function! lh#dict#get_composed(dst, key, ...) abort
   try
     let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.(.+))=$')
     call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
-    if !has_key(a:dst, key)
+    if !lh#type#is_dict(a:dst) || !has_key(a:dst, key)
       call s:Verbose('Return default value: Key %1 not found in %2.', key, a:dst)
       return get(a:, 1, s:k_unset)
     endif

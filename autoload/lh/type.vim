@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      20th Feb 2017
-" Last Update:  20th Feb 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions around |type()|
@@ -57,11 +57,14 @@ let s:names =
       \, type([])             : 'list'
       \, type({})             : 'dictionary'
       \, type(0.0)            : 'float'
-      \, type(v:true)         : 'bool'
-      \, type(v:none)         : 'None'
       \, 8                    : 'job'
       \, 9                    : 'channel'
       \ }
+if exists('v:true')
+  let s:names[v:true] = 'bool'
+  let s:names[v:false] = 'bool'
+  let s:names[v:none] = 'None'
+endif
 function! lh#type#name(type) abort
   return get(s:names, a:type, 'unknown')
 endfunction

@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  20th Feb 2017
+" Last Update:  07th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -68,6 +68,15 @@ endfunction
 " Function: lh#os#OnDOSWindows() {{{3
 function! lh#os#OnDOSWindows() abort
   return has('win64') || has('win16') || has('win32') || has('dos16') || has('dos32') || has('os2')
+endfunction
+
+" # builtin commands {{{2
+" Function: lh#os#lcd(path) {{{3
+function! lh#os#lcd(path) abort
+  " Need to neutralize several characters like #, %, ...
+  let path = fnameescape(a:path)
+  call s:Verbose("buffer %1 -> `:lcd %2`", bufname('%'), path)
+  exe 'lcd '.path
 endfunction
 
 " # External program Execution {{{2

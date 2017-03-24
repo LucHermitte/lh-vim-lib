@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 03rd Feb 2017
+                        For Vim version 7+      Last change: 08th Mar 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -94,7 +94,7 @@ Functor related functions:                              |lhvl#function|   {{{2
 - |lh#function#prepare()|
 List related functions:                                 |lhvl#list|       {{{2
 - |lh#list#accumulate()|
-- |lh#list#Find_if()| and |lh#list#find_if()|
+- |lh#list#Find_if()|, |lh#list#find_if()|, and |lh#list#find_if_fast()|
 - |lh#list#Transform()| and |lh#list#transform()|
 - |lh#list#arg_min()|, |lh#list#arg_max()|
 - |lh#list#chain_transform()|
@@ -244,6 +244,7 @@ OS/System related functions:                            |lhvl#os|         {{{2
 - |lh#os#sys_cd()|
 - |lh#os#cpu_number()|
 - |lh#os#cpu_cores_number()|
+- |lh#os#lcd()|
 Completion related functions                            |lhvl#completion| {{{2
 - |lh#icomplete#new()|
 - |lh#icomplete#new_on()|
@@ -266,6 +267,8 @@ Version Control System functions                        |lhvl#vcs|        {{{2
 - |lh#vcs#as_http()|
 OO helpers                                              |lhvl#oo|         {{{2
 - |lh#object#make_top_type()|
+- |lh#object#inject()|
+- |lh#object#inject_methods()|
 - |lh#object#to_string()|
 - |lh#object#_to_string()|
 Variable helper functions                               |lhvl#variable|   {{{2
@@ -295,13 +298,17 @@ Design by Contract related functions                    |lhvl#DbC|        {{{2
   - |lh#assert#match()|
   - |lh#assert#not_equal()|
   - |lh#assert#true()|
+  - |lh#assert#value().empty()|
   - |lh#assert#value().equal()|
   - |lh#assert#value().differ()|
   - |lh#assert#value().is_lt()|
   - |lh#assert#value().is_le()|
   - |lh#assert#value().is_gt()|
   - |lh#assert#value().is_ge()|
+  - |lh#assert#value().is_set()|
+  - |lh#assert#value().is_unset()|
   - |lh#assert#value().has_key()|
+  - |lh#assert#value().match()|
   - |lh#assert#value().not()|
   - |lh#assert#unexpected()|
 
@@ -1350,8 +1357,10 @@ lh#list#find_entity({list}, {entity})        (3)~
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                             *lh#list#find_if()* *lh#list#Find_if()*           {{{3
-lh#list#Find_if({list},{string-predicate} [, {pred-parameters}][, {start-pos}])~
-lh#list#find_if({list},{functor-predicate} [, {pred-parameters}][, {start-pos}])~
+                            *lh#list#find_if_fast()*
+lh#list#Find_if({list}, {string-predicate} [, {pred-parameters}][, {start-pos}])~
+lh#list#find_if({list}, {functor-predicate} [, {pred-parameters}][, {start-pos}])~
+lh#list#find_if_fast({list}, {simple-predicate} [, {start-pos}])~
 @param             {list}  |List|
 @param      {*-predicate}  Predicate to evaluate
 @param {pred-parameters}]  |List| of Parameters to bind to special arguments in
@@ -1371,6 +1380,10 @@ The {string-predicate} recognizes some special arguments:
   This particular feature permits to pass any type of variable to the
   predicate: a |expr-string|, a |List|, a |Dictionary|, ...
 
+The {simple-predicate} only recognizes |v:val| and |v:key| arguments.
+`lh#list#find_if_fast()` is something like 100 times faster than
+`lh#list#find_if()` on the example below.
+
 e.g.: >
     :let b = { 'min': 12, 'max': 42 }
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
@@ -1382,8 +1395,9 @@ The {functor-predicate} is a |lhvl#function|. The same example can be
 rewritten as: >
     :let l = [ 1, 5, 48, 25, 5, 28, 6]
     :let i = lh#list#find_if(l, 'v:1_>12  && v:1_<42 && v:1_%2==0')
-    :echo l[i]
-    28
+    :let j = lh#list#find_if(l, 'v:val>12  && v:val<42 && v:val%2==0')
+    :echo l[i] . ' -- ' . l[j]
+    28 -- 28
 NB: Expect the `Find_if()` version to be replaced with the `find_if()` one.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3302,12 +3316,18 @@ It will use /proc/cpuinfo when it exists, or $NUMBER_OF_PROCESSORS on Windows.
 -1 is returned otherwise.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                              *lh#os#cpu_core_number()*           {{{3
-lh#os#cpu_core_number()~
+                                              *lh#os#cpu_cores_number()*          {{{3
+lh#os#cpu_cores_number()~
 Returns the number of cores of the current machine.
 
 It will use /proc/cpuinfo when it exists.
 -1 is returned otherwise. (This is not supported, yet, on Windows)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#os#lcd()*                       {{{3
+lh#os#lcd(path)~
+Executes `:lcd fnameescape({path})` and log the command along the way.
+See |:lcd|, |fnameescape()|.
 
 ------------------------------------------------------------------------------
 COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2
@@ -3593,7 +3613,7 @@ For the moment only stringification is addressed, may be other services will
 be provided in the future. I can't tell.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#make_top_type()* {{{3
+                                                 *lh#object#make_top_type()*   {{{3
 lh#object#make_top_type(dict-params)~
 Creates a |Dictionary| that implements:
 - *__lhvl_oo_type()*
@@ -3608,7 +3628,7 @@ to an implementation that fits your needs. You may need to use
 issues.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#to_string()* {{{3
+                                                 *lh#object#to_string()*       {{{3
 lh#object#to_string(data)~
 This function will work as `:echo data`, i.e. multiple occurrences of a same
 object will be shorten to `[...]` or `{...}`, but it will also hide methods
@@ -3619,26 +3639,27 @@ Internally, it relies on |lh#object#_to_string()| to build the string to
 display. Actually, it's just a call to: >
     lh#object#_to_string(a:data, [])
 <
-                                                 *lh#object#_to_string()* {{{3
+                                                 *lh#object#_to_string()*      {{{3
 lh#object#to_string(data, list_of_already_handled_data)~
 This is the internal function used to print objects once. Unless you're
 defining your own `_to_string()` overload, don't use it. See
 autoload/lh/object.vim `s:to_string()` implementation to see how to use it.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#is_an_object()* {{{3
+                                                 *lh#object#is_an_object()*    {{{3
 lh#object#is_an_object(var)~
 @return whether the {var} is an object. It tests whether it contains a
 `'__lhvl_oo_type'` field which is automatically added to objects built through
 |lh#object#make_top_type()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#object#inject()*       {{{3
+                                                 *lh#object#inject()*          {{{3
 lh#object#inject({object}, {method-name}, {function-name}, {snr})~
 @since Version 4.0.0
 Adds a method named {method-name} to {object}. The method will point to the
 |local-function| (in the script of id {snr}, or named {snr}) named
 {function-name}.
+@see also |lh#object#inject_methods()|
 
 This function is meant to be used by plugin writers while in maintenance.
 
@@ -3654,6 +3675,38 @@ I modify `lh#foo#make_bar()` in order to bind a new method `x()` to `s:obj`.
 Problem: I can't run the function again as the object isn't modified, but I
 want to test/use the new function. Here comes to rescue: >
   :call lh#object#inject(s:obj, 'x', 'get_x', 'autoload/lh/foo.vim')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                 *lh#object#inject_methods()*  {{{3
+lh#object#inject_methods({object}, {snr}, {method-names...})~
+@since Version 4.0.0
+Adds a method named {method-name} to {object}. The method will point to the
+|local-function| (in the script of id {snr}, or named {snr}) named
+{function-name}.
+@see also |lh#object#inject()|
+
+This function is meant to help define new objets. Given the script
+|local-function|s `s:get()`, `s:set()`, `s:name()`, etc., instead of defining
+a `s:getSNR()` function and a new object with: >
+
+    " autoload/lh/foo/bar.vim
+    function! lh#foo#bar#new() abort
+      let res = lh#object#make_top_type({})
+      let res.get  = function(s:getSNR('get'))
+      let res.set  = function(s:getSNR('set'))
+      let res.name = function(s:getSNR('name'))
+      ...
+      return res
+    endfunction
+
+we could in one call: >
+    " autoload/lh/foo/bar.vim
+    let s:k_script_name = expand('<sfile>:p')
+    function! lh#foo#bar#new() abort
+      let res = lh#object#make_top_type({})
+      call lh#object#inject_methods(res, s:k_script_name, ['get', 'set', 'name'...])
+      return res
+    endfunction
 
 ------------------------------------------------------------------------------
 VARIABLE HELPERS                                      *lhvl#variables*  {{{2
@@ -3702,12 +3755,13 @@ Examples: >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                  *lh#let#to()*        *:LetTo*      {{{3
-lh#let#to({varname}, {value})~
-:LetTo {varname} {value}~
-:LetTo {varname} = {value}~
+lh#let#to({varname}, {value}[, {hide-or-overwrite}])~
+:LetTo [--hide|--overwrite] {varname} {value}~
+:LetTo [--hide|--overwrite] {varname} = {value}~
 @param[in] {varname} scoped named of a variable (|w:|, |b:|, |p:|, |P:|, |t:|,
                      |g:|), or environment variable.
 @param[in] {value} assigned, must no be quoted
+@param[in] {hide-or-overwrite} see below
 @return variable built
 
 @note |command-completion| is supported on {varname}.
@@ -3721,6 +3775,21 @@ lh#let#to({varname}, {value})~
     variables must be explictly global, buffer-, windows-, or tab-local.  |s:|
     variables won't give the correct result, nor expressions like
     `expand('<sfile>')`.
+
+{hide-or-overwrite} parameter makes sense only for |p:variables| when there is
+a hierarchy of projects. Its possible values are `"overwrite"` or `"hide"`. By
+default (empty), `"hide"` is assumed.
+
+This permits to chose between:
+- hiding any preexisting occurence(s) of `p:foobar` in parent projects by
+  defining the new `p:foobar` variable at current (leaf) project scope ;
+- and overwriting any preexisting occurence of `p:foobar` in parent projects
+  with a new value -- if there was none, the `p:foobar` variable will be
+  stored in the current (leaf) project.
+
+In order to properly see how dictionaries are handled, refer to
+`s:Test_best_varname_match()` from `tests/lh/project.vim`, and to
+|lh#project#_best_varname_match()|.
 
 lh#let#to({assignment-string})~
 Flavour meant to be used internally by |:LetTo|
@@ -3840,21 +3909,26 @@ Default values for:
 - *g:lh#project.permissions.blacklist*   : ['/']   // always forced!
 - *g:lh#project.permissions.sandboxlist* : []
 
+These lists are best handled with:
+- *lh#project#permission_lists()* to obtain the current value
+- *lh#project#munge()* to add a new path to a list
+- *lh#project#filter_list()* to filter paths in a list
+Indeed, these functions make sure the `g:lh#project.permissions` variable has
+been defined before doing any thing on it.
+
 For instance, they can be overriden in the |.vimrc| with: >
 
-    LetIfUndef g:lh#project.permissions             {}
-    LetIfUndef g:lh#project.permissions.whitelist   []
-    LetIfUndef g:lh#project.permissions.asklist     []
-    LetIfUndef g:lh#project.permissions.blacklist   []
-
-    " $HOME/.vim/addons is where VAM stores the plugin it manages
-    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/.vim/addons')
-    call lh#path#munge(g:lh#project.permissions.whitelist, $HOME.'/workspace')
-    call lh#path#munge(g:lh#project.permissions.asklist,   $HOME.'/3rdparties')
-    call lh#path#munge(g:lh#project.permissions.blacklist, $HOME)
-    call lh#path#munge(g:lh#project.permissions.blacklist, '/')
+    " Req: the following expects lh-vim-lib to have already been activated
+    " by your plugin manager.
+    "
+    " $HOME/.vim/addons is where VAM stores the plugins it manages
+    call lh#project#munge('whitelist', $HOME.'/.vim/addons')
+    call lh#project#munge('whitelist', $HOME.'/workspace')
+    call lh#project#munge('asklist',   $HOME.'/3rdparties')
+    call lh#project#munge('blacklist', $HOME)
+    call lh#project#munge('blacklist', '/')
     " Remove $HOME from asklist in case it was already there
-    call filter(g:lh#project.permissions.asklist, 'v:val == $HOME')
+    call lh#project#filter_list('asklist', 'v:val != $HOME')
 
 See also |lh#path#new_permission_lists()|, which is used internally to manage
 these lists.
@@ -3946,7 +4020,12 @@ where current paths are changed behing our back.
                                                     *:Project-:echo*
 :Project [{prj-name}] :echo {varname}~
 Echoes the value of the |p:|variable {varname} associated to specified
-project, or the current project otherwise.
+project, or to the current project otherwise.
+
+                                                    *:Project-:let*
+:Project [{prj-name}] :let {varname} = {value}~
+Sets the value of the |p:|variable {varname} associated to specified
+project, or to the current project otherwise, to {value}
 
                                                     *:Project-:doonce*
 :Project [{prj-name}] :doonce {cmd}~
@@ -3954,6 +4033,15 @@ Executes {cmd} in the first window found that is associated to specified
 (or current) project. If no buffer from the project is opened in a window, we
 try to open one (which'll be automatically discarded).
 @pre the project shall have listed buffers.
+
+The best way to execute |:make| on a project is with this subcommand. This way,
+it makes sure all variables related to the project are correctly set when
+compiling. >
+
+    :Project ProjectName :doonce make %<
+
+Note that `:Project :doonce command` is strictly equivalent to `:command` and
+doesn't really make any sense.
 
                                                     *:Project-:windo*
 :Project [{prj-name}] :windo {cmd}~
@@ -3987,13 +4075,33 @@ Prefer |:Project--define| or |lh#project#define()|.
 @post A project without an explicit name will be provided one automatically.
 
 Reserved fields:
-- "name"      <- Project name   *lhvl-project_name*
-- "parents"
-- "paths.root" ? TODO!!
-- "buffers"
-- "variables" <- where p:foobar will be stored
-- "options"   <- where altered vim options will be stored
-- "env"       <- where $ENV variables will be stored
+- `"name"`      <- Project name   *lhvl-project_name*
+- `"parents"`   <- List of parent projects
+- `"buffers"`   <- buffer ids that belongs to the project
+- `"variables"` <- where p:foobar will be stored
+- `"options"`   <- where altered vim options will be stored
+- `"env"`       <- where $ENV variables will be stored
+
+Avoid depending on these fields.
+
+and functions:
+- _`inherit()`         <- registers a new parent project (internal)
+- `_register_buffer()` <- registers a buffer to a project (internal)
+- `_remove_buffer()`   <- removes a buffers from "`buffer`" list
+- `_update_option()`   <- propagates an option value in all project buffers ; don't change current buffer
+- `_use_options()`     <- propagates all options to all project buffers
+- `apply()`            <- applies |Funcref| to all project buffers
+- `children()`         <- returns list of children projects
+- `depth()`            <- returns the maximum project hierarchy depth
+- `environment()`      <- aggregates all $ENV defined at current and parent levels
+- `exists()`           <- tells whether a variable is defined at current/parent level
+- `find_holder()`      <- returns |dict| that holds a given var/opt/env
+- `find_holder_name()` <- returns public fullname to a project var/opt/env
+- `get()`              <- returns the value of a var/opt/env at project/parent level
+- `get_names()`        <- returns the |list| of all variables and options stored at this project level
+- `map()`              <- returns `map(copy(self.buffers), a:action)`
+- `set()`              <- sets a new value to a var/opt/env, at project level
+- `update()`           <- updates the value of a var/opt/new, at the project level that holds the data
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#project#define()*            {{{3
@@ -4135,7 +4243,7 @@ You may also use `:Toggle PluginAssertionmode [{value}]` to change its value
 with |lhvl-:Toggle|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#assert#X()*     {{{3
+                                *assertion-list*  *lh#assert#X()*   {{{3
 Let me know if you really need to know what is tested...
 In doubt, remember that I've mimicked the interfaces from Vim |test-functions|.
 
@@ -4158,14 +4266,9 @@ lh#assert#if({cond1}).then_expect({cond2} [, {msg}])   *lh#assert#if().then_expe
     i.e. it asserts that {cond2} is True when {cond1} is True.
     `lh#assert#if(context_applies).then_expect(stuff)`
 
-lh#assert#value({actual}).equal({ref})                 *lh#assert#value().equal()*
-lh#assert#value({actual}).differ({ref})                *lh#assert#value().differ()*
-lh#assert#value({actual}).is_lt({ref})                 *lh#assert#value().is_lt()*
-lh#assert#value({actual}).is_le({ref})                 *lh#assert#value().is_le()*
-lh#assert#value({actual}).is_gt({ref})                 *lh#assert#value().is_gt()*
-lh#assert#value({actual}).is_ge({ref})                 *lh#assert#value().is_ge()*
-lh#assert#value({actual}).has_key({key})               *lh#assert#value().has_key()*
-lh#assert#value({actual}).not()                        *lh#assert#value().not()*
+
+
+lh#assert#value({actual})....                          *lh#assert#value()*
     Just another syntax to do the same thing. Choose what suits you best.
     Notes:
     - these functions return {actual}, while `not()` inverse the following tests.
@@ -4174,6 +4277,31 @@ lh#assert#value({actual}).not()                        *lh#assert#value().not()*
     e.g. >
     call lh#assert#value({'a': 1}).has_key('a')
     call lh#assert#value({'a': 1}).not().has_key('b')
+
+lh#assert#value({actual}).equal({ref}[, {msg}])                 *lh#assert#value().equal()*
+lh#assert#value({actual}).differ({ref}[, {msg}])                *lh#assert#value().differ()*
+lh#assert#value({actual}).is_lt({ref}[, {msg}])                 *lh#assert#value().is_lt()*
+lh#assert#value({actual}).is_le({ref}[, {msg}])                 *lh#assert#value().is_le()*
+lh#assert#value({actual}).is_gt({ref}[, {msg}])                 *lh#assert#value().is_gt()*
+lh#assert#value({actual}).is_ge({ref}[, {msg}])                 *lh#assert#value().is_ge()*
+lh#assert#value({actual}).empty([, {msg}])                      *lh#assert#value().empty()*
+lh#assert#value({actual}).has_key({key}[, {msg}])               *lh#assert#value().has_key()*
+lh#assert#value({actual}).match({pattern}[, {msg}])             *lh#assert#value().match()*
+lh#assert#value({actual}).not([, {msg}])                        *lh#assert#value().not()*
+
+lh#assert#value({actual}).is_set([{msg}])                       *lh#assert#value().is_set()*
+lh#assert#value({actual}).is_unset([{msg}])                     *lh#assert#value().is_unset()*
+    Relates to |lh#option#is_set()| and |lh#option#is_unset()|
+
+lh#assert#value({actual}).verifies({func}, {arglist} [, {msg}]) *lh#assert#value().verifies()*
+    Lazily checks anything.
+    {func} and {arglist} are the exact same parameters as the ones used by
+    |call()|. There is little difference tough, if {actual} is a |dictionary|
+    with a {func} entry, then the predicate being asserted will be
+    `{actual}.{func}({args})` instead of `{func}([{actual}]+{args})`.
+
+    Unlike |lh#assert#true()|, this flavour doesn't evaluate {func} in
+    |dbc-ignore| mode.
 
 lh#assert#type({actual}).is({expected})                *lh#assert#type().is()*
 lh#assert#type({actual}).belongs_to({expected}...)     *lh#assert#type().belongs_to()*

@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:	05th Oct 2009
-" Last Update:	15th Nov 2016
+" Last Update:	08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Test lh#ft#options#*() functions
@@ -40,12 +40,12 @@ let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 "------------------------------------------------------------------------
 " ## Fixture {{{1
 function! s:Setup() " {{{2
-  let s:prj_list = lh#project#_save_prj_list()
+  let s:prj_list = lh#project#list#_save()
   let s:cleanup = lh#on#exit()
         \.restore('b:'.s:prj_varname)
         \.restore('s:prj_varname')
         \.restore('g:lh#project.auto_discover_root')
-        " \.register({-> lh#project#_restore_prj_list(s:prj_list)})
+        " \.register({-> lh#project#list#_restore(s:prj_list)})
   let g:lh#project = { 'auto_discover_root': 'no' }
   if exists('b:'.s:prj_varname)
     exe 'unlet b:'.s:prj_varname
@@ -54,7 +54,7 @@ endfunction
 
 function! s:Teardown() " {{{2
   call s:cleanup.finalize()
-  call lh#project#_restore_prj_list(s:prj_list)
+  call lh#project#list#_restore(s:prj_list)
 endfunction
 
 "------------------------------------------------------------------------
@@ -65,11 +65,23 @@ function! s:Test_global() " {{{2
         \.restore('b:foo')
         \.restore('g:FT_foo')
         \.restore('b:FT_foo')
+        \.restore('g:bar')
+        \.restore('b:bar')
+        \.restore('g:FT_bar')
+        \.restore('b:FT_bar')
   try
     Unlet g:foo
     Unlet b:foo
+    Unlet p:foo
     Unlet g:FT_foo
     Unlet b:FT_foo
+    Unlet p:FT_foo
+    Unlet g:bar
+    Unlet b:bar
+    Unlet p:bar
+    Unlet g:FT_bar
+    Unlet b:FT_bar
+    Unlet p:FT_bar
     let g:foo = 42
     AssertEquals(lh#ft#option#get('foo', 'FT', 12) , 42)
     AssertEquals(lh#ft#option#get('bar', 'FT', 12) , 12)

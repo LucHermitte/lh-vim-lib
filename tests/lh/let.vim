@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:      4.0.0
 " Created:      10th Sep 2012
-" Last Update:  10th Oct 2016
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for plugin/let.vim's LetIfUndef
@@ -42,7 +42,7 @@ endtry
 " ## Fixture {{{1
 let s:prj_varname = 'b:'.get(g:, 'lh#project#varname', 'crt_project')
 function! s:Setup() " {{{2
-  let s:prj_list = lh#project#_save_prj_list()
+  let s:prj_list = lh#project#list#_save()
   let s:cleanup = lh#on#exit()
         \.restore('b:'.s:prj_varname)
         \.restore('s:prj_varname')
@@ -55,7 +55,7 @@ endfunction
 
 function! s:Teardown() " {{{2
   call s:cleanup.finalize()
-  call lh#project#_restore_prj_list(s:prj_list)
+  call lh#project#list#_restore(s:prj_list)
 endfunction
 
 " ## Tests {{{1
@@ -449,6 +449,8 @@ function! s:Test_let_force_dictionaries_cmd() " {{{3
   AssertEquals(type(g:dummy_test.un.deux), type(12))
   LetTo g:dummy_test.un.deux 42
   AssertEquals(g:dummy_test.un.deux, 42)
+  " cannot change var to dict
+  AssertThrow(lh#let#to('g:dummy_test.un.deux.trois', 42))
 
   " value = string {{{4
   silent! unlet g:dummy_test

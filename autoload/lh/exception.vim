@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  20th Feb 2017
+" Last Update:  08th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -137,7 +137,8 @@ endfunction
 
 " Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
 function! lh#exception#callstack_as_qf(filter, ...) abort
-  return call(lh#exception#get_callstack().as_qf, [a:filter]+a:000)
+  let stack = lh#exception#get_callstack()
+  return call(stack.as_qf, [a:filter]+a:000, stack)
 endfunction
 
 " Function: lh#exception#decode([throwpoint]) {{{3
