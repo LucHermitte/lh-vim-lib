@@ -51,9 +51,12 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#fmt#printf()|
 - |lh#float#min()|, |lh#float#max()|,
   |lh#float#arg_min()|, |lh#float#arg_max()|
-- *lh#has#partials()* returns whether |Partial|s are implemented
-- *lh#has#jobs()*     returns whether |+job|s are correctly implemented
+- |lh#ft#is_script()|
+- |lh#ft#is_text()|
 - *lh#has#default_in_getbufvar()* returns whether |getbufvar()| has 3 parameters
+- *lh#has#jobs()*     returns whether |+job|s are correctly implemented
+- *lh#has#partials()* returns whether |Partial|s are implemented
+- |lh#has#patch()|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
@@ -856,6 +859,15 @@ Tells whether the corresponding filetype correspond to a text filetype.
 lh#ft#is_text([ft])~
 Tells whether the corresponding filetype correspond to a script filetype (sh,
 python, ruby, perl).
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                *lh#has#patch()*                                  {{{3
+lh#ft#has_patch('patch-{ver}.{patch})~
+@since Version 4.0.0
+Provides a portable layer over |has-patch| improved detection added in patch
+7.4-236 and 7.4-237.
+In other, `has('patch-7.4.001')` won't work, while `lh#has#patch('patch-7.4.001')` will.
+Note however, that this function isn't required since Version 7.4-237.
 
 ------------------------------------------------------------------------------
 OPTION RELATED FUNCTIONS                              *lhvl#option*     {{{2

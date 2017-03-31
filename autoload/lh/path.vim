@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  30th Mar 2017
+" Last Update:  31st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -428,7 +428,9 @@ function! lh#path#relative_to(from, to) abort
 endfunction
 
 " Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
-if has("patch-7.4-279")
+if has("patch-7.4.279") || (v:version == 704 && has('patch279'))
+  " Either version >= 7.4.237 and `has('patch-7.4.279')` detects correctly, or
+  " we can fall back to old detection, assuming that we still need to test v 7.4,
   function! s:DoGlobPath(pathslist, expr) abort
     let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
     return globpath(pathslist, a:expr, 1, 1)

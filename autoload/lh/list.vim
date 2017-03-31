@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  14th Mar 2017
+" Last Update:  31st Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -570,7 +570,7 @@ function! lh#list#subset(list, indices) abort
 endfunction
 
 " Function: lh#list#mask(list, masks) {{{3
-if has('patch-7.2-295')
+if lh#has#patch('patch-7.2-295')
   function! lh#list#mask(list, masks) abort
     let len = len(a:list)
     call lh#assert#equal(len, len(a:masks),
