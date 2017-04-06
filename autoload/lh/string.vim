@@ -7,7 +7,7 @@
 " Version:      4.0.0.
 let s:k_version = '4000'
 " Created:      08th Dec 2015
-" Last Update:  24th Mar 2017
+" Last Update:  06th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -52,7 +52,7 @@ endfunction
 " Function: lh#string#trim(string) {{{3
 " @version 3.4.0
 function! lh#string#trim(string) abort
-  return matchstr(a:string, '^\v\s*\zs.{-}\ze\s*$')
+  return matchstr(a:string, '^\v\_s*\zs.{-}\ze\_s*$')
 endfunction
 
 " Function: lh#string#trim_text_right(string, ) {{{3
