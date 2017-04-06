@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  04th Jan 2017
+" Last Update:  06th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -287,19 +287,28 @@ if s:has_default_in_getbufvar
   endfunction
 else
   function! lh#option#getbufvar(buf, name,...)
+    call s:Verbose('getbufvar(%1, %2)', a:buf, a:name)
+    if bufnr(a:buf) == -1
+      let res = a:0 == 0 ? lh#option#unset('unknow option ['.a:buf.']:'.a:name) : a:1
+      return res
+    endif
     let res = getbufvar(a:buf, a:name)
     if (type(res) == type('')) && empty(res)
       " Check whether this is really empty, or whether the variable doesn't
       " exist
       try
         let b = bufnr('%')
-        exe 'buf '.a:buf
+        exe 'buf '.bufnr(a:buf)
         if !exists('b:'.a:name)
           unlet res
           let res = a:0 == 0 ? lh#option#unset('unknow option ['.a:buf.']:'.a:name) : a:1
         endif
       finally
+        if bufexists(b)
+          " the buffer may be under destruction, and thus, it may not exist
+          " anymore
         exe 'buf '.b
+        endif
       endtry
     endif
     return res
