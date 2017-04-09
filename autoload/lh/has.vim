@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400000'
 " Created:      02nd Sep 2016
-" Last Update:  31st Mar 2017
+" Last Update:  09th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -54,7 +54,7 @@ endfunction
 " # Vim features {{{2
 
 " Function: lh#has#patch(vernumber) {{{3
-if v:version >= 704 || (v:version == 704 && has('patch237'))
+if (v:version > 704) || (v:version == 704 && has('patch237'))
   function! lh#has#patch(vernumber) abort
     return has(a:vernumber)
   endfunction
@@ -62,7 +62,7 @@ else
   function! lh#has#patch(vernumber) abort
     let [all, major, minor, patch; tail] = matchlist(a:vernumber, '\v^patch-(\d+)\.(\d+)[.-](\d+)$')
     let ver = eval(printf('%d%02d', major, minor))
-    return v:version >= ver || (v:version == ver && has('patch'.patch))
+    return (v:version > ver) || (v:version == ver && has('patch'.patch))
   endfunction
 endif
 
