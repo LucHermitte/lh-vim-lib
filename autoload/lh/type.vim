@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      20th Feb 2017
-" Last Update:  07th Mar 2017
+" Last Update:  10th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions around |type()|
@@ -63,6 +63,8 @@ let s:names =
 if exists('v:true')
   let s:names[v:true] = 'bool'
   let s:names[v:false] = 'bool'
+endif
+if exists('v:none')
   let s:names[v:none] = 'None'
 endif
 function! lh#type#name(type) abort
