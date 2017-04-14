@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  10th Mar 2017
+" Last Update:  14th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -339,7 +339,7 @@ function! s:pre_build_value() abort " {{{4
   let res.is_gt      = function(s:getSNR('is_gt'))
   let res.is_ge      = function(s:getSNR('is_ge'))
   let res.eq         = function(s:getSNR('eq'))
-  let res.diff       = function(s:getSNR('diff'))
+  let res.differ     = function(s:getSNR('diff'))
   let res.match      = function(s:getSNR('match'))
   let res.has_key    = function(s:getSNR('has_key'))
   let res.empty      = function(s:getSNR('empty'))
@@ -354,7 +354,7 @@ function! s:pre_build_value() abort " {{{4
   let ignored.is_gt    = ignored.not
   let ignored.is_ge    = ignored.not
   let ignored.eq       = ignored.not
-  let ignored.diff     = ignored.not
+  let ignored.differ   = ignored.not
   let ignored.match    = ignored.not
   let ignored.has_key  = ignored.not
   let ignored.empty    = ignored.not
