@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      07th Mar 2017
-" Last Update:  08th Mar 2017
+" Last Update:  14th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define support functions for :Project
@@ -115,10 +115,13 @@ function! s:echo_project(prj, var) abort " {{{2
 endfunction
 
 function! s:let_project(prj, var, lVal) abort " {{{2
+  " TODO: support &tw += 42, and &tags+='path' => not the same let-operator
+  call s:Verbose('let {%1}.%2 <- %3', a:prj.name, a:var, a:lVal)
   let value0 = join(a:lVal, ' ')
   let [all, compound, equal, value ; rem] = matchlist(value0, '\v^\s=%(([+-/*.])\=|(\=))\s*(.*)$')
   if !empty(compound)
     let old = a:prj.get(a:var)
+    " debug call s:Verbose('type: old:%1, value:%2, eval value:%3', type(old), type(value), type(eval(value)))
     if compound == '*'
       exe 'let old = old * '.value
     elseif compound == '/'
