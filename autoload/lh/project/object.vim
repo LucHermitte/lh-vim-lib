@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      08th Mar 2017
-" Last Update:  08th Mar 2017
+" Last Update:  14th Apr 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -219,7 +219,7 @@ function! s:update(varname, value, ...) dict abort " {{{2
   let varname = a:varname[1:]
   if     a:varname[0] == '&' " {{{3 -- options
     if has_key(self.options, varname)
-      call self._update_option(a:varname)
+      call self._update_option(varname)
       return 1
     endif
   elseif a:varname[0] == '$' " {{{3 -- $ENV
@@ -269,6 +269,7 @@ function! s:do_update_option(bid, varname, value) abort " {{{2
 endfunction
 
 function! s:_update_option(varname, ...) dict abort " {{{2
+  call lh#assert#value(a:varname[0]).differ('&')
   let value = self.options[a:varname]
   call s:Verbose('%1._update_option(%2 <- %3)', self.name, a:varname, value)
   if a:0 == 0
