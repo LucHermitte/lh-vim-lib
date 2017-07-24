@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:version = '4.0.0'
 " Created:      01st Mar 2013
-" Last Update:  07th Mar 2017
+" Last Update:  24th Jul 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -137,6 +137,23 @@ function! lh#mapping#plug(...) abort
     endif
   endfor
 endfunction
+
+" Function: lh#mapping#reinterpret_escaped_char(seq) {{{3
+" This function transforms '\<cr\>', '\<esc\>', ... '\<{keys}\>' into the
+" interpreted sequences "\<cr>", "\<esc>", ...  "\<{keys}>".
+" It is meant to be used by fonctions like MapNoContext(), InsertSeq(), ... as
+" we can not define mappings (/abbreviations) that contain "\<{keys}>" into the
+" sequence to insert.
+" Note:	It accepts sequences containing double-quotes.
+" @version 4.0.0, moved from lh-dev lh#dev#reinterpret_escaped_char()
+function! lh#mapping#reinterpret_escaped_char(seq) abort
+  let seq = escape(a:seq, '"\')
+  " let seq = (substitute( seq, '\\\\<\(.\{-}\)\\\\>', "\\\\<\\1>", 'g' ))
+  " exe 'return "'.seq.'"'
+  exe 'return "' .
+        \   substitute( seq, '\\\\<\(.\{-}\)\\\\>', '"."\\<\1>"."', 'g' ) .  '"'
+endfunction
+
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 "

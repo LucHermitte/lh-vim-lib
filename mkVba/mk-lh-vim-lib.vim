@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:version = '4.0.0'
 " Created:	06th Nov 2007
-" Last Update:  08th Mar 2017
+" Last Update:  24th Jul 2017
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -49,6 +49,7 @@ autoload/lh/let.vim
 autoload/lh/list.vim
 autoload/lh/log.vim
 autoload/lh/mapping.vim
+autoload/lh/mark.vim
 autoload/lh/math.vim
 autoload/lh/menu.vim
 autoload/lh/on.vim
@@ -87,6 +88,7 @@ tests/lh/list.vim
 tests/lh/math.vim
 tests/lh/path.vim
 tests/lh/ref.vim
+tests/lh/reinterpret_escaped_chars.vim
 tests/lh/test-Fargs2String.vim
 tests/lh/test-askmenu.vim
 tests/lh/test-command.vim

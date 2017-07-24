@@ -65,6 +65,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#math#abs()|
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
+- |lh#mapping#reinterpret_escaped_char()|
 - |lh#on#exit()|
 - |lh#po#context()|
 - |lh#position#char_at()|
@@ -460,6 +461,19 @@ For all the mode specified, it's equivalent to: >
     if !hasmapto(name, mode) && (mapcheck(keybinding, mode) == "")
         exe mode.'map <silent> <unique> '.keybinding.' '.name
     endif
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mapping#reinterpret_escaped_char()* {{{3
+lh#mapping#reinterpret_escaped_char(seq)~
+This function transforms `'\<cr\>'`, `'\<esc\>'`, ... `'\<{keys}\>'` into the
+interpreted sequences `"\<cr>"`, `"\<esc>"`, ...  `"\<{keys}>"`.
+It is meant to be used by fonctions like |lh#map#no_context()|,
+|lh#map#insert_seq()|, ... as we can not define mappings (/abbreviations) that
+contain `"\<{keys}>"` into the sequence to insert.
+
+Note:	It accepts sequences containing double-quotes.
+
+@version 4.0.0, moved from |lh-dev|' |lh#dev#reinterpret_escaped_char()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3
