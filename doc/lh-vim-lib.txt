@@ -60,6 +60,8 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#leader#get()|
 - |lh#leader#get_local()|
 - |lh#leader#set_local_if_unset()|
+- |lh#mark#find_first_unused()|
+- |lh#mark#is_unused()|
 - |lh#math#abs()|
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
@@ -407,6 +409,21 @@ Unlike |printf()|, this function takes positional parameters, i.e. >
   AssertEquals(lh#fmt#printf("foo %1 bar %2", 42, "toto"), "foo 42 bar toto")
   AssertEquals(lh#fmt#printf("foo %2 bar %1", 42, "toto"), "foo toto bar 42")
   AssertEquals(lh#fmt#printf("foo %{2.toto}-%{1.titi} bar %1", {'a':42, 'titi': 'tutu'}, {'toto': {'foo': 42}}), "foo {'foo': 42}-tutu bar {'a': 42, 'titi': 'tutu'}")
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mark#find_first_unused()*     {{{3
+lh#mark#find_first_unused()~
+@returns The name of the first |mark| found to be _unused_ (as in
+`lh#mark#is_unused()`).
+The mark names are searched in `A`..`Z` and `a`..`z`.
+@version 4.0.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mark#is_unused()*             {{{3
+lh#mark#is_unused(mark)~
+@returns Whether the given |mark| named {mark} is used. A mark is considered to be unused
+from the moment `getpos(mark)[1:]` equals `[0, 0, 0]`
+@version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#math#abs()*                   {{{3
