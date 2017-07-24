@@ -52,6 +52,7 @@ autoload/lh/mapping.vim
 autoload/lh/mark.vim
 autoload/lh/math.vim
 autoload/lh/menu.vim
+autoload/lh/notify.vim
 autoload/lh/on.vim
 autoload/lh/option.vim
 autoload/lh/path.vim

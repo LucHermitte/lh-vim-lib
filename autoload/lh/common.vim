@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:k_version = 400
 " Created:	07th Oct 2006
-" Last Update:	14th Jun 2017
+" Last Update:	24th Jul 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Some common functions for:
@@ -97,7 +97,7 @@ function! lh#common#CheckDeps(Symbol, File, path, plugin) " {{{3
   return lh#common#check_deps(a:Symbol, a:File, a:path, a:plugin)
 endfunction
 
-" Function: lh#common#rand(max) {{{3
+" Function: lh#common#rand(max) {{{2
 " This function requires ruby, and it may move to another autoload plugin
 if has('ruby')
   function! lh#common#rand_ruby(max)

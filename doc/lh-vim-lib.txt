@@ -66,6 +66,9 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
 - |lh#mapping#reinterpret_escaped_char()|
+- |lh#notify#clear_notifications()|
+- |lh#notify#deprecated()|
+- |lh#notify#once()|
 - |lh#on#exit()|
 - |lh#po#context()|
 - |lh#position#char_at()|
@@ -474,6 +477,42 @@ contain `"\<{keys}>"` into the sequence to insert.
 Note:	It accepts sequences containing double-quotes.
 
 @version 4.0.0, moved from |lh-dev|' |lh#dev#reinterpret_escaped_char()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#notify#clear_notifications()* {{{3
+lh#notify#clear_notifications()~
+Clears previous notifications. Identical notifications will be issued again.
+@version 4.0.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#notify#deprecated()*          {{{3
+lh#notify#deprecated(old, new)~
+Notifies once that {old} is deprecated and that we should use {new} instead.
+@version 4.0.0
+>
+  call lh#notify#deprecated(
+       \ 'lh#dev#reinterpret_escaped_char',
+       \ 'lh#mapping#reinterpret_escaped_char')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#notify#once()*                {{{3
+lh#notify#once(id [, message])~
+Issues a notification once.
+@param[in] {id}      Identifier of the notification
+@param[in] {message} displayed.
+                     Its format is the same as the one taken by |lh#fmt#printf()|
+                     When not provided, no message is displayed, the
+                     notification itself is left to the calling code.
+@return whether a notification has/shall be done.
+@version 4.0.0
+>
+  " Usage 1
+  call lh#notify#once('foo', 'Warning: %1 is unexpected %2', what, context)
+
+  " Usage 2
+  if lh#notify#once('shy_dalek')
+      echomsg "Exterminate"
+  endif
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#on#exit()*                    {{{3
