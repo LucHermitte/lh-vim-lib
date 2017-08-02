@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      24th Jul 2017
-" Last Update:  24th Jul 2017
+" Last Update:  02nd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       API to notify things once
@@ -54,7 +54,7 @@ endfunction
 function! lh#notify#clear_notifications() abort
   let s:notifications = {}
 endfunction
-call lh#notify#clear_notification()
+call lh#notify#clear_notifications()
 
 " Function: lh#notify#once(id [, text]) {{{2
 function! lh#notify#once(id, ...) abort
