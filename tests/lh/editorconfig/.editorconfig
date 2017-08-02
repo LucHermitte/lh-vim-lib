@@ -1,0 +1,8 @@
+[*]
+p#name = test editorconfig
+p!foo.bar = 44
+p?foo.str = 'titi'
+max_line_length = 70
+p!&isk+=µ
+&p!isk+=µ
+p!$FOOBAR = 42

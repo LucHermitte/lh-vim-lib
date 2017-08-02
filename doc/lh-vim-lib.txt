@@ -284,7 +284,7 @@ Variable helper functions                               |lhvl#variable|   {{{2
 - |lh#let#if_undef()|
 - |lh#let#to()|
 - |lh#let#undef()|
-Project related defintions                              |lhvl#project|    {{{2
+Project related definitions                             |lhvl#project|    {{{2
 - |p:| |project-variable|
 - |:Project|
 - |lh#project#define()|
@@ -3956,6 +3956,11 @@ but it impacts CMake configuration directory, included directory list (for
 Being able to toggle an option between several values, when this is a buffer
 local option, quickly becomes a nightmare. This is because we don't have
 `p:roject_options`.
+
+Note, that's it's also possible to specify project settings with
+[|editorconfig|](https://github.com/editorconfig/editorconfig-vim). The syntax
+will be slightly different from the usual. See the related section in
+doc/Project.md.
 
 So? Let's have them then!
 

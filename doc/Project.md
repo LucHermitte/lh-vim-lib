@@ -7,6 +7,7 @@
       * [3.1.1 and you want to define a new project](#311-and-you-want-to-define-a-new-project)
         * [3.1.1.1 Automagically](#3111-automagically)
         * [3.1.1.2. From your `.lvimrc` or `_vimrc_local.vim`](#3112-from-your-lvimrc-or-_vimrc_localvim)
+        * [3.1.1.3. From your `.editorconfig` file.](#3113-from-your-editorconfig-file)
       * [3.1.2. Auto-detect the project root path](#312-auto-detect-the-project-root-path)
       * [3.1.3. Default value for project options](#313-default-value-for-project-options)
       * [3.1.4. Set a project option](#314-set-a-project-option)
@@ -206,6 +207,55 @@ plugin used.
 ```
 
 Note that this also could be done by hand -- see power-user approaches below.
+
+#### 3.1.1.3. From your `.editorconfig` file.
+[EditorConfig project](http://editorconfig.org/) aims a rationalizing and
+factorizing project configuration among multiple IDEs.
+
+While all the _project_ settings provided by this lh-vim-lib feature cannot be
+used from other IDEs, you may still be interested at maintaining only one
+file, instead of one file for a local vimrc plugin, and one file for
+EditorConfig.
+
+In that `.editorconfig` file, you'll have options shared among several IDEs,
+and _project_ options.
+
+In order to use EditorConfig, I expect you have properly installed
+[EditorConfig-vim](https://github.com/editorconfig/editorconfig-vim), and
+registered it **before** lh-vim-lib in your plugin manager.
+
+Then, you'll be able to maintain a `.editorconfig` file at the root of a
+project.  From there, you'll be able to define a _lh-vim-lib project_, and to
+set options through `LetTo` and `LetIfUndef`, but with another (!) dedicated
+syntax.
+
+```dosini
+[*]
+# Define a new project, as with "Project --define Name"
+p#name = My Project Name
+
+# Set p:foo.bar to 42, as with ":LetTo"
+p!foo.bar = 42
+
+# Idem, as with "LetTo --overwrite" for nested projects, see below
+p!overwrite!foo.bar2 = 12
+
+# Idem, as with "LetTo --hide" for nested projects, see below
+p!hide!foo.bar3 = 12
+
+# Set p:foo.str to 'some string', if it wasn't defined, as with ":LetIfUndef"
+p?foo.str = 'some string'
+```
+
+See also:
+- [3.1.1.1 (You're an end-user and you want to define a new project) Automagically](#3111-automagically)
+- [3.1.3. (You're an end-user and you want to) Set a default value for project options](#313-default-value-for-project-options)
+- [3.1.4. (You're an end-user and you want to) Set a project option](#314-set-a-project-option)
+- [3.2.8. (Set a variable in a precise project) through `:LetTo`](#328-set-a-variable-in-a-precise-project)
+
+**Warning**: Because of editorconfig(-vim?) way of doing things, environment
+variables will be changed to lowercase. This means, that `p!$FOO = 42` won't
+assign 42 to `p:$FOO` but to `p:$foo`.
 
 ### 3.1.2. Auto-detect the project root path
 On a project definition, we can automatically deduce the current project root

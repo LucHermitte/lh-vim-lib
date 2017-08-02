@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      29th Sep 2016
-" Last Update:  09th Mar 2017
+" Last Update:  02nd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -68,6 +68,11 @@ augroup LH_PROJECT
 
   au BufWinEnter,VimEnter * call lh#project#_CheckUpdateCWD()
 augroup END
+
+" ## Register to editorconfig if found {{{1
+if !empty(globpath(&rtp, 'autoload/editorconfig.vim'))
+  call editorconfig#AddNewHook(function('lh#project#editorconfig#hook'))
+endif
 
 " }}}1
 "------------------------------------------------------------------------
