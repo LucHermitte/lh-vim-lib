@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 08th Mar 2017
+                        For Vim version 7+      Last change: 03rd Aug 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -162,6 +162,7 @@ Graph related functions:                                |lhvl#graph|      {{{2
 - |lh#graph#tsort#breadth()|
 Path related functions:                                 |lhvl#path|       {{{2
 - |lh#path#add_path_if_exists()|
+- |lh#path#cd_without_sideeffects()|
 - |lh#path#common()|
 - |lh#path#depth()|
 - |lh#path#exists()|
@@ -2228,7 +2229,7 @@ These two functions implement a topological sort on the Direct Acyclic Graph.
 PATH RELATED FUNCTIONS                                *lhvl#path*       {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#add_path_if_exists()*    {{{3
+                                                    *lh#path#add_path_if_exists()*     {{{3
 lh#path#add_path_if_exists(listname, path)~
 @param[in,out] {lisname} |List| of pathnames to complete, or |p:var|iable that
                          designates a |List|.
@@ -2240,7 +2241,26 @@ The {path} may end in `/**` which will be ignored.
 If {path} is a directory, it'll be added to {listname}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#common()*                {{{3
+                                                    *lh#path#cd_without_sideeffects()* {{{3
+lh#path#cd_without_sideeffects({pathname})~
+According to |haslocaldir()|, this function will perform either a |:cd|, or a
+|:lcd|.
+@param[in] {pathname} that is expected to exist.
+@see also |lh#os#lcd()|
+@since Version 4.0.0
+
+In order to change the current directory, it's important to take the context
+into account. Indeed:
+- unconditional use to |:lcd| will set a local directory to the current
+  window while there was none
+- unconditional use of |:cd| will remove the local directory in all windows
+  with a local directory equal to the one of the current window before the
+  call to |:cd|.
+
+Thanks to this function, no side effect will be observed.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                    *lh#path#common()*                 {{{3
 lh#path#common({pathnames})~
 @param[in] {pathnames} |List| of pathnames to analyse
 @return the common leading path between all {pathnames}
@@ -2251,7 +2271,7 @@ echoes >
  foo/
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                   *lh#path#depth()*                 {{{3
+                                                   *lh#path#depth()*                  {{{3
 lh#path#depth({dirname})~
 Returns the depth of a directory name.
 
@@ -2264,14 +2284,14 @@ Returns the depth of a directory name.
       -1 or 3.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                   *lh#path#exists()*                {{{3
+                                                   *lh#path#exists()*                 {{{3
 lh#path#exists({pathname})~
 @return whether {pathname} can be read (with |filereadable|) or whether a
 buffer exists with that name (see |bufexists()|).
 @since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#find()*                  {{{3
+                                                    *lh#path#find()*                   {{{3
 lh#path#find({pathslist}, {regex})~
 @param[in] {pathslist} List of paths which can be received as a |List| or as a
                        string made of coma separated paths.
@@ -2289,7 +2309,7 @@ e.g.: >
  endif
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                    *lh#path#find_in_parents()*       {{{3
+                                                    *lh#path#find_in_parents()*        {{{3
 lh#path#find_in_parents({path}, {path-patterns}, {kinds}, {last-valid-path})~
 Internal recursive function used by |local_vimrc|.
 
@@ -2304,7 +2324,7 @@ Internal recursive function used by |local_vimrc|.
 {path-patterns} up to {last-valid-path}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#fix()*                   {{{3
+                                                *lh#path#fix()*                    {{{3
 lh#path#fix({pathname} [,{shellslash} [,{quote-char}]]~
 Discl.: This function is the old |system-tools|' |FixPathName| moved to lh-vim-lib.
 
@@ -2347,7 +2367,7 @@ Exemples~
 Note: Unlike |fnameescape()|, |lh#path#fix()| will work even under the Windows native flavour of gvim, whichever the |'shellslash'| is, and whichever the |'shell'| is.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#glob_as_list()*          {{{3
+                                                *lh#path#glob_as_list()*           {{{3
                                                 *lh#path#GlobAsList()*
 lh#path#glob_as_list({pathslist}, {expr} [,{must_sort}])~
 lh#path#GlobAsList({pathslist}, {expr})  (*deprecated*)~
@@ -2361,7 +2381,7 @@ In case {expr} is a |List|, |globpath()| is applied on each expression in
 {expr}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_absolute_path()*      {{{3
+                                                *lh#path#is_absolute_path()*       {{{3
 lh#path#is_absolute_path({path})~
                                                 *lh#path#IsAbsolutePath()*
 lh#path#IsAbsolutePath({path})  (*deprecated*)~
@@ -2370,7 +2390,7 @@ lh#path#IsAbsolutePath({path})  (*deprecated*)~
 @note Supports Unix absolute paths, Windows absolute paths, and UNC paths
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_distant_or_scratch()* {{{3
+                                                *lh#path#is_distant_or_scratch()*  {{{3
 lh#path#is_distant_or_scratch({path})~
 @param[in] {path} Path to test
 @return
@@ -2379,14 +2399,14 @@ lh#path#is_distant_or_scratch({path})~
 - or whether it's an UNC path, i.e. starting with either `"//"` or `"\\"`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_in()*                 {{{3
+                                                *lh#path#is_in()*                  {{{3
 lh#path#is_in({file}, {path})~
 Tells whether a {file} is within a directory tree.
 The function first tries to check whether the names match, then it tries again
 but on resolved pathnames (with |lh#path#readlink()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_up_to_date()*         {{{3
+                                                *lh#path#is_up_to_date()*          {{{3
 lh#path#is_up_to_date({file1}, {file2})~
 @param[in] {file1} filename
 @param[in] {file2} filename
@@ -2394,7 +2414,7 @@ lh#path#is_up_to_date({file1}, {file2})~
 {file2}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#is_url()*                {{{3
+                                                *lh#path#is_url()*                 {{{3
 lh#path#is_url({path})~
                                                 *lh#path#IsURL()*
 lh#path#IsURL({path})  (*deprecated*)~
@@ -2404,7 +2424,7 @@ lh#path#IsURL({path})  (*deprecated*)~
 rsynch://, scp://
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#join()*                  {{{3
+                                                *lh#path#join()*                   {{{3
 lh#path#join({pathparts} [, {path-separator}])~
 @param[in] {pathparts} Parts to pathanme to join
 @param[in] {path-separator} Joining character to use. Default depends on |'shellslash'|
@@ -2414,7 +2434,7 @@ i.e. >
     AssertEquals(lh#path#join([ "home", "me", "foo", "bar" ]), "home/me/foo/bar")
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#new_permission_lists()*  {{{3
+                                                *lh#path#new_permission_lists()*   {{{3
                                                 *lhvl#permission-list*
 lh#path#new_permission_lists(options)~
 Prepares a permission lists object.
@@ -2436,7 +2456,7 @@ Prepares a permission lists object.
 @see |local_vimrc| documentation for more details.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#readlink()*              {{{3
+                                                *lh#path#readlink()*               {{{3
 lh#path#readlink({pathname})~
 Resolves any symbolic links in pathnames.
 Where the *nix command readlink is available, it returns >
@@ -2445,7 +2465,7 @@ elsewhere it returns {pathname}.
 @param[in] pathslist to resolve
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#relative_to()*           {{{3
+                                                *lh#path#relative_to()*            {{{3
 lh#path#relative_to({from}, {to})~
 Returns the relative directory that indentifies {to} from {from} location.
 @param {from} origin directory
@@ -2454,12 +2474,12 @@ Returns the relative directory that indentifies {to} from {from} location.
         from the {from} directory.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#remove_dir_mark()*       {{{3
+                                                 *lh#path#remove_dir_mark()*        {{{3
 lh#path#remove_dir_mark({dirname})~
 Remove the trailing 'shellslash' character ('`/`' or a '`\`') from {dirname}.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#select_one()*            {{{3
+                                                *lh#path#select_one()*             {{{3
                                                 *lh#path#SelectOne()*
 lh#path#select_one({pathnames},{prompt})~
 lh#path#SelectOne({pathnames},{prompt})  (*deprecated*)~
@@ -2476,12 +2496,12 @@ The pathnames displayed will be simplified thanks to |lh#path#strip_common()|
 simplified pathname selected.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#shellslash()*            {{{3
+                                                *lh#path#shellslash()*             {{{3
 lh#path#shellslash()~
 @return `'/'` or `'\'` depending on the current OS, or on |'ssl'| state.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#simplify()*              {{{3
+                                                *lh#path#simplify()*               {{{3
                                                 *lh#path#Simplify()*
 lh#path#simplify({pathname} [{make_relative_to_pwd])~
 lh#path#Simplify({pathname})  (*deprecated*)~
@@ -2499,7 +2519,7 @@ containing "`..\`". (It likelly works this way when vim is compiled without
 'shellslash' support)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#split()*                 {{{3
+                                                *lh#path#split()*                  {{{3
 lh#path#split({path})~
 @param[in] {path} Path to split at `[/\\]`
 Split pathname parts
@@ -2508,7 +2528,7 @@ i.e. >
     AssertEquals(lh#path#split("/home/me/foo/bar"), [ "home", "me", "foo", "bar" ])
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#strip_common()*          {{{3
+                                                *lh#path#strip_common()*           {{{3
                                                 *lh#path#StripCommon()*
 lh#path#strip_common({pathnames})~
 lh#path#StripCommon({pathnames})  (*deprecated*)~
@@ -2524,7 +2544,7 @@ echoes >
  ['bar/file','file', 'foo/file']
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#strip_start()*           {{{3
+                                                 *lh#path#strip_start()*            {{{3
                                                  *lh#path#StripStart()*
 lh#path#strip_start({pathname}, {pathslist})~
 lh#path#StripStart({pathname}, {pathslist})  (*deprecated*)~
@@ -2542,7 +2562,7 @@ echoes >
  template/bar.template
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                 *lh#path#to_dirname()*            {{{3
+                                                 *lh#path#to_dirname()*             {{{3
 lh#path#to_dirname({dirname})~
 Ensures the returned directory name ends with a '`/`' or a '`\`'.
 
@@ -2550,7 +2570,7 @@ Ensures the returned directory name ends with a '`/`' or a '`\`'.
       character to append.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#to_relative()*           {{{3
+                                                *lh#path#to_relative()*            {{{3
                                                 *lh#path#ToRelative()*
 lh#path#to_relative({pathname})~
 lh#path#ToRelative({pathname})  (*deprecated*)~
@@ -2559,7 +2579,7 @@ lh#path#ToRelative({pathname})  (*deprecated*)~
         from the current directory.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#to_regex()*              {{{3
+                                                *lh#path#to_regex()*               {{{3
 lh#path#to_regex({pathname})~
 Transforms the {pathname} to separate each node-name by the string '`[/\\]`'
 
@@ -2573,7 +2593,7 @@ echoes >
  [/\\]home[/\\]luc[/\\]\(vimfiles\|.vim\)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#path#vimfiles()*              {{{3
+                                                *lh#path#vimfiles()*               {{{3
 lh#path#vimfiles()~
 Function that I use to find either `$HOME/.vim/` or the equivalent on windows.
 This function got a very internal and personal variation point: if `$LUCHOME`

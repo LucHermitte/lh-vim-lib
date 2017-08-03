@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  31st Mar 2017
+" Last Update:  03rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -421,9 +421,9 @@ function! lh#path#relative_to(from, to) abort
   " cannot rely on :cd (as it alters things, and doesn't work with
   " non-existant paths)
   let pwd = getcwd()
-  exe 'cd '.a:to
+  call lh#path#cd_without_sideeffects(a:to)
   let res = lh#path#to_relative(a:from)
-  exe 'cd '.pwd
+  call lh#path#cd_without_sideeffects(pwd)
   return res
 endfunction
 
@@ -715,6 +715,15 @@ function! lh#path#is_up_to_date(file1, file2) abort
     return d1 <= d2
   endif
   return 0
+endfunction
+
+" Function: lh#path#cd_without_sideeffects(path) {{{3
+" @since Version 4.0.0
+function! lh#path#cd_without_sideeffects(path) abort
+  let cd = exists('*haslocaldir') && haslocaldir()
+        \ ? 'lcd '
+        \ : 'cd '
+  exe cd . a:path
 endfunction
 
 " # Permission lists {{{2

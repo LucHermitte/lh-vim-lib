@@ -12,7 +12,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 - Since Version 2.2.0, the naming policy of these autoload functions have been harmonized. Now, most names are in lower cases, with words separated by underscores.
 - Since version 3.2.7, it's no longer hosted on google-code but on github
-- Version 4.0.0 breaks `lh#let#if_undef()` interface, deprecates `CONFIRM()`«»
+- Version 4.0.0 breaks `lh#let#if_undef()` interface, deprecates `CONFIRM()`
 
 ## Functions
 
@@ -225,6 +225,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | Function                                     | Purpose                                                                                                   |
 |:---------------------------------------------|:----------------------------------------------------------------------------------------------------------|
 | `lh#path#add_path_if_exists(listname, path)` | Adds a path is a list iff the path points to an existing node                                             |
+| `lh#path#cd_without_sideeffects()`           | Change the current directory without altering the behaviour regarding window local directories            |
 | `lh#path#common()`                           | Returns the biggest common part between several paths                                                     |
 | `lh#path#depth()`                            | Returns the depth of a path                                                                               |
 | `lh#path#exists()`                           | Returns whether a pathname can be read, or if it's open in a buffer                                       |
