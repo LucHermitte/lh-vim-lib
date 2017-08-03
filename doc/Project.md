@@ -247,15 +247,26 @@ p!hide!foo.bar3 = 12
 p?foo.str = 'some string'
 ```
 
+Note that the global-, buffer-, window- and tab- scopes are also supported.
+
 See also:
 - [3.1.1.1 (You're an end-user and you want to define a new project) Automagically](#3111-automagically)
 - [3.1.3. (You're an end-user and you want to) Set a default value for project options](#313-default-value-for-project-options)
 - [3.1.4. (You're an end-user and you want to) Set a project option](#314-set-a-project-option)
 - [3.2.8. (Set a variable in a precise project) through `:LetTo`](#328-set-a-variable-in-a-precise-project)
 
-**Warning**: Because of editorconfig(-vim?) way of doing things, environment
-variables will be changed to lowercase. This means, that `p!$FOO = 42` won't
-assign 42 to `p:$FOO` but to `p:$foo`.
+**Warnings**: Because of editorconfig(-vim?) way of doing things:
+- environment variables will be changed to lowercase. This means, that
+  `p!$FOO = 42` won't assign 42 to `p:$FOO` but to `p:$foo`.
+- we have no control over the evaluation order of the variables. IOW, don't try
+
+    ```dosini
+    g!dependency = 42
+    g!variable = g:dependency *  2
+    ```
+
+    EditorConfig cannot hold computations as complex as the ones we can realize
+    in local vimrcs.
 
 ### 3.1.2. Auto-detect the project root path
 On a project definition, we can automatically deduce the current project root

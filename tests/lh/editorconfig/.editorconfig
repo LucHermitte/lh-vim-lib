@@ -6,3 +6,9 @@ max_line_length = 70
 p!&isk+=µ
 &p!isk+=µ
 p!$FOOBAR = 42
+g?foo.bar = 'g ifunset'
+b!foo.foo = 'b force'
+# Define dependencies that are likelly to break
+g!var1 = 42
+g!var2 = g:var1 * 2
+g!var = g:var2 / 9.0

@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      02nd Aug 2017
-" Last Update:  02nd Aug 2017
+" Last Update:  03rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Hook for editorconfig-vim
@@ -79,12 +79,13 @@ function! lh#project#editorconfig#hook(config) abort
   endif
 
   for [k,value] in items(a:config)
-    if k =~ '\v^p[!?]'
-      let [all, scope, how, varname; dummy] = matchlist(k, '\v^(\&?p)(!.*!|[!?])(.*)')
+    if k =~ '\v^[wbptg][!?]'
+      let [all, scope, how, varname; dummy] = matchlist(k, '\v^(\&?[wbptg])(!.*!|[!?])(.*)')
+      call s:Verbose("# lh-vim-setting: %1 %2:%3 <- %4", how, scope, varname, value)
       if     how == '!'
         call lh#let#to(scope.':'.varname.'='.value)
       elseif how == '?'
-        call lh#let#if_undef('p:'.varname.'='.value)
+        call lh#let#if_undef(scope.':'.varname.'='.value)
       elseif how =~ '\v(hide|overwrite)'
         call lh#let#to('--'.how[1:-2].' '.scope.':'.varname.'='.value)
       else
