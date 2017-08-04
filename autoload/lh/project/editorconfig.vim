@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      02nd Aug 2017
-" Last Update:  03rd Aug 2017
+" Last Update:  04th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Hook for editorconfig-vim
@@ -67,9 +67,9 @@ endfunction
 
 " Function: lh#project#editorconfig#hook(config) {{{3
 function! lh#project#editorconfig#hook(config) abort
-  call s:Verbose("editor config hook -> %1", a:config)
-  let qf = lh#exception#callstack_as_qf('')
-  call setqflist(qf)
+  call s:Verbose("lhvl/project: editor config hook -> %1", a:config)
+  " let qf = lh#exception#callstack_as_qf('')
+  " call setqflist(qf)
   " First of all, if there is a "p#name", it should be applied first
   if has_key(a:config, 'p#name')
     " Trim quotes from project name without evaluating its value with |eval()|.
