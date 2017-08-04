@@ -1837,6 +1837,8 @@ represented as strings. >
     " Assert sorted in place
     AssertIs(l, res)
 
+It can also sort list of lists. This time the sort is done on the first index.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#list#subset()*                 {{{3
 lh#list#subset({input},{indices})~
