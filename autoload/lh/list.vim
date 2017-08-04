@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  31st Mar 2017
+" Last Update:  04th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -430,40 +430,30 @@ endfunction
 " Function: lh#list#arg_max(list [, transfo]) {{{3
 function! lh#list#arg_max(list, ...) abort
   if empty(a:list) | return -1 | endif
-  let Transfo = a:0 > 0 ? a:1 : function(s:getSNR(id))
-  let m = Transfo(a:list[0])
-  let p = 0
-  let i = 1
-  while i != len(a:list)
-    let e = a:list[i]
-    let v = Transfo(e)
-    if v > m
-      let m = v
-      let p = i
+  if a:0 > 0
+    let Transfo = a:1
+    let list = map(copy(a:list), '[Transfo(v:val), v:key]')
+  else
+    let list = map(copy(a:list), '[v:val, v:key]')
     endif
-    let i += 1
-  endwhile
-  return p
+  let res = [list[0]]
+  call map(list[1:], 'add(res, v:val[0] > res[-1][0] ? v:val : res[-1])')
+  return res[-1][1]
 endfunction
 
 " Function: lh#list#arg_min(list [, transfo]) {{{3
 " @since Version 4.0.0
 function! lh#list#arg_min(list, ...) abort
   if empty(a:list) | return -1 | endif
-  let Transfo = a:0 > 0 ? a:1 : function(s:getSNR(id))
-  let m = Transfo(a:list[0])
-  let p = 0
-  let i = 1
-  while i != len(a:list)
-    let e = a:list[i]
-    let v = Transfo(e)
-    if v < m
-      let m = v
-      let p = i
+  if a:0 > 0
+    let Transfo = a:1
+    let list = map(copy(a:list), '[Transfo(v:val), v:key]')
+  else
+    let list = map(copy(a:list), '[v:val, v:key]')
     endif
-    let i += 1
-  endwhile
-  return p
+  let res = [list[0]]
+  call map(list[1:], 'add(res, v:val[0] < res[-1][0] ? v:val : res[-1])')
+  return res[-1][1]
 endfunction
 
 " Function: lh#list#not_found(range) {{{3

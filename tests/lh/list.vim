@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.0.0
 " Created:	19th Nov 2008
-" Last Update:  14th Mar 2017
+" Last Update:  04th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -134,7 +134,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " Searchs {{{2
-function! s:TestBinarySearches()
+function! s:TestBinarySearches() " {{{3
   let v1 = [ -3, -2, -1, -1, 0, 0, 1, 2, 3, 4, 6 ]
   let i = lh#list#lower_bound(v1, 3)
   AssertEquals (v1[i] ,  3)
@@ -160,6 +160,20 @@ function! s:TestBinarySearches()
   AssertEquals (len(v1) ,  lh#list#lower_bound(v1, 10))
   AssertEquals (len(v1) ,  lh#list#upper_bound(v1, 10))
   AssertEquals ([len(v1), len(v1)] ,  lh#list#equal_range(v1, 10))
+endfunction
+
+" Function: s:Test_arg_min_max() {{{3
+function! s:Test_arg_min_max() abort
+  let v1 = [ -3, -2, -1, -1, 0, 0, 1, 2, 3, 4, 6 ]
+  AssertEquals(lh#list#arg_min(v1), 0)
+  AssertEquals(lh#list#arg_max(v1), 10)
+
+  let v2 = [ 0, 0, 1, 20000, -200, 3, 4, 6, -20, -1000, -1, 0, 0, 1, 2, 3, 4, 6 ]
+  AssertEquals(lh#list#arg_min(v2), 9)
+  AssertEquals(lh#list#arg_max(v2), 3)
+
+  AssertEquals(lh#list#arg_min(v2, function('strlen')), 0)
+  AssertEquals(lh#list#arg_max(v2, function('strlen')), 3)
 endfunction
 
 " Function: s:Test_match() {{{3
