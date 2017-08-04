@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  03rd Aug 2017
+" Last Update:  04th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -494,7 +494,7 @@ function! s:prepare_pathlist_for_strip_start(pathslist)
   let pathslist_abs=filter(copy(pathslist), 'v:val =~ "^\\.\\%(/\\|$\\)"')
   let pathslist += pathslist_abs
   " replace path separators by a regex that can match them
-  call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")')
+  call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")."[\\/]\\="')
   " echomsg string(pathslist)
   " escape . and ~
   call map(pathslist, '"^".escape(v:val, ".~")')
@@ -505,30 +505,20 @@ function! s:prepare_pathlist_for_strip_start(pathslist)
 
   return pathslist
 endfunction
+
+function! s:find_best_match(pathname, pathslist) abort
+  let matches = map(copy(a:pathslist), 'substitute(a:pathname, v:val, "", "")')
+  let best_match_idx = lh#list#arg_min(matches, function('len'))
+  return matches[best_match_idx]
+endfunction
+
 function! lh#path#strip_start(pathname, pathslist) abort
   let pathslist = s:prepare_pathlist_for_strip_start(a:pathslist)
-  if 0
-    " build the strip regex
-    let strip_re = join(pathslist, '\|')
-    " echomsg strip_re
-    let best_match = substitute(a:pathname, '\%('.strip_re.'\)[/\\]\=', '', '')
+  if !empty(pathslist)
+    let pathnames = type(a:pathname) == type([]) ? copy(a:pathname) : [a:pathname]
+    let res = map(pathnames, 's:find_best_match(v:val, pathslist)')
   else
-    if !empty(pathslist)
-      let pathnames = type(a:pathname) == type([]) ? a:pathname : [a:pathname]
-      let res = []
-      for pathname in pathnames
-        let best_match = substitute(pathname, '^\%('.pathslist[0].'\)[/\\]\=', '', '')
-        for path in pathslist[1:]
-          let a_match = substitute(pathname, '^\%('.path.'\)[/\\]\=', '', '')
-          if len(a_match) < len(best_match)
-            let best_match = a_match
-          endif
-        endfor " each pathslist
-        let res += [best_match]
-      endfor " each pathnames
-    else
-      let res = a:pathname
-    endif
+    let res = a:pathname
   endif
   return type(a:pathname) == type([]) ? res : res[0]
 endfunction
