@@ -489,17 +489,19 @@ function! lh#list#sort(list,...) abort
   if empty(a:list) | return a:list | endif
   let args = [a:list] + a:000
   if len(args) > 1
-    if args[1] == 'N'
-      let args[0] = map(a:list, 'eval(v:val)')
-      let args[1] = 'n'
-      let was_sorting_numbers_as_strings = 1
-    endif
-    if !s:k_has_list_num_cmp && args[1]=='n' && type(a:list[0])==type([])
-      let args[1] = 'lh#list#_list_regular_cmp'
-    elseif !s:k_has_num_cmp && args[1]=='n'
-      let args[1] = 'lh#list#_regular_cmp'
-    elseif !s:k_has_fixed_str_cmp && args[1]==''
-      let args[1] = 'lh#list#_str_cmp'
+    if lh#type#is_string(args[1])
+      if args[1] == 'N'
+        let args[0] = map(a:list, 'eval(v:val)')
+        let args[1] = 'n'
+        let was_sorting_numbers_as_strings = 1
+      endif
+      if !s:k_has_list_num_cmp && args[1]=='n' && type(a:list[0])==type([])
+        let args[1] = 'lh#list#_list_regular_cmp'
+      elseif !s:k_has_num_cmp && args[1]=='n'
+        let args[1] = 'lh#list#_regular_cmp'
+      elseif !s:k_has_fixed_str_cmp && args[1]==''
+        let args[1] = 'lh#list#_str_cmp'
+      endif
     endif
   else
     if !s:k_has_list_num_cmp && type(a:list[0])==type([])
