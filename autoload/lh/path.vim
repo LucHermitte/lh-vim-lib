@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  04th Aug 2017
+" Last Update:  07th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -674,11 +674,12 @@ function! lh#path#find_in_parents(path, path_patterns, kinds, last_valid_path) a
   return res
 endfunction
 
-" Function: lh#path#munge(pathlist, path) {{{3
-function! lh#path#munge(pathlist, path) abort
+" Function: lh#path#munge(pathlist, path [, sep]) {{{3
+function! lh#path#munge(pathlist, path, ...) abort
   if type(a:pathlist) == type('str')
-    let pathlist = split(a:pathlist, ',')
-    return join(lh#path#munge(pathlist, a:path), ',')
+    let sep = get(a:, 1, ',')
+    let pathlist = split(a:pathlist, sep)
+    return join(lh#path#munge(pathlist, a:path), sep)
   else
     " if filereadable(a:path) || isdirectory(a:path)
     if ! empty(glob(a:path))
