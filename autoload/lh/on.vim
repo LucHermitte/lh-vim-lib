@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  20th Feb 2017
+" Last Update:  12th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -193,13 +193,21 @@ function! s:finalize() dict " {{{4
     try
       if type(l:Action) == type(function('has'))
         call l:Action()
-      elseif type(l:Action) == type({}) && has_key(l:Action, 'execute')
-        call l:Action.execute([])
+      elseif type(l:Action) == type({})
+        if has_key(l:Action, 'object')
+          " Trick to work without Partials in old vom versions
+          call lh#assert#value(l:Action).has_key('method')
+          call call(l:Action.method, [], l:Action.object)
+        elseif has_key(l:Action, 'execute')
+          call l:Action.execute([])
+        else
+          call lh#assert#unexpected(lh#fmt#printf("Doesn't know how to evaluate this dictionary: %1", l:Action"))
+        endif
       elseif !empty(l:Action)
         exe l:Action
       endif
     catch /.*/
-      call lh#log#this('Error occured when running action (%1)', l:Action)
+      call lh#log#this('Error occured when running action (%1): %2', l:Action, v:exception)
       call lh#log#exception()
     finally
       unlet l:Action
