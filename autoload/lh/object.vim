@@ -151,13 +151,7 @@ endfunction
 
 " Function: s:is_already_handled(object, handled_list) abort {{{3
 function! s:is_already_handled(object, handled_list) abort
-  for e in a:handled_list
-    if e is a:object
-      return 1
-    endif
-    unlet e
-  endfor
-  return 0
+  return lh#list#contain_entity(a:handled_list, a:object)
 endfunction
 
 " # Misc {{{2
