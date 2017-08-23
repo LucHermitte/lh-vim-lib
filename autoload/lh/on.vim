@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  12th Aug 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -195,7 +195,7 @@ function! s:finalize() dict " {{{4
         call l:Action()
       elseif type(l:Action) == type({})
         if has_key(l:Action, 'object')
-          " Trick to work without Partials in old vom versions
+          " Trick to work without Partials in old vim versions
           call lh#assert#value(l:Action).has_key('method')
           call call(l:Action.method, [], l:Action.object)
         elseif has_key(l:Action, 'execute')
