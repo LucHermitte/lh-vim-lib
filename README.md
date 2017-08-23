@@ -6,6 +6,9 @@ _lh-vim-lib_ is a library that defines some common vim functions I use in my var
 
 This library has been conceived as a suite of [|autoload|](http://vimhelp.appspot.com/eval.txt.html#autoload) plugins. As such, it requires Vim 7+.
 
+As I only have access to a version 7.3-429 on travis-ci, let's say this is the
+minimum vim version I'll try to be compatible with.
+
 The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/master/doc/lh-vim-lib.txt) can be browsed.
 
 **Important:**
