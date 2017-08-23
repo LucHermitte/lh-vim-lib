@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      08th Mar 2017
-" Last Update:  14th Apr 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -274,9 +274,7 @@ function! s:_update_option(varname, ...) dict abort " {{{2
   call s:Verbose('%1._update_option(%2 <- %3)', self.name, a:varname, value)
   if a:0 == 0
     " Apply to all buffers
-    for b in self.buffers
-      call s:do_update_option(b, '&'.a:varname, value)
-    endfor
+    cal map(copy(self.buffers), 's:do_update_option(v:val, "&".a:varname, value)')
   else
     call s:do_update_option(a:1, '&'.a:varname, value)
   endif

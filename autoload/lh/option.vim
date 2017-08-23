@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  06th Apr 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -139,23 +139,15 @@ function! lh#option#get(names,...) abort
         let r = lh#project#_get(name)
         if lh#option#is_set(r)
           call s:Verbose('p:%1 found -> %2', name, r)
-          if lh#ref#is_bound(r)
-            return r.resolve()
-          else
-            return r
-          endif
+          return lh#ref#is_bound(r) ? r.resolve() : r
         endif
       elseif exists(scope.':'.name)
         " \ && (0 != strlen({scope}:{name}))
-        " This syntax doesn't work with dictionaries -> !exe
+        " "return" syntax doesn't work with dictionaries -> "!exe"
         " return {scope}:{name}
         exe 'let value='.scope.':'.name
         call s:Verbose('%1:%2 found -> %3', scope, name, value)
-        if lh#ref#is_bound(value)
-          return value.resolve()
-        else
-          return value
-        endif
+        return lh#ref#is_bound(value) ? value.resolve() : value
       endif
     endfor
   endfor

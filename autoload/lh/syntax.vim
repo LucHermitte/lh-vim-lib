@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:k_version = 400
 " Created:	05th Sep 2007
-" Last Update:	01st Mar 2017
+" Last Update:	22nd Aug 2017
 "------------------------------------------------------------------------
 " Description:	«description»
 "
@@ -130,7 +130,7 @@ function! lh#syntax#list(name)
     else
       let li = ''
     endif
-    if strlen(li) != 0
+    if !empty(li)
       let li = substitute(li, 'contained\S*\|transparent\|nextgroup\|skipwhite\|skipnl\|skipempty', '', 'g')
       let kinds = split(li, '\s\+')
       call extend(res, kinds)

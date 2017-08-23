@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  12th Feb 2017
+" Last Update:  22nd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -129,9 +129,7 @@ function! lh#ft#option#inherited_filetypes(fts) abort
   let res = []
   let lFts = split(a:fts, ',')
   let aux = map(copy(lFts), '[v:val] + lh#ft#option#inherited_filetypes(lh#option#get(v:val."_inherits", ""))')
-  for a in aux
-    let res += a
-  endfor
+  call map(aux, 'extend(res, v:val)')
   return res
 endfunction
 

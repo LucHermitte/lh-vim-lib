@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      03rd Nov 2008
-" Last Update:  20th Jan 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Implements:
@@ -20,6 +20,7 @@ let s:k_version = 400
 " History:
 "       v4.0.0:  ENH: Use new OO top class
 "                ENH: Use `call()` instead of `eval()`
+"                PERF: Improve `#execute()` performances
 "       v3.6.1:  ENH: Use new logging framework
 "       v3.4.0:  ENH: lh#function#bind supports composition
 "       v3.3.20: Explicit error msg w/ lh#function#execute
@@ -81,19 +82,10 @@ endfunction
 
 " # Function: s:DoBindList(arguments...) {{{2
 function! s:DoBindList(formal, real) abort
-  let args = []
-  for arg in a:formal
-    if type(arg)==type('string') && arg =~ '\v^v:\d+_$'
-      let new = a:real[matchstr(arg, '\vv:\zs\d+\ze_')-1]
-    elseif type(arg)==type('string')
-      let new = eval(s:DoBindEvaluatedString(arg, a:real))
-    else
-      let new = arg
-    endif
-    call add(args, new)
-    unlet new
-    unlet arg
-  endfor
+  let args = map(copy(a:formal),
+        \ 'type(v:val) != type("str")        ? v:val '
+        \.': match(v:val, "\\v^v:\\d+_$")>=0 ? a:real[matchstr(v:val, "\\vv:\\zs\\d+\\ze_")-1] '
+        \.': eval(s:DoBindEvaluatedString(v:val, a:real))')
   return args
 endfunction
 
@@ -120,9 +112,7 @@ function! s:ToString(expr) abort
 endfunction
 
 function! s:DoBindEvaluatedString(expr, real) abort
-  let expr = a:expr
-  let expr = substitute(expr,  '\v<v:(\d+)_>', '\=s:ToString(a:real[submatch(1)-1])', 'g')
-  " let expr = substitute(expr,  '\<v:\(\d\+\)_\>', '\=string(a:real[submatch(1)-1])', 'g')
+  let expr = substitute(a:expr,  '\v<v:(\d+)_>', '\=s:ToString(a:real[submatch(1)-1])', 'g')
   return expr
 endfunction
 
@@ -130,10 +120,6 @@ endfunction
 function! s:Execute(args) dict abort
   let args = has_key(self, 'args') ? s:DoBindList(self.args, a:args) : a:args
   if type(self.function) == type(function('exists'))
-    " let args = s:DoBindList(self.args, a:args)
-    " echomsg '##'.string(self.function).'('.join(args, ',').')'
-    " let res = eval(string(self.function).'('.s:Join(args).')')
-    " TODO: test the new |call()| syntax
     let res = call(self.function, args)
   elseif type(self.function) == type('string')
     let expr = s:DoBindString(self.function, 'args')

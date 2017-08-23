@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      17th Apr 2007
-" Last Update:  04th Aug 2017
+" Last Update:  22nd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -137,24 +137,13 @@ function! lh#list#Transform(input, output, action) abort
   let new = map(copy(a:input), a:action)
   let res = extend(a:output,new)
   return res
-
-  for element in a:input
-    let action = substitute(a:action, 'v:val','element', 'g')
-    let res = eval(action)
-    call add(a:output, res)
-    unlet element " for heterogeneous lists
-  endfor
-  return a:output
 endfunction
 
 " Function: lh#list#transform(input, output, action) {{{3
 function! lh#list#transform(input, output, action) abort
-  for element in a:input
-    let res = lh#function#execute(a:action, element)
-    call add(a:output, res)
-    unlet element " for heterogeneous lists
-  endfor
-  return a:output
+  let new = map(copy(a:input), 'lh#function#execute(a:action, v:val)')
+  let res = extend(a:output,new)
+  return res
 endfunction
 
 " Function: lh#list#chain_transform(input, actions) {{{3
@@ -573,7 +562,7 @@ function! lh#list#subset(list, indices) abort
 endfunction
 
 " Function: lh#list#mask(list, masks) {{{3
-if lh#has#patch('patch-7.2-295')
+if lh#has#vkey()
   function! lh#list#mask(list, masks) abort
     let len = len(a:list)
     call lh#assert#equal(len, len(a:masks),
@@ -642,7 +631,6 @@ if s:has_add_ternary()
     let yes = []
     let no = []
     if type(a:Cond) == type(function('has'))
-      " call map(copy(a:list), {idx, val -> add(a:Cond(idx,val)?yes:no, val)})
       call map(copy(a:list), 'add(a:Cond(v:key,v:val)?yes:no, v:val)')
     else
       call map(copy(a:list), 'add((('.a:Cond.')?(yes):(no)), v:val)')
@@ -754,11 +742,7 @@ function! lh#list#for_each_call(list, action) abort
         \.restore('&isk')
   try
     set isk&vim
-    for e in a:list
-      let action = substitute(a:action, '\v<v:val>', '\=string(e)', 'g')
-      exe 'call '.action
-      unlet e
-    endfor
+    let actions = map(copy(a:list), 'eval(substitute(a:action, "\\v<v:val>", "\\=string(v:val)", "g"))')
   catch /.*/
     throw "lh#list#for_each_call: ".v:exception." in ``".action."''"
   finally

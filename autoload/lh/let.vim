@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  09th Mar 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -412,9 +412,7 @@ endfunction
 " Function: lh#let#_push_options(variable, ...) {{{3
 function! lh#let#_push_options(variable, ...) abort
   let var = lh#let#if_undef(a:variable, [])
-  for val in a:000
-    call lh#list#push_if_new(var, val)
-  endfor
+  call map(copy(a:000), 'lh#list#push_if_new(var, v:val)')
   return var
 endfunction
 

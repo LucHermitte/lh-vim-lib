@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  07th Aug 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -109,6 +109,7 @@ let s:k_version = 40000
 "       (*) Improve `lh#path#strip_start()` performances
 "       (*) lh#path#split('/foo') will now return 2 elements
 "       (*) Recognize empty name buffer as scratch/distant
+"       (*) PERF: Improve performances
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -461,9 +462,10 @@ function! lh#path#glob_as_list(pathslist, expr, ...) abort
     return s:GlobAsList(a:pathslist, a:expr, mustSort)
   elseif type(a:expr) == type([])
     let res = []
-    for expr in a:expr
-      call extend(res, s:GlobAsList(a:pathslist, expr, mustSort))
-    endfor
+    call map(copy(a:expr), 'extend(res, s:GlobAsList(a:pathslist, v:val, mustSort))')
+    " for expr in a:expr
+      " call extend(res, s:GlobAsList(a:pathslist, expr, mustSort))
+    " endfor
     return res
   else
     throw "Unexpected type for a:expression"
