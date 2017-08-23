@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400000'
 " Created:      02nd Sep 2016
-" Last Update:  14th Apr 2017
+" Last Update:  23rd Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -84,6 +84,11 @@ endfunction
 " Function: lh#has#default_in_getbufvar() {{{3
 function! lh#has#default_in_getbufvar() abort
   return lh#has#patch("patch-7.3.831")
+endfunction
+
+" Function: lh#has#vkey() {{{3
+function! lh#has#vkey() abort
+  return lh#has#patch('patch-7.2-295')
 endfunction
 
 "------------------------------------------------------------------------
