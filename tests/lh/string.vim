@@ -26,6 +26,15 @@ function! s:Test_matches() " {{{2
   AssertEquals(matches, expected)
 endfunction
 
+function! s:Test_matchstrpos() " {{{2
+  " Examples from vim documentation
+  AssertEquals(lh#string#matchstrpos('testing', 'ing'),    ['ing', 4, 7])
+  AssertEquals(lh#string#matchstrpos('testing', 'ing', 2), ['ing', 4, 7])
+  AssertEquals(lh#string#matchstrpos('testing', 'ing', 5), ['', -1, -1])
+  AssertEquals(lh#string#matchstrpos([1, '__x'], '\a'), ['x', 1, 2, 3])
+  " TODO: add other tests
+endfunction
+
 function! s:Test_trim_text() " {{{2
   AssertEquals(lh#string#trim('foobar'), 'foobar')
   AssertEquals(lh#string#trim('  foobar'), 'foobar')

@@ -159,6 +159,7 @@ Stack related functions:                                |lhvl#stack|      {{{2
 String related functions:                               |lhvl#string|     {{{2
 - |lh#string#as()|
 - |lh#string#matches()|
+- |lh#string#matchstrpos()|
 - |lh#string#substitute_unless()|
 - |lh#string#trim()|
 Graph related functions:                                |lhvl#graph|      {{{2
@@ -1289,6 +1290,12 @@ Example: >
    let matches = lh#string#matches('sqjg %1 msqkg ml %2 mihs m%43%8', '%\zs\d\+')
    let expected= ['1', '2', '43', '8']
    AssertEquals(matches, expected)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#matchstrpos()*         {{{3
+lh#string#matchstrpos(expr, pattern [, start [, count]])~
+Backports |matchstrpos()| to old versions of vim.
+@since Version 4.0.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#substitute_unless()*   {{{3

@@ -76,6 +76,35 @@ function! lh#string#matches(string, pattern) abort
   return res
 endfunction
 
+" Function: lh#string#matchstrpos(expr, pattern) {{{3
+" Back port |matchstrpos()| to older versions of vim
+" @version 4.0.0
+if ! exists('*matchstrpos')
+  function! lh#string#matchstrpos(expr, pattern) abort
+    return matchstrpos(a:expr, a:pattern)
+  endfunction
+else
+  function! lh#string#matchstrpos(expr, pattern, ...) abort
+    call lh#assert#type(a:expr).belongs_to('', [])
+    if type(a:expr) == type('')
+      let b = call('match', [a:expr, a:pattern] + a:000)
+      if b < 0 | return ['', -1, -1] | endif
+      let e = call('matchend', [a:expr, a:pattern] + a:000)
+      return [a:expr[b : e], b, e]
+    else " list case
+      " First the first match
+      let res = map(copy(a:expr), '[v:key, call("match", [v:val, a:pattern]+a:000)]')
+      call filter(res, 'v:val[1] >= 0')
+      if empty(res) | return ['', -1, -1, -1] | endif
+      let idx = res[0][0]
+      " And finally extract the end and the str
+      let b = res[0][1]
+      let e = call('matchend', [a:expr[idx], a:pattern] + a:000)
+      return [a:expr[idx][b : e], idx, b, e]
+    endif
+  endfunction
+endif
+
 " # Convertion {{{2
 " Function: lh#string#as(val) {{{3
 " NOTE: this function cannot use s:Log()
