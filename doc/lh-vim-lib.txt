@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 23rd Aug 2017
+                        For Vim version 7+      Last change: 25th Aug 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4421,8 +4421,11 @@ lh#assert#value({actual}).verifies({func}, {arglist} [, {msg}]) *lh#assert#value
     Unlike |lh#assert#true()|, this flavour doesn't evaluate {func} in
     |dbc-ignore| mode.
 
-lh#assert#type({actual}).is({expected})                *lh#assert#type().is()*
-lh#assert#type({actual}).belongs_to({expected}...)     *lh#assert#type().belongs_to()*
+lh#assert#type({actual})....                           *lh#assert#type()*
+    This time the assertions are done on the type of the expression.
+
+lh#assert#type({actual}).is({expected})                         *lh#assert#type().is()*
+lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type().belongs_to()*
     They are very similar to |lh#assert#value()| tests, but on types.
     e.g. >
     call lh#assert#type([1,2]).is([])
