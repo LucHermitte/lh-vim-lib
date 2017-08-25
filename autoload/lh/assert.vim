@@ -2,10 +2,10 @@
 " File:         autoload/lh/assert.vim                            {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
+" Version:      4.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  14th Apr 2017
+" Last Update:  25th Aug 2017
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -325,7 +325,7 @@ endfunction
 function! s:verifies(func, ...) dict abort "{{{4
   let args = get(a:, 1, [])
   if ! self.__eval( (type(a:func)==type('') && lh#type#is_dict(self.actual) && has_key(self.actual, a:func)) ? call(self.actual[a:func], args, self.actual) : call(a:func, [self.actual]+args))
-    let msg = a:0 > 0 ? a:2 : lh#string#as(self.actual)." doesn't verify: ".a:func
+    let msg = a:0 > 0 ? a:2 : lh#string#as(self.actual)." doesn't verify: ".string(a:func)
     call lh#assert#_trace_assert(msg)
   endif
   return self
