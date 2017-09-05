@@ -74,6 +74,7 @@ Vim 8.0-287. See [Vim Issue #1352](http://github.com/vim/vim/issues/1352).
 | `lh#assert#value().is_unset()` | Asserts `lh#option#is_unset(actual)`                                                                                                              |
 | `lh#assert#value().empty()`    | Asserts `empty(actual)`                                                                                                                           |
 | `lh#assert#value().has_key()`  | Asserts `has_key(actual, key)`                                                                                                                    |
+| `lh#assert#value().get()`      | Permits to assert on the element at key/index position in the actual dict/list                                                                    |
 | `lh#assert#value().match()`    | Asserts `actual =~ pattern`                                                                                                                       |
 | `lh#assert#value().verifies()` | Asserts the predicate passed evaluates to true with the specified parameters                                                                      |
 | `lh#assert#value().not()`      | Inverses the logic of the next assertions                                                                                                         |

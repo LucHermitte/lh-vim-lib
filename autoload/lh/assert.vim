@@ -321,7 +321,6 @@ function! s:is_unset(...) dict abort " {{{4
   endif
   return self
 endfunction
-" Pre-built #value() result
 function! s:verifies(func, ...) dict abort "{{{4
   let args = get(a:, 1, [])
   if ! self.__eval( (type(a:func)==type('') && lh#type#is_dict(self.actual) && has_key(self.actual, a:func)) ? call(self.actual[a:func], args, self.actual) : call(a:func, [self.actual]+args))
@@ -330,7 +329,26 @@ function! s:verifies(func, ...) dict abort "{{{4
   endif
   return self
 endfunction
-function! s:pre_build_value() abort " {{{4
+function! s:get(id, ...) dict abort " {{{4
+  if     type(self.actual) == type({})
+    call call(self.has_key, [a:id] + a:000, self)
+  elseif type(self.actual) == type([])
+    let actual = self.actual " because I share a common global objet => need to save the actual value tested
+    call lh#assert#type(a:id).is(42, 'Expected a number as index in an array, got '.string(a:id))
+    call lh#assert#value(len(actual)).is_gt(a:id, 'Expected the index ('.a:id.') to be lesser than the number of elements ('.len(actual).'): '.string(actual))
+    let self.actual = actual
+  else
+    call lh#assert#unexpected('Expected a dictionary or an array. Got a '.lh#type#name(type(self.actual)).': '.string(self.actual))
+    return self
+  endif
+  " We should not get an unset element here given the previous tests
+  let element = get(self.actual, a:id)
+  let self.actual = element
+  return self
+endfunction
+
+" Pre-built #value() result " {{{4
+function! s:pre_build_value() abort
   let res = lh#object#make_top_type({})
   let res.__eval     = function(s:getSNR('__eval'))
   let res.not        = function(s:getSNR('not'))
@@ -346,6 +364,7 @@ function! s:pre_build_value() abort " {{{4
   let res.is_set     = function(s:getSNR('is_set'))
   let res.is_unset   = function(s:getSNR('is_unset'))
   let res.verifies   = function(s:getSNR('verifies'))
+  let res.get        = function(s:getSNR('get'))
 
   let ignored = lh#object#make_top_type({})
   let ignored.not      = function(s:getSNR('__ignore'))
@@ -361,6 +380,7 @@ function! s:pre_build_value() abort " {{{4
   let ignored.is_set   = ignored.not
   let ignored.is_unset = ignored.not
   let ignored.verifies = ignored.not
+  let ignored.get      = ignored.not
   return [res, ignored]
 endfunction
 let [s:value_default, s:value_ignore] = s:pre_build_value()
@@ -372,11 +392,12 @@ function! lh#assert#value(actual) abort " {{{4
   return res
 endfunction
 
-" Function: lh#assert#type(actual) {{{3
-function! s:type_is(expected) dict abort " {{{4
+" Function: lh#assert#type(actual [, message]) {{{3
+function! s:type_is(expected, ...) dict abort " {{{4
   let t_actual = type(self.actual)
   if ! self.__eval(t_actual == type(a:expected))
-    call lh#assert#_trace_assert('Expected '.string(self.actual).' to be a '.lh#type#name(type(a:expected)).' not a '.lh#type#name(t_actual))
+    let msg = a:0 > 0 ? a:1 : 'Expected '.string(self.actual).' to be a '.lh#type#name(type(a:expected)).' not a '.lh#type#name(t_actual)
+    call lh#assert#_trace_assert(msg)
   endif
   return self
 endfunction

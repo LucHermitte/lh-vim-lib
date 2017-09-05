@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 25th Aug 2017
+                        For Vim version 7+      Last change: 05th Sep 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -322,6 +322,7 @@ Design by Contract related functions                    |lhvl#DbC|        {{{2
   - |lh#assert#value().is_ge()|
   - |lh#assert#value().is_set()|
   - |lh#assert#value().is_unset()|
+  - |lh#assert#value().get()|
   - |lh#assert#value().has_key()|
   - |lh#assert#value().match()|
   - |lh#assert#value().not()|
@@ -4418,6 +4419,13 @@ lh#assert#value({actual}).is_set([{msg}])                       *lh#assert#value
 lh#assert#value({actual}).is_unset([{msg}])                     *lh#assert#value().is_unset()*
     Relates to |lh#option#is_set()| and |lh#option#is_unset()|
 
+lh#assert#value({actual}).get({index}|{key} [, {msg}])          *lh#assert#value().get()*
+    Asserts first that {actual} is a |List| or a |Dictionary|.
+    Then asserts it has an element at the given {index}|{key}.
+    Finally returns an altered assertion object on which anything could be
+    asserted, e.g.: >
+    call lh#assert#value({'d:': 42}).get('d').eq(42)
+
 lh#assert#value({actual}).verifies({func}, {arglist} [, {msg}]) *lh#assert#value().verifies()*
     Lazily checks anything.
     {func} and {arglist} are the exact same parameters as the ones used by
@@ -4431,7 +4439,7 @@ lh#assert#value({actual}).verifies({func}, {arglist} [, {msg}]) *lh#assert#value
 lh#assert#type({actual})....                           *lh#assert#type()*
     This time the assertions are done on the type of the expression.
 
-lh#assert#type({actual}).is({expected})                         *lh#assert#type().is()*
+lh#assert#type({actual}).is({expected} [, {msg}])               *lh#assert#type().is()*
 lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type().belongs_to()*
     They are very similar to |lh#assert#value()| tests, but on types.
     e.g. >
