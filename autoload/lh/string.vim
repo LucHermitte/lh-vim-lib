@@ -79,7 +79,7 @@ endfunction
 " Function: lh#string#matchstrpos(expr, pattern) {{{3
 " Back port |matchstrpos()| to older versions of vim
 " @version 4.0.0
-if ! exists('*matchstrpos')
+if exists('*matchstrpos')
   function! lh#string#matchstrpos(expr, pattern) abort
     return matchstrpos(a:expr, a:pattern)
   endfunction
