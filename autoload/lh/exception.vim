@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      18th Nov 2015
-" Last Update:  08th Mar 2017
+" Last Update:  28th Sep 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -72,6 +72,7 @@ function! lh#exception#callstack(throwpoint) abort
   let cleanup = lh#on#exit()
         \.restore('&isk')
   try
+    set isk&vim
     set isk+=#
     let stack = split(a:throwpoint, '\.\.')
     call reverse(stack)
