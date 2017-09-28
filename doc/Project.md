@@ -244,6 +244,7 @@ p!overwrite!foo.bar2 = 12
 p!hide!foo.bar3 = 12
 
 # Set p:foo.str to 'some string', if it wasn't defined, as with ":LetIfUndef"
+# Don't forget the quotes around the string expression
 p?foo.str = 'some string'
 ```
 
@@ -257,7 +258,9 @@ See also:
 
 **Warnings**: Because of editorconfig(-vim?) way of doing things:
 - environment variables will be changed to lowercase. This means, that
-  `p!$FOO = 42` won't assign 42 to `p:$FOO` but to `p:$foo`.
+  `p!$FOO = 42` won't assign 42 to `p:$FOO` but to `p:$foo`. I've used another
+  trick to say: this is uppercase stuff: double the dollars as in `p:$$FoO` to
+  design the environment variable `p:FOO`. At, there is no way to use `$FoO`.
 - we have no control over the evaluation order of the variables. IOW, don't try
 
     ```dosini

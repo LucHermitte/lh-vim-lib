@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      02nd Aug 2017
-" Last Update:  04th Aug 2017
+" Last Update:  28th Sep 2017
 "------------------------------------------------------------------------
 " Description:
 "       Hook for editorconfig-vim
@@ -82,6 +82,11 @@ function! lh#project#editorconfig#hook(config) abort
     if k =~ '\v^[wbptg][!?]'
       let [all, scope, how, varname; dummy] = matchlist(k, '\v^(\&?[wbptg])(!.*!|[!?])(.*)')
       call s:Verbose("# lh-vim-setting: %1 %2:%3 <- %4", how, scope, varname, value)
+      " TODO: check whether we need to add quotes around the expression
+      if len(varname) > 1 && varname[0:1] == '$$'
+        " Special trick to force the environment variable into CAPS
+        let varname = toupper(varname[1:])
+      endif
       if     how == '!'
         call lh#let#to(scope.':'.varname.'='.value)
       elseif how == '?'
