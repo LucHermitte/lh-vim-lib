@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      13th Oct 2006
-" Last Update:  07th Mar 2017
+" Last Update:  14th Oct 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -33,6 +33,7 @@ let s:k_version = 4000
 "               ENH: toggle-menu on `p:var` always refers to the exact same
 "               variable from the current project at the moment the menu is
 "               defined.
+"               ENH: Accept multiple words value in `:Toggle`
 " TODO: {{{2
 "       * Should the argument to :Toggle be simplified to use the variable name
 "       instead ? May be a banged :Toggle! could work on the real variable
@@ -374,7 +375,7 @@ function! s:Toggle(cmdName, ...) abort
   endif
   let data = s:toggle_commands[a:cmdName]
   if a:0 > 0
-    call s:SetTextValue(data, a:1)
+    call s:SetTextValue(data, join(a:000, ' '))
   else
     call s:NextValue(data)
   endif
