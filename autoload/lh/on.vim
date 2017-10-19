@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  23rd Aug 2017
+" Last Update:  19th Oct 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -168,6 +168,12 @@ function! s:restore_mapping_and_clear_now(key, mode) dict abort " {{{4
   return self
 endfunction
 
+function! s:restore_highlight(hlname) dict abort " {{{4
+  let def = lh#askvim#execute('hi '.a:hlname)[0]
+  let action = substitute(def, '^'.a:hlname.'\s\+\zsxxx\s\+', '', '')
+  let self.actions += [ 'silent! hi '.action]
+  return self
+endfunction
 
 " Function: lh#on#exit() {{{3
 function! lh#on#exit()
@@ -179,6 +185,7 @@ function! lh#on#exit()
   let res.register                       = function(s:getSNR('register'))
   let res.restore_buffer_mapping         = function(s:getSNR('restore_buffer_mapping'))
   let res.restore_mapping_and_clear_now  = function(s:getSNR('restore_mapping_and_clear_now'))
+  let res.restore_highlight              = function(s:getSNR('restore_highlight'))
 
   return res
 endfunction

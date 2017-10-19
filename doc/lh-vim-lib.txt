@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 05th Sep 2017
+                        For Vim version 7+      Last change: 19th Oct 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -527,17 +527,20 @@ lh#on#exit()~
 This function will register action to be executed at the end on a scope, and
 more precisally in a |:finally| section.
 It permits to do the following things:
-- `restore()`                       restores a |variable| or a vim |option|.
-- `restore_option()`                restores a |lhvl#option.|
-- `register()`                      registers: a |command| , or a |funcref|,
+- *restore()*                       restores a |variable| or a vim |option|.
+- *restore_option()*                restores a |lhvl#option.|
+- *register()*                      registers: a |command| , or a |funcref|,
                                   or |lhvl#functor| or an object method, to
                                   execute.
                                   It takes a second facultative argument
                                   `"priority"` to give the highest priority to
                                   the command.
-- `restore_buffer_mapping()`        restores a |:map-<buffer>|.
-- `restore_mapping_and_clear_now()` restores |:map| and |:map-<buffer>| on
+- *restore_buffer_mapping()*        restores a |:map-<buffer>|.
+- *restore_mapping_and_clear_now()* restores |:map| and |:map-<buffer>| on
                                   `finalize()` and undefine them right away.
+- *restore_highlight()*             restores highlight definition like
+                                  |CursorLine| one.
+
 
 Object methods emulates |Partials| on old vim versions. They are specified
 with: `{'object': dictionary, 'method': function_name_or_ref}`
