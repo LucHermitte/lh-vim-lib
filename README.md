@@ -337,15 +337,18 @@ interactive functions. Depending on a configuration variable
 (`(bpg):ui_type`), they will delegate the interaction to a gvim UI
 function, or a plain text UI function (defined by vim, or emulated)
 
-| Function          | Purpose                                                                                                                                                 |
-|:------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `lh#ui#check()`   | Emulates a checbox UI function                                                                                                                          |
-| `lh#ui#combo()`   | Emulates a combobox UI function                                                                                                                         |
-| `lh#ui#confirm()` | Similar to `confirm()`                                                                                                                                  |
-| `lh#ui#if()`      | Acts as the ternary operator                                                                                                                            |
-| `lh#ui#input()`   | Calls `inputdialog()` or `input()`                                                                                                                      |
-| `lh#ui#switch()`  | Emulates `switch()` in vim-script language                                                                                                              |
-| `lh#ui#which()`   | Wrapper around functions like `lh#ui#confirm()` or `lh#ui#combo()` that returns the text of the selected item instead of the index of the selected item |
+| Function                         | Purpose                                                                                                                                                 |
+|:---------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `lh#ui#ask()`                    | Ask a question under the status line                                                                                                                    |
+| `lh#ui#check()`                  | Emulates a checbox UI function                                                                                                                          |
+| `lh#ui#combo()`                  | Emulates a combobox UI function                                                                                                                         |
+| `lh#ui#confirm()`                | Similar to `confirm()`                                                                                                                                  |
+| `lh#ui#global_confirm_command()` | Extends `:substitute` `confirm`  flag to `:global`. Wrapped in `:ConfirnGlobal`                                                                         |
+| `lh#ui#if()`                     | Acts as the ternary operator                                                                                                                            |
+| `lh#ui#input()`                  | Calls `inputdialog()` or `input()`                                                                                                                      |
+| `lh#ui#make_confirm_command()`   | Prepare an object to use when executing a command multiple times                                                                                        |
+| `lh#ui#switch()`                 | Emulates `switch()` in vim-script language                                                                                                              |
+| `lh#ui#which()`                  | Wrapper around functions like `lh#ui#confirm()` or `lh#ui#combo()` that returns the text of the selected item instead of the index of the selected item |
 
 In the same thematics, see also [VFT - Vim Form Toolkit](http://www.vim.org/scripts/script.php?script_id=2160)
 

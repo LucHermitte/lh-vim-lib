@@ -5,7 +5,7 @@
 " Version:      4.0.0.0.
 let s:k_version = '4000'
 " Created:      03rd Jan 2017
-" Last Update:  27th Feb 2017
+" Last Update:  19th Oct 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -317,6 +317,99 @@ function! lh#ui#check(prompt, ...) abort
   else               " {{{5
     throw "lh#ui#check(): Unkonwn user-interface style (".o.")"
   endif
+endfunction
+
+" Function: lh#ui#ask(message) {{{3
+function! lh#ui#ask(message) abort
+  redraw! " clear the msg line
+  echohl StatusLineNC
+  echo "\r".a:message
+  echohl None
+  let key = nr2char(getchar())
+  return key
+endfunction
+
+" Function: lh#ui#confirm_command(command) {{{3
+" states:
+" - ask
+" - ignore
+" - always
+function! s:check() dict abort
+  if     self.state == 'ignore'
+    return
+  elseif self.state == 'always'
+    let shall_execute_command = 1
+  elseif self.state == 'ask'
+    try
+      let cleanup = lh#on#exit()
+            \.restore('&cursorline')
+            \.restore_highlight('CursorLine')
+      set cursorline
+      hi CursorLine   cterm=NONE ctermbg=black ctermfg=white guibg=black guifg=white
+      let choice = lh#ui#ask(self.message)
+      if     choice == 'q'
+        let self.state = 'ignore'
+        let shall_execute_command = 0
+        " TODO: find how not to blink
+        redraw! " clear the msg line
+      elseif choice == 'a'
+        let self.state = 'always'
+        let shall_execute_command = 1
+        " TODO: find how not to blink
+        redraw! " clear the msg line
+      elseif choice == 'y'
+        " leave state as 'ask'
+        let shall_execute_command = 1
+      elseif choice == 'n'
+        " leave state as 'ask'
+        let shall_execute_command = 0
+      elseif choice == 'l'
+        let shall_execute_command = 1
+        let self.state = 'ignore'
+      endif
+    finally
+      call cleanup.finalize()
+    endtry
+  endif
+
+  if shall_execute_command
+    execute self.command
+  endif
+endfunction
+
+function! s:getSID() abort
+  return eval(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_getSID$'))
+endfunction
+let s:k_script_name      = s:getSID()
+
+function! lh#ui#make_confirm_command(command, message) abort
+  let res = lh#object#make_top_type(
+        \ { 'state': 'ask'
+        \ , 'command': a:command
+        \ , 'message': a:message . ' (y/n/a/q/l/^E/^Y)'
+        \ })
+  call lh#object#inject_methods(res, s:k_script_name, 'check')
+  return res
+endfunction
+
+" Function: lh#ui#global_confirm_command(pattern, command, message [, sep='/']) {{{3
+" Exemple: to remove lines that match a pattern:
+" > call lh#ui#global_confirm_command(pattern, 'd', 'delete line?')
+function! lh#ui#global_confirm_command(pattern, command, message, ...) abort
+  let cmd = lh#ui#make_confirm_command(a:command, a:message)
+  let sep = get(a:, 1, '/')
+  exe 'g'.sep.a:pattern.sep.'call cmd.check()'
+endfunction
+
+" Function: lh#ui#_confirm_global(param) {{{3
+function! lh#ui#_confirm_global(param) abort
+  let sep = a:param[0]
+  let parts = split(a:param, sep)
+  if len(parts) < 2
+    throw "Not enough arguments to `ConfirmGlobal`!"
+  endif
+  let cmd = join(parts[1:])
+  call lh#ui#global_confirm_command(parts[0], cmd, cmd . ' on line?', sep)
 endfunction
 
 "------------------------------------------------------------------------

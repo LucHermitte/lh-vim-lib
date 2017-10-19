@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
 " Version:	4.0.0
 " Created:	27th Apr 2010
-" Last Update:	28th Feb 2017
+" Last Update:	19th Oct 2017
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -15,7 +15,7 @@
 " Installation:
 "       Drop the file into {rtp}/plugin
 " History:
-"       v4.0.0   New commands: :StopBGExecution :Jobs, :JobUnpause
+"       v4.0.0   New commands: :StopBGExecution :Jobs, :JobUnpause, ConfirmGlobal
 "       v3.8.2,3 New command: :LHLog
 "       v3.1.12  New command: :CleanEmptyBuffers
 "       v3.1.6   New command: :LoadedBufDo
@@ -51,6 +51,8 @@ command! -nargs=0 JobUnpause call lh#async#_unpause_jobs()
 command! -nargs=1
       \ -complete=customlist,lh#async#_complete_job_names
       \ StopBGExecution call lh#async#stop(<q-args>)
+
+command! -nargs=1 ConfirmGlobal call lh#ui#_confirm_global('<args>')
 
 "------------------------------------------------------------------------
 " ## Options {{{1
