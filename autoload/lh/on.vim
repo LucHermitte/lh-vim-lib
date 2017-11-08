@@ -7,7 +7,7 @@
 " Version:      4.00.0.
 let s:k_version = 4000
 " Created:      15th Jan 2015
-" Last Update:  19th Oct 2017
+" Last Update:  08th Nov 2017
 "------------------------------------------------------------------------
 " Description:
 "
@@ -98,10 +98,15 @@ function! s:restore(varname, ...) dict abort " {{{4
     let clean = call('lh#function#bind', args)
     let self.actions += [clean]
   else
+    let varname = a:varname
+
     " unlet is always required in case the type changes
-    let self.actions += ['call lh#on#_unlet('.string(a:varname).')']
-    if a:varname =~ '[~@]' || exists(a:varname)
-      let action = 'let '.a:varname.'='.string(eval(a:varname))
+    let self.actions += ['call lh#on#_unlet('.string(varname).')']
+    if lh#option#is_set_locally(varname)
+      let varname = '&l:'.varname[1:]
+    endif
+    if varname =~ '[~@]' || exists(varname)
+      let action = 'let '.varname.'='.string(eval(varname))
       let self.actions += [action]
     endif
   endif

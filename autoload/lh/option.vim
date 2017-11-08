@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  23rd Aug 2017
+" Last Update:  08th Nov 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -265,6 +265,23 @@ endfunction
 function! lh#option#exists_in_buf(bufid, varname) abort
   let bufvars = getbufvar(a:bufid, '')
   return has_key(bufvars, a:varname)
+endfunction
+
+" Function: lh#option#is_set_locally(option_name, [bufid='%']) {{{3
+" @return whether a vim option is already set locally, which requires to use
+" `let &l:`  or `setlocal`
+let s:k_option_fullname = {
+      \ 'isk': 'iskeyword'
+      \ }
+function! lh#option#is_set_locally(option_name, ...) abort
+  let bufid = get(a:, 1, '%')
+  if a:option_name =~ '^&\(\([lg]:\)\@!.\)*$'
+    " options with no explicit scope
+    if has_key(getbufvar(bufid, '&'), get(s:k_option_fullname, a:option_name[1:], a:option_name[1:]))
+      return 1
+    endif
+  endif
+  return 0
 endfunction
 
 " Function: lh#option#getbufvar(expr, name [, default])            {{{3
