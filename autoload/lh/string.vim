@@ -7,7 +7,7 @@
 " Version:      4.0.0.
 let s:k_version = '4000'
 " Created:      08th Dec 2015
-" Last Update:  06th Apr 2017
+" Last Update:  09th Nov 2017
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -80,8 +80,8 @@ endfunction
 " Back port |matchstrpos()| to older versions of vim
 " @version 4.0.0
 if exists('*matchstrpos')
-  function! lh#string#matchstrpos(expr, pattern) abort
-    return matchstrpos(a:expr, a:pattern)
+  function! lh#string#matchstrpos(expr, pattern, ...) abort
+    return call('matchstrpos', [a:expr, a:pattern] + a:000)
   endfunction
 else
   function! lh#string#matchstrpos(expr, pattern, ...) abort
