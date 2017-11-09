@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  08th Nov 2017
+" Last Update:  09th Nov 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -277,7 +277,12 @@ function! lh#option#is_set_locally(option_name, ...) abort
   let bufid = get(a:, 1, '%')
   if a:option_name =~ '^&\(\([lg]:\)\@!.\)*$'
     " options with no explicit scope
-    if has_key(getbufvar(bufid, '&'), get(s:k_option_fullname, a:option_name[1:], a:option_name[1:]))
+    let options = getbufvar(bufid, '&')
+    " Before 7.4.434, getbufvar() returns an empty string instead of an
+    " empty dict when nothing is found
+    " Also, older version of vim don't return local options with
+    " getbufvar(bid, '&')
+    if !empty(options) && has_key(options, get(s:k_option_fullname, a:option_name[1:], a:option_name[1:]))
       return 1
     endif
   endif
