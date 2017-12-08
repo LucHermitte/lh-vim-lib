@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      05th Oct 2009
-" Last Update:  22nd Aug 2017
+" Last Update:  08th Dec 2017
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -50,7 +50,7 @@ endfunction
 " ## Exported functions {{{1
 
 " Function: lh#ft#option#get(name, filetype[, default [, scope]])  {{{2
-" @return which ever exists first among: b:{ft}_{name}, or g:{ft}_{name}, or
+" @return which ever exists first among: b:{name}_{ft}, or g:{name}_{ft}, or
 " b:{name}, or g:{name}. {default} is returned if none exists.
 " @note filetype inheritance is supported.
 " The order of the scopes for the variables checked can be specified through
@@ -72,8 +72,8 @@ function! lh#ft#option#get(name, ft,...) abort
   return a:0 > 0 ? a:1 : s:k_unset
 endfunction
 
-" Function: lh#ft#option#get_postfixed(name, filetype, default [, scope])  {{{2
-" @return which ever exists first among: b:{ft}_{name}, or g:{ft}_{name}, or
+" Function: lh#ft#option#get_postfixed(name, filetype, [default [, scope]])  {{{2
+" @return which ever exists first among: b:{name}_{ft}, or g:{name}_{ft}, or
 " b:{name}, or g:{name}. {default} is returned if none exists.
 " @note filetype inheritance is supported.
 " The order of the scopes for the variables checked can be specified through
@@ -85,7 +85,7 @@ function! lh#ft#option#get_postfixed(name, ft,...) abort
   let scope = (a:0 == 2) ? a:2 : 'bpg'
 
   for ft in fts
-    let r = lh#option#get(ft.a:name, s:k_unset, scope)
+    let r = lh#option#get(a:name.ft, s:k_unset, scope)
     if lh#option#is_set(r)
       return r
     endif
