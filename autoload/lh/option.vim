@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      24th Jul 2004
-" Last Update:  09th Nov 2017
+" Last Update:  08th Dec 2017
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -343,7 +343,7 @@ endif
 " Function: lh#option#add(name, values)                       {{{3
 " Add fields to a vim option.
 " @param values list of values to add
-" @example let lh#option#add('l:tags', ['.tags'])
+" @example call lh#option#add('l:tags', ['.tags'])
 function! lh#option#add(name,values)
   let values = type(a:values) == type([])
         \ ? copy(a:values)

@@ -97,7 +97,7 @@ endfunction
 " Function: lh#ft#option#get_all(varname [, ft]) {{{2
 " Unlike lh#ft#option#get(), this time, we gather every possible value, but
 " keeping the most specialized value
-" This only works to gather disctionaries scatered in many specialized
+" This only works to gather dictionaries scatered in many specialized
 " variables.
 function! lh#ft#option#get_all(varname, ...) abort
   let ft = get(a:, '1', &ft)

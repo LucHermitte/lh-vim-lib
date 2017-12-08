@@ -1071,7 +1071,7 @@ This function will permit to test whether an option is set or not: >
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#ft#option#get()*              {{{3
-lh#ft#option#get({name}, {ft}, {default} [,{scopes}])~
+lh#ft#option#get({name}, {ft}[, {default} [,{scopes}]])~
 @return which ever exists first among: b:{ft}_{name}, or p:{ft}_{name}, or
 g:{ft}_{name}, or b:{name}, or p:{name}, or g:{name}. {default} is returned
 if none exists.

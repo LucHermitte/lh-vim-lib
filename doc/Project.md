@@ -106,11 +106,14 @@ comes into play.
 
 # 2. Rationale
 
-Vim support various means to define options.
+Vim supports various means to define options.
  * First there are vim options that are used to tune how Vim behaves in various
-   situations. They are set with `:set`. Some are global, other are local to
-   buffers. In this later case we usually choose their value either on a
-   filetype basis, or a project basis.
+   situations. They are set with
+   [`:set`](http://vimhelp.appspot.com/options.txt.html#%3aset). Some are
+   global, other are
+   [local to buffers](http://vimhelp.appspot.com/options.txt.html#local%2doptions).
+   In this later case we usually choose their value either on a filetype basis,
+   or a project basis.
  * Then there are plugin options. Again, they can be `g:`lobal,
    `b:`uffer-local, or even `w:`indow or `t:`ab local. In lh-vim-lib I provide
    `lh#option#get()` to obtain in a simple call the most specialized value of
