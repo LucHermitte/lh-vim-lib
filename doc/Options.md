@@ -1,5 +1,34 @@
 # Option management
 
+  * [Rationale](#rationale)
+  * [Option API](#option-api)
+    * [Design concepts](#design-concepts)
+      * [_unset_ state](#_unset_-state)
+      * [Variable scopes](#variable-scopes)
+      * [Project options](#project-options)
+      * [Inherited filetypes](#inherited-filetypes)
+      * [Dictionary options](#dictionary-options)
+    * [Function list](#function-list)
+      * [Vim option API](#vim-option-api)
+         * [`lh#option#add({name}, {values...})`](#lhoptionaddname-values)
+      * [(filetype independent) option API](#filetype-independent-option-api)
+         * [`lh#option#get({name} [,{default} [, {scope}]])`](#lhoptiongetname-default-scope)
+         * [`lh#option#get_non_empty({name} [,{default} [, {scope}]])`](#lhoptionget_non_emptyname-default-scope)
+         * [`lh#option#get_from_buf({bufid}, {name} [,{default} [, {scope}]])`](#lhoptionget_from_bufbufid-name-default-scope)
+         * [`lh#option#getbufvar({buf}, {varname} [,{default}])`](#lhoptiongetbufvarbuf-varname-default)
+         * [`lh#option#getbufglobvar({buf}, {varname} [,{default}])`](#lhoptiongetbufglobvarbuf-varname-default)
+      * [Filetype-option API](#filetype-option-api)
+         * [`lh#ft#option#get({name}, {ft} [, {default} [, {scope}]] )`](#lhftoptiongetname-ft-default-scope-)
+         * [`lh#ft#option#get_postfixed({name}, {ft} [, {default} [, {scope}]])`](#lhftoptionget_postfixedname-ft-default-scope)
+         * [`lh#ft#option#get_all({name} [, {ft}])`](#lhftoptionget_allname-ft)
+      * [_unset_ state API](#_unset_-state-api)
+         * [`lh#option#is_set({expr})`](#lhoptionis_setexpr)
+         * [`lh#option#is_unset({expr})`](#lhoptionis_unsetexpr)
+         * [`lh#option#unset([{textual context}])`](#lhoptionunsettextual-context)
+  * [Note on how options could be set](#note-on-how-options-could-be-set)
+    * [Global options](#global-options)
+    * [Local options](#local-options)
+
 ## Rationale
 
 There exist two kinds of options in Vim.
@@ -28,16 +57,16 @@ call s:use(g:my_option)
 ```
 
 Alas sometimes, we need to use an option that can be specific to the current
-project (and/or to the current filetype). Typical examples are which naming
+project (and/or to the current filetype). Typical examples are: which naming
 convention should be applied, where the compilation shall happen for the
 current project, where project specific snippets are stored, and so on.
 
 This means that technically, again, options can be `g:`lobal, `b:`uffer-local,
 or even `w:`indow or `t:`ab local.
 
-In those cases, we have no choice but to fetch the option at the last moment.
-Indeed, we cannot store the value of the option when the plugin starts and
-expect it to remain valid in a buffer not yet opened.
+In those later cases, we have no choice but to fetch the option at the last
+moment.  Indeed, we cannot store the value of the option when the plugin starts
+and expect it to remain valid in a buffer not yet opened.
 Instead, first we'd check if there is a window-local option, then a
 buffer-local option, then a tab-local option... and eventually a global option.
 
@@ -73,8 +102,9 @@ By default, `{scope}` is considered to be `"bpg"`.
 This means, that `lh#option#get('my.option')` will search in order for an
 option named either `b:my.option`, or `p:my.option`, or finally `g:my_option`.
 
-If you wish to check `w:my.option` or `t:my.option`, then pass for instance
-`"wbptg"` to `{scope}` parameter.
+This means we can specify the scopes, and the order, in which a variable are
+searched. For instance, If you wish to also check `w:my.option` or
+`t:my.option`, then pass for instance `"wbptg"` to `{scope}` parameter.
 
 **Note:** As a personal convention, when I document an option, I prefix its
 name with the list of admissible scopes. IOW, you'll see `(bpg):my.option`, or
@@ -110,7 +140,7 @@ TBC
 
 #### Vim option API
 ##### `lh#option#add({name}, {values...})`
-Adds new values to a vim list-option -- and avoids the values from being listed more than once.
+Adds new values to a vim list-option -- and prevent the values from being listed more than once.
 
 Example:
 
@@ -118,17 +148,73 @@ Example:
 call lh#option#add('l:tags', '.tags')
 " or
 call lh#option#add('l:tags', ['.tags'])
-" which is equivalent to
+
+" which are equivalent to
 setlocal tags+=.tags
 ```
 
-This function becomes interesting to use variables and avoid stuff like
+This function becomes interesting to use variables and avoid more complex code like:
 
 ```vim
 exe 'setlocal tags+='.fnameescape(some_path.'/tags')
 ```
 
+#### (filetype independent) option API
+##### `lh#option#get({name} [,{default} [, {scope}]])`
+Fetches the value of a user defined option, that may be _empty_.
+
+**Parameters:**
+ * `{name}` option (root) name
+ * `{default}` default value for the option if not found -- default: `lh#option#unset()`
+ * [`{scope}`](#variable-scopes) scopes in which the option name shall be searched -- default: `"bpg"`
+
+**See also:**
+- `lh#option#get_non_empty()`
+- `lh#option#get_from_buf()`
+- `lh#ft#option#get()`
+- `lh#ft#option#get_postfixed()`
+- `lh#ft#option#get_all()`
+
+##### `lh#option#get_non_empty({name} [,{default} [, {scope}]])`
+Fetches the value of a user defined option, that is **not** _empty_.
+
+IOW, returns of `b:{name}`, `g:{name}`, or `{default}` the first which exists and is not empty.
+
+**Parameters:**
+ * `{name}` option (root) name
+ * `{default}` default value for the option if not found -- default: `lh#option#unset()`
+ * [`{scope}`](#variable-scopes) scopes in which the option name shall be searched -- default: `"bpg"`
+
+**See also:**
+- `lh#option#get_non_empty()`
+- `lh#option#get_from_buf()`
+
+##### `lh#option#get_from_buf({bufid}, {name} [,{default} [, {scope}]])`
+Same as `lh#option#get()` except that it works from `{bufid}` context.
+
+**Parameters:**
+ * `{bufid}` buffer identifier to use to search for `b:{name}`
+ * `{name}` option (root) name
+ * `{default}` default value for the option if not found -- default: `lh#option#unset()`
+ * [`{scope}`](#variable-scopes) scopes in which the option name shall be searched -- default: `"bpg"`
+
+**See also:**
+- `lh#option#get()`
+- `lh#option#get_non_empty()`
+
+##### `lh#option#getbufvar({buf}, {varname} [,{default}])`
+Encapsulates `getbufvar(buf, varname, lh#option#unset())` when `{default}` is not passed. This provides [`getbufvar()`](http://vimhelp.appspot.com/eval.txt.html#getbufvar%28%29) on older versions of vim.
+
+##### `lh#option#getbufglobvar({buf}, {varname} [,{default}])`
+Encapsulates `getbufvar(buf, varname, get(g:, varname, lh#option#unset()))`.
+
 #### Filetype-option API
+These functions relate to options that can also be specialised on a filetype
+basis.
+
+[Filetype inheritance](#filetype-inheritance) is supported in all these
+functions.
+
 ##### `lh#ft#option#get({name}, {ft} [, {default} [, {scope}]] )`
 Fetches the value of a user defined option that can be specialized on a filetype basis
 
@@ -136,12 +222,14 @@ Returns which ever exists first among: `b:{name}_{ft}`, or `p:{name}_{ft}`, or
 `g:{name}_{ft}`, or `b:{name}`, or `p:{name}`, or `g:{name}`. `{default}` is
 returned if none exists.
 
-The scopes, and their order, for the variables checked can be specified through
-the optional argument `{scope}`.
+**Parameters:**
+ * `{name}` option (root) name
+ * `{ft}` filetype for which the option name shall be searched -- usual value: `&ft`
+ * `{default}` default value for the option if not found -- default: `lh#option#unset()`
+ * [`{scope}`](#variable-scopes) scopes in which the option name shall be searched -- default: `"bpg"`
 
-Note: [filetype inheritance](#filetype-inheritance) is supported.
-
-See also:
+**See also:**
+- `lh#option#get()`
 - `lh#ft#option#get_postfixed()`
 - `lh#ft#option#get_all()`
 
@@ -153,7 +241,17 @@ option names searched: returns which ever exists first among: `b:{name}_{ft},`
 or `g:{name}_{ft}`, or `b:{name}`, or `g:{name}`. `{default}` is returned if
 none exists.
 
-##### `lh#ft#option#get_all({name} [, {ft}...])`
+**Parameters:**
+ * `{name}` option (root) name
+ * `{ft}` filetype for which the option name shall be searched -- usual value: `&ft`
+ * `{default}` default value for the option if not found -- default: `lh#option#unset()`
+ * [`{scope}`](#variable-scopes) scopes in which the option name shall be searched -- default: `"bpg"`
+
+**See also:**
+- `lh#ft#option#get()`
+- `lh#ft#option#get_all()`
+
+##### `lh#ft#option#get_all({name} [, {ft}])`
 Fetches the merged values of a dictionary that can be specialized on a filetype basis.
 
 Unlike `lh#ft#option#get()`, this time, we gather every possible value, but
@@ -167,38 +265,44 @@ keeping the most specialized value when there are.
 Possible variable names: `b:{ft}_{name}`, or `p:{ft}_{name}`, or `g:{ft}_{name}`, or
 `b:{name}`, or `p:{name}`, or `g:{name}`.
 
-TODO: Example:
+**Parameters:**
+ * `{name}` option (root) name
+ * `{ft}` filetype for which the option name shall be searched -- default value: `&ft`
 
-Note: [filetype inheritance](#filetype-inheritance) is supported.
+**Example:**
+```vim
+Unlet g:foo
+Unlet b:foo
+Unlet g:FT_foo
+Unlet b:FT_foo
+LetTo g:foo.glob        = 'g'
+LetTo g:foo.spe_buff    = 'g'
+LetTo g:foo.spe_gFT     = 'g'
 
-See also:
+LetTo g:FT_foo.gFT      = 'gft'
+LetTo g:FT_foo.spe_gFT  = 'gft'
+LetTo g:FT_foo.spe_bFT  = 'gft'
+
+LetTo b:foo.buff        = 'b'
+LetTo b:foo.spe_buff    = 'b'
+LetTo b:foo.spe_bFT     = 'b'
+
+LetTo b:FT_foo.bFT      = 'bft'
+LetTo b:FT_foo.spe_bFT  = 'bft'
+
+let d = lh#ft#option#get_all('foo', 'FT')
+AssertEquals(d.glob,     'g')
+AssertEquals(d.buff,     'b')
+AssertEquals(d.spe_buff, 'b')
+AssertEquals(d.gFT,      'gft')
+AssertEquals(d.spe_gFT,  'gft')
+AssertEquals(d.bFT,      'bft')
+AssertEquals(d.spe_bFT,  'bft')
+```
+
+**See also:**
 - `lh#ft#option#get()`
-
-#### (filetype independent) option API
-##### `lh#option#get({name} [,{default} [, {scope}]])`
-Fetches the value of a user defined option, that may be _empty_.
-
-Parameters:
-- `{default}` is returned if the option does not exists. Default value for `{default}` is `g:lh#option#unset`
-- `{scope}` specifies which scopes shall be tested. By default, `{scope}`
-  values `"bpg"`. TODO: See concept-scope
-
-##### `lh#option#get_non_empty()`
-Fetches the value of a user defined option, that is not _empty_
-
-IOW, returns of `b:{name}`, `g:{name}`, or `{default}` the first which exists and is not empty.
-
-The order of the variables checked can be specified through the optional
-argument `{scope}`.
-
-##### `lh#option#get_from_buf({bufid}, {name} [...])`
-Same as `lh#option#get()` except that it works from `{bufid}` context.
-
-##### `lh#option#getbufvar({buf}, {varname} [,{default}])`
-Encapsulates `getbufvar(buf, varname, g:lh#option#unset)` when `{default}` is not passed. This provides `getbufvar()` on older versions of vim.
-
-##### `lh#option#getbufglobvar({buf}, {varname} [,{default}])`
-Encapsulates `getbufvar(buf, varname, get(g:, varname, g:lh#option#unset))`.
+- `lh#ft#option#get_all()`
 
 #### _unset_ state API
 ##### `lh#option#is_set({expr})`
@@ -212,11 +316,11 @@ Tells whether the expression is not set (i.e. identical to
 Returns an [object](OO.md) that is interpreted as _unset_ by
 `lh#option#is_set()` and `lh#option#is_unset()`.
 
-Parameter:
-* {textual context} Optional message that can report more information about the
+**Parameter:**
+* `{textual context}` Optional message that can report more information about the
   nature of the unset option.
 
-Example:
+**Example:**
 
 ```vim
 :echo lh#object#to_string(lh#option#unset())
@@ -226,10 +330,68 @@ Example:
 {(No known extension associated to xxx filetype)}
 ```
 
-## Notes
-I haven't the question regarding where option could be set.
+## Note on how options could be set
+So far I haven't addressed the question regarding where options could be set
+depending on their scope.
 
-TBC.
-TODO: Sometimes, they can even be specialized for buffers/projects and/or
-filetypes.
+The answer depends on the scope of the option we wish to define.
+
+### Global options
+A global option is best initialized in a script that is loaded once. Afterward,
+it could be changed globally for every buffer on user actions.
+
+The best place to initialize a variable once is quite certainly the
+[`.vimrc`](http://vimhelp.appspot.com/starting.txt.html#%2evimrc).
+
+Sometimes, we use a plugin that uses global variables to tune a behaviour that
+should have been project specific. That's for instance the case of
+alternate.vim which uses `g:alternateSearchPath` to indicate where to find a
+header file from an implementation file and the other way around. That option
+should be specific to each project, and yet, it's a global one. In those cases,
+we could use the _always loaded_ section of
+[local_vimrcs](https://github.com/LucHermitte/local_vimrc) to change the value
+of the option every time we enter a different buffer.
+
+That's a classic workaround with plugins which aren't project-aware as they
+should have been.
+
+### Local options
+When plugins do use options that can be specialized for each buffer (filetype
+and/or project specific options), we should not set those options in scripts
+which will initialize them in only one single buffer.
+
+Indeed, if you set `b:my.option` in your `.vimrc`, it will be set only for the
+buffer opened along with Vim. The option won't be known in buffers
+opened/created later. It's the same with
+[plugin scripts](http://vimhelp.appspot.com/usr_05.txt.html#plugin).
+At best a buffer-related
+[autocommand](http://vimhelp.appspot.com/autocmd.txt.html#autocommand) could be
+defined in a `.vimrc` or in a plugin script, and that autocommand will
+eventually modify/set a buffer-local variable or a buffer-local vim-option.
+
+Local options are thus best initialized from buffer-related autocommands. We
+could hard-code these autocommands manually, we could or rely on plugins or on
+core features that does this transparently. That is to say:
+ * From a [filetype-plugin script](http://vimhelp.appspot.com/usr_43.txt.html#filetype%2dplugin),
+ we can initialize local options based on the ... current filetype.
+ * From a [local_vimrc](https://github.com/LucHermitte/local_vimrc),
+ we can initialize local options based on the ... current directory. The
+ semantics we associate to a directory is usually: _"what's within belong to a
+ same project"_.
+ * From a [`.editorconfig` file given lh-vim-lib hook is used](#3113-from-your-editorconfig-file),
+ we can initialize local options based on the current directory and on the
+ current file extension.
+ * From an [extended let-modeline](https://github.com/LucHermitte/lh-misc/blob/master/plugin/let-modeline.vim),
+ we can define a local variable also -- but as modelines, this doesn't scale
+ much.
+ * _project_ and _projectionist_ plugins provides other ways to achieve a
+   similar result.
+
+
+And of course, we can change local variables manually. But beware, changing a
+buffer-local variable in a buffer won't change its value in other buffers, even
+if they are meant to belong to a same project. However, when we change manually
+a [`p:`roject variable](Project.md) in a buffer, the change will be replicated
+to all other buffers belonging to the same project, whether they are already
+opened or they'll be opened later on.
 
