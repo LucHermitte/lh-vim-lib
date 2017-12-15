@@ -12,14 +12,14 @@
       * [Vim option API](#vim-option-api)
          * [`lh#option#add({name}, {values...})`](#lhoptionaddname-values)
       * [(filetype independent) option API](#filetype-independent-option-api)
-         * [`lh#option#get({name} [,{default} [, {scope}]])`](#lhoptiongetname-default-scope)
-         * [`lh#option#get_non_empty({name} [,{default} [, {scope}]])`](#lhoptionget_non_emptyname-default-scope)
-         * [`lh#option#get_from_buf({bufid}, {name} [,{default} [, {scope}]])`](#lhoptionget_from_bufbufid-name-default-scope)
+         * [`lh#option#get({name} [,{default} [, {scope}]])`](#lhoptiongetname-default--scope)
+         * [`lh#option#get_non_empty({name} [,{default} [, {scope}]])`](#lhoptionget_non_emptyname-default--scope)
+         * [`lh#option#get_from_buf({bufid}, {name} [,{default} [, {scope}]])`](#lhoptionget_from_bufbufid-name-default--scope)
          * [`lh#option#getbufvar({buf}, {varname} [,{default}])`](#lhoptiongetbufvarbuf-varname-default)
          * [`lh#option#getbufglobvar({buf}, {varname} [,{default}])`](#lhoptiongetbufglobvarbuf-varname-default)
       * [Filetype-option API](#filetype-option-api)
-         * [`lh#ft#option#get({name}, {ft} [, {default} [, {scope}]] )`](#lhftoptiongetname-ft-default-scope-)
-         * [`lh#ft#option#get_postfixed({name}, {ft} [, {default} [, {scope}]])`](#lhftoptionget_postfixedname-ft-default-scope)
+         * [`lh#ft#option#get({name}, {ft} [, {default} [, {scope}]])`](#lhftoptiongetname-ft-default--scope)
+         * [`lh#ft#option#get_postfixed({name}, {ft} [, {default} [, {scope}]])`](#lhftoptionget_postfixedname-ft-default--scope)
          * [`lh#ft#option#get_all({name} [, {ft}])`](#lhftoptionget_allname-ft)
       * [_unset_ state API](#_unset_-state-api)
          * [`lh#option#is_set({expr})`](#lhoptionis_setexpr)
@@ -239,7 +239,7 @@ basis.
 [Filetype inheritance](#inherited-filetypes) is supported in all these
 functions.
 
-##### `lh#ft#option#get({name}, {ft} [, {default} [, {scope}]] )`
+##### `lh#ft#option#get({name}, {ft} [, {default} [, {scope}]])`
 Fetches the value of a user defined option that can be specialized on a filetype basis
 
 Returns which ever exists first among: `b:{name}_{ft}`, or `p:{name}_{ft}`, or
