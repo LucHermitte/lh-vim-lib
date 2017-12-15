@@ -19,7 +19,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 
 ## Functions
 
-  * [Option management](doc/Option.md) -- other web page
+  * [Option management](doc/Options.md) -- other web page
   * [Miscellaneous functions](#miscellaneous-functions)
   * [System related functions](#system-related-functions)
   * [Lists and dictionaries related functions](#lists-and-dictionaries-related-functions)
