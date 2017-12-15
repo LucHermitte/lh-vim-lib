@@ -64,7 +64,7 @@ current project?"_, _"where project specific snippets are stored?"_, and so on.
 This means that technically, again, options can be either `g:`lobal, or `b:`uffer-local,
 or even `w:`indow-local or `t:`ab-local.
 
-In those later cases, we have no choice but to fetch the option at the last
+In those later cases, we have no choice but to fetch the option in the last
 moment.  Indeed, we cannot store the value of the option when the plugin starts
 and expect it to remain valid in a buffer not yet opened.
 Instead, first we'd check if there is a window-local option, then a
@@ -104,9 +104,9 @@ This means, that `lh#option#get('my.option')` will search in order for an
 option named either `b:my.option`, or `p:my.option`, or at the last resort
 `g:my_option`.
 
-This means we can specify the scopes, and the order, in which a variable are
+This means we can specify the scopes, and the order, in which a variable is
 searched.  For instance, If you wish to also check `w:my.option` or
-`t:my.option`, then pass for instance `"wbptg"` to `{scope}` parameter.
+`t:my.option`, then pass for instance `"wbptg"` to the `{scope}` parameter.
 
 **Notes:**
  * In Vim documentation, what I call _scope_ is named
@@ -126,11 +126,11 @@ feature in the related [help page](Project.md).
 
 #### Inherited filetypes
 Some the options available though lh-vim-lib and its _ft-option_ API
-(`lh#ft#*()`) can be specialized for each filetype. Doing so for every filetype
-would quickly become cumbersome when these filetypes have a lot in common like
-for instance C and C++. Instead of copying all `(bpg):c_some.options` into
-`(bpg):cpp_some.options`, it's more interesting to say that
-`(bpg):c_some.options` are valid in C++ context.
+(`lh#ft#option#*()`) can be specialized for each filetype. Doing so for every
+filetype would quickly become cumbersome when these filetypes have a lot in
+common like for instance C and C++. Instead of copying all
+`(bpg):c_some.options` into `(bpg):cpp_some.options`, it's more interesting to
+say that `(bpg):c_some.options` are valid in C++ contexts.
 
 As a consequence, to simplify options tuning, `lh#ft#option#*()` functions support
 filetype inheritance.
@@ -370,7 +370,7 @@ The best place to initialize a variable once is quite certainly the
 Sometimes, we use a plugin that uses global variables to tune a behaviour that
 should have been project specific. That's for instance the case of
 alternate.vim which uses `g:alternateSearchPath` to indicate where to find a
-header file from an implementation file and the other way around. That option
+header file given an implementation file and the other way around. That option
 should be specific to each project, and yet, it's a global one. In those cases,
 we could use the _always loaded_ section of
 [local_vimrcs](https://github.com/LucHermitte/local_vimrc) to change the value
