@@ -71,8 +71,8 @@ very big project. We may even imagine subprojects within a hierarchy.
 
 In the end, what really defines a programming project is a (leaf) "makefile" --
 and BTW, why restrict ourselves to makefiles, what about scons, autotools, ant,
-(b)jam, aap? Also, Sun-Makefiles or GNU-Makefiles?
-Other project will be recognized by the `.git/` directory at their root, and
+(b)jam, Rakefile? Also, Sun-Makefiles or GNU-Makefiles?
+Other projects will be recognized by the `.git/` directory at their root, and
 they won't have anything to do with programming.
 
 It's important to notice that what distinguishes two projects is not the type
@@ -101,8 +101,8 @@ options, when available.
 
 The finest possible option for a given buffer would be first a `b:`uffer local
 variable, then a `p:`roject local variable, a `t:`ab local variable, to finish
-with default settings in `g:`lobal variables. That's where `lh#option#get()`
-comes into play.
+with default settings in `g:`lobal variables. That's where
+[`lh#option#get()`](Options.md#lhoptiongetname-default--scope) comes into play.
 
 # 2. Rationale
 
@@ -116,11 +116,10 @@ Vim supports various means to define options.
    or a project basis.
  * Then there are plugin options. Again, they can be `g:`lobal,
    `b:`uffer-local, or even `w:`indow or `t:`ab local. In lh-vim-lib I provide
-   `lh#option#get()` to obtain in a simple call the most specialized value of
-   an option. In
-   [lh-dev](http://github.com/LucHermitte/lh-dev#options-1), I went a little
-   bit further in order to support specialization for buffer and/or filetypes
-   -- now it's available directly in lh-vim-lib (with `lh#ft#option#get()`).
+   [`lh#option#get()`](Options.md#lhoptiongetname-default--scope) to obtain in
+   a simple call the most specialized value of an option.
+   I even went a little bit further in order to support
+   [specialization for buffer and/or filetypes](Options.md#filetype-independent-option-api).
 
 Given the objective to have options that are project specific, it's quite easy
 to achieve it thanks to plugins like
@@ -135,10 +134,10 @@ That works well I've said. Up to a point: a same option could be duplicated
 hundred times: once in each buffer that belongs to a project. As long as we
 don't want to change an option this is fine. But as soon as we want to change a
 setting we have to change it in every opened buffer belonging to the project.
-This is tedious to do correctly: we must have a way to found all buffers that
+This is tedious to do correctly: we must have a way to find all buffers that
 share the same variable. Should we maintain a list of buffers, or jump in every
-buffer (and trigger too many unrequired autocommands), or check buffer
-pathnames against a pattern...?
+buffer (and trigger too many unrequired autocommands if done incorrectly), or
+should we echeck buffer pathnames against a pattern...?
 
 How often does this need arise? Much to often IMO. In
 [BuildToolsWrapper](https://github.com/LucHermitte/vim-build-tools-wrapper/),
@@ -155,8 +154,8 @@ So? Let's have them then!
 
 # 3. Usage:
 
-There are a few use-cases depending on whether you're an end-user who want to
-configure the plugins you use, or whether you're a plugin maintainer who want
+There are a few use-cases depending on whether you're an end-user who wants to
+configure the plugins you use, or whether you're a plugin maintainer who wants
 to have project-aware plugins.
 
 ## 3.1. You're an end-user
@@ -181,11 +180,11 @@ the files from a directory hierarchy as part of a same project are:
    g:lh#project.root_patterns`);
  * You have to set in your `.vimrc`:
 
- ```vim
- LetTo g:lh#project.auto_detect = 1
- " or
- let g:lh#project = { 'auto_detect' : 1 }
- ```
+     ```vim
+     LetTo g:lh#project.auto_detect = 1
+     " or
+     let g:lh#project = { 'auto_detect' : 1 }
+     ```
 
 From there, the project name will be built automatically.
 
@@ -226,11 +225,11 @@ and _project_ options.
 
 In order to use EditorConfig, I expect you have properly installed
 [EditorConfig-vim](https://github.com/editorconfig/editorconfig-vim), and
-registered it **before** lh-vim-lib in your plugin manager.
+registered it in your plugin manager.
 
-Then, you'll be able to maintain a `.editorconfig` file at the root of a
+Then, you'll be able to maintain an `.editorconfig` file at the root of a
 project.  From there, you'll be able to define a _lh-vim-lib project_, and to
-set options through `LetTo` and `LetIfUndef`, but with another (!) dedicated
+set options through `:LetTo` and `:LetIfUndef`, but with another (!) dedicated
 syntax.
 
 ```dosini
@@ -298,10 +297,10 @@ The detection policy will depend on the value of
 
 By default, we reuse `p:paths.sources`. Then, we check whether a parent
 directory contains a [directory related to a versionning system](#3111-automagically)
-(i.e.  `.git/`, `.svn/`...) to use it a root directory. Then we check among
-current list of dirnames used as project root directories to see whether there
+(i.e.  `.git/`, `.svn/`...) to use it as root directory. Then we check among
+the current list of dirnames used as project root directories to see whether there
 is one that matches the pathname of the current file. Then, in doubt, we may
-ask to user to fill in this dirname.
+ask the user to fill in this dirname.
 
 
 This could also be overridden from `lh#project#define()` and `lh#project#new()`
@@ -364,7 +363,7 @@ The environment variable won't be changed globally, but its value will be
 injected on-the-fly with `lh#os#system()`, not w/ `system()` nor `:make`...
 Yet,
 [BuildToolsWrapper](https://github.com/LucHermitte/vim-build-tools-wrapper)
-uses it both in background and in forground compilations.
+uses it both in background and in foreground compilations.
 
 ### 3.1.5. A more complete configuration example will be:
 ```vim
@@ -416,7 +415,7 @@ Project --list
 Project --which
 ```
 
-This'll present the projects the current buffer belongs to directly and
+This'll display the projects the current buffer belongs to, directly and
 indirectly through project inheritance.
 
 #### List buffers associated to a project
@@ -434,7 +433,7 @@ Project :ls
 ```
 
 This time, it'll display the buffers associated to the current project (i.e.
-the one the current buffer belongs to).
+the project the current buffer belongs to).
 
 
 #### Echo a variable associated to a project
@@ -528,7 +527,7 @@ In the case different independent project configurations may co-exist in a
 `_vimrc_local.vim` file, you may need to have several branches, and call
 `lh#project#define()` with a third parameter to distinguish the projects. This
 will permit to store project information in a variable with a name which is not
-from `s:project`. See the
+`s:project`. See the
 [`_local_vimrc` file](https://github.com/LucHermitte/lh-misc/blob/master/_vimrc_local.vim)
 I drop at the root of my `$HOME/.vim/` directory.
 
@@ -546,7 +545,7 @@ Beware, the current buffer will be registered to this project.
 :let prj = lh#project#crt()
 ```
 In case there is no project associated to the current buffer,
-`lh#option#unset()` will be returned.
+[`lh#option#unset()`](Options.md#lhoptionis_unsetexpr) will be returned.
 
 ### 3.2.4. Fetch the name of the current project variable
 This name is the name of the buffer-local variable used to store the project
@@ -559,8 +558,8 @@ In case there is no project associated to the current buffer,
 an exception will be thrown.
 
 This will most likely return `"b:crt_project"`, the exact name depends on
-`g:lh#project#varname` global which can be overridden in your `.vimrc` once and
-for all.
+`g:lh#project#varname` global variable which can be overridden in your `.vimrc`
+once and for all.
 
 ### 3.2.5. Fetch the name under which an option is stored
 ```
@@ -644,9 +643,10 @@ and you want your plugins to be project-aware:
 :let val = lh#option#get('foo.bar.team')
 ```
 
-Note, in order to know whether the option is set, use `lh#option#is_set(val)`
-or `lh#option#is_unset(val)`. When not, you'll may prefer to print its value
-either with lh-vim-lib logging framework
+Note, in order to know whether the option is set, use
+[`lh#option#set(val)`](Options.md#lhoptionis_setexpr) or
+[`lh#option#unset(val)`](Options.md#lhoptionis_unsetexpr). When not, you'll may
+prefer to print its value either with lh-vim-lib logging framework
 
 ```vim
 :echo lh#fmt#printf("%1", val)
@@ -741,8 +741,9 @@ isn't possible.
 
 ## Regarding environment variables
 
-At this point, we cannot unset environment variables. As a consequence, I've
-preferred setting them on-the-fly and locally only when we need to use them.
+At this point, [we cannot unset environment variables](https://github.com/vim/vim/issues/1116).
+As a consequence, I've preferred setting them on-the-fly and locally only when
+we need to use them.
 
 ## Miscellaneous stuff
 
@@ -752,9 +753,10 @@ preferred setting them on-the-fly and locally only when we need to use them.
 
 # 5. Compatible plugins
 
-Most of my plugins, as they use `lh#option#get()`, are already compatible with
-this new _project_ feature. However some final tweaking will be required to
-fully take advantage of option toggling, `p:$ENV` variables
+Most of my plugins, as they use
+[`lh#ft#option#get()`](#lhftoptiongetname-ft--default--scope), are already
+compatible with this new _project_ feature. However some final tweaking will be
+required to fully take advantage of option toggling, `p:$ENV` variables
 ([lh-tags](http://github.com/LucHermitte/lh-tags),
 [lh-dev](http://github.com/LucHermitte/lh-dev)
 , and
@@ -775,7 +777,7 @@ the firsts I've in mind).
       * [ ] lh-dev
       * [ ] µTemplate
       * [ ] Test on windows!
-   * Have let-modeline support p:var, p:&opt, and p:$env
+   * [ ] Have let-modeline support p:var, p:&opt, and p:$env
  * Setlocally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
