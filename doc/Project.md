@@ -754,7 +754,7 @@ we need to use them.
 # 5. Compatible plugins
 
 Most of my plugins, as they use
-[`lh#ft#option#get()`](#lhftoptiongetname-ft--default--scope), are already
+[`lh#ft#option#get()`](Options.md#lhftoptiongetname-ft--default--scope), are already
 compatible with this new _project_ feature. However some final tweaking will be
 required to fully take advantage of option toggling, `p:$ENV` variables
 ([lh-tags](http://github.com/LucHermitte/lh-tags),
