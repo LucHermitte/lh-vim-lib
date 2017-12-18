@@ -176,8 +176,9 @@ belong to a project.
 Most project detections may be done implicitly. The conditions to detect all
 the files from a directory hierarchy as part of a same project are:
 
- * At the root, there is a `.svn/` or a `.git/` directory (mercurial is not
-   supported, yet, nor other versionning systems);
+ * At the root, there is a drectory typical of a versionning system, i.e. a
+   `.svn/`, `.git/`, `.hg/`, `_darcs/`, or `.bzr/` directory (See `:h
+   g:lh#project.root_patterns`);
  * You have to set in your `.vimrc`:
 
  ```vim
@@ -296,10 +297,11 @@ The detection policy will depend on the value of
  - `'in_doubt_improvise`: Uses the file current path a project root.
 
 By default, we reuse `p:paths.sources`. Then, we check whether a parent
-directory contains a directory named `.git/` or `.svn/` to use it a root
-directory. Then we check among current list of dirnames used as project root
-directories to see whether there is one that matches the pathname of the
-current file. Then, in doubt, we may ask to user to fill in this dirname.
+directory contains a [directory related to a versionning system](#3111-automagically)
+(i.e.  `.git/`, `.svn/`...) to use it a root directory. Then we check among
+current list of dirnames used as project root directories to see whether there
+is one that matches the pathname of the current file. Then, in doubt, we may
+ask to user to fill in this dirname.
 
 
 This could also be overridden from `lh#project#define()` and `lh#project#new()`

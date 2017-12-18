@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 19th Oct 2017
+                        For Vim version 7+      Last change: 18th Dec 2017
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4087,6 +4087,18 @@ For instance, they can be overriden in the |.vimrc| with: >
 
 See also |lh#path#new_permission_lists()|, which is used internally to manage
 these lists.
+
+*g:lh#project.root_patterns*
+|List| of file names and of directory names. Whenever one is found from the
+directory of the current |buffer,| we'll use its directory as a base for the
+to deduce the project root directory.
+
+By default the option is initialized with >
+    LetIfUndef g:lh#project.root_patterns = ['.git/', '.svn/', '.hg/', '_darcs/', '.bzr/']
+
+You can use filename patterns, of dirname patterns (ending with a trailing
+slash). In both cases, see |file-searching| for the syntax.
+
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *p:* *project-variable*          {{{3

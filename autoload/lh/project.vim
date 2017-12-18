@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '400'
 " Created:      08th Sep 2016
-" Last Update:  15th Mar 2017
+" Last Update:  18th Dec 2017
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -327,15 +327,13 @@ function! s:FetchPrjDirname() abort " {{{3
     return project_sources_dir
   endif
 
-  " VCS
-  let prj_dirname = lh#vcs#get_git_root()
-  if !empty(prj_dirname)
-    call s:Verbose("s:FetchPrjDirname() -> git: %1 -> %2", prj_dirname, fnamemodify(prj_dirname, ':p:h:h'))
-    return fnamemodify(prj_dirname, ':p:h:h')
-  endif
-  let prj_dirname = lh#vcs#get_svn_root()
-  if !empty(prj_dirname)
-    return fnamemodify(prj_dirname, ':p:h:h')
+  " VCS & co
+  let possible_prj_dirnames = map(copy(g:lh#project.root_patterns), '[v:val, lh#path#find_upward(v:val)]')
+  call filter(possible_prj_dirnames, '!empty(v:val[1])')
+  " TODO: permit to sort result by depth instead of patterns order
+  if !empty(possible_prj_dirnames)
+    call s:Verbose("s:FetchPrjDirname() -> %1 found in %2", possible_prj_dirnames[0][0], possible_prj_dirnames[0][1])
+    return possible_prj_dirnames[0][1]
   endif
 
   " Deduce from current path, previous project paths
@@ -499,6 +497,10 @@ endfunction
 "------------------------------------------------------------------------
 " ## globals {{{1
 " # Public globals {{{2
+" - patterns where to search root directories {{{3
+" Files must be added without a trailing slash
+LetIfUndef g:lh#project.root_patterns = ['.git/', '.svn/', '.hg/', '_darcs/', '.bzr/']
+
 " - blacklists & co for auto_detect_projects {{{3
 LetIfUndef g:lh#project.permissions             {}
 LetIfUndef g:lh#project.permissions.whitelist   []
