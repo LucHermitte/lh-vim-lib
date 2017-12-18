@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 40000
 " Created:      23rd Jan 2007
-" Last Update:  23rd Aug 2017
+" Last Update:  18th Dec 2017
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -542,6 +542,27 @@ function! lh#path#find(paths, regex) abort
   call filter(paths, 'match(v:val, a:regex) != -1')
   let shortest = lh#list#arg_min(paths, function('len'))
   return empty(paths) ? '' : paths[shortest]
+endfunction
+
+" Function: lh#path#find_upward(what, [from=expand('%:p:h')]) {{{3
+function! lh#path#find_upward(what, ...) abort
+  call lh#assert#value(a:what).not().empty()
+  let path = a:0 == 0 ? expand('%:p:h') : a:1
+  call lh#assert#value(path).not().verifies('lh#path#is_distant_or_scratch')
+  if a:what[-1 : ] == '/' " directory name
+    let r = finddir(a:what, path. ';')
+    let mod = ':p:h:h'
+    let node_exist = 'isdirectory'
+  else
+    let r = findfile(a:what, path. ';')
+    let mod = ':p:h'
+    let node_exist = 'filereadable'
+  endif
+  if !empty(r)
+    let r = fnamemodify(r, mod)
+    call lh#assert#value(r.'/'.a:what).verifies(node_exist)
+  endif
+  return r
 endfunction
 
 " Function: lh#path#vimfiles() {{{3

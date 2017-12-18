@@ -173,6 +173,7 @@ Path related functions:                                 |lhvl#path|       {{{2
 - |lh#path#exists()|
 - |lh#path#find()|
 - |lh#path#find_in_parents()|
+- |lh#path#find_upward()|
 - |lh#path#fix()|
 - |lh#path#glob_as_list()|
 - |lh#path#is_absolute_path()|
@@ -2344,6 +2345,31 @@ Internal recursive function used by |local_vimrc|.
 
 @return a |List| of pathname to file and/or directories that match
 {path-patterns} up to {last-valid-path}.
+@see also |lh#path#find_upward()|
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                    *lh#path#find_upward()*            {{{3
+lh#path#find_upward({what} [, {from}])~
+Encapsulates and upward saerch with |finddir()| or |findfile()|. The exact
+function called will depend on the presence of a trailing slash at the end of
+{what}.
+
+@param[in] {what} File or directory searched.
+@param[in] {from} Where the search starts from. Default: directory of the
+                  current file: `expand('%:p:h')`.
+@returns the directory where {what} is found, and an empty string if nothing
+is found.
+
+@pre {what} shall not be empty
+@pre {from} shall not be a distant filename (e.g. `scp://log@host:path/name`)
+nor a scratch filename.
+@see also |lh#path#find_in_parents()|
+
+@example >
+    LetIfUndef g:lh#project.root_patterns = ['.git/', '.svn/', '.hg/', '_darcs/', '.bzr/']
+    let possible_prj_dirnames = map(copy(g:lh#project.root_patterns),
+    \ '[v:val, lh#path#find_upward(v:val)]')
+    call filter(possible_prj_dirnames, '!empty(v:val[1])')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#fix()*                    {{{3

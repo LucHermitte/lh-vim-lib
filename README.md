@@ -225,6 +225,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#exists()`                           | Returns whether a pathname can be read, or if it's open in a buffer                                       |
 | `lh#path#find(pathlist, regex)`              | Returns the first path in a list that matches a regex                                                     |
 | `lh#path#find_in_parents()`                  | Support function at the root of [local_vimrc](http://github.com/LucHermitte/local_vimrc)                  |
+| `lh#path#find_upward()`                      | Uniform interface to `finddir()` and `filefile()`                                                         |
 | `lh#path#fix()`                              | Fixes a pathname in order for it to be compatible with external commands or vim options                   |
 | `lh#path#glob_as_list()`                     | Returns `globpath()`result as a list                                                                      |
 | `lh#path#is_absolute_path()`                 | Tells whether the parameter is an absolute pathname                                                       |
