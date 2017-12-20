@@ -157,8 +157,9 @@ OK. Now, you know how to create objects and use them in vim scripts.
 You're certainly wondering what's the point of documenting this as a part of
 lh-vim-lib.
 
-lh-vim-lib provides a few small services vaguely related to OO programming in
-vim script.
+Well, lh-vim-lib provides a few small services vaguely related to OO
+programming in vim script. There are not _must have_, but they are still quite
+nice to have.
 
 ### Stringification
 Let's say you want to display `my_first_object` state with `:echo
@@ -209,7 +210,7 @@ a `to_string()` method, or override the `_to_string()` method with one to your
 liking. e.g.
 
 ```vim
-function! s:_to__string() dict abort
+function! s:_to_string() dict abort
     return printf('{(internal state is %d: %sthe answer)}',
         \ self.__my_int,
         \ self.does_know_the_answer() ? '' : 'not ')
@@ -227,12 +228,14 @@ let my_first_object.does_know_the_answer = function('s:does_know_the_answer')
 ```
 
 #### Prerequisites for old Vim versions
-It can also be tedious with old versions of vim, which requires the
-`s:getSNR()` trick.
+As you have seen, it can be tedious with old versions of Vim, which requires
+the `s:getSNR()` trick in the previous vanilla examples.
 
-In order to support older versions of vim the _method-injection_ functions
-require either the number (the one returned by `:scriptname`) of the current
-script, or the name of the current script.
+lh-vim-lib helper functions still need a similar trick in order to provide
+_method-injection_ with older versions of Vim.
+
+The helper functions require either the number (returned by `:scriptname`) of
+the current script, or the name of the current script.
 
 IOW, first you'll need:
 
@@ -249,8 +252,8 @@ let s:k_script_name      = expand('<sfile>:p')
 ```
 
 #### `lh#object#inject_methods(object, snr, methodnames...)`
-Method 1: You can inject a bunch of methods that have the same name as script
-local functions:
+Method 1: You can inject a bunch of methods that have the same names as
+script-local functions:
 
 ```vim
 call lh#object#inject_methods(my_first_object, s:k_script_name,
@@ -261,7 +264,7 @@ This can also be used on an existing object to inject methods defined a
 script-local functions.
 
 #### `lh#object#inject(object, method_name, function_name, snr)`
-Method 2: If the method names differ from the script local function names,
+Method 2: If the method names differ from the script-local function names,
 you'll need to use instead:
 
 ```vim
@@ -284,4 +287,4 @@ In order to check whether a dictionary is actually an object built with
 
 ## See Also
 I remember to have seen other vim scripts using objects in their code. They had
-other utility functions, best practices, etc. Alas I can't remember their name.
+other utility functions, best practices, etc. Alas I can't remember their names.
