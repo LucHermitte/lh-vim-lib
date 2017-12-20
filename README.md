@@ -20,6 +20,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 ## Functions
 
   * [Option management](doc/Options.md) -- other web page
+  * [Object Oriented Programming in vim scripts](doc/OO.md) -- other web page
   * [Miscellaneous functions](#miscellaneous-functions)
   * [System related functions](#system-related-functions)
   * [Lists and dictionaries related functions](#lists-and-dictionaries-related-functions)
@@ -91,11 +92,6 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#notify#deprecated()`                       | Notifies somthing is deprecated once                                                                                                                                     |
 | `lh#notify#clear_notifications()`              | Clear previous notification so that could be notified again                                                                                                              |
 | `lh#on#exit()`                                 | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions                                                    |
-| `lh#object#inject()`                           | Injects a new method in an existing object. Meant to simplify maintenance task.                                                                                          |
-| `lh#object#inject_methods()`                   | Injects several methods in an existing object.                                                                                                                           |
-| `lh#object#is_an_object()`                     | Tells whether the parameter is an object built with `lh#object#make_top_type()`                                                                                          |
-| `lh#object#make_top_type()`                    | Creates a new object                                                                                                                                                     |
-| `lh#object#to_string()`                        | Stringifies a data -- hide objects methods                                                                                                                               |
 | `lh#ref#bind(varname)`                         | Returns a reference to another variable. To be evaluated with [`lh#option#get()`](doc/Options.md#lhoptiongetname-default--scope)                                         |
 | `lh#ref#is_bound(var)`                         | Tells whether a variable is bound to another                                                                                                                             |
 | `lh#po#context().translate(msgId)`             | Translates message Id from Portable Object files                                                                                                                         |
