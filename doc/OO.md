@@ -10,8 +10,8 @@ of methods that apply to that data.
 Often we seek to provide a safe capsule around the data, and the data is
 expected to be accessed through a controlled interface/abstraction. The
 interface is defined as a series of exposed methods. These methods are somehow
-the messages the object can handle and respond to. What is important is not the
-data, but the service the object can provide us.
+the messages the object can handle and respond to. Note that what is important
+is not the data, but the service the object can provide us.
 
 ### Dictionaries FTW
 In vim script, the best building block available to define _objects_ is the
@@ -73,14 +73,23 @@ In the previous example I've used an
 [anonymous-function](http://vimhelp.appspot.com/eval.txt.html#anonymous%2dfunction)
 to define object methods.
 
-As a matter of fact I highly advise you against this practice. Anonymous
-functions are a
-[nightmare to debug](https://stackoverflow.com/questions/39862874/how-to-debug-error-while-processing-function-in-vim-and-nvim),
-all we can know about the function is a number and its code (e.g. `function
-343`). We have no way to trace back in which file it has been defined. As a
-consequence, it'll defeat any attempt made at decoding
-[`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint). More
-precisely, it'll defeat my [assertion framework](DbC.md), my
+I know several articles and blog posts promote this technique, but as a matter
+of fact I highly advise you against this practice. Anonymous functions are a
+[nightmare to debug](https://stackoverflow.com/questions/39862874/how-to-debug-error-while-processing-function-in-vim-and-nvim)
+when something goes wrong.
+We can know the function name is a number, we can obtain its code and where
+it has been defined, but only as long as the function still exists -- This can
+be done with `:verbose function {343}`) for instance.
+
+The problem is that if the function belongs only to a single dictionary
+variable, and if that variable has been disposed of by Vim garbage collector,
+then the function reference will also have been disposed of. As a consequence,
+`:verbose function {343}` would end up in a `E123: Undefined function: 343`
+error message.
+
+As a consequence, it'll defeat any attempt made at decoding
+[`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint). In
+particular, it'll defeat my [assertion framework](DbC.md), my
 [unit-testing framework](https://github.com/LucHermitte/vim-UT), and tricks
 like [`:WTF`](../autoload/lh/exception.vim#179) (TODO: document this feature
 elsewhere).
@@ -90,7 +99,8 @@ Also, when an object has been created with an anonymous function, reloading the
 script where the function is defined won't necessarily update the definition of
 the function in the object.
 
-So, instead, use external script functions. The previous example thus becomes:
+So, instead, use external script functions flagged with the `dict` annotation.
+The previous example thus becomes:
 
 ```vim
 function! s:next() dict abort
@@ -125,7 +135,7 @@ let my_first_object.does_know_the_answer = function(s:getSNR('does_know_the_answ
 In order to avoid scattering object creation all over the place, it's best to
 define dedicated factory functions and to always use these functions to define
 objects of a certain kind -- this pattern may have another name in language
-like Javascript, let me know if there is a better name.
+like Javascript, let me know if there is anything better.
 
 It could look like this:
 
@@ -151,14 +161,179 @@ function namespace#make_kindname(construction_parameters) abort
 endfunction
 ```
 
+#### Polymorphism, and method overriding
+One of the key feature of OO is _"extreme late binding of all things"_. For
+most of us, this translates into _polymorphism_. Let's explore the concept with
+vim script objects.
+
+First, remember, as in Python, vim script language doesn't support
+[_function overloading_](https://en.wikipedia.org/wiki/Function_overloading).
+This means we cannot overload methods either.
+At best we can define
+[variadic functions](http://vimhelp.appspot.com/eval.txt.html#%2e%2e%2e) and
+decode their parameters.
+
+Polymorphism in vim scripts will be very close to polymorphism in Python. We
+are in the _duck typing_ land: It walks like a duck, it quacks like a duck,
+then this is a duck. There is no: _"we expect this parameter to belong to that
+class or any derived class"_. We pass the parameter, if it has the right
+method, then it certainly is the right parameter.
+
+The first aspect of polymorphism and subtyping is this possibility to use an
+object of a _type_ in an expression, and that the _type_ of this object may not
+have existed when the expression was designed. Of course, we have no types but
+ducks here, but the idea still applies.
+
+```vim
+let a_dog  = dog#make("Médor")
+let a_bird = bird#make("Tweety")
+call s:go_to_park(a_dog)
+call s:go_to_park(a_bird)
+
+" As long as both have a move() method, everything is fine.
+" These objects don't even need to be related in any way.
+```
+
+A second aspect is that we should be able to specialize behaviours in the
+objects used in the expression. The result may not be the same, but the
+expression stays valid and produces results, which are compatible with some
+postconditions.
+
+The usual technique to achieve this consists in
+[_overriding methods_](https://en.wikipedia.org/wiki/Method_overriding).
+
+A typical way of doing this in vim scripts would be to have a factory function
+for the parent kind of objects that (may) set a method, and a factory function
+for the children that overrides that same method.
+
+```vim
+" -----[ autoload/parent.vim
+function s:method() dict abort
+  ...some generic/default behaviour
+endfunction
+
+function! parent#make(initial_state) abort
+    let res = {'__state': a:initial_state}
+    let res.method = function('s:method')
+    return res
+endfunction
+...
+
+
+" -----[ autoload/child.vim
+function s:method() dict abort
+  ...specialized behaviour
+endfunction
+
+function! child#make(initial_state) abort
+    let res = parent#make(a:initial_state)
+
+    " <<--- Here, we override the default behaviour --->>
+    let res.method = function('s:method')
+
+    return res
+endfunction
+```
+
+Now, a problem arises. What if we need to call this default behaviour from the
+new function? If a default behaviour has been written, it's likely already
+doing interesting things we wouldn't like to duplicate, would we?
+
+Here we have no choice but to store manually the old function reference
+somewhere. Unlike Python and most other OO languages, Vim won't assist us in
+any way here.
+
+```vim
+" -----[ autoload/child.vim
+function s:method() dict abort
+  do stuff
+  call self.__parent_method()
+  do some other stuff
+endfunction
+
+function! child#make(initial_state) abort
+    let res = parent#make(a:initial_state)
+
+    let res.__parent_method = res.method
+    let res.method          = function('s:method')
+
+    return res
+endfunction
+```
+
+Happy? Honestly, I'm not. I really dislike this way of proceeding. I find it
+doesn't scale. As personal rules I prefer to rely on
+[_Template Method Design Pattern_](https://en.wikipedia.org/wiki/Template_method_pattern),
+and to avoid to override methods that already have a behaviour. The drawback is
+that I have to think beforehand about what the variation points are expected to
+be. Actually, most of the time, I just end-up refactoring by extracting
+sub-functions that become variation points.
+
+In vim script, it translates into the following:
+
+```vim
+" -----[ autoload/parent.vim
+function! s:common_stuff() dict abort
+    some stuff that never change
+    call self.__first_VP()
+    some other stuff that never change
+    call self.__second_VP()
+    final stuff that never change
+endfunction
+
+function! parent#make(initial_state) abort
+    let res = {'__state': a:initial_state}
+    let res.common_stuff = function('s:common_stuff)
+    " If we don't define __first_VP() nor __second_VP(), they are abstract...
+    " As well as the object returned by parent#make()
+    return res
+endfunction
+
+" -----[ autoload/child.vim
+function! s:first_VP() dict abort
+  ...
+endfunction
+function! s:second_VP() dict abort
+  ...
+endfunction
+
+function! child#make(initial_state) abort
+    let res = parent#make(a:initial_state)
+
+    " And we make sure the object returned isn't abstract
+    let res.__first_VP = function('s:first_VP')
+    let res.__second_VP = function('s:second_VP')
+
+    return res
+endfunction
+```
+
+If you're not used to the terms _variation point_ and _commonalities_, think
+that in the _parent_ part of the object you have a generic process where you've
+identified hooks/callbacks. These hooks, you'll set them in the _child_ part of
+the object built.
+
+
+In all cases, if you override a method, make sure it accepts the same
+parameters in the whole pseudo-hierarchy. Make also sure you never strengthen
+preconditions, and that you never relax postconditions. For more information,
+search for the
+[LSP: Liskov Substitution Principle](https://en.wikipedia.org/wiki/Liskov_substitution_principle).
+It has unexpected consequences, or at least, consequences we're used to:
+(mutable) circles are not ellipses, sorted lists are not lists,
+[coloured points are not points](https://www.pearson.com/us/higher-education/program/Bloch-Effective-Java-2nd-Edition/PGM310651.html),
+and so on.
+
+-----
+
 ## What lh-vim-lib can bring to the table
-OK. Now, you know how to create objects and use them in vim scripts.
+OK. Now, we have seen how to create objects and use them in vim scripts.
 
 You're certainly wondering what's the point of documenting this as a part of
 lh-vim-lib.
 
 Well, lh-vim-lib provides a few small services vaguely related to OO
-programming in vim script. There are not _must have_, but they are still quite
+programming in vim script. They are not _must have_, but they are still quite
 nice to have.
 
 ### Stringification
@@ -215,6 +390,12 @@ function! s:_to_string() dict abort
         \ self.__my_int,
         \ self.does_know_the_answer() ? '' : 'not ')
 endfunction
+
+function! my#make(....) abort
+  ...
+  call lh#object#inject_methods(res, s:k_script_name, '_to_string')
+  ...
+endfunction
 ```
 
 ### Method injection
@@ -260,8 +441,13 @@ call lh#object#inject_methods(my_first_object, s:k_script_name,
      \ 'next', 'does_know_the_answer')
 ```
 
-This can also be used on an existing object to inject methods defined a
+This can also be used on an existing object to inject methods defined as
 script-local functions.
+
+```vim
+:" from the command-line
+:call lh#object#inject_methods(my_existing_object, expand('%:p'), 'next')
+```
 
 #### `lh#object#inject(object, method_name, function_name, snr)`
 Method 2: If the method names differ from the script-local function names,
@@ -277,8 +463,13 @@ call lh#object#inject(my_first_object, 'next',                 'h2g2_next',     
 call lh#object#inject(my_first_object, 'does_know_the_answer', 'h2g2_does_know_the_answer', s:k_script_name)
 ```
 
-This can also be used on an existing object to inject methods defined a
+This can also be used on an existing object to inject methods defined as
 script-local functions.
+
+```vim
+:" from the command-line
+:call lh#object#inject(my_existing_object, 'next', 'h2g2_next', expand('%:p'))
+```
 
 ### Is this dictionary an (lhvl) object?
 In order to check whether a dictionary is actually an object built with
