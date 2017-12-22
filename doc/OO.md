@@ -79,7 +79,7 @@ of fact I highly advise you against this practice. Anonymous functions are a
 when something goes wrong.
 We can know the function name is a number, we can obtain its code and where
 it has been defined, but only as long as the function still exists -- This can
-be done with `:verbose function {343}`) for instance.
+be done with `:verbose function {343}` for instance.
 
 The problem is that if the function belongs only to a single dictionary
 variable, and if that variable has been disposed of by Vim garbage collector,
@@ -413,7 +413,9 @@ As you have seen, it can be tedious with old versions of Vim, which requires
 the `s:getSNR()` trick in the previous vanilla examples.
 
 lh-vim-lib helper functions still need a similar trick in order to provide
-_method-injection_ with older versions of Vim.
+_method-injection_ with older versions of Vim, and also to manually inject
+methods (defined as script-local functions) into an existing object, from the
+command-line.
 
 The helper functions require either the number (returned by `:scriptname`) of
 the current script, or the name of the current script.
