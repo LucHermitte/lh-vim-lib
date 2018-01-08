@@ -91,8 +91,7 @@ As a consequence, it'll defeat any attempt made at decoding
 [`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint). In
 particular, it'll defeat my [assertion framework](DbC.md), my
 [unit-testing framework](https://github.com/LucHermitte/vim-UT), and tricks
-like [`:WTF`](../autoload/lh/exception.vim#179) (TODO: document this feature
-elsewhere).
+like [`:WTF`](Callstack.md#lhexceptionsay_what).
 
 
 Also, when an object has been created with an anonymous function, reloading the

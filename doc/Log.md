@@ -74,14 +74,14 @@ execute
 
 ![lh-vim-lib logging framework demo](screencast-log.gif "lh-vim-lib logging framework demo")
 
-##Functions:
+## Functions:
 
-| Function                                       | Purpose                                                                        |
-|------------------------------------------------|--------------------------------------------------------------------------------|
-| `lh#log#echomsg()`                             | Returns a new logger object, that logs with `:echomsg` (internal use)          |
-| `lh#log#new()`                                 | Returns a new logger object (internal use)                                     |
-| `lh#log#none()`                                | Returns a new, inactive, logger object (internal use)                          |
-| `lh#log#set_logger(kind, opts)`                | Sets the global logging policy (quickfix/loclist window, none, `echomsg`)      |
-| `lh#log#this({format}, {args...})`             | Logs a formatted message with the global logger                                |
-| `lh#log#exception(...)`                        | Logs the exception, and possibly its callstack, with the global logger.        |
+| Function                           | Purpose                                                                        |
+|------------------------------------|--------------------------------------------------------------------------------|
+| `lh#log#echomsg()`                 | Returns a new logger object, that logs with `:echomsg` (internal use)          |
+| `lh#log#new()`                     | Returns a new logger object (internal use)                                     |
+| `lh#log#none()`                    | Returns a new, inactive, logger object (internal use)                          |
+| `lh#log#set_logger(kind, opts)`    | Sets the global logging policy (quickfix/loclist window, none, `echomsg`)      |
+| `lh#log#this({format}, {args...})` | Logs a formatted message with the global logger                                |
+| `lh#log#exception(...)`            | Logs the exception, and possibly its call stack, with the global logger.       |
 
