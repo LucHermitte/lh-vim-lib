@@ -2,7 +2,7 @@
 
 The topic is about obtaining the current function call stack. Its main
 applications relate to plugin maintenance: debugging,
-[unit testing](https://github.com/LucHermitte/vim-UT), [DbC](Dbc.md),
+[unit testing](https://github.com/LucHermitte/vim-UT), [DbC](DbC.md),
 [logging](Log.md) ...
 
 While Vim knows internally its current call stack, this information isn't
@@ -50,7 +50,7 @@ Given a _throwpoint_, creates an [object](OO.md) containing call stack
 information.
 
 The object is made of:
-- `"callstack"`: [`list`](http://vimhelp.appspot.com/eval.txt.html#List)
+- `"callstack"`: [list](http://vimhelp.appspot.com/eval.txt.html#List)
   returned by [`lh#exception#callstack()`](#lhexceptioncallstackthrowpoint).
 - `"as_qf()"`: method that converts the call stack object into a list accepted
   by [`setqflist()`](http://vimhelp.appspot.com/eval.txt.html#setqflist%28%29).
@@ -75,7 +75,7 @@ can see this function as the second main entry point.
 
 Internally it returns
 [`lh#exception#get_callstack().as_qf()`](#lhexceptionget_callstack) filtered
-(by [`:h filter()`](http://vimhelp.appspot.com/eval.txt.html#filter%28%29))
+(by [`filter()`](http://vimhelp.appspot.com/eval.txt.html#filter%28%29))
 with `filter` parameter.
 
 The typical use case for this function is from plugins that wish to display the
@@ -84,7 +84,11 @@ display only pertinent information.
 
 
 ### `lh#exception#say_what()`
-This function has been inspired by https://github.com/tweekmonster/exception.vim
+This function has been inspired by
+https://github.com/tweekmonster/exception.vim
+It analyses last error message reported by Vim, the call stack is expanded into
+as many entries as required, and the result is displayed in the
+[quickfix window](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow).
 
 A neat way to use it consists in defining the following command (in your
 `.vimrc` for instance) -- at this time I don't provide the command
