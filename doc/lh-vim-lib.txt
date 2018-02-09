@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 18th Dec 2017
+                        For Vim version 7+      Last change: 09th Feb 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -238,7 +238,9 @@ Window related functions:                               |lhvl#window|     {{{2
 Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#is_a_comment()|
 - |lh#syntax#is_a_comment_at()|
-- |lh#syntax#getline_without()|
+- |lh#syntax#getline_matching()|
+- |lh#syntax#getline_not_matching()|
+- |lh#syntax#line_filter()|
 - |lh#syntax#match_at()|
 - |lh#syntax#name_at()|
 - |lh#syntax#name_at_mark()|
@@ -3272,14 +3274,26 @@ Function meant to be used along with |lh#window#getid()|.
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#syntax#getline_without()*      {{{3
-lh#syntax#getline_without({lnum}, {syn-pattern})~
+                                                *lh#syntax#getline_matching()*          {{{3
+lh#syntax#getline_matching({lnum}, {syn-pattern})~
 @param {lnum}        line of the character
 @param {syn-pattern} |regex| matched against |synIDattr()|.
 @pre {lnum} shall be a |Number|.
 @return a string made of the characters from line {lnum}, without the
 characters with a syntax ID matching {syn-pattern}.
 @since Version 4.0.0
+@see also |lh#syntax#getline_not_matching()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#syntax#getline_not_matching()*      {{{3
+lh#syntax#getline_not_matching({lnum}, {syn-pattern})~
+@param {lnum}        line of the character
+@param {syn-pattern} |regex| matched against |synIDattr()|.
+@pre {lnum} shall be a |Number|.
+@return a string made of the characters from line {lnum}, without the
+characters with a syntax ID matching {syn-pattern}.
+@since Version 4.0.0
+@see also |lh#syntax#getline_matching()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                         *lh#syntax#is_a_comment_at()*  *lh#syntax#is_a_comment()*         {{{3
@@ -3289,6 +3303,23 @@ lh#syntax#is_a_comment_at({lnum}, {col})~
 @param {lnum}  line of the character
 @param {col}   column of the character
 @return whether the character is within a Comment syntax element.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#syntax#line_filter()*      {{{3
+lh#syntax#line_filter({syn-pattern})~
+@param {syn-pattern} |regex| matched against |synIDattr()|.
+@return an |lhvl#object| that permits to filter lines to keep only characters
+matching (or not matching a given) {syn-pattern}.
+
+The object provides the two services:
+- `getline_matching({lnum})`
+- `getline_not_matching({lnum})`
+
+This filter is an optimized version of |lh#syntax#getline_matching()|, and
+|lh#syntax#getline_not_matching()| aimed at processing several lines.
+
+@since Version 4.0.0
+@see also |lh#syntax#getline_matching()|, and |lh#syntax#getline_not_matching()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#syntax#match_at()*             {{{3

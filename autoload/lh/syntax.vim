@@ -7,7 +7,7 @@
 " Version:	4.0.0
 let s:k_version = 400
 " Created:	05th Sep 2007
-" Last Update:	22nd Aug 2017
+" Last Update:	09th Feb 2018
 "------------------------------------------------------------------------
 " Description:	«description»
 "
@@ -232,10 +232,10 @@ function! lh#syntax#prev_hl(name, ...) abort
   return 1
 endfunction
 
-" Function: lh#syntax#getline_without(linenr, syn_pattern) : string {{{3
+" Function: lh#syntax#getline_not_matching(linenr, syn_pattern) : string {{{3
 " @since Version 4.0.0
 " @warning col(['.', '$']) doesn't work!, so linenr shall be a number
-function! lh#syntax#getline_without(linenr, syn_pattern) abort
+function! lh#syntax#getline_not_matching(linenr, syn_pattern) abort
   call lh#assert#type(a:linenr).is(42)
   let valid =  map(range(col([a:linenr, '$'])-1), '! lh#syntax#match_at(a:syn_pattern, a:linenr, v:val+1) ? v:val : -1')
   call filter(valid, 'v:val >= 0')
@@ -244,6 +244,58 @@ function! lh#syntax#getline_without(linenr, syn_pattern) abort
   let res = join(map(copy(valid), 'line[v:val]'), '')
   return res
 endfunction
+
+" Function: lh#syntax#getline_matching(linenr, syn_pattern) : string {{{3
+" @since Version 4.0.0
+" @warning col(['.', '$']) doesn't work!, so linenr shall be a number
+" @warning This could be quite slow :( ...
+function! lh#syntax#getline_matching(linenr, syn_pattern) abort
+  " call lh#assert#type(a:linenr).is(42)
+  let valid =  map(range(col([a:linenr, '$'])-1), 'lh#syntax#match_at(a:syn_pattern, a:linenr, v:val+1) ? v:val : -1')
+  call filter(valid, 'v:val >= 0')
+  let line = getline(a:linenr)
+  " join is required to merge bytes back into multibyte-characters
+  let res = join(map(copy(valid), 'line[v:val]'), '')
+  return res
+endfunction
+
+" Function: lh#syntax#line_filter(syn_pattern) : object {{{3
+function! s:match(id) dict abort " {{{4
+  if has_key(self.ids, a:id)
+    return self.ids[a:id]
+  endif
+  let name = synIDattr(a:id, "name")
+  let self.ids[a:id] = match(name, self.pattern) >= 0
+  return self.ids[a:id]
+endfunction
+
+function! s:getline_matching(linenr) dict abort " {{{4
+  let valid =  map(range(col([a:linenr, '$'])-1), 'self.match(synID(a:linenr, v:val+1, 1)) ? v:val : -1')
+  call filter(valid, 'v:val >= 0')
+  let line = getline(a:linenr)
+  let res = join(map(copy(valid), 'line[v:val]'), '')
+  return res
+endfunction
+
+function! s:getline_not_matching(linenr) dict abort " {{{4
+  let valid =  map(range(col([a:linenr, '$'])-1), '! self.match(synID(a:linenr, v:val+1, 1)) ? v:val : -1')
+  call filter(valid, 'v:val >= 0')
+  let line = getline(a:linenr)
+  let res = join(map(copy(valid), 'line[v:val]'), '')
+  return res
+endfunction
+
+let s:k_script_name = expand('<sfile>:p')
+function! lh#syntax#line_filter(syn_pattern) abort " {{{4
+  let obj = lh#object#make_top_type({})
+  let obj.pattern = a:syn_pattern
+  let obj.ids = {}
+
+  call lh#object#inject_methods(obj, s:k_script_name, ['match', 'getline_matching', 'getline_not_matching'])
+
+  return obj
+endfunction
+
 " Functions }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
