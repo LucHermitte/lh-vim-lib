@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.0.0)
-                        For Vim version 7+      Last change: 09th Feb 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.0.1)
+                        For Vim version 7+      Last change: 07th Mar 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -543,6 +543,7 @@ It permits to do the following things:
                                   `finalize()` and undefine them right away.
 - *restore_highlight()*             restores highlight definition like
                                   |CursorLine| one.
+- *restore_cursor()*                restores the cursor to its initial position.
 
 
 Object methods emulates |Partials| on old vim versions. They are specified
