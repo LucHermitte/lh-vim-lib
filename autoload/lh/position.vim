@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 400
+" Version:      4.1.0
+let s:k_version = 410
 " Created:      05th Sep 2007
-" Last Update:  08th Nov 2016
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:  «description»
 " }}}1
@@ -119,6 +119,19 @@ function! lh#position#extract(pos1, pos2) abort
   let lines[0]  = lines[0][pos1[1]-1 : ]
   return join(lines, "\n")
 endfunction
+
+" Function: lh#position#getcur() {{{3
+" @since 4.1.0
+if exists('*getcurpos')
+  function! lh#position#getcur()
+    return getcurpos()
+  endfunction
+else
+  function! lh#position#getcur()
+    return getpos('.')
+  endfunction
+endif
+
 
 " Functions }}}1
 "------------------------------------------------------------------------

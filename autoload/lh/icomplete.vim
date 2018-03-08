@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.0.0
-let s:version = '4.0.0'
+" Version:      4.1.0
+let s:version = '4.1.0'
 " Created:      03rd Jan 2011
-" Last Update:  16th Nov 2016
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -147,16 +147,6 @@ function! s:function(funcname)
   return function(s:getSNR(a:funcname))
 endfunction
 
-if exists('*getcurpos')
-  function! s:getcurpos()
-    return getcurpos()
-  endfunction
-else
-  function! s:getcurpos()
-    return getpos('.')
-  endfunction
-endif
-
 "------------------------------------------------------------------------
 " ## Smart completion {{{1
 " Example:
@@ -280,11 +270,11 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         return -3
         call self.finalize()
       endif
-      if self.cursor_pos == s:getcurpos()
+      if self.cursor_pos == lh#position#getcur()
         call s:Verbose("cursor hasn't moved -> -2")
         return -2
       endif
-      let self.cursor_pos = s:getcurpos()
+      let self.cursor_pos = lh#position#getcur()
       return self.startcol
     else
       return self.get_completions(a:base)

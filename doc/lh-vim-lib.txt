@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.0.1)
-                        For Vim version 7+      Last change: 07th Mar 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.1.0)
+                        For Vim version 7+      Last change: 08th Mar 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -80,6 +80,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#position#char_at_pos()|
 - |lh#position#compare()|
 - |lh#position#extract()|
+- |lh#position#getcur()|
 - |lh#position#is_before()|
 - |lh#time#bench()|
 - |lh#time#bench_n()|
@@ -773,6 +774,12 @@ lh#position#char_at_pos({pos})~
                                              *lh#position#extract()*           {{{3
 lh#position#extract({pos1}, {pos2})~
 @return             The string between the two positions (see |getpos()|).
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                             *lh#position#getcur()*            {{{3
+lh#position#extract({pos1}, {pos2})~
+@return             |getcurpos()| when it exists, |getpos()| otherwise.
+@since              Version 4.1.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#time#bench()*                 {{{3

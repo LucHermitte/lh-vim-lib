@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.00.1.
-let s:k_version = 4001
+" Version:      4.01.0.
+let s:k_version = 4010
 " Created:      15th Jan 2015
-" Last Update:  07th Mar 2018
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "
@@ -181,7 +181,7 @@ function! s:restore_highlight(hlname) dict abort " {{{4
 endfunction
 
 function! s:restore_cursor() dict abort " {{{4
-  let crt_pos = getpos('.')
+  let crt_pos = lh#position#getcur()
   call self.register('call setpos(".", '.string(crt_pos).')')
   return self
 endfunction
