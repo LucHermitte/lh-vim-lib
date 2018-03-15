@@ -7,7 +7,7 @@
 " Version:      4.0.0.
 let s:k_version = '4000'
 " Created:      08th Dec 2015
-" Last Update:  09th Nov 2017
+" Last Update:  15th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -47,8 +47,24 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 "
+" # Counting {{{2
+" Function: lh#string#count_char(string, what) {{{3
+" @since Version 4.2.0
+if lh#has#patch('patch-8.0.0794')
+  function! lh#string#count_char(...) abort
+    return call('count', a:000)
+  endfunction
+else
+  function! lh#string#count_char(string, what, ...) abort
+    " len + substitute is 300 times slower than count(string)
+    let ic = get(a:, 1, 0) ? '\v' : ''
+    return len(substitute(a:string, ic.'[^'.a:what.']', '', 'g'))
+    " count + split is twice as slow as len + substitute
+    " return call('count', [split(a:string, '\zs')] + a:000)
+  endfunction
+endif
+
 " # Trimming {{{2
-"
 " Function: lh#string#trim(string) {{{3
 " @version 3.4.0
 function! lh#string#trim(string) abort

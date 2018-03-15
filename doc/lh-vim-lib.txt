@@ -159,6 +159,7 @@ Stack related functions:                                |lhvl#stack|      {{{2
     - |lh#stack-top_or()|
 String related functions:                               |lhvl#string|     {{{2
 - |lh#string#as()|
+- |lh#string#count()|
 - |lh#string#matches()|
 - |lh#string#matchstrpos()|
 - |lh#string#substitute_unless()|
@@ -1282,6 +1283,13 @@ The evaluation is meant to be done with |eval()|.
 
 ------------------------------------------------------------------------------
 STRING RELATED FUNCTIONS                              *lhvl#string*     {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#count_char()*          {{{3
+lh#string#count_char({string}, {char} [, {ic}])~
+@return the number of occurences the character {char} in the {string}
+received. The search can be case insensitive if {ic} is true.
+@since Version 4.2.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#as()*                  {{{3
