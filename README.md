@@ -6,9 +6,7 @@ _lh-vim-lib_ is a library that defines some common vim functions I use in my var
 
 This library has been conceived as a suite of [|autoload|](http://vimhelp.appspot.com/eval.txt.html#autoload) plugins. As such, it requires Vim 7+. A few commands are defined.
 
-As I only have access to a version 7.4-052 on travis-ci, let's say this is the
-minimum vim version I'll try to be compatible with. Until last year I was
-trying to be compatible with 7.3-429.
+As I only have access to a version 7.4-052 on travis-ci, let's say this is the minimum vim version I'll try to be compatible with. Until 2017 (v3.x) I was trying to be compatible with 7.3-429.
 
 The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/master/doc/lh-vim-lib.txt) can be browsed.
 
@@ -37,7 +35,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Logging framework](doc/Log.md) -- other web page
   * [Design by Contract functions](doc/DbC.md) -- other web page
   * [Call stack decoding](doc/Callstack.md) -- other web page
-  * [Command](#commands)
+  * [Commands](#commands)
 
 ### Miscellaneous functions
 
