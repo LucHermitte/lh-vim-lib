@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.3.0
-let s:version = '4.3.0'
+" Version:	4.3.1
+let s:version = '4.3.1'
 " Created:      01st Mar 2013
 " Last Update:  28th Mar 2018
 "------------------------------------------------------------------------
@@ -57,7 +57,9 @@ endfunction
 function! lh#mapping#_build_rhs(mapping_definition) abort
   call lh#assert#value(a:mapping_definition)
         \.has_key('rhs')
-  let rhs = substitute(a:mapping_definition.rhs, '<SID>', "\<SNR>".get(a:mapping_definition, 'sid', 'SID_EXPECTED').'_', 'g')
+  let g:mappings = get(g:, 'mappings', {})
+  let g:mappings[a:mapping_definition.lhs] = a:mapping_definition
+  let rhs = substitute(a:mapping_definition.rhs, '\c<SID>', "\<SNR>".get(a:mapping_definition, 'sid', 'SID_EXPECTED').'_', 'g')
   return rhs
 endfunction
 
