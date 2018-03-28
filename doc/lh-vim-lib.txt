@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.1.0)
-                        For Vim version 7+      Last change: 08th Mar 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.3.0)
+                        For Vim version 7+      Last change: 28th Mar 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4536,7 +4536,7 @@ lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type(
 
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2017 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2018 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:

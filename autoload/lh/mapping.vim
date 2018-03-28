@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.0.0
-let s:version = '4.0.0'
+" Version:	4.3.0
+let s:version = '4.3.0'
 " Created:      01st Mar 2013
-" Last Update:  24th Jul 2017
+" Last Update:  28th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -47,10 +47,24 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+" Function: lh#mapping#_build_rhs(mapping_definition) {{{2
+" Transforms the {rhs} part of a mapping definition obtained with
+" maparg(dict=1) into a something than can be used to define another mapping.
+"
+" @param mapping_definition is a dictionary witch the same keys than the ones
+" filled by maparg()
+" @since Version 4.3.0
+function! lh#mapping#_build_rhs(mapping_definition) abort
+  call lh#assert#value(a:mapping_definition)
+        \.has_key('rhs')
+  let rhs = substitute(a:mapping_definition.rhs, '<SID>', "\<SNR>".get(a:mapping_definition, 'sid', 'SID_EXPECTED').'_', 'g')
+  return rhs
+endfunction
+
 " Function: lh#mapping#_build_command(mapping_definition) {{{2
 " @param mapping_definition is a dictionary witch the same keys than the ones
 " filled by maparg()
-function! lh#mapping#_build_command(mapping_definition)
+function! lh#mapping#_build_command(mapping_definition) abort
   call lh#assert#value(a:mapping_definition)
         \.has_key('mode')
         \.has_key('lhs')
@@ -68,7 +82,7 @@ function! lh#mapping#_build_command(mapping_definition)
     " endif
   " endfor
   let cmd .= ' '.(a:mapping_definition.lhs)
-  let rhs = substitute(a:mapping_definition.rhs, '<SID>', "\<SNR>".get(a:mapping_definition, 'sid', 'SID_EXPECTED').'_', 'g')
+  let rhs = lh#mapping#_build_rhs(a:mapping_definition)
   let cmd .= ' '.rhs
   return cmd
 endfunction
