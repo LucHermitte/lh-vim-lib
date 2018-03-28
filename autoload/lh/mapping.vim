@@ -94,6 +94,24 @@ function! lh#mapping#define(mapping_definition)
   silent exe cmd
 endfunction
 
+" Function: lh#mapping#_switch_int(trigger, cases) {{{3
+" @Since Version 4.3.0, moved from lh-bracket lh#brackets#_switch_int
+function! lh#mapping#_switch_int(trigger, cases) abort
+  for c in a:cases
+    if eval(c.condition)
+      return eval(c.action)
+    endif
+  endfor
+  return lh#mapping#reinterpret_escaped_char(eval(a:trigger))
+endfunction
+
+" Function: lh#mapping#_switch(trigger, cases) {{{3
+" @Since Version 4.3.0, moved from lh-bracket lh#brackets#_switch
+function! lh#mapping#_switch(trigger, cases) abort
+  return lh#mapping#_switch_int(a:trigger, a:cases)
+  " debug return lh#mapping#_switch_int(a:trigger, a:cases)
+endfunction
+
 " Function: lh#mapping#clear() {{{2
 function! lh#mapping#clear() abort
   let s:issues_notified = {}
