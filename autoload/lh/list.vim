@@ -4,17 +4,20 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 40000
+" Version:      4.3.1
+let s:k_version = 40301
 " Created:      17th Apr 2007
-" Last Update:  22nd Aug 2017
+" Last Update:  30th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
 "
 "------------------------------------------------------------------------
 " History: {{{2
-"       v4.0.0.0
+"       v4.3.1
+"       (*) PORT: notify when lh#list#separate() is used on old
+"           machines.
+"       v4.0.0
 "       (*) ENH: Add lh#list#push_if_new_entity()
 "       (*) ENH: Add lh#list#contain_entity()
 "       (*) ENH: Add lh#list#arg_min() & max()
@@ -125,6 +128,16 @@ endfunction
 
 function! lh#list#debug(expr) abort
   return eval(a:expr)
+endfunction
+
+" # Support functions {{{2
+function! s:has_add_ternary() abort
+  let a = []
+  let b = []
+  for i in range(4)
+    call add((i%2 ? a : b), i)
+  endfor
+  return a == [1, 3] && b == [0, 2]
 endfunction
 
 "=============================================================================
@@ -617,15 +630,6 @@ function! lh#list#flat_extend(list, rhs) abort
 endfunction
 
 " Function: lh#list#separate(list, Cond) {{{3
-function! s:has_add_ternary()
-  let a = []
-  let b = []
-  for i in range(4)
-    call add((i%2 ? a : b), i)
-  endfor
-  return a == [1, 3] && b == [0, 2]
-endfunction
-
 if s:has_add_ternary()
   function! lh#list#separate(list, Cond) abort
     let yes = []
@@ -637,7 +641,7 @@ if s:has_add_ternary()
     endif
     return [yes, no]
   endfunction
-else
+elseif lh#has#vkey()
   let s:k_assoc = { 'v:key' : 'idx', 'v:val': 'e'}
   function! lh#list#separate(list, Cond) abort
     " call lh#assert#type(a:Cond).belongs_to('', function('has'))
@@ -654,6 +658,10 @@ else
       let idx += 1
     endfor
     return [yes, no]
+  endfunction
+else
+  function! lh#list#separate(list, Cond) abort
+    call lh#assert#unexpected("Sorry, lh#list#separate isn't implemented for your version of Vim. Contact me to implement a workaround.")
   endfunction
 endif
 
