@@ -7,7 +7,7 @@
 " Version:	4.3.1
 let s:version = '4.3.1'
 " Created:      01st Mar 2013
-" Last Update:  28th Mar 2018
+" Last Update:  17th Apr 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -96,7 +96,7 @@ function! lh#mapping#define(mapping_definition)
   silent exe cmd
 endfunction
 
-" Function: lh#mapping#_switch_int(trigger, cases) {{{3
+" Function: lh#mapping#_switch_int(trigger, cases) {{{2
 " @Since Version 4.3.0, moved from lh-bracket lh#brackets#_switch_int
 function! lh#mapping#_switch_int(trigger, cases) abort
   for c in a:cases
@@ -107,7 +107,7 @@ function! lh#mapping#_switch_int(trigger, cases) abort
   return lh#mapping#reinterpret_escaped_char(eval(a:trigger))
 endfunction
 
-" Function: lh#mapping#_switch(trigger, cases) {{{3
+" Function: lh#mapping#_switch(trigger, cases) {{{2
 " @Since Version 4.3.0, moved from lh-bracket lh#brackets#_switch
 function! lh#mapping#_switch(trigger, cases) abort
   return lh#mapping#_switch_int(a:trigger, a:cases)
@@ -172,7 +172,7 @@ function! lh#mapping#plug(...) abort
   endfor
 endfunction
 
-" Function: lh#mapping#reinterpret_escaped_char(seq) {{{3
+" Function: lh#mapping#reinterpret_escaped_char(seq) {{{2
 " This function transforms '\<cr\>', '\<esc\>', ... '\<{keys}\>' into the
 " interpreted sequences "\<cr>", "\<esc>", ...  "\<{keys}>".
 " It is meant to be used by fonctions like MapNoContext(), InsertSeq(), ... as
