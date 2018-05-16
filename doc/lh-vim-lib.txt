@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.3.0)
-                        For Vim version 7+      Last change: 28th Mar 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.4.0)
+                        For Vim version 7+      Last change: 16th May 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -82,6 +82,8 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#position#extract()|
 - |lh#position#getcur()|
 - |lh#position#is_before()|
+- |lh#position#move()|
+- |lh#position#move_n()|
 - |lh#time#bench()|
 - |lh#time#bench_n()|
 - |lh#time#date()|
@@ -781,6 +783,25 @@ lh#position#extract({pos1}, {pos2})~
 lh#position#extract({pos1}, {pos2})~
 @return             |getcurpos()| when it exists, |getpos()| otherwise.
 @since              Version 4.1.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                             *lh#position#move()*              {{{3
+lh#position#move({direction})~
+@param {direction}  should be either `"\<right>"` or `"\<left>"`.
+@return             a string that can be used to move the cursor in the specified direction
+                    If vim version is >= 7.4.849, the movement can be
+                    repeated/redone (see |redo-register|).
+@since              Version 4.4.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                             *lh#position#move_n()*            {{{3
+lh#position#move_n({direction}, {count})~
+@param {direction}  should be either `"\<right>"` or `"\<left>"`.
+@param {count}      number of positions the cursor shall be moved
+@return             a string that can be used to move the cursor in the specified direction
+                    If vim version is >= 7.4.849, the movement can be
+                    repeated/redone (see |redo-register|).
+@since              Version 4.4.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#time#bench()*                 {{{3

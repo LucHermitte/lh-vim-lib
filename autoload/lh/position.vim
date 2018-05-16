@@ -4,12 +4,12 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.1.0
-let s:k_version = 410
+" Version:      4.4.0
+let s:k_version = 440
 " Created:      05th Sep 2007
-" Last Update:  08th Mar 2018
+" Last Update:  16th May 2018
 "------------------------------------------------------------------------
-" Description:  «description»
+" Description:  Cursor related functions
 " }}}1
 "=============================================================================
 
@@ -48,7 +48,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Functions {{{1
 " # Public {{{2
-" Function: lh#position#is_before {{{3
+" Function: lh#position#is_before                 {{{3
 " @param[in] positions as those returned from |getpos()|
 " @return whether lhs_pos is before rhs_pos
 function! lh#position#is_before(lhs_pos, rhs_pos) abort
@@ -82,7 +82,7 @@ function! lh#position#compare(lhs_pos, rhs_pos) abort
   return res
 endfunction
 
-" Function: lh#position#char_at_mark {{{3
+" Function: lh#position#char_at_mark              {{{3
 " @return the character at a given mark (|mark|)
 function! lh#position#char_at_mark(mark) abort
   let c = getline(a:mark)[col(a:mark)-1]
@@ -92,7 +92,7 @@ function! lh#position#CharAtMark(mark)
 return lh#position#char_at_mark(a:mark)
 endfunction
 
-" Function: lh#position#char_at_pos {{{3
+" Function: lh#position#char_at_pos               {{{3
 " @return the character at a given position (|getpos()|)
 function! lh#position#char_at_pos(pos) abort
   let c = getline(a:pos[1])[(a:pos[2])-1]
@@ -102,13 +102,13 @@ function! lh#position#CharAtPos(pos) abort
   return  lh#position#char_at_pos(a:pos)
 endfunction
 
-" Function: lh#position#char_at {{{3
+" Function: lh#position#char_at                   {{{3
 function! lh#position#char_at(lin, col)
   let c = getline(a:lin)[(a:col)-1]
   return c
 endfunction
 
-" Function: lh#position#extract(pos1, pos2) {{{3
+" Function: lh#position#extract(pos1, pos2)       {{{3
 " positions from |getpos()|
 function! lh#position#extract(pos1, pos2) abort
   call s:Verbose('extract(%1, %2)', a:pos1, a:pos2)
@@ -120,7 +120,7 @@ function! lh#position#extract(pos1, pos2) abort
   return join(lines, "\n")
 endfunction
 
-" Function: lh#position#getcur() {{{3
+" Function: lh#position#getcur()                  {{{3
 " @since 4.1.0
 if exists('*getcurpos')
   function! lh#position#getcur()
@@ -132,6 +132,19 @@ else
   endfunction
 endif
 
+" Function: lh#position#move(direction)           {{{3
+" @since 4.4.0
+let s:k_move_prefix = lh#has#redo() ? "\<C-G>U" : ""
+function! lh#position#move(direction) abort
+  call lh#assert#value(a:direction).match("\<left>\\|\<right>")
+  return s:k_move_prefix . a:direction
+endfunction
+
+" Function: lh#position#move_n(direction, count)  {{{3
+" @since 4.4.0
+function! lh#position#move_n(direction, count) abort
+  return repeat(lh#position#move(a:direction), a:count)
+endfunction
 
 " Functions }}}1
 "------------------------------------------------------------------------

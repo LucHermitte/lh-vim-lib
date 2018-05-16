@@ -2,19 +2,16 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0
-let s:k_version = '400000'
+" Version:      4.4.0
+let s:k_version = '400400'
 " Created:      02nd Sep 2016
-" Last Update:  23rd Aug 2017
+" Last Update:  16th May 2018
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
 "       It's meant to avoid searching the patch list again and again when a
 "       feature has appeared in a working version.
 "
-"------------------------------------------------------------------------
-" History:      «history»
-" TODO:         «missing features»
 " }}}1
 "=============================================================================
 
@@ -53,7 +50,7 @@ endfunction
 " ## Exported functions {{{1
 " # Vim features {{{2
 
-" Function: lh#has#patch(vernumber) {{{3
+" Function: lh#has#patch(vernumber)       {{{3
 if (v:version > 704) || (v:version == 704 && has('patch237'))
   function! lh#has#patch(vernumber) abort
     return has(a:vernumber)
@@ -66,17 +63,17 @@ else
   endfunction
 endif
 
-" Function: lh#has#lambda() {{{3
+" Function: lh#has#lambda()               {{{3
 function! lh#has#lambda() abort
   return has("lambda")
 endfunction
 
-" Function: lh#has#partials() {{{3
+" Function: lh#has#partials()             {{{3
 function! lh#has#partials() abort
   return lh#has#patch("patch-7.4.1558")
 endfunction
 
-" Function: lh#has#jobs() {{{3
+" Function: lh#has#jobs()                 {{{3
 function! lh#has#jobs() abort
   return exists('*job_start') && lh#has#patch("patch-7.4.1980")
 endfunction
@@ -86,9 +83,15 @@ function! lh#has#default_in_getbufvar() abort
   return lh#has#patch("patch-7.3.831")
 endfunction
 
-" Function: lh#has#vkey() {{{3
+" Function: lh#has#vkey()                 {{{3
 function! lh#has#vkey() abort
   return lh#has#patch('patch-7.2-295')
+endfunction
+
+" Function: lh#has#redo()                 {{{3
+" @since v 4.4.0
+function! lh#has#redo() abort
+  return has('patch-7.4.849')
 endfunction
 
 "------------------------------------------------------------------------
