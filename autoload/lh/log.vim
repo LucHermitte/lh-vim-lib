@@ -6,7 +6,7 @@
 " let s:k_version = '4000'
 let s:k_version = '4000'
 " Created:      23rd Dec 2015
-" Last Update:  20th Oct 2016
+" Last Update:  25th May 2018
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -35,13 +35,13 @@ function! lh#log#verbose(...)
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Verbose(expr) abort
   if s:verbose
     echomsg a:expr
   endif
 endfunction
 
-function! lh#log#debug(expr)
+function! lh#log#debug(expr) abort
   return eval(a:expr)
 endfunction
 
@@ -227,7 +227,7 @@ function! lh#log#clear() abort
 endfunction
 
 " Function: lh#log#this(format, params) {{{3
-function! lh#log#this(fmt, ...)
+function! lh#log#this(fmt, ...) abort
   " Data in qf format need a special handling
   if type(a:fmt) == type([])
     for msg in a:fmt

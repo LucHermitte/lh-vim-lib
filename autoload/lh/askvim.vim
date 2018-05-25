@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      17th Apr 2007
-" Last Update:  08th Mar 2017
+" Last Update:  25th May 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -125,6 +125,9 @@ endfunction
 function! lh#askvim#where_is_function_defined(funcname) abort
   if has('*execute') || ! s:beware_running_through_client_server
     let definition = lh#askvim#execute('verbose function '.a:funcname)
+    if empty(definition)
+      throw "Cannot find a definition for ".a:funcname
+    endif
     let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
     return script
   elseif a:funcname =~ '#'

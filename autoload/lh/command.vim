@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 400
 " Created:      08th Jan 2007
-" Last Update:  16th Feb 2017
+" Last Update:  25th May 2018
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -34,11 +34,11 @@ function! lh#command#verbose(...)
   return s:verbose
 endfunction
 
-function! s:Log(...)
+function! s:Log(...) abort
   call call('lh#log#this', a:000)
 endfunction
 
-function! s:Verbose(...)
+function! s:Verbose(...) abort
   if s:verbose
     call call('s:Log', a:000)
   endif
