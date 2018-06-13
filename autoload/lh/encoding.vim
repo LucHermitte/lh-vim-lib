@@ -7,7 +7,7 @@
 " Version:      3.6.1
 let s:k_version = 361
 " Created:      21st Feb 2008
-" Last Update:  10th Feb 2017
+" Last Update:  13th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
@@ -117,6 +117,72 @@ endfunction
 function! lh#encoding#current_character() abort
   return matchstr(getline('.'), '\%'.col('.').'c.')
 endfunction
+
+" Function: lh#encoding#does_support(chars [, fonts=&guifont]) {{{3
+function! lh#encoding#does_support(chars, ...) abort
+  if ! lh#python#can_import('fontconfig') | return lh#option#unset('Cannot use python-fontconfig packet') | endif
+  let fonts = '('.escape(join(get(a:, 1, [substitute(&guifont, '\s\+\d\+$', '', '')]), '|'), '|\.*+').')'
+  " echomsg fonts
+  let res = {}
+python << EOF
+import fontconfig, re, sys, vim
+
+# https://stackoverflow.com/questions/22665667/python-2-7-6-splits-single-high-unicode-code-point-in-two
+def code_points(text):
+    import struct
+    utf32 = text.encode('UTF-32LE')
+    return struct.unpack('<{}I'.format(len(utf32) // 4), utf32)
+
+regexp = re.compile(vim.bindeval('l:')['fonts'])
+chars  = vim.bindeval('a:')['chars']
+fonts = fontconfig.query()
+fonts = [path for path in fonts if re.search(regexp, path) ]
+enc = vim.eval('&enc')
+res = vim.bindeval('l:')['res']
+
+for c in chars:
+    #if c.startswith('U+'):
+    #    c =  ('\\U%08x' % int(search[2:], 16)).decode('unicode-escape')
+    #else:
+    #    c = c.decode(enc)
+    # print(c)
+    c_dec = c.decode(enc) if isinstance(c, bytes) else c
+    cp = code_points(c_dec)
+    # print(cp)
+    if sys.maxunicode < cp[0]:
+        # With some python versions, we cannot decode "high" unicode code points
+        # even if the CP has a glyph in the current fontset :(
+        res.update({c: 0})
+        continue
+    for path in fonts:
+        font = fontconfig.FcFont(path)
+        # print('%s ' % (c_dec, ))
+        if font.has_char(c_dec):
+            # print('%s -> OK in %s' % (c_dec, font))
+            res.update({c: 1})
+            break
+    else:
+      res.update({c: 0})
+EOF
+  return res
+endfunction
+
+" Function: lh#encoding#find_best_glyph(glyphs...) {{{3
+" Expect last sequence to be in ASCII
+function! lh#encoding#find_best_glyph(...) abort
+  " call lh#assert#value(a:000[*]).not().empty()
+  if ! has('multi_byte') || &enc!='utf-8' || ! lh#python#can_import('fontconfig')
+    return map(copy(a:000), 'v:val[-1]')
+  endif
+  let glyphs = []
+  call map(copy(a:000), 'extend(glyphs, v:val[:-2])')
+  " let glyphs = a:glyphs[: -2]
+  let glyph_support = lh#encoding#does_support(glyphs)
+  let glyphs_supported = map(copy(a:000),
+        \ { idx, g -> filter(g[:-2], {i2, val -> get(glyph_support, val, 0)}) + [g[-1]]})
+  return lh#list#get(glyphs_supported, 0)
+endfunction
+
 " }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
