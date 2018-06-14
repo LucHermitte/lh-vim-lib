@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      13th Jun 2018
-" Last Update:  13th Jun 2018
+" Last Update:  14th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Utility function to use python from vim
@@ -48,15 +48,41 @@ function! lh#python#debug(expr) abort
   return eval(a:expr)
 endfunction
 
-
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+" Function: lh#python#best_still_avail() {{{3
+function! lh#python#best_still_avail(...) abort
+  if has('python_compiled') && has('python3_compiled')
+    " On the first succesful has('python'), or has('python3'), the other one
+    " will return false!
+    " Hence this case
+    let order = get(a:, 1, ['python3', 'python'])
+    let tests = map(copy(order), 'has(v:val) ? v:val : ""')
+    let tests = filter(tests, '!empty(v:val)') + ['']
+    return tests[0]
+  elseif has('python3')
+    return 'python3'
+  elseif has('python')
+    return 'python'
+  else
+    return ''
+  endif
+endfunction
+
+" Function: lh#python#has() {{{3
+function! lh#python#has() abort
+  if !exists('s:k_python')
+    let s:k_python = lh#python#best_still_avail()
+  endif
+  return !empty(s:k_python)
+endfunction
 
 " Function: lh#python#can_import(module) {{{3
 function! lh#python#can_import(module) abort
-  if !has('python') | return 0 | endif
+  let flavour = lh#python#best_still_avail()
+  if empty(flavour) | return 0 | endif
   try
-    exe 'python import '.a:module
+    exe flavour.' import '.a:module
   catch /.*/
     return 0
   endtry

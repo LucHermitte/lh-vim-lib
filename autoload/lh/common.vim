@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.0.0
-let s:k_version = 400
+" Version:	4.5.0
+let s:k_version = 450
 " Created:	07th Oct 2006
-" Last Update:	24th Jul 2017
+" Last Update:	14th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 " 	Some common functions for:
@@ -18,6 +18,8 @@ let s:k_version = 400
 " Requirements:
 " 	ruby, or python enabled for lh#common#rand()
 " History:
+"       v4.5.0:
+"       - REFACT: Try to use the the best python flavour available
 "       v4.0.0:
 "       - ENH: Define other implementations of lh#common#rand
 "       v3.6.1
@@ -110,8 +112,19 @@ EOF
   let s:random = get(s:, 'random', 'ruby')
 endif
 
-if has('python')
-  function! lh#common#rand_python(max)
+if !exists('s:random')
+  let py_flavour = lh#python#best_still_avail()
+  if !empty(py_flavour)
+    function! lh#common#rand_python3(max)
+python3 << EOF
+import vim, random
+rmax = eval(vim.eval("a:max")) - 1
+# rmax = nil if rmax == ""
+res = random.randint(0, rmax)
+vim.command("return %d" % (res,))
+EOF
+    endfunction
+    function! lh#common#rand_python(max)
 python << EOF
 import vim, random
 rmax = eval(vim.eval("a:max")) - 1
@@ -119,8 +132,9 @@ rmax = eval(vim.eval("a:max")) - 1
 res = random.randint(0, rmax)
 vim.command("return %d" % (res,))
 EOF
-  endfunction
-  let s:random = get(s:, 'random', 'python')
+    endfunction
+    let s:random = get(s:, 'random', py_flavour)
+  endif
 endif
 
 if lh#os#system_detected() == 'unix'
