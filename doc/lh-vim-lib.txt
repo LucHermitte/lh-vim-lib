@@ -267,6 +267,11 @@ OS/System related functions:                            |lhvl#os|         {{{2
 - |lh#os#cpu_number()|
 - |lh#os#cpu_cores_number()|
 - |lh#os#lcd()|
+Python related functions                                |lhvl#python|     {{{2
+- |lh#python#best_still_avail()|
+- |lh#python#has()|
+- |lh#python#can_import()|
+- |lh#python#external_can_import()|
 Completion related functions                            |lhvl#completion| {{{2
 - |lh#icomplete#new()|
 - |lh#icomplete#new_on()|
@@ -3546,6 +3551,46 @@ It will use /proc/cpuinfo when it exists.
 lh#os#lcd(path)~
 Executes `:lcd fnameescape({path})` and log the command along the way.
 See |:lcd|, |fnameescape()|.
+
+------------------------------------------------------------------------------
+PYTHON RELATED FUNCTIONS                              *lhvl#python*     {{{2
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#python#best_still_avail()*      {{{3
+lh#python#best_still_avail([preferred order])~
+Without imposing a version of python (which `has('python')` or
+`has('python3')` do), this function returns the best python flavour we can
+still use.
+Note: When vim has (internally) started to use a version on Python, we cannot
+use another one. See |E837|.
+If your version of Vim has been compiled with support of Python2 and Python3,
+compare the results of: >
+
+    $>vim -U NONE -u NONE -c 'echo has("python").has("python3")'
+    $>vim -U NONE -u NONE -c 'echo has("python3").has("python")'
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#python#has()*                   {{{3
+lh#python#has()~
+@returns has('python_compiled') || has('python3_compiled')
+This function tells whether python is available without imposing a version of
+Python. See |lh#python#best_still_avail()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#python#can_import()*            {{{3
+lh#python#can_import({modname})~
+@returns whether `:{bestpy} import {modname}` succeeds.
+The {bestpy} python flavour is determined by |lh#python#best_still_avail()|.
+@post a Python version is imposed at the end of this function.
+@see also |lh#python#externa_#can_import()|.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#python#external_can_import()*   {{{3
+lh#python#external_can_import({modname})~
+@returns whether `system('python -c "import {modname}")` succeeds.
+Unlike the |lh#python#can_import()|, the function does not impose a version of
+Python.
+@see also |lh#python#can_import()|.
 
 ------------------------------------------------------------------------------
 COMPLETION RELATED FUNCTIONS                          *lhvl#completion* {{{2

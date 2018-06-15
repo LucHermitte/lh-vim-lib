@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      13th Jun 2018
-" Last Update:  14th Jun 2018
+" Last Update:  15th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Utility function to use python from vim
@@ -71,10 +71,7 @@ endfunction
 
 " Function: lh#python#has() {{{3
 function! lh#python#has() abort
-  if !exists('s:k_python')
-    let s:k_python = lh#python#best_still_avail()
-  endif
-  return !empty(s:k_python)
+  return has('python_compiled') || has('python3_compiled')
 endfunction
 
 " Function: lh#python#can_import(module) {{{3
@@ -87,6 +84,16 @@ function! lh#python#can_import(module) abort
     return 0
   endtry
     return 1
+endfunction
+
+" Function: lh#python#external_can_import(module) {{{3
+function! lh#python#external_can_import(module) abort
+  try
+    let r = system('python -c "import '.a:module.'"')
+  catch /.*/
+    return 0
+  endtry
+  return v:shell_error == 0
 endfunction
 
 "------------------------------------------------------------------------
