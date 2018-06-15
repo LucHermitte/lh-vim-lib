@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.4.0)
-                        For Vim version 7+      Last change: 16th May 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.5.0)
+                        For Vim version 7+      Last change: 15th Jun 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -41,6 +41,8 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#common#rand()|
 - |lh#common#warning_msg()|
 - |lh#encoding#current_character()|
+- |lh#encoding#does_support()|
+- |lh#encoding#find_best_glyph()|
 - |lh#encoding#iconv()|
 - |lh#encoding#previous_character()|
 - |lh#encoding#strlen()|
@@ -848,6 +850,16 @@ lh#visual#cut()~
 @return             The current visual selection
 @post              |registers| are not altered by this function ;
                     selection is deleted.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#encoding#does_support()*      {{{3
+lh#encoding#does_support(chars, [, fonts=&guifont])~
+TBC
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#encoding#find_best_glyph()*   {{{3
+lh#encoding#find_best_glyph(caller, glyphs...)~
+TBC
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#iconv()*             {{{3
