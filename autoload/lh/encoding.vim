@@ -7,7 +7,7 @@
 " Version:      4.5.0
 let s:k_version = 450
 " Created:      21st Feb 2008
-" Last Update:  15th Jun 2018
+" Last Update:  16th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
@@ -129,11 +129,12 @@ endfunction
 let s:script_dir = expand('<sfile>:p:h')
 function! s:does_support(chars, ...) abort
   " TODO: support passing a true regex as "fonts"
-  let fonts = '('.escape(join(get(a:, 1, [substitute(&guifont, '\s\+\d\+$', '', '')]), '|'), '|\.*+').')'
+  let fonts = '('.escape(join(get(a:, 1, [substitute(&guifont, '\s\+\d\+$\|:.*$', '', '')]), '|'), '|\.*+').')'
   " echomsg fonts
   " Use an external script to not rely on the current implementation of python
-  let cmd = fnameescape(s:script_dir.'/encoding.py').' '.fnameescape(&enc).' '.string(fonts).' '
-        \ .join(map(copy(a:chars), 'fnameescape(v:val)'), ' ')
+  let cmd = shellescape(s:script_dir.'/encoding_does_support.py').' '.shellescape(&enc).' '.shellescape(fonts).' '
+        \ .join(map(copy(a:chars), 'shellescape(v:val)'), ' ')
+  " let g:cmd = cmd
   let res = eval(lh#os#system(cmd))
   return res
 endfunction

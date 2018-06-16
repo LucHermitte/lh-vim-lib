@@ -89,7 +89,7 @@ endfunction
 " Function: lh#python#external_can_import(module) {{{3
 function! lh#python#external_can_import(module) abort
   try
-    let r = system('python -c "import '.a:module.'"')
+    let r = system('python -c '.shellescape('import '.a:module))
   catch /.*/
     return 0
   endtry
