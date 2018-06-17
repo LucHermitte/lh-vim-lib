@@ -19,10 +19,15 @@ def code_points(text):
     utf32 = text.encode('UTF-32LE')
     return struct.unpack('<{}I'.format(len(utf32) // 4), utf32)
 
-def does_support(enc, font_re, chars):
+def does_support(enc, font, chars):
     import fontconfig
     fonts = fontconfig.query()
+    font_re = re.compile(sys.argv[2])
+    # print(fonts)
     fonts = [path for path in fonts if re.search(font_re, path) ]
+    if len(fonts) == 0:
+        return {'_error': 'No font found for '+font}
+    # print(fonts)
     res = {}
 
     for c in chars:
@@ -61,9 +66,9 @@ if __name__ == '__main__':
     # $2: font name regex
     # $3..$n: codepoint list
     enc     = sys.argv[1]
-    font_re = re.compile(sys.argv[2])
+    font    = sys.argv[2]
     chars   = sys.argv[3:]
-    res = does_support(enc, font_re, chars)
+    res = does_support(enc, font, chars)
 
     print(res)
 

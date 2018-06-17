@@ -7,7 +7,7 @@
 " Version:      4.5.0
 let s:k_version = 450
 " Created:      21st Feb 2008
-" Last Update:  16th Jun 2018
+" Last Update:  17th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
@@ -127,15 +127,64 @@ function! lh#encoding#does_support(chars, ...) abort
 endfunction
 
 let s:script_dir = expand('<sfile>:p:h')
-function! s:does_support(chars, ...) abort
+function! s:check_does_support_with_python_fontconfig(chars, ...) abort
+  if ! lh#python#external_can_import('fontconfig')
+    call s:Verbose('Abort: Cannot use fontconfig though python')
+    return {}
+  endif
   " TODO: support passing a true regex as "fonts"
-  let fonts = '('.escape(join(get(a:, 1, [substitute(&guifont, '\s\+\d\+$\|:.*$', '', '')]), '|'), '|\.*+').')'
+
+  let font_list = get(a:, 1, [substitute(&guifont, '\s\+\d\+$\|:.*$', '', '')])
+  if empty(font_list) ||empty(font_list[0])
+    call s:Verbose('Abort: font list is empty')
+    return {}
+  endif
+  let fonts = '('.escape(join(font_list, '|'), '|\.*+').')'
   " echomsg fonts
+  " Some shells don't support passing UTF-8 glyphs through system() => convert
+  " them
+  let chars = map(copy(a:chars), "printf('U+%x',char2nr(v:val))")
   " Use an external script to not rely on the current implementation of python
   let cmd = shellescape(s:script_dir.'/encoding_does_support.py').' '.shellescape(&enc).' '.shellescape(fonts).' '
-        \ .join(map(copy(a:chars), 'shellescape(v:val)'), ' ')
+        \ .join(map(chars, 'shellescape(v:val)'), ' ')
   " let g:cmd = cmd
   let res = eval(lh#os#system(cmd))
+  if has_key(res, '_error')
+    call s:Verbose('Error: %1', res._error)
+    return {}
+  endif
+  return res
+endfunction
+
+" Doesn't return anything usefull on cygwin-vim nor or vim-win64
+function! s:check_does_support_with_cached_screenchar(chars, ...) abort
+  let g:chars = a:chars
+  let res = {}
+  try
+    tabnew
+    call setline(1, join(a:chars, ''))
+    let line = map(range(1,virtcol('$')-1), 'screenchar(1,v:val)')
+    call lh#assert#value(len(line)).eq(eval(join(map(copy(a:chars), 'strwidth(v:val)'),'+')))
+    " call map(copy(a:chars), 'extend(res, {v:val: char2nr(v:val) == line[v:key]})')
+    " TODO: support glyphs with strwidth > 1
+    let idx = 1
+    for c in a:chars
+      call extend(res, {c: screenchar(1,idx) == char2nr(c)})
+      let idx += strwidth(c)
+    endfor
+    undo
+  finally
+    tabclose
+  endtry
+  return res
+endfunction
+
+function! s:does_support(chars, ...) abort
+  let res = call('s:check_does_support_with_python_fontconfig', [a:chars]+a:000)
+  " if empty(res)
+  "   " This doesn't permit to know anything...
+  "   let res = call('s:check_does_support_with_cached_screenchar', [a:chars]+a:000)
+  " endif
   return res
 endfunction
 
