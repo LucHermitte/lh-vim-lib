@@ -7,7 +7,7 @@
 " Version:      4.5.0
 let s:k_version = 450
 " Created:      21st Feb 2008
-" Last Update:  17th Jun 2018
+" Last Update:  18th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
@@ -110,24 +110,24 @@ function! lh#encoding#strlen(mb_string)
   return strlen(substitute(a:mb_string, '.', 'a', 'g'))
 endfunction
 
-" Function: lh#encoding#previous_character() {{{3
+" Function: lh#encoding#previous_character() {{{2
 function! lh#encoding#previous_character() abort
   return matchstr(getline('.'), '.\%'.col('.').'c')
 endfunction
 
-" Function: lh#encoding#current_character() {{{3
+" Function: lh#encoding#current_character() {{{2
 function! lh#encoding#current_character() abort
   return matchstr(getline('.'), '\%'.col('.').'c.')
 endfunction
 
-" Function: lh#encoding#does_support(chars [, fonts=&guifont]) {{{3
-function! lh#encoding#does_support(chars, ...) abort
+" Function: lh#encoding#does_support(chars [, fonts=&guifont]) {{{2
+function! lh#encoding#does_support(chars, ...) abort " {{{3
   if ! lh#python#external_can_import('fontconfig') | return lh#option#unset('Cannot use python-fontconfig packet') | endif
   return call('s:does_support', [a:chars + a:000])
 endfunction
 
 let s:script_dir = expand('<sfile>:p:h')
-function! s:check_does_support_with_python_fontconfig(chars, ...) abort
+function! s:check_does_support_with_python_fontconfig(chars, ...) abort " {{{3
   if ! lh#python#external_can_import('fontconfig')
     call s:Verbose('Abort: Cannot use fontconfig though python')
     return {}
@@ -156,8 +156,8 @@ function! s:check_does_support_with_python_fontconfig(chars, ...) abort
   return res
 endfunction
 
-" Doesn't return anything usefull on cygwin-vim nor or vim-win64
-function! s:check_does_support_with_cached_screenchar(chars, ...) abort
+function! s:check_does_support_with_cached_screenchar(chars, ...) abort " {{{3
+  " Doesn't return anything usefull on cygwin-vim nor or vim-win64
   let g:chars = a:chars
   let res = {}
   try
@@ -179,7 +179,7 @@ function! s:check_does_support_with_cached_screenchar(chars, ...) abort
   return res
 endfunction
 
-function! s:does_support(chars, ...) abort
+function! s:does_support(chars, ...) abort " {{{3
   let res = call('s:check_does_support_with_python_fontconfig', [a:chars]+a:000)
   " if empty(res)
   "   " This doesn't permit to know anything...
@@ -188,7 +188,7 @@ function! s:does_support(chars, ...) abort
   return res
 endfunction
 
-" Function: lh#encoding#find_best_glyph(caller, glyphs...) {{{3
+" Function: lh#encoding#find_best_glyph(caller, glyphs...) {{{2
 " Expect last sequence to be in ASCII
 function! lh#encoding#find_best_glyph(plugin_name, ...) abort
   " call lh#assert#value(a:000[*]).not().empty()
