@@ -134,7 +134,8 @@ function! s:check_does_support_with_python_fontconfig(chars, ...) abort " {{{3
   endif
   " TODO: support passing a true regex as "fonts"
 
-  let font_list = get(a:, 1, [substitute(&guifont, '\s\+\d\+$\|:.*$', '', '')])
+  let def_font = has('gui_running') ? substitute(&guifont, '\s\+\d\+$\|:.*$', '', '') : ''
+  let font_list = get(a:, 1, [def_font])
   if empty(font_list) ||empty(font_list[0])
     call s:Verbose('Abort: font list is empty')
     return {}
@@ -142,8 +143,8 @@ function! s:check_does_support_with_python_fontconfig(chars, ...) abort " {{{3
   let fonts = '('.escape(join(font_list, '|'), '|\.*+').')'
   " echomsg fonts
   " Some shells don't support passing UTF-8 glyphs through system() => convert
-  " them
-  let chars = map(copy(a:chars), "printf('U+%x',char2nr(v:val))")
+  " them to "U+{hexa}" from
+  let chars = map(copy(a:chars), "v:val =~ '\\M^U+' ? v:val : printf('U+%x',char2nr(v:val))")
   " Use an external script to not rely on the current implementation of python
   let cmd = shellescape(s:script_dir.'/encoding_does_support.py').' '.shellescape(&enc).' '.shellescape(fonts).' '
         \ .join(map(chars, 'shellescape(v:val)'), ' ')
@@ -157,8 +158,10 @@ function! s:check_does_support_with_python_fontconfig(chars, ...) abort " {{{3
 endfunction
 
 function! s:check_does_support_with_cached_screenchar(chars, ...) abort " {{{3
-  " Doesn't return anything usefull on cygwin-vim nor or vim-win64
-  let g:chars = a:chars
+  " Doesn't return anything usefull on cygwin-vim, vim-win64,
+  " vim-linux64...
+  " => returns the codepoint, independently of the current font
+  " let g:chars = a:chars
   let res = {}
   try
     tabnew

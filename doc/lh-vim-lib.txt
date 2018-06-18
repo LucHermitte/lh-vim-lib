@@ -854,7 +854,28 @@ lh#visual#cut()~
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#does_support()*      {{{3
 lh#encoding#does_support(chars, [, fonts=&guifont])~
-TBC
+Tries to detect automatically whether a codepoint has an associated glyph in
+the current font used.
+@since Version 4.5.0
+@param[in] {chars}   |List| of characters expressed either as `"\uHEXA"`, or
+                     `"\UHEXA"`, or `'U+HEXA'`.
+@param[in] [{fonts}] Regex that define active fonts. Defaults to |'guifont'|
+                     when `has('gui_running')` is true
+@return              |Dictionary| where the keys are the codepoints, and the
+                     values are 0/1 depending whether the font supports that character.
+
+Examples: >
+    :echo lh#encoding#does_support(["\u274c", "U+1F6C8"])
+
+Requires:
+- |gvim|
+    Unfortunatelly this feature requires a way for Vim to know which is the
+    current font. This is impossible to do so in a portable way from the
+    terminal.  This means, unless you know which font your terminal is using,
+    it'll uses |'guifont'| which is available only from GUI sessions, IOW when
+    we use `gvim`, and not `vim`.
+- Python (external) with `python-fontconfig` module installed (and thus
+  `fontconfig`)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#find_best_glyph()*   {{{3
