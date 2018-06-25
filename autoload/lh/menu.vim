@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 4000
+" Version:      4.5.0
+let s:k_version = 40500
 " Created:      13th Oct 2006
-" Last Update:  14th Oct 2017
+" Last Update:  25th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -34,6 +34,7 @@ let s:k_version = 4000
 "               variable from the current project at the moment the menu is
 "               defined.
 "               ENH: Accept multiple words value in `:Toggle`
+"       v4.5.0  BUG: Make :Toggle reject bar ; may need more intelligence
 " TODO: {{{2
 "       * Should the argument to :Toggle be simplified to use the variable name
 "       instead ? May be a banged :Toggle! could work on the real variable
@@ -212,7 +213,7 @@ function! s:SetTextValue(Data, text) abort
   let old = s:Fetch(a:Data, labels_key)
   let new_idx = s:SearchText(a:Data, a:text)
   if -1 == new_idx
-    throw "toggle-menu: unsupported value for {".lh#object#to_string(a:Data.variable)."}"
+    throw "toggle-menu: unsupported value (".a:text.") for {".lh#object#to_string(a:Data.variable)."}"
   endif
   if a:Data.idx_crt_value == new_idx
     " value unchanged => abort
@@ -353,7 +354,7 @@ function! lh#menu#def_toggle_item(Data) abort
   let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
   " Lazy definition of the command
   if 2 != exists(':'.s:k_Toggle_cmd)
-    exe 'command! -nargs=+ -complete=custom,lh#menu#_toggle_complete '
+    exe 'command! -nargs=+ -complete=custom,lh#menu#_toggle_complete -bar '
           \ . s:k_Toggle_cmd . ' :call s:Toggle(<f-args>)'
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
@@ -519,7 +520,7 @@ function! lh#menu#def_string_item(Data) abort
   let cmdName = substitute(a:Data.menu.name, '[^a-zA-Z_]', '', 'g')
   " Lazy definition of the command
   if 2 != exists(':'.s:k_Set_cmd)
-    exe 'command! -nargs=1 -complete=custom,lh#menu#_string_complete '
+    exe 'command! -nargs=1 -complete=custom,lh#menu#_string_complete -bar '
           \ . s:k_Set_cmd . ' :call s:SetVariableFromCommand(<f-args>)'
   endif
   " silent exe 'command! -nargs=0 '.cmdName.' :call s:NextValue(s:Data'.id.')'
