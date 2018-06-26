@@ -2,10 +2,10 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.4.0
-let s:k_version = '400400'
+" Version:      4.5.0
+let s:k_version = '400500'
 " Created:      02nd Sep 2016
-" Last Update:  16th May 2018
+" Last Update:  26th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -63,6 +63,16 @@ else
   endfunction
 endif
 
+" Function: lh#has#default_in_getbufvar() {{{3
+function! lh#has#default_in_getbufvar() abort
+  return lh#has#patch("patch-7.3.831")
+endfunction
+
+" Function: lh#has#jobs()                 {{{3
+function! lh#has#jobs() abort
+  return exists('*job_start') && lh#has#patch("patch-7.4.1980")
+endfunction
+
 " Function: lh#has#lambda()               {{{3
 function! lh#has#lambda() abort
   return has("lambda")
@@ -73,25 +83,21 @@ function! lh#has#partials() abort
   return lh#has#patch("patch-7.4.1558")
 endfunction
 
-" Function: lh#has#jobs()                 {{{3
-function! lh#has#jobs() abort
-  return exists('*job_start') && lh#has#patch("patch-7.4.1980")
-endfunction
-
-" Function: lh#has#default_in_getbufvar() {{{3
-function! lh#has#default_in_getbufvar() abort
-  return lh#has#patch("patch-7.3.831")
-endfunction
-
-" Function: lh#has#vkey()                 {{{3
-function! lh#has#vkey() abort
-  return lh#has#patch('patch-7.2-295')
+" Function: lh#has#properties_in_qf() {{{3
+" @since v 4.5.0
+function! lh#has#properties_in_qf() abort
+  return lh#has#patch("patch-7.4.2200")
 endfunction
 
 " Function: lh#has#redo()                 {{{3
 " @since v 4.4.0
 function! lh#has#redo() abort
   return has('patch-7.4.849')
+endfunction
+
+" Function: lh#has#vkey()                 {{{3
+function! lh#has#vkey() abort
+  return lh#has#patch('patch-7.2-295')
 endfunction
 
 "------------------------------------------------------------------------
