@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.1.0
-let s:version = '4.1.0'
+" Version:      4.5.0
+let s:version = '4.5.0'
 " Created:      03rd Jan 2011
-" Last Update:  08th Mar 2018
+" Last Update:  26th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -17,6 +17,7 @@ let s:version = '4.1.0'
 "       Drop this file into {rtp}/autoload/lh
 "       Requires Vim7+
 " History:
+"       v4.5.0 : Reduce side effects on &complete
 "       v4.0.0 : Support vim7.3
 "                Stay in insert mode when there is no hook
 "       v3.5.0 : Smarter completion function added
@@ -162,13 +163,13 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   silent! unlet b:complete_data
   let augroup = 'IComplete'.bufnr('%').'Done'
   let b:complete_data = lh#on#exit()
-        \.restore('&completefunc')
-        \.restore('&complete')
-        \.restore('&omnifunc')
+        \.restore('&l:completefunc')
+        \.restore('&l:complete')
+        \.restore('&l:omnifunc')
         \.restore('&completeopt')
         \.register('au! '.augroup)
         \.register('call s:Verbose("finalized! (".getline(".").")")')
-  set complete=
+  setlocal complete=
   " TODO: actually, remove most options but preview
   set completeopt-=menu
   set completeopt-=longest
@@ -311,8 +312,8 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   " Register {{{3
   " call b:complete_data
         " \.restore('b:complete_data')
-  " set completefunc=lh#icomplete#func
-  set omnifunc=lh#icomplete#func
+  " setlocal completefunc=lh#icomplete#func
+  setlocal omnifunc=lh#icomplete#func
 
   " Return {{{3
   return b:complete_data
