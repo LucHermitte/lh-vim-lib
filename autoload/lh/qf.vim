@@ -51,8 +51,65 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+" # Context object {{{2
+" Function: lh#qf#make_context_map() {{{3
+" Create a map that'll (externally) associate qf list to context
+" As other plugins may use that context for their own need, let's use another
+" approach
+function! s:getSID() abort
+  return eval(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_getSID$'))
+endfunction
 
-" Function: lh#qf#get_title() {{{2
+let s:k_script_name      = s:getSID()
+if lh#has#properties_in_qf()
+  function! lh#qf#make_context_map(required) abort
+    let res = lh#object#make_top_type({'_contexts': {}})
+    call lh#object#inject_methods(res, s:k_script_name
+          \, 'get_id'
+          \, 'context'
+          \, 'get'
+          \, 'set'
+          \ )
+    return res
+  endfunction
+else
+  function! lh#qf#make_context_map(required) abort
+    call lh#assert#true(a:required, "Sorry this feature isn't available in Vim ".v:version)
+    call lh#object#inject(res, 'get_id', ' s:dummy', s:k_script_name)
+    call lh#object#inject(res, 'context', 's:dummy', s:k_script_name)
+    call lh#object#inject(res, 'get', '    s:dummy', s:k_script_name)
+    call lh#object#inject(res, 'set', '    s:dummy', s:k_script_name)
+  endfunction
+endif
+
+function! s:dummy(...) abort
+endfunction
+
+function! s:get_id() dict abort
+  return getqflist({'id': 0}).id
+endfunction
+
+function! s:context(...) dict abort
+  let id = a:0 > 0 ? a:1 : self.get_id()
+  if ! has_key(self._contexts, id)
+    let self._contexts[id] = {}
+  endif
+  return self._contexts[id]
+endfunction
+
+function! s:get(key, ...) dict abort
+  let id = a:0 > 0 ? a:1 : self.get_id()
+  return get(self.context(id), a:key)
+endfunction
+
+function! s:set(key, value, ...) dict abort
+  let id = a:0 > 0 ? a:1 : self.get_id()
+  let ctx = self.context(id)
+  let ctx[a:key] = a:value
+endfunction
+
+" # Misc functions {{{2
+" Function: lh#qf#get_title() {{{3
 " @since V4.5.0
 if lh#has#properties_in_qf()
   function! lh#qf#get_title() abort
@@ -65,7 +122,7 @@ else
   endfunction
 endif
 
-" Function: lh#qf#get_winnr() {{{2
+" Function: lh#qf#get_winnr() {{{3
 " @since V4.5.0
 if exists('*getwininfo')
   function! lh#qf#get_winnr() abort
@@ -83,7 +140,7 @@ else
   endfunction
 endif
 
-" Function: lh#qf#is_displayed() {{{2
+" Function: lh#qf#is_displayed() {{{3
 function! lh#qf#is_displayed() abort
   return lh#qf#get_winnr() ? 1 : 0
 endfunction
