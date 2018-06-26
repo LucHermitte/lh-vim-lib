@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.5.0)
-                        For Vim version 7+      Last change: 15th Jun 2018
+                        For Vim version 7+      Last change: 26th Jun 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -239,8 +239,14 @@ Buffer related functions:                               |lhvl#buffer|     {{{2
     - |lh#buffer#dialog#update()|
 Window related functions:                               |lhvl#window|     {{{2
 - |lh#window#create_window_with()|
+- |lh#window#getid()|
+- |lh#window#gotoid()|
 - |lh#window#new()|
 - |lh#window#split()|
+Quickfix related functions:                             |lhvl#quickfix|   {{{2
+- |lh#qf#get_title()|
+- |lh#qf#get_winnr()|
+- |lh#qf#is_displayed()|
 Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#is_a_comment()|
 - |lh#syntax#is_a_comment_at()|
@@ -3319,6 +3325,7 @@ The second tries to execute `:split {options}`
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#window#getid()*               {{{3
 lh#window#getid([{win}])~
+@since version 3.9.0
 Encapsulation over vim recent function |win_getid()|.
 An emulation is provided for older versions of vim.
 This function associates (on-the-fly) a unique window-id to a |window| know from
@@ -3337,6 +3344,7 @@ Function meant to be used along with |lh#window#gotoid()|.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#window#gotoid()*              {{{3
 lh#window#gotoid({id})~
+@since version 3.9.0
 Encapsulation over vim recent function |win_gotoid()|.
 An emulation is provided for older versions of vim.
 This function jumps to the window that has the window id {id}.
@@ -3344,6 +3352,35 @@ This function jumps to the window that has the window id {id}.
 Note: While window numbers may change as windows get reorganized, window ids
 are stable and never change.
 Function meant to be used along with |lh#window#getid()|.
+
+------------------------------------------------------------------------------
+QUICKFIX RELATED FUNCTIONS                            *lhvl#quickfix*   {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#get_title()*               {{{3
+lh#qf#get_title()~
+@since version 4.5.0
+@returns the title of the |quickfix-window|, even on versions of Vim where >
+    getqflist({'title':1})
+isn't supported.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#get_winnr()*               {{{3
+lh#qf#get_winnr()~
+@since version 4.5.0
+@returns Window number of the the |quickfix-window|, or 0 if it isn't opened.
+@note    |location-list-window|s are ignored.
+
+It works even on versions of Vim where >
+    filter(getwininfo(), 'v:val.quickfix && !v:val.loclist')[0].winnr
+isn't supported.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#is_displayed()*            {{{3
+lh#qf#is_displayed()~
+@since version 4.5.0
+@returns whether the |quickfix-window| is opened.
+@note    |location-list-window|s are ignored.
 
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2

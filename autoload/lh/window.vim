@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.10.4.
-let s:k_version = '3104'
+" Version:      4.5.0.
+let s:k_version = '40500'
 " Created:      29th Oct 2015
-" Last Update:  02nd Jun 2016
+" Last Update:  26th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.
@@ -18,12 +18,12 @@ let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
-" # Version {{{2
+" # Version          {{{2
 function! lh#window#version()
   return s:k_version
 endfunction
 
-" # Debug   {{{2
+" # Debug            {{{2
 let s:verbose = get(s:, 'verbose', 0)
 function! lh#window#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
@@ -72,7 +72,7 @@ function! lh#window#new(bufname) abort
   call call('lh#window#create_window_with',[join(['new']+a:000, ' ')])
 endfunction
 
-" # Window Id {{{2
+" # Window Id        {{{2
 " Function: lh#window#getid() {{{3
 " @since version 3.9.0
 let s:has_win_getid = exists('*win_getid')
