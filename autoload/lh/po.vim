@@ -2,10 +2,10 @@
 " File:         autoload/lh/po.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.00.0.
-let s:k_version = '4000'
+" Version:      4.5.0.
+let s:k_version = '40500'
 " Created:      03rd Feb 2017
-" Last Update:  03rd Mar 2017
+" Last Update:  27th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Utility functions to handle Portable Object messages
@@ -62,8 +62,8 @@ let s:k_cached_translations = {}
 function! s:translate(id) dict abort
   let cache = lh#dict#let(s:k_cached_translations, self._env.LANG .'.'. self._env.TEXTDOMAIN, {})
   if !has_key(cache, a:id)
-    if &shell =~ 'bash'
-      let cache[a:id] = lh#os#system('echo $"'.a:id.'"', self._env)
+    if executable('bash')
+      let cache[a:id] = lh#os#system('bash -c '.shellescape('echo $"'.a:id.'"'), self._env)
     else
       " TODO: support windows
       let cache[a:id] = a:id
