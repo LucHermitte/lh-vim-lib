@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      26th Jun 2018
-" Last Update:  26th Jun 2018
+" Last Update:  27th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -131,9 +131,10 @@ if exists('*getwininfo')
     return empty(wins) ? 0 : wins[0].winnr
   endfunction
 else
+  let s:k_msg_qflist = lh#po#context().translate('[Quickfix List]')
   function! lh#qf#get_winnr() abort
     let buffers = lh#askvim#execute('ls!')
-    call filter(buffers, 'v:val =~ "\\[Quickfix List\\]"')
+    call filter(buffers, 'v:val =~ "\\V".s:k_msg_qflist')
     " :cclose removes the buffer from the list (in my config only??)
     " assert(len(buffers) <= 1)
     return empty(buffers) ? 0 : eval(matchstr(buffers[0], '\v^\s*\zs\d+'))
