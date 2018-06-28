@@ -142,6 +142,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#dict#get_composed()`         | Function symetric to `lh#let#*()` functions                                                                       |
 | `lh#dict#key()`                  | Expects the dictionary to have only one element (throw otherwise) and returns it                                  |
 | `lh#dict#let()`                  | Emulates `:let dict.key.key.key = value`                                                                          |
+| `lh#dict#need_ref_on()`          | Makes sure `:let dict.key.key.key` exists and returns a reference to that element                                 |
 | `lh#dict#subset()`               | Builds a subset dictionary of a dict                                                                              |
 | `lh#list#accumulate()`           | Accumulates the elements from a list                                                                              |
 | `lh#list#accumulate()`           | Accumulates the elements from a list                                                                              |

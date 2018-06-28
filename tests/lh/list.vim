@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.0.0
+" Version:      4.5.0
 " Created:	19th Nov 2008
-" Last Update:  04th Aug 2017
+" Last Update:  28th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -623,6 +623,64 @@ function! s:Test_dict_let() abort
   AssertEquals(d.a.b.z, 42)
   call lh#dict#let(d, 'a.z1.z2.z3', 42)
   AssertEquals(d.a.z1.z2.z3, 42)
+endfunction
+
+" lh#dict#need_ref_on() {{{2
+" Function: s:Test_dict_need_ref_on() {{{3
+function! s:Test_dict_need_ref_on() abort
+  let D = { 'a': { 'b': 1}, 'c': 2}
+  AssertEquals(D.a.b, 1)
+  AssertEquals(D.c, 2)
+
+  " --- Access something already there, 1 level deep
+  let a = lh#dict#need_ref_on(D, 'a')
+  AssertIs(a, D.a)
+
+  let a = lh#dict#need_ref_on(D, ['a']) " other syntax
+  AssertIs(a, D.a)
+
+  " --- Access something already there, n level deep
+  AssertThrows(lh#dict#need_ref_on(D, 'a.b.c.d.e', 42))
+  call lh#dict#let(D, 'a.b.c.d.e', 42)
+  let d = lh#dict#need_ref_on(D, 'a.b.c.d')
+  AssertIs(a, D.a)
+  AssertIs(d, D.a.b.c.d)
+
+  let c = lh#dict#need_ref_on(D, ['a', 'b', 'c']) " other syntax
+  AssertIs(a, D.a)
+  AssertIs(c, D.a.b.c)
+  AssertIs(d, D.a.b.c.d)
+
+  " --- Add something new, 1 lcl deep
+  let ee = lh#dict#need_ref_on(D, 'a.ee')
+  AssertIs(a, D.a)
+  AssertIs(c, D.a.b.c)
+  AssertIs(d, D.a.b.c.d)
+  Assert! has_key(D.a, 'ee')
+  AssertIs(D.a.ee, ee)
+  AssertEquals!(type(ee), type({}))
+  AssertEquals(ee, {})
+
+  " --- Add something new, n lcl deep, other syntax
+  let ff = lh#dict#need_ref_on(D, 'a.b.c.d.1.2.3.ff', [1, 2])
+  AssertIs(a, D.a)
+  AssertIs(c, D.a.b.c)
+  AssertIs(d, D.a.b.c.d)
+  Assert! has_key(D.a, 'ee')
+  AssertIs(D.a.ee, ee)
+  AssertEquals!(type(ee), type({}))
+  AssertEquals(ee, {})
+  Assert! has_key(D.a.b.c.d, '1')
+  Assert! has_key(D.a.b.c.d.1, '2')
+  Assert! has_key(D.a.b.c.d.1.2, '3')
+  Assert! has_key(D.a.b.c.d.1.2.3, 'ff')
+  AssertIs(D.a.b.c.d.1.2.3.ff, ff)
+  AssertEquals!(type(ff), type([]))
+  AssertEquals(ff, [1, 2])
+
+  " --- Try to add something that requires a type modification of a
+  "  subdict
+  AssertThrows(lh#dict#need_ref_on(D, 'a.b.c.d.e.1.2.3.ff', [1, 2]))
 endfunction
 
 " lh#list#cross() {{{2
