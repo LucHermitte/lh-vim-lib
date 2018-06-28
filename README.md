@@ -28,7 +28,8 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Paths related functions](#paths-related-functions)
   * [Commands related functions](#commands-related-functions)
   * [Menus related functions](#menus-related-functions)
-  * [Buffers related functions](#buffers-related-functions)
+  * [Buffers and Windows related functions](#buffers-and-windows-related-functions)
+  * [Quickfix related functions](#quickfix-related-functions)
   * [Syntax related functions](#syntax-related-functions)
   * [UI functions](#ui-functions)
   * [Project feature](doc/Project.md) -- other web page
@@ -278,7 +279,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 See also the documentation of the old functions at http://hermitte.free.fr/vim/general.php#expl_menu_map
 
 
-### Buffers related functions
+### Buffers and Windows related functions
 | Function                         | Purpose                                                                                                                          |
 |:---------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
 | `lh#buffer#dialog#add_help()`    | see [lh-vim-lib/dialog](doc/Dialog.md)                                                                                           |
@@ -296,6 +297,14 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#window#getid()`              | Emulates recent `win_getid()` function                                                                                           |
 | `lh#window#gotoid()`             | Emulates recent `win_gotoid()` function                                                                                          |
 
+
+### Quickfix related functions
+| Function                   | Purpose                                                                                                                      |
+|:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------|
+| `lh#qf#get_title()`        | Returns title of the qf window                                                                                               |
+| `lh#qf#get_winnr()`        | Returns window number of the qf window -- ignore location list windows                                                       |
+| `lh#qf#is_displayed()`     | Tells whether the qf window is visible -- ignore location list windows                                                       |
+| `lh#qf#make_context_map()` | Returns a non intrusive alternative to [`quickfix-context`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dcontext) |
 
 ### Syntax related functions
 | Function                                                         | Purpose                                                                                                                                |

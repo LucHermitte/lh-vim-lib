@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      26th Jun 2018
-" Last Update:  27th Jun 2018
+" Last Update:  28th Jun 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -53,7 +53,7 @@ endfunction
 " ## Exported functions {{{1
 " # Context object {{{2
 " Function: lh#qf#make_context_map() {{{3
-" Create a map that'll (externally) associate qf list to context
+" Create a map that'll (externally) associate context to qf lists.
 " As other plugins may use that context for their own need, let's use another
 " approach
 function! s:getSID() abort
@@ -66,7 +66,7 @@ if lh#has#properties_in_qf()
     let res = lh#object#make_top_type({'_contexts': {}})
     call lh#object#inject_methods(res, s:k_script_name
           \, 'get_id'
-          \, 'context'
+          \, '_context'
           \, 'get'
           \, 'set'
           \ )
@@ -75,10 +75,10 @@ if lh#has#properties_in_qf()
 else
   function! lh#qf#make_context_map(required) abort
     call lh#assert#true(a:required, "Sorry this feature isn't available in Vim ".v:version)
-    call lh#object#inject(res, 'get_id', ' s:dummy', s:k_script_name)
-    call lh#object#inject(res, 'context', 's:dummy', s:k_script_name)
-    call lh#object#inject(res, 'get', '    s:dummy', s:k_script_name)
-    call lh#object#inject(res, 'set', '    s:dummy', s:k_script_name)
+    call lh#object#inject(res, 'get_id',   's:dummy', s:k_script_name)
+    call lh#object#inject(res, '_context', 's:dummy', s:k_script_name)
+    call lh#object#inject(res, 'get',      's:dummy', s:k_script_name)
+    call lh#object#inject(res, 'set',      's:dummy', s:k_script_name)
   endfunction
 endif
 
@@ -89,22 +89,23 @@ function! s:get_id() dict abort
   return getqflist({'id': 0}).id
 endfunction
 
-function! s:context(...) dict abort
+function! s:_context(...) dict abort
   let id = a:0 > 0 ? a:1 : self.get_id()
-  if ! has_key(self._contexts, id)
-    let self._contexts[id] = {}
-  endif
-  return self._contexts[id]
+  return lh#dict#need_ref_on(self._contexts, id, {})
+  "if ! has_key(self._contexts, id)
+  "  let self._contexts[id] = {}
+  "endif
+  "return self._contexts[id]
 endfunction
 
 function! s:get(key, ...) dict abort
   let id = a:0 > 0 ? a:1 : self.get_id()
-  return get(self.context(id), a:key)
+  return get(self._context(id), a:key)
 endfunction
 
 function! s:set(key, value, ...) dict abort
   let id = a:0 > 0 ? a:1 : self.get_id()
-  let ctx = self.context(id)
+  let ctx = self._context(id)
   let ctx[a:key] = a:value
 endfunction
 

@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.5.0)
-                        For Vim version 7+      Last change: 26th Jun 2018
+                        For Vim version 7+      Last change: 28th Jun 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -249,6 +249,7 @@ Quickfix related functions:                             |lhvl#quickfix|   {{{2
 - |lh#qf#get_title()|
 - |lh#qf#get_winnr()|
 - |lh#qf#is_displayed()|
+- |lh#qf#make_context_map()|
 Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#is_a_comment()|
 - |lh#syntax#is_a_comment_at()|
@@ -3430,6 +3431,49 @@ lh#qf#is_displayed()~
 @since version 4.5.0
 @returns whether the |quickfix-window| is opened.
 @note    |location-list-window|s are ignored.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#make_context_map()*        {{{3
+lh#qf#make_context_map(required)~
+@since version 4.5.0
+@param[in] {required} Helps detecting cases when the availability of the
+                      option is critical
+@returns a |lhvl#object| that helps associate context to a |quickfix-list|.
+@pre *lh#has#properties_in_qf()* || not {required} // `has('patch-7.4.2200')`
+
+Creates a |dictionary|-map that'll (externally) associate a context to a
+|quickfix-list|.
+
+Rationale:~
+This feature is somehow redundant to |quickfix-context|. The difference is
+that different plugins may want to use the context for their own purpose.
+Typically plugins that encapsulate compilation or searching may want to store
+the exact command-line, or some other high level information like a
+compilation mode (/Release/, /Debug/...)...
+If another plugin that works on quickfix lists needs to associate un unrelated
+information to each list, then there is a high risk of conflict on their usage
+of the |quickfix-context|.
+That's the rationale behind `lh#qf#make_context_map()`: to be able to
+associate a context without any possible interference from other plugins.
+
+Unfortunatelly, this feature won't be available before the quite recent (at
+this time) Vim 7.4.2200. Hence, the {required} flag. If the version
+requirement cannot be satisfied, and in the feature isn't really important in
+your plugins, thay you can say "this is not required". Thanks to that, all
+methods will return the value 0 -- which by the way is |empty()|.
+
+Methods:~
+*lh#qf#make_context_map().get_id()*
+Returns the |quickfix-ID| of the current quickfix list
+
+*lh#qf#make_context_map().get()* --> `.get(key [, id])`
+Returns the values previously associated to the {key} for the specified (or
+current) |quickfix-ID|.
+
+*lh#qf#make_context_map().get()* --> `.set(key, value [, id])`
+Associates a {value} to the {key} for the specified (or current) |quickfix-ID|.
+The plugin has been developped with the idea the {value} would be a
+|dictionary| or a |list|.
 
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2
