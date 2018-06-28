@@ -3743,7 +3743,6 @@ See |:lcd|, |fnameescape()|.
 ------------------------------------------------------------------------------
 PYTHON RELATED FUNCTIONS                              *lhvl#python*     {{{2
 
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#python#best_still_avail()*      {{{3
 lh#python#best_still_avail([preferred order])~

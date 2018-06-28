@@ -16,6 +16,13 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 - Since version 3.2.7, it's no longer hosted on google-code but on github.
 - Version 4.0.0 breaks `lh#let#if_undef()` interface, deprecates `CONFIRM()`, requires vim 7.4-52.
 
+## Table of Content
+
+  * [Functions](#functions)
+  * [Installation](#installation)
+  * [Credits](#credits)
+  * [Some other Vim Scripting libraries](#some-other-vim-scripting-libraries)
+
 ## Functions
 
   * [Option management](doc/Options.md) -- other web page
@@ -37,6 +44,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Design by Contract functions](doc/DbC.md) -- other web page
   * [Call stack decoding](doc/Callstack.md) -- other web page
   * [Commands](#commands)
+  * [Python related functions](#python-related-functions)
 
 ### Miscellaneous functions
 
@@ -378,6 +386,15 @@ See http://hermitte.free.fr/vim/general.php#expl_words_tools
 | `:Unlet`                                  | [`:unlet`](http://vimhelp.appspot.com/eval.txt.html#%3aunlet) a variable if it doesn't exists -- no side effect unlike `:silent! unlet`                                    |
 | `:PushOptions`, `:PopOptions`             | Pushs/pops values into list variables                                                                                                                                      |
 | [`:Project`](doc/Project.md)              | Central command for the project feature                                                                                                                                    |
+
+## Python related functions
+
+| Command                           | Purpose                                                                                       |
+| :---------------------------------| :---------------------------------------------------------------------------------------------|
+| `lh#python#best_still_avail()`    | Returns the best python flavour we can use without imposing a version, unlike `has('python')` |
+| `lh#python#has()`                 | Returns `has('python_compiled') || has('python3_compiled')`                                   |
+| `lh#python#can_import()`          | Returns whether `:{bestpy} import {modname}` succeeds                                         |
+| `lh#python#external_can_import()` | Returns whether `system('python -c "import {modname}")` succeeds                              |
 
 ## Installation
   * Requirements: Vim 7.4, Vim 8 for `lh#async` feature.
