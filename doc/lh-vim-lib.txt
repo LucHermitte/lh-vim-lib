@@ -40,6 +40,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#common#error_msg()|
 - |lh#common#rand()|
 - |lh#common#warning_msg()|
+- |lh#encoding#at()|
 - |lh#encoding#current_character()|
 - |lh#encoding#does_support()|
 - |lh#encoding#find_best_glyph()|
@@ -889,7 +890,31 @@ Requires:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#find_best_glyph()*   {{{3
 lh#encoding#find_best_glyph(caller, glyphs...)~
-TBC
+Returns the first codepoint of each list that has a glyph in the current font
+used.
+@since Version 4.5.0
+@param[in] {caller} name the plugin in the need the information for richer
+                    error messages
+@param[in] {glyphs} |list| of |list| of codepoints. The characters can be
+                    expressed either as `"\uHEXA"`, or `"\UHEXA"`, or `'U+HEXA'`.
+@return             |list| of matching codepoints -- taken from the inputs.
+                    When no codepoint is found to have a glyph in a |list|,
+                    then the last value (that can be a string, and not a
+                    codepoint) is returned.
+Same requirements as |lh#encoding#does_support()| upon which this function
+rely.
+
+Examples: >
+    let s_error   = s:opt('signs.error',   ["\u274c", 'XX']           )
+    let s_warning = s:opt('signs.warning', ["\u26a0", "\u26DB", '!!'] )
+    let s_note    = s:opt('signs.note',    ["\u2139", "\U1F6C8", 'ii'])
+    let s_context = s:opt('signs.context', ['>>']                     )
+    let s_info    = s:opt('signs.info',    ["\u27a9", '->']           )
+
+    let [error, warning, note, ctx, here] = lh#encoding#find_best_glyph(
+          \ 'compil-hints',
+          \ s_error, s_warning, s_note, s_context, s_info
+          \ )
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#encoding#iconv()*             {{{3
