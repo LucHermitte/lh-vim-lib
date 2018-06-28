@@ -432,7 +432,7 @@ See http://hermitte.free.fr/vim/general.php#expl_words_tools
 
 ## Some other Vim Scripting libraries
 
-### The ones that seem to be still activelly maintainded
+### The ones that seem to be still activelly maintained
   * [ingo-library](http://www.vim.org/scripts/script.php?script_id=4433), by
     Ingo Karkat
   * [maktaba](https://github.com/google/vim-maktaba), by google
