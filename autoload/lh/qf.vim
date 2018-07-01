@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      26th Jun 2018
-" Last Update:  28th Jun 2018
+" Last Update:  02nd Jul 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -125,7 +125,7 @@ endif
 
 " Function: lh#qf#get_winnr() {{{3
 " @since V4.5.0
-if exists('*getwininfo')
+if lh#has#patch('patch-7.4-2215') " && exists('*getwininfo')
   function! lh#qf#get_winnr() abort
     let wins = filter(getwininfo(), 'v:val.quickfix && !v:val.loclist')
     " assert(len(wins) <= 1)
