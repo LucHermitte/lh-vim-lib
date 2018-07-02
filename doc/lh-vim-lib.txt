@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.5.0)
-                        For Vim version 7+      Last change: 28th Jun 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.5.1)
+                        For Vim version 7+      Last change: 02nd Jul 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -3495,7 +3495,7 @@ Returns the |quickfix-ID| of the current quickfix list
 Returns the values previously associated to the {key} for the specified (or
 current) |quickfix-ID|.
 
-*lh#qf#make_context_map().get()* --> `.set(key, value [, id])`
+*lh#qf#make_context_map().set()* --> `.set(key, value [, id])`
 Associates a {value} to the {key} for the specified (or current) |quickfix-ID|.
 The plugin has been developped with the idea the {value} would be a
 |dictionary| or a |list|.
