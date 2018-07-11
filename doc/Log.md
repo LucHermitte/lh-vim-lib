@@ -90,7 +90,7 @@ execute
 
 ### Logging context, i18n...
 This framework has a feature that isn't that trivial to implement: it locates
-the line (file + line number) where every log message is issued.
+the lines (file + line number) from where every log message is issued.
 
 It isn't used by all logging policies, it's used only by those that fill the
 quickfix window (or location list windows) in order to permit to navigate the
