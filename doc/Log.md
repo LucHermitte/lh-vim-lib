@@ -85,3 +85,83 @@ execute
 | `lh#log#this({format}, {args...})` | Logs a formatted message with the global logger                                |
 | `lh#log#exception(...)`            | Logs the exception, and possibly its call stack, with the global logger.       |
 
+
+## Design considerations
+
+### Logging context, i18n...
+This framework has a feature that isn't that trivial to implement: it locates
+the line (file + line number) where every log message is issued.
+
+It isn't used by all logging policies, it's used only by those that fill the
+quickfix window (or location list windows) in order to permit to navigate the
+context of the logged messages, as you can see in the screencast.
+
+
+It's ain't trivial because:
+
+- we need a hack to ask Vim the current context we are in (callstack)
+- Vim returns context information in the current locale
+
+In neither case Vim provides anything to directly obtain the
+[information we are looking for](https://github.com/vim/vim/issues/1125). In
+the end, everything is taken care of by lh-vim-lib
+[callstack decoding API](Callstack.md) -- which has other applications.
+
+Also, please note that decoding the callstack is really slow and that this
+shall be avoided in loops.
+
+### Logging levels
+Usually logging frameworks provide logging levels. This logging framework does
+not, and it's not really an issue.
+
+
+#### TL;DR
+The choices I've made in lh-vim-lib and my other plugins are the following:
+- Information messages are meant to be always displayed.
+- Error messages are meant to be always displayed, and to stop the current
+  process. If they don't need to stop the current process, it means they are
+  just warnings that can be seen as colored information messages.
+- We can activate debug messages independently in each module.
+- I don't really care about the execution context of an information message,
+  this means information messages must be clear and explicitly about what they
+  saying.
+- When debugging I need the logging context of a debug message.
+- We need to be able to trace back the context of an error, whether it's a
+  runtime error or a logic error.
+
+#### Rationale/motivations
+End users only really need comprehensible error and information messages. They
+don't care about the context. They don't care about debug messages.
+
+Also, Vim already provides:
+
+- [`:echo`](http://vimhelp.appspot.com/eval.txt.html#%3aecho) and
+  [`:echomsg`](http://vimhelp.appspot.com/eval.txt.html#%3aechomsg) for
+  information messages ;
+- [`:echoerr`](http://vimhelp.appspot.com/eval.txt.html#%3aechoerr) or
+  [`:throw`](http://vimhelp.appspot.com/eval.txt.html#%3athrow) for error
+  messages.
+
+lh-vim-lib also provides `lh#common#warning_msg()`, `lh#common#error_msg()`,
+and `lh#common#echomsg_multilines()` that add some colors to the messages.
+
+If we want to report programming errors, lh-vim-lib provides a [DbC](Dbc.md)
+framework -- that can fill the quickfix window with error context, or initiate
+a debugging session from the failed assertion.
+
+Do we really need to be able to decode the context for error and information
+messages? I'm not so sure. That's why I don't provide anything like
+`lh#log#{info,error,debug}()`. Yet, if we really need to, we just have to call
+directly `lh#log#this()`. Regarding errors, if we fail with `:errorerr` or
+`:throw`, we can decode the error message with
+[`:call lh#exception#say_what()`](Callstack.md#lhexceptionsay_what).
+
+When I debug a feature I'm working on, I don't care about what happens in
+another plugin that is used along the way. This means I want to chose which
+module is in verbose mode, and which module shall remain silent. In the end, a
+_module_ is an autoload plugin. With a `lh#log#debug()` function, I'd need to
+pass around the name of the module. With a `s:Verbose()` function, I need
+instead to duplicate 30ish lines in all my autoload plugins.
+
+Note BTW that we mustn't and don't need to comment and uncomment debugging
+lines depending on whether we are working on a feature, or releasing a plugin.
