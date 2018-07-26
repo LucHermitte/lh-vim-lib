@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:	4.0.0
 " Created:	03rd Nov 2008
-" Last Update:	10th Oct 2016
+" Last Update:	26th Jul 2018
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/function.vim
@@ -16,6 +16,7 @@
 UTSuite [lh-vim-lib] Testing lh#function plugin
 
 runtime autoload/lh/function.vim
+runtime autoload/lh/partial.vim
 
 let s:cpo_save=&cpo
 set cpo&vim
@@ -295,6 +296,15 @@ endfunction
 " v:1_ + len(v:2_.v:3_)
 " '"foo"'
 " v:1_
+
+" Function: s:Test_partial() {{{3
+function! s:Test_partial() abort
+  let l:Cb = lh#partial#make('has', ['gui_running'])
+  AssertEquals(1, lh#partial#execute(l:Cb))
+  let l:Cb = lh#partial#make('has', [])
+  AssertEquals(1, lh#partial#execute(l:Cb, 'gui_running'))
+  AssertEquals(0, lh#partial#execute(l:Cb, 'g*i_running'))
+endfunction
 
 " }}}1
 "------------------------------------------------------------------------

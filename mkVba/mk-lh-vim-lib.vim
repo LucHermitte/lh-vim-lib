@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	4.5.1
-let s:version = '4.5.1'
+" Version:	4.6.0
+let s:version = '4.6.0'
 " Created:	06th Nov 2007
-" Last Update:  02nd Jul 2018
+" Last Update:  26th Jul 2018
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -41,6 +41,7 @@ autoload/lh/fmt.vim
 autoload/lh/ft.vim
 autoload/lh/ft/option.vim
 autoload/lh/function.vim
+autoload/lh/partial.vim
 autoload/lh/graph/tsort.vim
 autoload/lh/has.vim
 autoload/lh/icomplete.vim

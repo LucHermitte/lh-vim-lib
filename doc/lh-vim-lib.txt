@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.5.1)
-                        For Vim version 7+      Last change: 02nd Jul 2018
+*lh-vim-lib.txt*        Vim common libraries (v4.6.0)
+                        For Vim version 7+      Last change: 26th Jul 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -111,6 +111,8 @@ Functor related functions:                              |lhvl#function|   {{{2
 - |lh#function#bind()|
 - |lh#function#execute()|
 - |lh#function#prepare()|
+- |lh#partial#execute()|
+- |lh#partial#make()|
 List related functions:                                 |lhvl#list|       {{{2
 - |lh#list#accumulate()|
 - |lh#list#Find_if()|, |lh#list#find_if()|, and |lh#list#find_if_fast()|
@@ -1290,6 +1292,8 @@ This sub-library helps defining functors-like variables, and execute them.
 
 NB: C++ developpers may be already familiar with `boost.bind`
 (/`std(::tr1)::bind`) function that inspired by feature.
+Since Vim has introduced closures on |lambda|s, this feature isn't as
+interresting as it used to be.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                       *lhvl#functor*              {{{3
@@ -1373,6 +1377,23 @@ The evaluation is meant to be done with |eval()|.
    >:echo eval(call)
    1 ## 2 ## 'foo'
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                       *lh#partial#execute()* *lh#partial#make()* {{{3
+lh#partial#make({function}, {arguments})~
+lh#partial#execute({partial} [, {arguments}])~
+`lh#partial#make()` builds either a |Partial| or an object that'll emulate a
+partial if they are not supported in you current version of Vim.
+
+While partials can be directly evaluated with: >
+    let Cb = lh#partial#make('has', ['gui_running'])
+    echo Cb()
+
+There is no guarantee it'll work if vim version is < 7.4-1558.
+The right way to evaluate this partial is with: >
+    echo lh#partial#execute(Cb)
+
+On this same topic, see also |lh#function| feature which permits parameter
+reordering.
 
 ------------------------------------------------------------------------------
 STRING RELATED FUNCTIONS                              *lhvl#string*     {{{2

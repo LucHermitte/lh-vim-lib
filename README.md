@@ -334,11 +334,13 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 
 
 ### Functors
-| Function                | Purpose                                      |
-|:------------------------|:---------------------------------------------|
-| `lh#function#bind()`    | Builds a functor object.                     |
-| `lh#function#execute()` | Executes a functor object.                   |
-| `lh#function#prepare()` | Prepares a functor object to be `eval`uated. |
+| Function                  | Purpose                                                     |
+| :------------------------ | :-----------------------------------------------------------|
+| `lh#function#bind()`      | Builds a functor object.                                    |
+| `lh#function#execute()`   | Executes a functor object.                                  |
+| `lh#function#prepare()`   | Prepares a functor object to be `eval`uated.                |
+| `lh#partial#make()`       | Prepares a partial (or an emulated partial) to be executed. |
+| `lh#partial#execute()`    | Executes a partial (or an emulated partial) .               |
 
 
 ### UI functions
