@@ -2,10 +2,10 @@
 " File:         autoload/lh/project.vim                           {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0
-let s:k_version = '400'
+" Version:      4.6.0
+let s:k_version = '460'
 " Created:      08th Sep 2016
-" Last Update:  18th Dec 2017
+" Last Update:  27th Jul 2018
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -320,20 +320,17 @@ function! lh#project#root() abort
 endfunction
 
 function! s:FetchPrjDirname() abort " {{{3
-  " mu-template variable
-  let project_sources_dir = lh#option#get('project_sources_dir')
-  call s:Verbose('s:FetchPrjDirname() -- project_sources_dir: %1', project_sources_dir)
-  if lh#option#is_set(project_sources_dir)
-    return project_sources_dir
+  " TODO: provide an option to set the list of variables to test
+  " mu-template: project_sources_dir
+  let prj_dirname = lh#project#_check_project_variables(['project_sources_dir'])
+  if lh#option#is_set(prj_dirname)
+    return prj_dirname
   endif
 
   " VCS & co
-  let possible_prj_dirnames = map(copy(g:lh#project.root_patterns), '[v:val, lh#path#find_upward(v:val)]')
-  call filter(possible_prj_dirnames, '!empty(v:val[1])')
-  " TODO: permit to sort result by depth instead of patterns order
-  if !empty(possible_prj_dirnames)
-    call s:Verbose("s:FetchPrjDirname() -> %1 found in %2", possible_prj_dirnames[0][0], possible_prj_dirnames[0][1])
-    return possible_prj_dirnames[0][1]
+  let vcs_dirname = lh#project#_check_VCS_roots()
+  if lh#option#is_set(vcs_dirname)
+    return vcs_dirname
   endif
 
   " Deduce from current path, previous project paths
@@ -373,6 +370,48 @@ function! s:GetPlausibleRoot() abort " {{{3
   endif
   call s:Verbose('s:GetPlausibleRoot -> %1', prj_dirname)
   return prj_dirname
+endfunction
+
+" Function: lh#project#_check_project_variables(varnames) {{{3
+" Different plugins will use different variables to store where the
+" sources of their project is stored.
+" This function will search which variable is set
+" @since Version 4.6.0
+let s:k_unset_no_prj_var = lh#option#unset('No project variable detected')
+function! lh#project#_check_project_variables(varnames) abort
+  for varname in a:varnames
+    let simple_case = type(varname) == type('string')
+    let the_varname = simple_case ? varname : varname[0]
+    let dirname = lh#option#get(the_varname)
+    call s:Verbose("get(%1) -> %2", the_varname, dirname)
+    if lh#option#is_set(dirname)
+      if ! simple_case
+        let dirname2 = lh#dict#get_composed(dirname, varname[1])
+        if lh#option#is_unset(dirname2)
+          call lh#common#warning_msg(varname[0].' is set, but `'.join(varname, '.').'` is empty')
+          unlet dirname2
+          continue
+        endif
+      endif
+      return dirname
+    endif
+    unlet varname
+    unlet dirname
+  endfor
+  return s:k_unset_no_prj_var
+endfunction
+
+" Function: lh#project#_check_VCS_roots() {{{3
+" @since Version 4.6.0
+let s:k_unset_no_VCS_dir = lh#option#unset('No VCS directory detected')
+function! lh#project#_check_VCS_roots() abort
+  let possible_prj_dirnames = map(copy(g:lh#project.root_patterns), '[v:val, lh#path#find_upward(v:val)]')
+  " TODO: permit to sort result by depth instead of patterns order
+  if !empty(possible_prj_dirnames)
+    call s:Verbose("s:FetchPrjDirname() -> %1 found in %2", possible_prj_dirnames[0][0], possible_prj_dirnames[0][1])
+    return possible_prj_dirnames[0][1]
+  endif
+  return s:k_unset_no_VCS_dir
 endfunction
 
 " # Permission lists management {{{2
