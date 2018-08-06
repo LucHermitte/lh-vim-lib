@@ -2,10 +2,10 @@
 " File:         tests/lh/ref.vim                                  {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.6.0.
+let s:k_version = '40600'
 " Created:      09th Sep 2016
-" Last Update:  09th Sep 2016
+" Last Update:  06th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -111,6 +111,40 @@ function! s:Test_ref_to_attributes() " {{{2
 
   LetTo b:dummy = 12
   Assert !lh#ref#is_bound(b:dummy)
+endfunction
+
+function! s:Test_scoped() " {{{2
+  let g:dummy = [1,2,3]
+  Assert ! lh#ref#is_bound(g:dummy)
+  AssertEqual(lh#option#get('dummy'), g:dummy)
+
+  let res = lh#ref#bind('bpg:dummy')
+  Assert lh#ref#is_bound(res)
+
+  AssertIs(res.resolve(), g:dummy)
+
+  let b:dummy = 'b:'
+  AssertIs(res.resolve(), b:dummy)
+
+  unlet b:dummy
+  AssertIs(res.resolve(), g:dummy)
+
+  try
+    let b:dummy = 'b:'
+    AssertIs(res.resolve(), b:dummy)
+
+    let g:__d = {'k': 42}
+    LetTo p:dummy  = g:__d
+    AssertIs(res.resolve(), b:dummy)
+
+    unlet b:dummy
+    AssertIs(res.resolve(), g:__d)
+  finally
+    Unlet g:__d
+    Unlet p:dummy
+  endtry
+
+  AssertIs(res.resolve(), g:dummy)
 endfunction
 
 " }}}1
