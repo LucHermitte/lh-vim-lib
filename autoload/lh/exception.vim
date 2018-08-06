@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = '4000'
+" Version:      4.6.0
+let s:k_version = '40600'
 " Created:      18th Nov 2015
-" Last Update:  28th Sep 2017
+" Last Update:  06th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -188,7 +188,7 @@ endfunction
 " - Use a framework that have been here for little time for other topics
 "   (logging, unit testing)
 " - As few loops as possible -- I hate debugging them
-function! lh#exception#say_what() abort
+function! lh#exception#say_what(...) abort
   let po_ctx = lh#po#context()
   let po_err_detected = po_ctx.translate('Error detected while processing %s:')
   let rx_err_detected = '^\v'.printf(po_err_detected, '\zsfunction .*\ze').'$'
@@ -203,10 +203,12 @@ function! lh#exception#say_what() abort
   " => loop
   let qf = []
 
+  let nb_errors_to_decode = eval(get(a:, 1, 1))
+  let nb_errors_found     = 0
   let i = 0
   while 1
     let i = match(messages, rx_err_detected, i+1)
-    if i < 2
+    if (i < 2) && (nb_errors_found == 0)
       throw "No error detected!"
     endif
     let throwpoint = matchstr(messages[i], rx_err_detected)
@@ -219,7 +221,12 @@ function! lh#exception#say_what() abort
     let e_qf[0].text = substitute(e_qf[0].text, '^\.\.\.', messages[i-2], '')
     call lh#assert#not_empty(e_qf)
     call extend(qf, reverse(e_qf))
-    if messages[i-2] !~ '^E171:\|^E170' | break | endif
+    if messages[i-2] !~ '^E171:\|^E170'
+      let nb_errors_found += 1
+      if nb_errors_found == nb_errors_to_decode
+        break
+      endif
+    endif
   endwhile
 
   call setqflist(reverse(qf))

@@ -96,7 +96,8 @@ automatically in a plugin script:
 
 ```vim
 " .vimrc
-command! WTF call lh#exception#say_what()
+" Parameter: number of errors to decode, default: "1"
+command! -nargs=? WTF call lh#exception#say_what(<q-args>)
 ```
 
 The differences (with `tweekmonster/exception.vim`) are the following:
