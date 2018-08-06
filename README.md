@@ -257,6 +257,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#path#to_regex()`                         | Builds a regex that can be used to match pathnames                                                        |
 | `lh#path#to_relative()`                      | Transforms a pathname to a pathname relative to the current directory                                     |
 | `lh#path#vimfiles()`                         | Returns where the current user vimfiles are (`$HOME/.vim` `~/vimfiles`, ...)                              |
+| `lh#path#writable()`                         | Returns whether we could write into the pathname, even if nothing by that name already exists             |
 
 
 ### Commands related functions

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 40000
+" Version:      4.6.0
+let s:k_version = 40600
 " Created:      23rd Jan 2007
-" Last Update:  18th Dec 2017
+" Last Update:  06th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -716,6 +716,17 @@ endfunction
 " @return whether the file is readable or a buffer with the same name exists
 function! lh#path#exists(pathname) abort
   return filereadable(a:pathname) || bufexists(a:pathname)
+endfunction
+
+" Function: lh#path#writable(pathname) {{{3
+" @return whether the file exists and is writable, or whether it could be
+" created in the requested directory
+" Unlike |filewritable()|, non existing files aren't rejected.
+" @since Version 4.6.0
+function! lh#path#writable(pathname) abort
+  return isdirectory(a:pathname)
+        \ ? filewritable(a:pathname)
+        \ : filewritable(a:pathname) || 2 == filewritable(fnamemodify(a:pathname, ':h'))
 endfunction
 
 " Function: lh#path#is_up_to_date(file1, file2) {{{3

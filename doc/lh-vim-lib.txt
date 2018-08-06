@@ -207,6 +207,7 @@ Path related functions:                                 |lhvl#path|       {{{2
 - |lh#path#to_regex()|
 - |lh#path#to_relative()|
 - |lh#path#vimfiles()|
+- |lh#path#writable()|
 Command related functions:                              |lhvl#command|    {{{2
 - |lh#command#analyse_args()|
 - |lh#command#matching_variables()|
@@ -2826,6 +2827,14 @@ Function that I use to find either `$HOME/.vim/` or the equivalent on windows.
 This function got a very internal and personal variation point: if `$LUCHOME`
 exists, it's used instead of `$HOME` -- In the past, I've been given access to
 shared accounts where my real `$HOME` was something like `$HOME/luc/`...
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#path#writable()*               {{{3
+lh#path#writable({pathname})~
+@since Version 4.6.0
+@return whether {pathname} is writable. If the file doesn't exist, unlike
+|filewritable()|, this function checks whether we could write in the parent
+directory.
 
 ------------------------------------------------------------------------------
 MENU RELATED FUNCTIONS                                *lhvl#menu*       {{{2
