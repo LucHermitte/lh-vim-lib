@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '4000'
 " Created:      23rd Nov 2016
-" Last Update:  25th Aug 2017
+" Last Update:  02nd Jul 2018
 "------------------------------------------------------------------------
 " Description:
 "       Emulates assert_*() functions, but notifies as soon as possible that
@@ -385,7 +385,7 @@ function! s:pre_build_value() abort
 endfunction
 let [s:value_default, s:value_ignore] = s:pre_build_value()
 
-function! lh#assert#value(actual) abort " {{{4
+function! lh#assert#value(actual) abort " {{{3
   " We use and modify a global object, but this is not a problem
   let res = lh#assert#_shall_ignore() ? s:value_ignore : s:value_default
   let res.actual = a:actual
