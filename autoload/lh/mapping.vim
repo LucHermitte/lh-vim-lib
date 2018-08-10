@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.4.0
-let s:version = '4.4.0'
+" Version:	4.6.0
+let s:version = '4.6.0'
 " Created:      01st Mar 2013
-" Last Update:  16th May 2018
+" Last Update:  10th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -187,6 +187,18 @@ function! lh#mapping#plug(...) abort
       call lh#mapping#define(mapping)
     endif
   endfor
+endfunction
+
+" Function: lh#mapping#who_maps(rhs, mode) {{{2
+" @since Version 4.6.0
+function! lh#mapping#who_maps(rhs, mode) abort
+  let maps = filter(lh#askvim#execute(a:mode . 'map'), 'v:val =~ a:rhs."$"')
+  " Unfortunatelly, knowing exactly what mapping is associated to a
+  " keybinding, it's best to use maparg()
+  let lhs_list = map(maps, 'split(v:val)[1]')
+  let mappings = map(lhs_list, 'maparg(v:val, a:mode, 0, 1)')
+  call filter(mappings, 'v:val.rhs == a:rhs')
+  return mappings
 endfunction
 
 " Function: lh#mapping#reinterpret_escaped_char(seq) {{{2

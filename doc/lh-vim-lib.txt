@@ -73,6 +73,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
 - |lh#mapping#reinterpret_escaped_char()|
+- |lh#mapping#who_maps()|
 - |lh#notify#clear_notifications()|
 - |lh#notify#deprecated()|
 - |lh#notify#once()|
@@ -511,6 +512,14 @@ contain `"\<{keys}>"` into the sequence to insert.
 Note:	It accepts sequences containing double-quotes.
 
 @version 4.0.0, moved from |lh-dev|' |lh#dev#reinterpret_escaped_char()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#mapping#who_maps()*           {{{3
+lh#mapping#who_maps(rhs, mode)~
+@returns a |List| of mappings (in |maparg()| |dictionary| format) that are
+         bound to {rhs} in the specified {mode}.
+@version 4.6.0
+@see also |hasmapto()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#notify#clear_notifications()* {{{3
