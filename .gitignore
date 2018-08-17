@@ -1,4 +1,4 @@
-tags
+doc/tags
 *.sw*
 *~
 *.pyc
