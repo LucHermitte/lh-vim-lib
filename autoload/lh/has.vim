@@ -5,7 +5,7 @@
 " Version:      4.5.0
 let s:k_version = '400500'
 " Created:      02nd Sep 2016
-" Last Update:  26th Jun 2018
+" Last Update:  17th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -98,6 +98,12 @@ endfunction
 " Function: lh#has#vkey()                 {{{3
 function! lh#has#vkey() abort
   return lh#has#patch('patch-7.2-295')
+endfunction
+
+" Function: lh#has#writefile_append() {{{3
+" @since v 4.6.0
+function! lh#has#writefile_append() abort
+  return has('patch-7.4.503')
 endfunction
 
 "------------------------------------------------------------------------

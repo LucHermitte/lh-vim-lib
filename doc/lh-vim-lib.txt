@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.6.0)
-                        For Vim version 7+      Last change: 26th Jul 2018
+                        For Vim version 7+      Last change: 17th Aug 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -88,6 +88,8 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#position#is_before()|
 - |lh#position#move()|
 - |lh#position#move_n()|
+- |lh#tags#stack#push()|
+- |lh#tags#stack#jump()|
 - |lh#time#bench()|
 - |lh#time#bench_n()|
 - |lh#time#date()|
@@ -833,6 +835,34 @@ lh#position#move_n({direction}, {count})~
 @since              Version 4.4.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#tags#stack#jump()*            {{{3
+lh#tags#stack#jump(tagentry [, cmd = 'tag'])~
+Forge a new tag entry in the tag stack and jump to it with the specified
+command.
+@param {tagentry} tag entry as returned by |taglist()|, expected keys: '`cmd`'
+                  and `'filename`
+@param {cmd}      tag command to use to jump to the tagentry, defaults to
+                  |:tag|. See |tag-matchlist| commands regarding the valid
+                  alternatives.
+
+@pre The number of entries already forced < 1 million
+@since Version 4.6.0, used to belong to |lh-tags|
+
+Typical use: once a we know which function overload we wish to jump to, we can
+give an unique id to that overload and jump to it.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#tags#stack#push()*            {{{3
+lh#tags#stack#push(tagentry)~
+Forge a new tag entry in the tag stack.
+@param {tagentry} tag entry as returned by |taglist()|, expected keys: '`cmd`'
+                  and `'filename`
+@pre The number of entries already forced < 1 million
+@since Version 4.6.0, used to belong to |lh-tags|
+
+This function is used by |lh#tags#stack#jump()|, but still publicly exposed.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#time#bench()*                 {{{3
 lh#time#bench(Function[, args])~
 @return the time spent by the execution of `Function()`.
@@ -842,7 +872,7 @@ lh#time#bench(Function[, args])~
 @since Version 3.14.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#time#bench_n()*                 {{{3
+                                                *lh#time#bench_n()*               {{{3
 lh#time#bench_n(n Function[, args])~
 @return the time spent by the execution of `Function()` n times.
 @param[in] {n}        Number of times the function call is benched.
