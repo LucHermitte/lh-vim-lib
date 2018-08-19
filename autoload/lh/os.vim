@@ -7,7 +7,7 @@
 " Version:      4.00.0
 let s:k_version = 4000
 " Created:      10th Apr 2012
-" Last Update:  07th Mar 2017
+" Last Update:  19th Aug 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -49,6 +49,36 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
+
+" # Cygwin related functions {{{2
+" Function: lh#os#is_a_cygwin_shell() {{{3
+let s:cached_uname = {}
+function! s:uname_o() abort
+  let shell = exepath(&shell)
+  if !has_key(s:cached_uname, shell)
+    let s:cached_uname[shell] = lh#os#system('uname -o')
+  endif
+  return s:cached_uname[shell]
+endfunction
+
+function! lh#os#is_a_cygwin_shell() abort
+  return lh#os#system_detected() == 'unix' && s:uname_o() ==? 'cygwin'
+endfunction
+
+" Function: lh#os#prog_needs_cygpath_translation() {{{3
+let s:cached_prgs = {}
+function! s:cached_prg(prg) abort
+  " Expects cygwin
+  if !has_key(s:cached_prgs, a:prg)
+    let s:cached_prgs[a:prg] = lh#os#system(a:prg)
+  endif
+  return s:cached_prgs[a:prg]
+endfunction
+function! lh#os#prog_needs_cygpath_translation(prg) abort
+  " TRUE IFF windows flavour of vim + cygwin shell + cygwin version of the program
+  return lh#os#OnDOSWindows() && lh#os#is_a_cygwin_shell()
+        \ && s:cached_prg('ldd $(cygpath -u '.shellescape(exepath(a:prg)).')') =~? 'cygwin'
+endfunction
 
 " # OS kind {{{2
 
