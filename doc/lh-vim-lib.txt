@@ -1,4 +1,4 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.6.0)
+*lh-vim-lib.txt*        Vim common libraries (v4.6.1)
                         For Vim version 7+      Last change: 17th Aug 2018
 
                         By Luc Hermitte
@@ -184,6 +184,7 @@ Path related functions:                                 |lhvl#path|       {{{2
 - |lh#path#cd_without_sideeffects()|
 - |lh#path#common()|
 - |lh#path#depth()|
+- |lh#path#exe()|
 - |lh#path#exists()|
 - |lh#path#find()|
 - |lh#path#find_in_parents()|
@@ -2524,6 +2525,14 @@ Returns the depth of a directory name.
 @todo However, it is not able to return depth of negative paths like
       "`../../foo/`". I still need to decide whether the function should return
       -1 or 3.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                   *lh#path#exe()*                    {{{3
+lh#path#exexe({pathname})~
+@return the full path of an executable
+@since Version 4.6.1
+
+Emulates |exepath()| on old Vim versions
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                    *lh#path#exists()*                 {{{3

@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.0
+" Version:      4.6.1
 let s:k_version = 40600
 " Created:      23rd Jan 2007
-" Last Update:  06th Aug 2018
+" Last Update:  03rd Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -110,6 +110,8 @@ let s:k_version = 40600
 "       (*) lh#path#split('/foo') will now return 2 elements
 "       (*) Recognize empty name buffer as scratch/distant
 "       (*) PERF: Improve performances
+"       v4.6.1
+"       (*) PORT: Provide `lh#path#exe()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -711,6 +713,21 @@ function! lh#path#munge(pathlist, path, ...) abort
     return a:pathlist
   endif
 endfunction
+
+" Function: lh#path#exe(pathname) {{{3
+" @return the full path of an executable; emulate |exepath()| on old Vim
+" versions
+" @since Version 4.6.1
+if exists('*exepath')
+  function! lh#path#exe(exe) abort
+    return exepath(a:exe)
+  endfunction
+else
+  function! lh#path#exe(exe) abort
+    let PATH = join(split($PATH, has('unix') ? ':' : ';'), ',')
+    return globpath(PATH, a:exe)
+  endfunction
+endif
 
 " Function: lh#path#exists(pathname) {{{3
 " @return whether the file is readable or a buffer with the same name exists
