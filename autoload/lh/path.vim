@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.1
-let s:k_version = 40600
+" Version:      4.6.2
+let s:k_version = 40602
 " Created:      23rd Jan 2007
-" Last Update:  03rd Sep 2018
+" Last Update:  04th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -725,7 +725,7 @@ if exists('*exepath')
 else
   function! lh#path#exe(exe) abort
     let PATH = join(split($PATH, has('unix') ? ':' : ';'), ',')
-    return globpath(PATH, a:exe)
+    return join(filter(split(globpath(PATH, a:exe), "\n"), 'executable(v:val)')[:0], '')
   endfunction
 endif
 
