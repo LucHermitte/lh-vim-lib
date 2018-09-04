@@ -423,7 +423,7 @@ See http://hermitte.free.fr/vim/general.php#expl_words_tools
     plugins that use it:
 
     ```
-    flavor LucHermitte/lh-vim-lib
+    flavor 'LucHermitte/lh-vim-lib'
     ```
 
   * Vundle/NeoBundle:
