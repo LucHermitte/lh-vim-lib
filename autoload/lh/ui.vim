@@ -2,10 +2,10 @@
 " File:         autoload/lh/ui.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.6.3
+let s:k_version = '40603'
 " Created:      03rd Jan 2017
-" Last Update:  19th Oct 2017
+" Last Update:  09th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -197,6 +197,10 @@ function! lh#ui#confirm(text, ...) abort
   let o = s:Opt_type()
   if     o =~ 'g\%[ui]'  " {{{5
     exe 'return confirm(a:text,'.params.')'
+  elseif o =~ 'text_nodefault' " {{{5
+    " confirm() in plain Vim doesn't work that well => permit to override it
+    " with a version that works well
+    exe 'return s:confirm_text("none", a:text,'.params.')'
   elseif o =~ 't\%[ext]' " {{{5
     if !has('gui_running') && has('dialog_con')
       exe 'return confirm(a:text,'.params.')'

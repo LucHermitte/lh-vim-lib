@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.2
-let s:k_version = 40602
+" Version:      4.6.3
+let s:k_version = 40603
 " Created:      23rd Jan 2007
-" Last Update:  04th Sep 2018
+" Last Update:  09th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -112,6 +112,8 @@ let s:k_version = 40602
 "       (*) PERF: Improve performances
 "       v4.6.1
 "       (*) PORT: Provide `lh#path#exe()`
+"       v4.6.3
+"       (*) PORT: Use `lh#ui#confirm()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -349,7 +351,7 @@ function! lh#path#select_one(pathnames, prompt) abort
     try
       let guioptions_save = &guioptions
       set guioptions+=v
-      let selection = confirm(a:prompt, join(simpl_pathnames,"\n"), 1, 'Question')
+      let selection = lh#ui#confirm(a:prompt, join(simpl_pathnames,"\n"), 1, 'Question')
     finally
       let &guioptions = guioptions_save
     endtry
