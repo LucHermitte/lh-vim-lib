@@ -2,10 +2,10 @@
 " File:         autoload/lh/notify.vim                            {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.
-let s:k_version = '400'
+" Version:      4.6.3.
+let s:k_version = '463'
 " Created:      24th Jul 2017
-" Last Update:  02nd Aug 2017
+" Last Update:  10th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       API to notify things once
@@ -60,11 +60,9 @@ call lh#notify#clear_notifications()
 function! lh#notify#once(id, ...) abort
   let result = get(s:notifications, a:id, 0)
   if ! result
-    if a:0 > 0
-      let msg = call('lh#fmt#printf', a:000)
-      call s:Verbose('%1', msg)
-      call lh#common#warning_msg(msg)
-    endif
+    let msg = a:0 > 0 ? call('lh#fmt#printf', a:000) : a:id
+    call s:Verbose('%1', msg)
+    call lh#common#warning_msg(msg)
     let s:notifications[a:id] = 1
   endif
   return result
