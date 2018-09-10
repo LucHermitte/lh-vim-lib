@@ -5,7 +5,7 @@
 " Version:      4.6.3
 let s:k_version = '40603'
 " Created:      03rd Jan 2017
-" Last Update:  09th Sep 2018
+" Last Update:  10th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -13,7 +13,8 @@ let s:k_version = '40603'
 "------------------------------------------------------------------------
 " History:
 " v4.0.0: Factorization of plugins word_tools and ui-functions
-" TODO:         «missing features»
+" TODO:
+" - Use |call()| to forward parameters
 " }}}1
 "=============================================================================
 
@@ -175,43 +176,11 @@ endfunction
 
 " Function: lh#ui#confirm(text [, choices [, default [, type]]]) {{{3
 function! lh#ui#confirm(text, ...) abort
-  " 1- Check parameters {{{4
   if a:0 > 4 " {{{5
     throw "lh#ui#confirm(): too many parameters"
     return 0
   endif
-  " build the parameters string {{{5
-  let i = 1
-  while i <= a:0
-    if i == 1
-      if type(a:1) == type([])
-        let params = string(join(a:1, "\n"))
-      else
-        let params = 'a:{1}'
-      endif
-    else      | let params .= ',a:{'.i.'}'
-    endif
-    let i +=  1
-  endwhile
-  " 2- Choose the correct way to execute according to the option {{{4
-  let o = s:Opt_type()
-  if     o =~ 'g\%[ui]'  " {{{5
-    exe 'return confirm(a:text,'.params.')'
-  elseif o =~ 'text_nodefault' " {{{5
-    " confirm() in plain Vim doesn't work that well => permit to override it
-    " with a version that works well
-    exe 'return s:confirm_text("none", a:text,'.params.')'
-  elseif o =~ 't\%[ext]' " {{{5
-    if !has('gui_running') && has('dialog_con')
-      exe 'return confirm(a:text,'.params.')'
-    else
-      exe 'return s:confirm_text("none", a:text,'.params.')'
-    endif
-  elseif o =~ 'f\%[te]'  " {{{5
-      exe 'return s:confirm_fte(a:text,'.params.')'
-  else               " {{{5
-    throw "lh#ui#confirm(): Unkonwn user-interface style (".o.")"
-  endif
+  return call('s:confirm_impl', ['none', a:text] + a:000)
 endfunction
 
 " Function: lh#ui#input(prompt [, default ]) {{{3
@@ -244,30 +213,11 @@ endfunction
 
 " Function: lh#ui#combo(prompt, choice [, ... ]) {{{3
 function! lh#ui#combo(prompt, ...) abort
-  " 1- Check parameters {{{4
-  if a:0 > 4 " {{{5
+  if a:0 > 4
     throw "lh#ui#combo(): too many parameters"
     return 0
   endif
-  " build the parameters string {{{5
-  let i = 1
-  while i <= a:0
-    if i == 1 | let params = 'a:{1}'
-    else      | let params .=  ',a:{'.i.'}'
-    endif
-    let i +=  1
-  endwhile
-  " 2- Choose the correct way to execute according to the option {{{4
-  let o = s:Opt_type()
-  if     o =~ 'g\%[ui]'  " {{{5
-    exe 'return confirm(a:prompt,'.params.')'
-  elseif o =~ 't\%[ext]' " {{{5
-    exe 'return s:confirm_text("combo", a:prompt,'.params.')'
-  elseif o =~ 'f\%[te]'  " {{{5
-    exe 'return s:combo_fte(a:prompt,'.params.')'
-  else               " {{{5
-    throw "lh#ui#combo(): Unkonwn user-interface style (".o.")"
-  endif
+  return call('s:confirm_impl', ['combo', a:prompt] + a:000)
 endfunction
 
 " Function: lh#ui#which(function, prompt, choice [, ... ]) {{{3
@@ -429,10 +379,48 @@ function! s:Opt_type() " {{{2
   return s:Option('type', 'gui')
 endfunction
 
+function! s:Opt_confirm_type() " {{{2
+  return s:Option('confirm_type', 'lh')
+endfunction
+
+function! s:confirm_impl(box, text, ...) abort " {{{2
+  " 1- Check parameters {{{3
+  call lh#assert#value(a:0).is_le(4)
+  " build the parameters string {{{4
+  let i = 1
+  while i <= a:0
+    if i == 1
+      if type(a:1) == type([])
+        let params = string(join(a:1, "\n"))
+      else
+        let params = 'a:{1}'
+      endif
+    else      | let params .= ',a:{'.i.'}'
+    endif
+    let i +=  1
+  endwhile
+  " 2- Choose the correct way to execute according to the option {{{3
+  let o = s:Opt_type()
+  if o !~ '\v^(g%[ui]|t%[ext]|v%[te])$'
+    call lh#notify#once("lh#ui#confirm(): Unkonwn user-interface style (".o.")")
+  endif
+  if     o =~ '\vf%[te]'                                                                                        " {{{4
+    exe 'return s:confirm_fte(a:text,'.params.')'
+  elseif o =~ '\vg%[ui]' && has('gui_running')                                                                  " {{{4
+    exe 'return confirm(a:text,'.params.')'
+  elseif o =~ '\v(t%[ext]|g%[ui])' && has('dialog_con') && s:Opt_confirm_type() == 'std' && !has('gui_running') " {{{4
+    " confirm() in plain Vim doesn't work that well => permit to override it
+    " with a version that works well
+    exe 'return confirm(a:text,'.params.')'
+  else                                                                                                          " {{{4
+    exe 'return s:confirm_text(a:box, a:text,'.params.')'
+  endif
+endfunction
+
 " Function: s:status_line(current, hl [, choices] ) {{{2
 "     a:current: current item
 "     a:hl     : Generic, Warning, Error
-function! s:status_line(current, hl, ...)
+function! s:status_line(current, hl, ...) abort
   " Highlightning {{{3
   if     a:hl == "Generic"  | let hl = '%1*'
   elseif a:hl == "Warning"  | let hl = '%2*'
@@ -459,7 +447,7 @@ function! s:status_line(current, hl, ...)
 endfunction
 
 " Function: s:confirm_text(box, text [, choices [, default [, type]]]) {{{2
-function! s:confirm_text(box, text, ...)
+function! s:confirm_text(box, text, ...) abort
   let help = "/<esc>/<s-tab>/<tab>/<left>/<right>/<cr>/<F1>"
   " 1- Retrieve the parameters       {{{3
   let choices = ((a:0>=1) ? a:1 : '&Ok')

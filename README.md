@@ -354,6 +354,15 @@ interactive functions. Depending on a configuration variable
 (`(bpg):ui_type`), they will delegate the interaction to a gvim UI
 function, or a plain text UI function (defined by vim, or emulated)
 
+Possible values for `(bpg):ui_type` are: `gui` (default) or `text`.
+
+In `lh#ui#confirm()` case, the option `(bpg):ui_confirm_type` can be set to
+`'std'` to explicitly use
+[`confirm()`](http://vimhelp.appspot.com/eval.txt.html#confirm%28%29) instead
+of the old emulated version. The default is to use the emulated version of
+`confirm()`, which unlike the standard one permits to navigate between
+propositions with the cursor or `tab`  keys to choose one.
+
 | Function                         | Purpose                                                                                                                                                 |
 |:---------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#ui#ask()`                    | Ask a question under the status line                                                                                                                    |
