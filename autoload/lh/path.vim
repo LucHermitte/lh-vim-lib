@@ -347,7 +347,7 @@ function! lh#path#select_one(pathnames, prompt) abort
     let simpl_pathnames = deepcopy(a:pathnames)
     let simpl_pathnames = lh#path#strip_common(simpl_pathnames)
     let simpl_pathnames = [ '&Cancel' ] + map(simpl_pathnames, 'substitute(v:val, "_", "&&", "g")')
-    " Consider guioptions+=c is case of difficulties with the gui
+    " Consider guioptions+=c in case of difficulties with the gui
     try
       let guioptions_save = &guioptions
       set guioptions+=v
