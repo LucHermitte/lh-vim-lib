@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.00.0
-let s:k_version = 4000
+" Version:      4.6.4
+let s:k_version = 40604
 " Created:      10th Apr 2012
-" Last Update:  19th Aug 2018
+" Last Update:  13th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -229,7 +229,7 @@ function! lh#os#new_runner_script(command, env) abort
 endfunction
 
 function! s:run_script() dict abort
-  call s:Verbose(self._lines)
+  call s:Verbose("%1", self._lines)
   let r = system(&shell . ' ' . self._script_name)
   return r
 endfunction
