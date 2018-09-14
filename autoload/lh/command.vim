@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 400
+" Version:      4.6.4
+let s:k_version = 464
 " Created:      08th Jan 2007
-" Last Update:  25th May 2018
+" Last Update:  13th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -174,7 +174,7 @@ endfunction
 " Function: lh#command#matching_bash_completion(command, lead [, dir]) {{{3
 " Requires bash
 function! lh#command#matching_bash_completion(command, lead, ...) abort
-  if !executable('bash') || !filereadable('/etc/bash_completion')
+  if lh#command#can_use_bash_completion()
     return a:lead
   endif
 
@@ -204,6 +204,11 @@ function! lh#command#matching_bash_completion(command, lead, ...) abort
 
   let script = lh#os#new_runner_script(commands, env)
   return script.run()
+endfunction
+
+" Function: lh#command#can_use_bash_completion() {{{3
+function! lh#command#can_use_bash_completion() abort
+  return executable('bash') && filereadable('/etc/bash_completion')
 endfunction
 
 " Function: lh#command#matching_make_completion(lead [, dir]) {{{3
