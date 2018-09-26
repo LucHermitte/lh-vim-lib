@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.3
-let s:k_version = 40603
+" Version:      4.6.4
+let s:k_version = 40604
 " Created:      23rd Jan 2007
-" Last Update:  09th Sep 2018
+" Last Update:  26th Sep 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -114,6 +114,8 @@ let s:k_version = 40603
 "       (*) PORT: Provide `lh#path#exe()`
 "       v4.6.3
 "       (*) PORT: Use `lh#ui#confirm()`
+"       v4.6.4
+"       (*) BUG: Apply `readlink()` to `munge()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -703,14 +705,15 @@ endfunction
 
 " Function: lh#path#munge(pathlist, path [, sep]) {{{3
 function! lh#path#munge(pathlist, path, ...) abort
+  let path = lh#path#readlink(a:path)
   if type(a:pathlist) == type('str')
     let sep = get(a:, 1, ',')
     let pathlist = split(a:pathlist, sep)
-    return join(lh#path#munge(pathlist, a:path), sep)
+    return join(lh#path#munge(pathlist, path), sep)
   else
-    " if filereadable(a:path) || isdirectory(a:path)
-    if ! empty(glob(a:path))
-      call lh#list#push_if_new(a:pathlist, a:path)
+    " if filereadable(path) || isdirectory(path)
+    if ! empty(glob(path))
+      call lh#list#push_if_new(a:pathlist, path)
     endif
     return a:pathlist
   endif
