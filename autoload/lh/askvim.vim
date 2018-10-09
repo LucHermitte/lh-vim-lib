@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 4000
+" Version:      4.6.4
+let s:k_version = 40604
 " Created:      17th Apr 2007
-" Last Update:  25th May 2018
+" Last Update:  09th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -124,11 +124,23 @@ endfunction
 " @since Version 4.0.0
 function! lh#askvim#where_is_function_defined(funcname) abort
   if has('*execute') || ! s:beware_running_through_client_server
-    let definition = lh#askvim#execute('verbose function '.a:funcname)
+    let cleanup = lh#lang#set_message_temporarily('C')
+    try
+      " Makes sure the language is C in order to be able to extract the file
+      " name.
+      " We cannot simply extract the last part as since Vim 8.1.??? the new
+      " verbose message is now "Last set from <filename> line <number>"
+      " Using lh#po#xx() is quite complex as the string is
+      " "\n\tLast set from " which is quite difficult to inject into bash...
+      " Beside this is not portable to Windows...
+      let definition = lh#askvim#execute('verbose function '.a:funcname)
+    finally
+      call cleanup.finalize()
+    endtry
     if empty(definition)
       throw "Cannot find a definition for ".a:funcname
     endif
-    let script = matchstr(definition[1], '.\{-}\s\+\zs\f\+$')
+    let script = matchstr(definition[1], '.\{-}Last set from \zs\f\+')
     return script
   elseif a:funcname =~ '#'
     " autoloaded function
