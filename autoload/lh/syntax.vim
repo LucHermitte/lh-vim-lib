@@ -7,13 +7,39 @@
 " Version:	4.0.0
 let s:k_version = 400
 " Created:	05th Sep 2007
-" Last Update:	09th Feb 2018
+" Last Update:	17th Oct 2018
 "------------------------------------------------------------------------
 " Description:	«description»
 "
 "------------------------------------------------------------------------
 " TODO:
 " 	function, to inject "contained", see lhVimSpell approach
+"
+" Issue: {{{2
+" While typing new text, synID at current position isn't set yet when using
+" i_CTRL-R=
+" e.g. (where "^" marks the cursor position, in C++ code, '><' marks correct
+" solution, 'WW' marks incorrect solution)
+" * iab-<expr> case: everything works fine
+"           synId(col)           synID(col-1)     synstack(col)        synstack(col-1)
+"   //^     W''W                 >'cCommentL'<    W'cBlock'W           >'cCommentL' <
+"   /**/^   >''<                 >''         <    >'cBlock'<           >'cBlock'    <
+"   /*^*/   >'cCommentStart'<    >'cComment' <    >'cCommentStart'<    >'cComment'  <
+"
+" inoreab <buffer> <expr> µ printf("'%s'  '%s'  '%s'  '%s'", synIDattr(synID(line('.'),col('.'),1),'name'), synIDattr(synID(line('.'),col('.')-1,1),'name'), synIDattr(synstack(line('.'),col('.'))[-1], 'name'), synIDattr(synstack(line('.'),col('.')-1)[-1], 'name'))
+"
+" * iab <c-r>= case: where problems occur
+"           synId(col)           synID(col-1)         synstack(col)        synstack(col-1)
+"   //^     W''>                 >'cCommentL'<        W'cBlock'W           >'cCommentL'<
+"   /**/^   >''<                 W'cCommentStart'W    >'cBlock'<           W'cCommentStart'W
+"   /**/ ^  >''<                 >''<                 >'cBlock'<           >'cBlock'<
+"   /*^*/   >'cCommentStart'<    >'cCommentStart'<    >'cCommentStart'<    >'cCommentStart'<
+"
+"  inoreab <silent> <buffer> µ <c-r>=printf("'%s'  '%s'  '%s'  '%s'", synIDattr(synID(line('.'),col('.'),1),'name'), synIDattr(synID(line('.'),col('.')-1,1),'name'), synIDattr(synstack(line('.'),col('.'))[-1], 'name'), synIDattr(synstack(line('.'),col('.')-1)[-1], 'name'))<cr>
+"
+" Unfortunatelly, we cannot use iab-<expr> as we need to move the cursor
+" around...
+"
 " }}}1
 "=============================================================================
 
@@ -74,7 +100,7 @@ endfunction
 
 " Functions: skip string, comment, character, doxygen                  {{{3
 func! lh#syntax#skip_at(l,c)
-  return lh#syntax#name_at(a:l,a:c) =~? 'string\|comment\|character\|doxygen'
+  return lh#syntax#name_at(a:l,a:c) =~? '\vstring|comment|character|doxygen'
 endfun
 func! lh#syntax#SkipAt(l,c)
   return lh#syntax#skip_at(a:l,a:c)
@@ -98,8 +124,7 @@ endfun
 command! SynShow echo 'hi<'.lh#syntax#name_at_mark('.',1).'> trans<'
       \ lh#syntax#name_at_mark('.',0).'> lo<'.
       \ synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name').'>   ## '
-      \ lh#list#transform(synstack(line("."), col(".")), [], 'synIDattr(v:1_, "name")')
-
+      \ map(synstack(line("."), col(".")), 'synIDattr(v:val, "name")')
 
 " Function: lh#syntax#list_raw(name) : string                          {{{3
 function! lh#syntax#list_raw(name)
