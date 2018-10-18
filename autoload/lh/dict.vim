@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.5.0
-let s:k_version = '40500'
+" Version:      4.6.4
+let s:k_version = '40604'
 " Created:      26th Nov 2015
-" Last Update:  28th Jun 2018
+" Last Update:  18th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -90,7 +90,10 @@ function! lh#dict#need_ref_on(root, keys, ...) abort
     if !has_key(d, k)
       let d[k] = {}
     endif
-    let d = d[k]
+    let dk = d[k]
+    unlet d
+    let d = dk
+    unlet dk
     call lh#assert#type(d).is({})
   endfor
   if !has_key(d, keys[-1])
