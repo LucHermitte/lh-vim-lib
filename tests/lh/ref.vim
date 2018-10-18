@@ -5,7 +5,7 @@
 " Version:      4.6.0.
 let s:k_version = '40600'
 " Created:      09th Sep 2016
-" Last Update:  06th Aug 2018
+" Last Update:  18th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -138,6 +138,7 @@ function! s:Test_scoped() " {{{2
     AssertIs(res.resolve(), b:dummy)
 
     unlet b:dummy
+    Assert ! has_key(b:, 'dummy')
     AssertIs(res.resolve(), g:__d)
   finally
     Unlet g:__d
