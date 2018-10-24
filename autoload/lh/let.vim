@@ -7,7 +7,7 @@
 " Version:      4.0.0
 let s:k_version = 4000
 " Created:      10th Sep 2012
-" Last Update:  28th Sep 2017
+" Last Update:  24th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -59,10 +59,11 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) 
     " variable otherwise
     if lh#project#is_in_a_project()
       if a:must_keep_previous
-        let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
-        if lh#option#is_set(value)
+        let l:Value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+        if lh#option#is_set(l:Value)
+          call s:Verbose('s:BuildPublicVariableName:       %1 is set!', l:Value)
           call s:Verbose("%1 is defined somewhere => no need to build its name, let's abort", a:var)
-          return extend(copy(lh#option#unset()), {'_value': value})
+          return extend(copy(lh#option#unset()), {'_value': l:Value})
           " No need to check anything,
         endif
       endif
@@ -75,10 +76,10 @@ function! s:BuildPublicVariableName(var, hide_or_overwrite, must_keep_previous) 
   elseif a:var =~ '\v^p:|^\&p:'
     " It's a p:roject variable, or a project option
     if a:must_keep_previous && lh#project#is_in_a_project()
-      let value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
-      if lh#option#is_set(value)
+      let l:Value = lh#project#crt().get(matchstr(a:var, '\v^p\&=:\zs.*'))
+      if lh#option#is_set(l:Value)
         call s:Verbose("%1 is defined somewhere => no need to build its name, let's abort", a:var)
-        return extend(copy(lh#option#unset()), {'_value': value})
+        return extend(copy(lh#option#unset()), {'_value': l:Value})
         " No need to check anything,
       endif
     endif

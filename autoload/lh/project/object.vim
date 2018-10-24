@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      08th Mar 2017
-" Last Update:  23rd Aug 2017
+" Last Update:  24th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -303,15 +303,15 @@ endfunction
 
 function! s:get(varname, ...) dict abort " {{{2
   if     a:varname[0] == '$' && has_key(self.env, a:varname[1:])
-    let r0 = self.env[a:varname[1:]]
+    let l:R0 = self.env[a:varname[1:]]
   elseif a:varname[0] == '&' && has_key(self.options, a:varname[1:])
-    let r0 = self.options[a:varname[1:]]
+    let l:R0 = self.options[a:varname[1:]]
   elseif a:varname[0] !~ '[&$]'
-    let r0 = lh#dict#get_composed(self.variables, a:varname)
+    let l:R0 = lh#dict#get_composed(self.variables, a:varname)
   endif
-  if exists('r0') && lh#option#is_set(r0)
+  if exists('l:R0') && lh#option#is_set(l:R0)
     " may need to interpret a reference lh#ref('g:variable')
-    return r0
+    return l:R0
   else
     for p in self.parents
       let r = p.get(a:varname)
