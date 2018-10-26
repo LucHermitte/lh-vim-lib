@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.6.4
 " Created:	19th Nov 2008
-" Last Update:  18th Oct 2018
+" Last Update:  26th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -623,6 +623,37 @@ function! s:Test_dict_let() abort
   AssertEquals(d.a.b.z, 42)
   call lh#dict#let(d, 'a.z1.z2.z3', 42)
   AssertEquals(d.a.z1.z2.z3, 42)
+endfunction
+
+" lh#dict#get_composed() {{{2
+" Function: s:Test_dict_get_composed() {{{3
+function! s:Test_dict_get_composed() abort
+  let D  = { 'a': { 'b': 1, '5.1' : {'z': 0}}, 'c': 2, '8.2': {'9.3' : 42}}
+  AssertEquals(D.a.b, 1)
+  AssertEquals(D.c, 2)
+
+  " --- Access something already there, 1 level deep
+  let a = lh#dict#get_composed(D, 'a')
+  AssertIs(a, D.a)
+
+  " --- Access something already there, n level deep
+  AssertThrows(lh#dict#get_composed(D, 'a.b.c.d.e', 42))
+  call lh#dict#let(D, 'a.b.c.d.e', 42)
+  let d = lh#dict#get_composed(D, 'a.b.c.d')
+  AssertIs(a, D.a)
+  AssertIs(d, D.a.b.c.d)
+
+  " --- Access something with subscript syntax, 1 level deep
+  let _82 = lh#dict#get_composed(D, '[8.2]')
+  AssertEquals(_82, D['8.2'])
+  let _93 = lh#dict#get_composed(D, '[8.2][9.3]')
+  AssertEquals(_93, D['8.2']['9.3'])
+
+  let _51 = lh#dict#get_composed(D, 'a[5.1]')
+  AssertEquals(_51, D.a['5.1'])
+
+  let z   = lh#dict#get_composed(D, 'a[5.1].z')
+  AssertEquals(z, D.a['5.1'].z)
 endfunction
 
 " lh#dict#need_ref_on() {{{2

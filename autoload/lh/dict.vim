@@ -7,7 +7,7 @@
 " Version:      4.6.4
 let s:k_version = '40604'
 " Created:      26th Nov 2015
-" Last Update:  18th Oct 2018
+" Last Update:  26th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -123,14 +123,18 @@ endfunction
 " @since v4.0.0
 function! lh#dict#get_composed(dst, key, ...) abort
   try
-    let [all, key, subkey ; dummy] = matchlist(a:key, '^\v(.{-})%(\.(.+))=$')
+    if !empty(a:key) && a:key[0] == '['
+      let [all, key, subkey ; dummy] = matchlist(a:key, '^\v\[(.{-})\]\.=(.+)=$')
+    else
+      let [all, key, subkey ; dummy] = matchlist(a:key, '^\v([^.[]{1,})\.=%((.+))=$')
+    endif
     call s:Verbose('%1 --> key=%2 --- subkey=%3', a:key, key, subkey)
     if !lh#type#is_dict(a:dst) || !has_key(a:dst, key)
       call s:Verbose('Return default value: Key %1 not found in %2.', key, a:dst)
       return get(a:, 1, s:k_unset)
     endif
     if empty(subkey)
-      return a:dst[a:key]
+      return a:dst[key]
     else
       return call('lh#dict#get_composed', [a:dst[key], subkey]+a:000)
     endif
