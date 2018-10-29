@@ -140,15 +140,14 @@ function! s:LetIfUndef(var, value) abort " {{{4
     let [all, dict, key, subscript ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]{-})%(\[(.{-})\])=)=$')
     call s:Verbose('%1 --> dict=%2 --- key=%3 --- subscript=%4', a:var, dict, key, subscript)
     if !empty(subscript)
-      let type = type(a:value)
-      if type(a:value) == type(0)
+      if subscript =~ '^\v\d+$'
         " Corner case found. Expect an already initialized array => don't
         " populated it on the fly yet
         call lh#assert#value({dict}).has_key(key)
         call lh#assert#type({dict}[key]).is([])
         return {dict}[key][subscript]
       else
-        " TODO: may need to use [] syntex instead...
+        " TODO: may need to use [] syntax instead...
         let dict = dict.'.'.key
         let key = subscript
       endif
