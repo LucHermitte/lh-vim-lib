@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 4000
+" Version:      4.6.4
+let s:k_version = 40604
 " Created:      10th Sep 2012
-" Last Update:  24th Oct 2018
+" Last Update:  29th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -140,12 +140,20 @@ function! s:LetIfUndef(var, value) abort " {{{4
     let [all, dict, key, subscript ; dummy] = matchlist(a:var, '^\v(.{-})%(\.([^.]{-})%(\[(.{-})\])=)=$')
     call s:Verbose('%1 --> dict=%2 --- key=%3 --- subscript=%4', a:var, dict, key, subscript)
     if !empty(subscript)
-      " Corner case found. Expect an already initialized array => don't
-      " populated it on the fly yet
-      call lh#assert#value({dict}).has_key(key)
-      call lh#assert#type({dict}[key]).is([])
-      return {dict}[key][subscript]
-    elseif !empty(key)
+      let type = type(a:value)
+      if type(a:value) == type(0)
+        " Corner case found. Expect an already initialized array => don't
+        " populated it on the fly yet
+        call lh#assert#value({dict}).has_key(key)
+        call lh#assert#type({dict}[key]).is([])
+        return {dict}[key][subscript]
+      else
+        " TODO: may need to use [] syntex instead...
+        let dict = dict.'.'.key
+        let key = subscript
+      endif
+    endif
+    if !empty(key)
       " Dictionaries
       let dict2 = s:LetIfUndef(dict, {})
       if !has_key(dict2, key)
