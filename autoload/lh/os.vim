@@ -7,7 +7,7 @@
 " Version:      4.6.4
 let s:k_version = 40604
 " Created:      10th Apr 2012
-" Last Update:  13th Sep 2018
+" Last Update:  29th Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -142,18 +142,21 @@ endfunction
 
 " Function: lh#os#make(opt) {{{3
 " Prefer to use BuildToolsWrapper when possible
-function! lh#os#make(opt, bang) abort
+function! lh#os#make(opt, bang, ...) abort
   let bang
         \ = type(a:bang) == type(0) ? (a:bang ? '!' : '')
         \ : a:bang =~ '\v[1!]|bang' ? '!'
         \                           : ''
-  let env = lh#project#_environment()
-  if empty(env)
-    exe 'make'.bang.' '.a:opt
-  else
-    try
-      let cleanup = lh#on#exit()
-            \.restore('&makeprg')
+  try
+    let cleanup = lh#on#exit()
+          \.restore('&makeprg')
+    if a:0 > 0
+      let &l:makeprg = a:1
+    endif
+    let env = lh#project#_environment()
+    if empty(env)
+      exe 'make'.bang.' '.a:opt
+    else
       try
         let scr = lh#os#new_runner_script(&makeprg, env)
         let &l:makeprg = &shell . ' '.scr._script_name
@@ -161,10 +164,10 @@ function! lh#os#make(opt, bang) abort
       finally
         call scr.finalize()
       endtry
-    finally
-      call cleanup.finalize()
-    endtry
-  endif
+    endif
+  finally
+    call cleanup.finalize()
+  endtry
 endfunction
 
 " Function: lh#os#sys_cd(path [, ...]) {{{3

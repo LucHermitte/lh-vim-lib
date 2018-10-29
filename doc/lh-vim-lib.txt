@@ -3753,11 +3753,12 @@ result.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                               *lh#os#make()*                      {{{3
-lh#os#make({options}, {bang})~
+lh#os#make({options}, {bang} [, makeprg])~
 This is a shortcut to: >
     exe ':make '.bang.' '.option
 
 Any |p:$env| variable will be injected on the fly.
+|'makeprg'|setting can be overriden locally for the duration of the call. 
 @internal a temporary script will be created for the occasion.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
