@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/menu.vim                      {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.6.4.
+let s:k_version = '40604'
 " Created:      21st Feb 2017
-" Last Update:  21st Feb 2017
+" Last Update:  31st Oct 2018
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions to create project related menu items
@@ -73,6 +73,20 @@ endfunction
 " Function: lh#project#menu#remove(modes, name) {{{3
 function! lh#project#menu#remove(modes, name) abort
   call lh#menu#remove(a:modes, g:lh#project.menu.name . a:name)
+endfunction
+
+" Function: lh#project#menu#reserve_id([prj]) {{{3
+let s:last_id = get(s:, 'last_id', 200)
+function! lh#project#menu#reserve_id(...) abort
+  let prj = a:0 == 0 ? lh#project#crt() : a:1
+  let id = prj.get('menu.priority')
+  if lh#option#is_set(id)
+    return id
+  else
+    let s:last_id += 10
+    let prj.set('menu.priority', s:last_id)
+    return s:last_id
+  endif
 endfunction
 
 "------------------------------------------------------------------------
