@@ -7,7 +7,7 @@
 " Version:      4.6.4
 let s:k_version = 40604
 " Created:      17th Apr 2007
-" Last Update:  09th Oct 2018
+" Last Update:  23rd Nov 2018
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -122,6 +122,7 @@ endfunction
 
 " Function: lh#askvim#where_is_function_defined(funcname) {{{3
 " @since Version 4.0.0
+" @since Version 4.6.4: return a dictionary
 function! lh#askvim#where_is_function_defined(funcname) abort
   if has('*execute') || ! s:beware_running_through_client_server
     let cleanup = lh#lang#set_message_temporarily('C')
@@ -140,16 +141,22 @@ function! lh#askvim#where_is_function_defined(funcname) abort
     if empty(definition)
       throw "Cannot find a definition for ".a:funcname
     endif
-    let script = matchstr(definition[1], '.\{-}Last set from \zs\f\+')
-    return script
+    let script = matchstr(definition[1], '\v.{-}Last set from \zs\f+')
+    let res = {'script': script}
+    let line = matchstr(definition[1], '\v line \zs\d+\ze')
+    if !empty(line)
+      " Information available starting w/ Vim 8.1.0362+
+      let res.line = line
+    endif
+    return res
   elseif a:funcname =~ '#'
     " autoloaded function
     let script = substitute(a:funcname, '#', '/', 'g')
     let script = 'autoload/'.substitute(script, '.*\zs/.*$', '.vim', '')
     let scripts = lh#path#glob_as_list(&rtp, script)
-    return empty(scripts) ? '' : fnamemodify(scripts[0], ':.')
+    return {'script': empty(scripts) ? '' : fnamemodify(scripts[0], ':.')}
   else
-    return ''
+    return {'script': ''}
   endif
 endfunction
 

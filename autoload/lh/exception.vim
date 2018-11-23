@@ -7,7 +7,7 @@
 " Version:      4.6.4
 let s:k_version = '40604'
 " Created:      18th Nov 2015
-" Last Update:  18th Oct 2018
+" Last Update:  23rd Nov 2018
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -113,7 +113,11 @@ function! lh#exception#callstack(throwpoint) abort
           endif
         else
           if fname =~ '^\d\+$' | let fname = '{'.fname.'}' | endif
-          let script = lh#askvim#where_is_function_defined(fname)
+          let fn_def = lh#askvim#where_is_function_defined(fname)
+          let script = fn_def.script
+          if has_key(fn_def, 'line')
+            let fstart = fn_def.line
+          endif
         endif
         let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
         let offset = !empty(func_data[2]) ? func_data[2] : 0
@@ -121,7 +125,9 @@ function! lh#exception#callstack(throwpoint) abort
           if !has_key(dScripts, script)
             let dScripts[script] = reverse(readfile(script))
           endif
-          let fstart = len(dScripts[script]) - match(dScripts[script], '^\s*fu\%[nction]!\=\s\+'.fname.'\s*(')
+          if !exists('fstart')
+            let fstart = len(dScripts[script]) - match(dScripts[script], '^\s*fu\%[nction]!\=\s\+'.fname.'\s*(')
+          endif
           let data = {'script': script, 'fname': fname, 'fstart': fstart, 'offset': offset }
           let data.pos = data.offset + fstart
         else

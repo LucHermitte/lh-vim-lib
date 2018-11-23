@@ -678,12 +678,19 @@ lh#askvim#scriptnames()~
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#where_is_function_defined()* {{{3
 lh#askvim#where_is_function_defined({funcname})~
-@return the scriptname where {funcname} has been defined.
+@return a |dictionary| made of:
+    - `'script'`: the scriptname where {funcname} has been defined.
+    - `'line'`:   the liner number where {funcname} has been defined in the
+                script file, iff the information is available.
+                Requires Vim 8.1.0362+
+@since Version 4.0.0
 
 If |lh#askvim#_beware_running_through_client_server()| has been called, and if
 |execute()| is not supported by your vim version (v < 7.4-2008)
 `lh#askvim#where_is_function_defined` will try to decode the name of an
 autoloaded function, or return an empty string otherwise.
+
+@note Before v4.6.4, this function was returning a script.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#askvim#menu()*                {{{3
@@ -3758,7 +3765,7 @@ This is a shortcut to: >
     exe ':make '.bang.' '.option
 
 Any |p:$env| variable will be injected on the fly.
-|'makeprg'|setting can be overriden locally for the duration of the call. 
+|'makeprg'|setting can be overriden locally for the duration of the call.
 @internal a temporary script will be created for the occasion.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
