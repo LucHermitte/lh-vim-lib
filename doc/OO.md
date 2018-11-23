@@ -1,11 +1,11 @@
 # Object Oriented Programming in vim scripts
 Sorry, I won't spend much time on explaining what Object Oriented Programming
-is about.  I'll just concentrate on what could be done in Vim side and what
+is about.  I'll just focus on what could be done in Vim scripts and what
 lh-vim-lib has to offer on the subject.
 
 ## How to do OO in vim scripts
-A simplistic and perverted view of an object is: a collection of data and
-of methods that apply to that data.
+A simplistic and perverted view of an _object_ is: a collection of _data_ and
+of _methods_ that apply to that data.
 
 Often we seek to provide a safe capsule around the data, and the data is
 expected to be accessed through a controlled interface/abstraction. The
@@ -42,7 +42,7 @@ while 1
 endwhile
 ```
 
-Of course vim script language is not a rich as Python Language: we don't have
+Of course vim script language is not a rich as Python language: we don't have
 special methods that are automatically used to natively implement stuff like
 constructors, addition, stringification...
 
