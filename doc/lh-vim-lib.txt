@@ -3536,7 +3536,7 @@ isn't supported.
                                                 *lh#qf#get_winnr()*               {{{3
 lh#qf#get_winnr()~
 @since version 4.5.0
-@returns Window number of the the |quickfix-window|, or 0 if it isn't opened.
+@returns Window number of the |quickfix-window|, or 0 if it isn't opened.
 @note    |location-list-window|s are ignored.
 
 It works even on versions of Vim where >
