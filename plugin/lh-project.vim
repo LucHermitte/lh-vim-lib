@@ -2,10 +2,10 @@
 " File:         plugin/lh-project.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      4.6.4
+let s:k_version = '40604'
 " Created:      29th Sep 2016
-" Last Update:  02nd Aug 2017
+" Last Update:  16th Jan 2019
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -17,14 +17,16 @@ let s:k_version = '4000'
 "=============================================================================
 
 " Avoid global reinclusion {{{1
+let s:cpo_save=&cpo
+set cpo&vim
+
 if &cp || (exists("g:loaded_lh_project")
       \ && (g:loaded_lh_project >= s:k_version)
       \ && !exists('g:force_reload_lh_project'))
+  let &cpo=s:cpo_save
   finish
 endif
 let g:loaded_lh_project = s:k_version
-let s:cpo_save=&cpo
-set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " ## Options {{{1

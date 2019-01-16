@@ -4,9 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      4.0.0
+" Version:      4.6.4
+let s:k_version = 464
 " Created:      31st May 2010
-" Last Update:  08th Oct 2016
+" Last Update:  16th Jan 2019
 "------------------------------------------------------------------------
 " Description:
 "       Defines a command :LetIfUndef that sets a variable if undefined
@@ -29,15 +30,16 @@
 "=============================================================================
 
 " Avoid global reinclusion {{{1
-let s:k_version = 300
+let s:cpo_save=&cpo
+set cpo&vim
+
 if &cp || (exists("g:loaded_let")
       \ && (g:loaded_let >= s:k_version)
       \ && !exists('g:force_reload_let'))
+  let &cpo=s:cpo_save
   finish
 endif
 let g:loaded_let = s:k_version
-let s:cpo_save=&cpo
-set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " Commands and Mappings {{{1
@@ -54,14 +56,6 @@ command! -nargs=+ -complete=customlist,lh#let#_push_options_complete
 command! -nargs=+ -complete=customlist,lh#let#_pop_options_complete
       \ PopOptions call lh#let#_pop_options(<f-args>)
 " Commands and Mappings }}}1
-"------------------------------------------------------------------------
-" Functions {{{1
-" Note: most functions are best placed into
-" autoload/?your-initials?/?let?.vim
-" Keep here only the functions are are required when the plugin is loaded,
-" like functions that help building a vim-menu for this plugin.
-
-" Functions }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
