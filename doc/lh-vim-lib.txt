@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.6.4)
-                        For Vim version 7+      Last change: 09th Oct 2018
+                        For Vim version 7+      Last change: 26th Feb 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4767,7 +4767,7 @@ variable that can be:
 lh#assert#mode([mode])~
 As with C++17+ DbC proposal, end-user can select the assertion mode he wants
 to run with. The default behaviour will remind things to Windows users: a
-|confirm| box will ask whether we want to |dbc-ignore|, |dbc-abort|, or enter
+|confirm| box will ask whether we want to |dbc-ignore|, |dbc-stop|, or enter
 in |dcb-debug|.
 
 - *dbc-ignore* -- we'll try to go on. But don't (you, the end-user) expect
@@ -4776,7 +4776,7 @@ in |dcb-debug|.
   Note that unlike C and C++, the tests cannot be avoided with
   |lh#assert#equal()| & co, but it could be short-circuited with
   |lh#assert#value()| and |lh#assert#type()| tests.
-- *dbc-abort* -- we'll |:throw| an exception with as much context as possible.
+- *dbc-stop* -- we'll |:throw| an exception with as much context as possible.
 - *bdc-debug* is a tricky one. This mode is aimed at plugin writers.
   |:debug| mode will be entered. Don't expect to be able to run anything
   useful that isn't |>bt|, |>up|, |>down| or |:echo|.
@@ -4792,10 +4792,10 @@ information about the backtrace. You should not need it.
   execution of |:finally| blocks.)
 - *dbc-stacktrace* -- can be accessed only from the default (empty) mode:
   it'll display the stacktrace associated to the current assertion failure in
-  the quickfix window, and then ask whether we which to `'ignore'`, `'abort'`
+  the quickfix window, and then ask whether we which to `'ignore'`, `'stop'`
   or `'debug'`.
 
-Executing `lh#assert#mode()` with either `'ignore'`, `'abort'` or `'debug'`
+Executing `lh#assert#mode()` with either `'ignore'`, `'stop'` or `'debug'`
 will force the assertion mode globally. To go back to the |confirm| box, call
 the function with an empty string.
 Calling the function with no argument will permit to know which mode is the
@@ -4883,7 +4883,7 @@ lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type(
 
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2018 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2019 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
