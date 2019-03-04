@@ -7,7 +7,7 @@
 " Version:	4.6.4
 let s:version = '4.6.4'
 " Created:      01st Mar 2013
-" Last Update:  16th Oct 2018
+" Last Update:  04th Mar 2019
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -98,8 +98,8 @@ function! lh#mapping#define(md) abort
         \.has_key('lhs')
         \.has_key('rhs')
   " In case LaTeX-Suite/IMAP is installed
-  if exists('*IMAP') && a:md.mode=='i' && (a:md.lhs !~? '<bs>\|<cr>\|<up>\|<down>\|<left>\|<right>')
-    let rhs = get(a:md, 'expr', 0) ? "\<c-r>=".(a:md.rhs)."\<cr>"
+  if exists('*IMAP') && a:md.mode=='i' && (a:md.lhs !~? '<bs>\|<cr>\|<up>\|<down>\|<left>\|<right>\|<M-\|<C-\|<PageDown>\|<PageUp>\|<end>\|<home>')
+    let rhs = get(a:md, 'expr', 0) ? "\<c-r>=".(a:md.rhs)."\<cr>" : a:md.rhs
     call s:Verbose("Using IMAP() to define the mapping %1 -> %2", strtrans(a:md.lhs), strtrans(lhs))
     if get(a:md, 'buffer', 0)
       call IMAP(a:md.lhs, rhs, &ft)
