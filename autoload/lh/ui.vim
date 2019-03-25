@@ -2,10 +2,10 @@
 " File:         autoload/lh/ui.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.3
-let s:k_version = '40603'
+" Version:      4.6.4
+let s:k_version = '40604'
 " Created:      03rd Jan 2017
-" Last Update:  10th Sep 2018
+" Last Update:  25th Mar 2019
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -507,106 +507,109 @@ function! s:confirm_text(box, text, ...) abort
   " let &wcm = wcm
   " 3.1- Preparations for the statusline {{{4
   " save the statusline
-  let sl = &l:statusline
-  " Color schemes for selected item {{{5
-  :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow
-        \ guifg=Black guibg=Yellow
-  :hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
-        \ guifg=Black guibg=LightRed
-  :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red
-        \ guifg=Black guibg=Red
-  :hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
-        \ guifg=Black guibg=Cyan
-  :hi User5 term=inverse,bold cterm=inverse,bold ctermfg=LightYellow
-        \ guifg=Black guibg=LightYellow
-  :hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
-        \ guifg=DarkRed guibg=LightGray
-  :hi User7 term=inverse,bold cterm=inverse,bold ctermfg=LightCyan
-        \ guifg=Black guibg=LightCyan
-  " }}}5
+  let cleanup = lh#on#exit()
+        \.restore('&l:statusline')
+  try
+    " Color schemes for selected item {{{5
+    :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow
+          \ guifg=Black guibg=Yellow
+    :hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
+          \ guifg=Black guibg=LightRed
+    :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red
+          \ guifg=Black guibg=Red
+    :hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
+          \ guifg=Black guibg=Cyan
+    :hi User5 term=inverse,bold cterm=inverse,bold ctermfg=LightYellow
+          \ guifg=Black guibg=LightYellow
+    :hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
+          \ guifg=DarkRed guibg=LightGray
+    :hi User7 term=inverse,bold cterm=inverse,bold ctermfg=LightCyan
+          \ guifg=Black guibg=LightCyan
+    " }}}5
 
-  " 3.2- Interactive loop                {{{4
-  let help =  "\r-- Keys available (".help_k.help.")"
-  " item selected at the start
-  let i = ('check' != a:box) ? default : 1
-  let direction = 0 | let toggle = 0
-  while 1
-    if 'combo' == a:box
-      let choice_{i} = substitute(choice_{i}, '^( )', '(*)', '')
-    endif
-    " Colored statusline
-    " Note: unfortunately the 'statusline' is a global option, {{{
-    " not a local one. I the hope that may change, as it does not provokes any
-    " error, I use '&l:statusline'. }}}
-    exe 'let &l:statusline=s:status_line(i, type,'. list_choices .')'
-    if has(':redrawstatus')
-      redrawstatus!
-    else
-      redraw!
-    endif
-    " Echo the current selection
-    echohl Question
-    echon "\r". a:text
-    echohl ModeMsg
-    echon  ' '.substitute(choice_{i}, '&', '', '')
-    echohl None
-    " Wait the user to hit a key
-    let key=getchar()
-    let complType=nr2char(key)
-    " If the key hit matched awaited keys ...
-    if -1 != stridx(" \<tab>\<esc>\<enter>".hotkeys,complType) ||
-          \ (key =~ "\<F1>\\|\<right>\\|\<left>\\|\<s-tab>")
-      if key           == "\<F1>"                       " Help      {{{5
-        redraw!
-        echohl StatusLineNC
-        echo help
-        echohl None
-        let key=getchar()
-        let complType=nr2char(key)
-      endif
-      " TODO: support CTRL-D
-      if     complType == "\<enter>"                    " Validate  {{{5
-        break
-      elseif complType == " "                           " check box {{{5
-        let toggle = 1
-      elseif complType == "\<esc>"                      " Abort     {{{5
-        let i = -1 | break
-      elseif complType == "\<tab>" || key == "\<right>" " Next      {{{5
-        let direction = 1
-      elseif key =~ "\<left>\\|\<s-tab>"                " Previous  {{{5
-        let direction = -1
-      elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
-        if '' == complType  | continue | endif
-        let direction = hotkey_{toupper(complType)} - i
-        let toggle = 1
-      " else
-      endif
-      " }}}5
-    endif
-    if direction != 0 " {{{5
+    " 3.2- Interactive loop                {{{4
+    let help =  "\r-- Keys available (".help_k.help.")"
+    " item selected at the start
+    let i = ('check' != a:box) ? default : 1
+    let direction = 0 | let toggle = 0
+    while 1
       if 'combo' == a:box
-        let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
+        let choice_{i} = substitute(choice_{i}, '^( )', '(*)', '')
       endif
-      let i +=  direction
-      if     i > nb_choices | let i = 1
-      elseif i == 0         | let i = nb_choices
+      " Colored statusline
+      " Note: unfortunately the 'statusline' is a global option, {{{
+      " not a local one. I the hope that may change, as it does not provokes any
+      " error, I use '&l:statusline'. }}}
+      exe 'let &l:statusline=s:status_line(i, type,'. list_choices .')'
+      if has(':redrawstatus')
+        redrawstatus!
+      else
+        redraw!
       endif
-      let direction = 0
-    endif
-    if toggle == 1    " {{{5
-      if 'check' == a:box
-        let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]')
-              \ . strpart(choice_{i}, 3)
+      " Echo the current selection
+      echohl Question
+      echon "\r". a:text
+      echohl ModeMsg
+      echon  ' '.substitute(choice_{i}, '&', '', '')
+      echohl None
+      " Wait the user to hit a key
+      let key=getchar()
+      let complType=nr2char(key)
+      " If the key hit matched awaited keys ...
+      if -1 != stridx(" \<tab>\<esc>\<enter>".hotkeys,complType) ||
+            \ (key =~ "\<F1>\\|\<right>\\|\<left>\\|\<s-tab>")
+        if key           == "\<F1>"                       " Help      {{{5
+          redraw!
+          echohl StatusLineNC
+          echo help
+          echohl None
+          let key=getchar()
+          let complType=nr2char(key)
+        endif
+        " TODO: support CTRL-D
+        if     complType == "\<enter>"                    " Validate  {{{5
+          break
+        elseif complType == " "                           " check box {{{5
+          let toggle = 1
+        elseif complType == "\<esc>"                      " Abort     {{{5
+          let i = -1 | break
+        elseif complType == "\<tab>" || key == "\<right>" " Next      {{{5
+          let direction = 1
+        elseif key =~ "\<left>\\|\<s-tab>"                " Previous  {{{5
+          let direction = -1
+        elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
+          if '' == complType  | continue | endif
+          let direction = hotkey_{toupper(complType)} - i
+          let toggle = 1
+          " else
+        endif
+        " }}}5
       endif
-      let toggle = 0
-    endif
-  endwhile " }}}4
-  " 4- Terminate                     {{{3
-  " Clear screen
-  redraw!
+      if direction != 0 " {{{5
+        if 'combo' == a:box
+          let choice_{i} = substitute(choice_{i}, '^(\*)', '( )', '')
+        endif
+        let i +=  direction
+        if     i > nb_choices | let i = 1
+        elseif i == 0         | let i = nb_choices
+        endif
+        let direction = 0
+      endif
+      if toggle == 1    " {{{5
+        if 'check' == a:box
+          let choice_{i} = ((choice_{i}[1] == ' ')? '[X]' : '[ ]')
+                \ . strpart(choice_{i}, 3)
+        endif
+        let toggle = 0
+      endif
+    endwhile " }}}4
 
-  " Restore statusline
-  let &l:statusline=sl
+  finally " 4- Terminate                     {{{3
+    " Clear screen
+    redraw!
+    " Restore statusline
+    call cleanup.finalize()
+  endtry
   " Return
   if (i == -1) || ('check' != a:box)
     return i
