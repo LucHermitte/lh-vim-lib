@@ -4749,7 +4749,7 @@ new menu entries along with other project related topics.
 ------------------------------------------------------------------------------
 DESIGN BY CONTRACT FUNCTIONS                          *lhvl#DbC*    {{{2
 @since Version 4.0.0
-This set of functions introduce DbC helpers. There are here to help plugin
+This set of functions introduces DbC helpers. There are here to help plugin
 developers to detect and eradicate vim-scripting programming errors.
 When an assertion fails, we cannot expect the script to go on correctly. There
 IS an error in its logic. We cannot expect anything good after that. That's
@@ -4765,7 +4765,7 @@ variable that can be:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                    *dbc-mode*   *lh#assert#mode()*     {{{3
 lh#assert#mode([mode])~
-As with C++17+ DbC proposal, end-user can select the assertion mode he wants
+As with C++20+ DbC proposal, end-user can select the assertion mode he wants
 to run with. The default behaviour will remind things to Windows users: a
 |confirm| box will ask whether we want to |dbc-ignore|, |dbc-stop|, or enter
 in |dcb-debug|.

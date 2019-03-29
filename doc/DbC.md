@@ -1,7 +1,7 @@
 # Design by Contract functions
 
 ## Presentation
-This set of functions introduce DbC helpers. There are here to help plugin
+This set of functions introduces DbC helpers. There are here to help plugin
 developers to detect and eradicate Vim Scripting programming errors.
 
 When an assertion fails, we cannot expect the script to go on correctly. There
