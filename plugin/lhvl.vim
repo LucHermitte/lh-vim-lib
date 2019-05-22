@@ -7,7 +7,7 @@
 " Version:	4.6.4
 let s:k_version = 40604
 " Created:	27th Apr 2010
-" Last Update:	16th Jan 2019
+" Last Update:	22nd May 2019
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -55,6 +55,27 @@ command! -nargs=1
       \ StopBGExecution call lh#async#stop(<q-args>)
 
 command! -nargs=1 ConfirmGlobal call lh#ui#_confirm_global('<args>')
+
+command! -nargs=+ -complete=file
+      \ SplitIfNotOpen4COC
+      \ call s:coc_open(<f-args>)
+
+" Function: s:coc_open(...) {{{3
+function! s:coc_open(...) abort
+  echomsg "coc_open".string(a:000)
+  if a:1 =~ '^+'
+    let where = a:1[1:]
+    let files = a:000[1:]
+    echomsg "where: ".where
+  else
+    let files = a:000
+  endif
+  echomsg "files ".string(files)
+
+  if lh#buffer#jump(files[0], 'sp') > 0 && exists('where')
+    exe where
+  endif
+endfunction
 
 "------------------------------------------------------------------------
 " ## Options {{{1
