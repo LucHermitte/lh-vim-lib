@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.5.0
-let s:k_version = 40500
+" Version:      4.6.4
+let s:k_version = 40604
 " Created:      13th Oct 2006
-" Last Update:  25th Jun 2018
+" Last Update:  23rd May 2019
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -624,18 +624,23 @@ function! lh#menu#map_all(map_type,...) abort
   if a:1 == "<buffer>" | let i = 3 | let binding = a:1 . ' ' . a:2
   else                 | let i = 2 | let binding = a:1
   endif
-  let binding = '<silent> ' . binding
+  let build_cmd = nore . 'map <silent> ' . binding
   let cmd = a:{i}
   let i +=  1
   while i <= a:0
     let cmd .=  ' ' . a:{i}
     let i +=  1
   endwhile
-  let build_cmd = nore . 'map ' . binding
   while strlen(prefix)
     if prefix[0] == "a" | let prefix = "incv"
     else
-      execute prefix[0] . build_cmd . <SID>Build_CMD(prefix[0],cmd)
+      let map_cmd = prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd)
+      if hasmapto(binding, prefix)
+        call lh#common#warning_msg("Warning: There is already a ".prefix. "-mode mapping starting with ".binding. " when mapping\n  -> ".map_cmd)
+        exe 'verbose '.prefix.'map '.binding
+      endif
+      call s:Verbose("%1", map_cmd)
+      execute map_cmd
       let prefix = strpart(prefix, 1)
     endif
   endwhile
