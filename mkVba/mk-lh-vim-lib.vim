@@ -7,7 +7,7 @@
 " Version:	4.6.4
 let s:version = '4.6.4'
 " Created:	06th Nov 2007
-" Last Update:  13th Sep 2018
+" Last Update:  24th May 2019
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -29,6 +29,7 @@ autoload/lh/assert.vim
 autoload/lh/async.vim
 autoload/lh/buffer.vim
 autoload/lh/buffer/dialog.vim
+autoload/lh/coc.vim
 autoload/lh/command.vim
 autoload/lh/common.vim
 autoload/lh/dict.vim
