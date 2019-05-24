@@ -175,6 +175,7 @@ String related functions:                               |lhvl#string|     {{{2
 - |lh#string#count()|
 - |lh#string#matches()|
 - |lh#string#matchstrpos()|
+- |lh#string#or()|
 - |lh#string#substitute_unless()|
 - |lh#string#trim()|
 Graph related functions:                                |lhvl#graph|      {{{2
@@ -1489,6 +1490,12 @@ Example: >
 lh#string#matchstrpos(expr, pattern [, start [, count]])~
 Backports |matchstrpos()| to old versions of vim.
 @since Version 4.0.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#or()*                  {{{3
+lh#string#or([strings...])~
+@return the first non empty string
+@since Version 4.6.4
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#substitute_unless()*   {{{3

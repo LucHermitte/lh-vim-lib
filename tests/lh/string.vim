@@ -2,10 +2,10 @@
 " File:         tests/lh/string.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      3.4.0.
-let s:k_version = '340'
+" Version:      4.6.4
+let s:k_version = '464'
 " Created:      15th Dec 2015
-" Last Update:  24th Mar 2017
+" Last Update:  24th May 2019
 "------------------------------------------------------------------------
 " Description:
 "       UT for lh#string#*() functions
@@ -45,6 +45,28 @@ function! s:Test_trim_text() " {{{2
   AssertEquals(lh#string#trim_text_right('foobar', 'fobo'), 'foobar')
   AssertEquals(lh#string#trim_text_right('foobar', 'bar'), 'foobar')
   AssertEquals(lh#string#trim_text_right('foobar', 'foobarbar'), 'foobar')
+endfunction
+
+" Function: s:Test_or() {{{3
+function! s:Test_or() abort
+  AssertEquals(lh#string#or(), '')
+  AssertEquals(lh#string#or(''), '')
+  AssertEquals(lh#string#or('', ''), '')
+  AssertEquals(lh#string#or('', '', ''), '')
+
+  AssertEquals(lh#string#or('1'), '1')
+  AssertEquals(lh#string#or('1', ''), '1')
+  AssertEquals(lh#string#or('1', '2'), '1')
+  AssertEquals(lh#string#or('1', '', ''), '1')
+  AssertEquals(lh#string#or('1', '2', ''), '1')
+  AssertEquals(lh#string#or('1', '', '3'), '1')
+  AssertEquals(lh#string#or('1', '2', '3'), '1')
+
+  AssertEquals(lh#string#or('', '2'), '2')
+  AssertEquals(lh#string#or('', '2', ''), '2')
+  AssertEquals(lh#string#or('', '2', '3'), '2')
+
+  AssertEquals(lh#string#or('', '', '3'), '3')
 endfunction
 
 " }}}1

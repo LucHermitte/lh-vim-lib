@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0.
-let s:k_version = '4000'
+" Version:      4.6.4.
+let s:k_version = '40604'
 " Created:      08th Dec 2015
-" Last Update:  15th Mar 2018
+" Last Update:  24th May 2019
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -148,6 +148,14 @@ function! lh#string#substitute_unless(string, pat, char) abort
   return join(s, '')
 endfunction
 
+" # Miscellaneous {{{2
+" @return the first not empty string
+" @version 4.6.4
+" Function: lh#string#or(...) {{{3
+function! lh#string#or(...) abort
+  let r = filter(copy(a:000), '!empty(v:val)')
+  return get(r, 0, '')
+endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
