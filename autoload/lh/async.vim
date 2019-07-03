@@ -5,7 +5,7 @@
 " Version:      4.0.0
 let s:k_version = '4000'
 " Created:      01st Sep 2016
-" Last Update:  13th Mar 2017
+" Last Update:  03rd Jul 2019
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -499,7 +499,7 @@ function! s:ui_update() abort " {{{3
 endfunction
 
 function! s:ui_cancel_jobs() abort " {{{3
-  let self.interrupted = 0
+  let s:job_queue.interrupted = 0
   let l = len(s:job_queue.list)
 
   try
@@ -517,13 +517,13 @@ function! s:ui_cancel_jobs() abort " {{{3
       endif
     endif
   finally
-    if self.interrupted
+    if s:job_queue.interrupted
       " We could be interrupted just after the test. In that case, the old job
       " won't be removed and it's get executed twice...
       call remove(self.list, 0)
       call self._check_start_next() " cannot be interrupted anymore
     endif
-    unlet self.interrupted
+    unlet s:job_queue.interrupted
   endtry
 endfunction
 " }}}1
