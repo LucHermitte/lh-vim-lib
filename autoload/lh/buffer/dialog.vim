@@ -15,6 +15,7 @@ let s:k_version = 40700
 " History:
 "       v4.7.0
 "       (*) ENH: Use the exact width available to display rulers
+"       (*) BUG: Fix improper offset when selecting lines
 "       v4.0.0
 "       (*) ENH: Add `_to_string()` to dialog buffer
 "       (*) ENH: Tags selection support visual mode
@@ -133,8 +134,8 @@ function! s:ToggleTag(lineNum, ...) abort
 endfunction
 
 function! s:Help_NbL() abort " {{{3
-  " return 1 + nb lines of BuildHelp
-  return 2 + len(b:dialog['help_'.b:dialog.help_type])
+  " return 3 (header+ruler+empty line) + nb lines of BuildHelp
+  return 3 + len(b:dialog['help_'.b:dialog.help_type])
 endfunction
 "----------------------------------------
 " Go to the Next (/previous) possible choice. {{{3
@@ -152,7 +153,7 @@ endfunction
 
 function! lh#buffer#dialog#update(dialog) abort " {{{3
   set noro
-  silent! exe (s:Help_NbL()+2).',$d_'
+  silent! exe (s:Help_NbL()+1).',$d_'
   silent! call append('$', map(copy(a:dialog.choices), '"  ".v:val'))
   set ro
 endfunction
