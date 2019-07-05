@@ -64,8 +64,8 @@ let s:k_job_methods = [
       \ 'in_mode', 'out_mode', 'err_mode',
       \ 'term', 'channel',
       \ 'in_io', 'in_top', 'in_bot', 'in_name', 'in_buf',
-      \ 'out_io', 'out_top', 'out_bot', 'out_name', 'out_buf', 'out_modiiable',
-      \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modiiable',
+      \ 'out_io', 'out_top', 'out_bot', 'out_name', 'out_buf', 'out_modifiable',
+      \ 'err_io', 'err_top', 'err_bot', 'err_name', 'err_buf', 'err_modifiable',
       \ 'block_write'
       \ ]
 
