@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.5.0.
-let s:k_version = '40500'
+" Version:      4.4.0.
+let s:k_version = '40400'
 " Created:      29th Oct 2015
-" Last Update:  26th Jun 2018
+" Last Update:  05th Jul 2019
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding handling windows.
@@ -132,6 +132,17 @@ else
     throw "No window found of id ".a:id
   endfunction
 endif
+
+" Function: lh#window#text_width(...) {{{3
+" @return the actual width available to display text in the current window:
+"    -> winwidth() - &foldcolumn - (&signcolumn * 2)
+" @since Version 4.7.0
+function! lh#window#text_width(...) abort
+  let winnr = get(a:, 1, 0)
+  return winwidth(winnr)
+        \ - getwinvar(winnr, '&foldcolumn')
+        \ - (getwinvar(winnr, '&signcolumn') != 'no' ? 2 : 0)
+endfunction
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1

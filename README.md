@@ -313,6 +313,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#window#create_window_with()` | Forces to create a new split, with any split related command, ignoring E36                                                       |
 | `lh#window#getid()`              | Emulates recent `win_getid()` function                                                                                           |
 | `lh#window#gotoid()`             | Emulates recent `win_gotoid()` function                                                                                          |
+| `lh#window#text_width()`         | Return the actual width available to display text in the current window.                                                         |
 
 
 ### Quickfix related functions

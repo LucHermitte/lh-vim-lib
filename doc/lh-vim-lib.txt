@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.6.4)
-                        For Vim version 7+      Last change: 26th Feb 2019
+*lh-vim-lib.txt*        Vim common libraries (v4.7.0)
+                        For Vim version 7+      Last change: 05th Jul 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -255,6 +255,7 @@ Window related functions:                               |lhvl#window|     {{{2
 - |lh#window#gotoid()|
 - |lh#window#new()|
 - |lh#window#split()|
+- |lh#window#text_width()|
 Quickfix related functions:                             |lhvl#quickfix|   {{{2
 - |lh#qf#get_title()|
 - |lh#qf#get_winnr()|
@@ -3527,6 +3528,17 @@ This function jumps to the window that has the window id {id}.
 Note: While window numbers may change as windows get reorganized, window ids
 are stable and never change.
 Function meant to be used along with |lh#window#getid()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#window#text_width()*          {{{3
+lh#window#text_width({winnr})~
+@since version 4.7.0
+Return the actual width available to display text in the current window.
+Indeed |winwidth()| doesn't take the columns used for signs and folding into
+account.
+
+IOW, this function returns: >
+    winwidth() - &foldcolumn - (&signcolumn * 2)
 
 ------------------------------------------------------------------------------
 QUICKFIX RELATED FUNCTIONS                            *lhvl#quickfix*   {{{2
