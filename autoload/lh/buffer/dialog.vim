@@ -4,15 +4,17 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 4000
+" Version:      4.7.0
+let s:k_version = 40700
 " Created:      21st Sep 2007
-" Last Update:  13th Mar 2017
+" Last Update:  05th Jul 2019
 "------------------------------------------------------------------------
 " Description:  «description»
 "
 "------------------------------------------------------------------------
 " History:
+"       v4.7.0
+"       (*) ENH: Use the exact width available to display rulers
 "       v4.0.0
 "       (*) ENH: Add `_to_string()` to dialog buffer
 "       (*) ENH: Tags selection support visual mode
@@ -227,12 +229,13 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
   " Short Help
   " call lh#buffer#dialog#add_help(res, '@| h                       : Toggle help', 'short')
 
-  call lh#buffer#dialog#add_help(res, '@+'.repeat('-', winwidth(bufwinnr(res.id))-3), 'ruler')
+  let window_width = lh#window#text_width(bufwinnr(res.id))
+  call lh#buffer#dialog#add_help(res, '@+'.repeat('-', window_width-3), 'ruler')
   let res.toggle_help = function("lh#buffer#dialog#toggle_help")
   let title = '@  ' . a:title
   let helpstr = '| Toggle (h)elp'
   let title = title
-        \ . repeat(' ', winwidth(bufwinnr(res.id))-lh#encoding#strlen(title)-lh#encoding#strlen(helpstr)-1)
+        \ . repeat(' ', window_width-lh#encoding#strlen(title)-lh#encoding#strlen(helpstr)-1)
         \ . helpstr
   call s:Display(res, title)
 
