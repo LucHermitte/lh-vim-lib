@@ -2,10 +2,10 @@
 " File:         autoload/lh/async.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0
-let s:k_version = '4000'
+" Version:      4.6.4
+let s:k_version = '040604'
 " Created:      01st Sep 2016
-" Last Update:  03rd Jul 2019
+" Last Update:  05th Jul 2019
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -191,7 +191,7 @@ function! s:start_next() dict abort                " {{{3
   call lh#assert#true(!self.is_empty())
   " call lh#assert#value(self.state).differ('paused')
 
-  let s:job_queue.state = 'active'
+  let self.state = 'active'
   let job = self.list[0]
   try
     let success = 0
@@ -520,8 +520,8 @@ function! s:ui_cancel_jobs() abort " {{{3
     if s:job_queue.interrupted
       " We could be interrupted just after the test. In that case, the old job
       " won't be removed and it's get executed twice...
-      call remove(self.list, 0)
-      call self._check_start_next() " cannot be interrupted anymore
+      call remove(s:job_queue.list, 0)
+      call s:job_queue._check_start_next() " cannot be interrupted anymore
     endif
     unlet s:job_queue.interrupted
   endtry
