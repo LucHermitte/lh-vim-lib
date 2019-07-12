@@ -7,7 +7,7 @@
 " Version:      4.5.0.
 let s:k_version = '450'
 " Created:      26th Jun 2018
-" Last Update:  02nd Jul 2018
+" Last Update:  12th Jul 2019
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -110,7 +110,19 @@ function! s:set(key, value, ...) dict abort
 endfunction
 
 " # Misc functions {{{2
-" Function: lh#qf#get_title() {{{3
+" Function: lh#qf#get_metrics()      {{{3
+" @Since version 4.7.0, moved for build-tools-wrappers
+function! lh#qf#get_metrics() abort
+  let qf = getqflist()
+  let recognized = filter(qf, 'get(v:val, "valid", 1)')
+  " TODO: support other locales, see lh#po#context().tranlate()
+  let errors   = filter(copy(recognized), 'v:val.type == "E" || v:val.text =~ "\\v^ *(error|erreur)"')
+  let warnings = filter(copy(recognized), 'v:val.type == "W" || v:val.text =~ "\\v^ *(warning|attention)"')
+  let res = { 'all': len(qf), 'errors': len(errors), 'warnings': len(warnings) }
+  return res
+endfunction
+
+" Function: lh#qf#get_title()        {{{3
 " @since V4.5.0
 if lh#has#properties_in_qf()
   function! lh#qf#get_title() abort
@@ -123,7 +135,7 @@ else
   endfunction
 endif
 
-" Function: lh#qf#get_winnr() {{{3
+" Function: lh#qf#get_winnr()        {{{3
 " @since V4.5.0
 if lh#has#patch('patch-7.4-2215') " && exists('*getwininfo')
   function! lh#qf#get_winnr() abort
@@ -142,7 +154,7 @@ else
   endfunction
 endif
 
-" Function: lh#qf#is_displayed() {{{3
+" Function: lh#qf#is_displayed()     {{{3
 function! lh#qf#is_displayed() abort
   return lh#qf#get_winnr() ? 1 : 0
 endfunction

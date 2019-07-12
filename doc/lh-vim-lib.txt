@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.0)
-                        For Vim version 7+      Last change: 05th Jul 2019
+                        For Vim version 7+      Last change: 12th Jul 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -257,6 +257,7 @@ Window related functions:                               |lhvl#window|     {{{2
 - |lh#window#split()|
 - |lh#window#text_width()|
 Quickfix related functions:                             |lhvl#quickfix|   {{{2
+- |lh#qf#get_metrics()|
 - |lh#qf#get_title()|
 - |lh#qf#get_winnr()|
 - |lh#qf#is_displayed()|
@@ -3542,6 +3543,16 @@ IOW, this function returns: >
 
 ------------------------------------------------------------------------------
 QUICKFIX RELATED FUNCTIONS                            *lhvl#quickfix*   {{{2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#get_metrics()*             {{{3
+lh#qf#get_metrics()~
+@since version 4.7.0
+@returns a |Dictionary| that counts the numbers of errors and warnings found
+in the |quickfix| list.
+ - "`all`"      = number of recognized error messages (see |getqflist()| `valid` entry)
+ - "`errors`"   = number of actual error found (`type=='E' || text=~'error||erreur'`)
+ - "`warnings`" = number of actual warning found (`type=='W' || text=~'warning||attention'`)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#qf#get_title()*               {{{3

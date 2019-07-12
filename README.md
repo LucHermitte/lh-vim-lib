@@ -319,6 +319,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 ### Quickfix related functions
 | Function                   | Purpose                                                                                                                      |
 |:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------|
+| `lh#qf#get_merics()`       | Returns the numbers of errors and warnings in the quickfix list                                                              |
 | `lh#qf#get_title()`        | Returns title of the qf window                                                                                               |
 | `lh#qf#get_winnr()`        | Returns window number of the qf window -- ignore location list windows                                                       |
 | `lh#qf#is_displayed()`     | Tells whether the qf window is visible -- ignore location list windows                                                       |
