@@ -7,7 +7,7 @@
 " Version:      3.6.1
 let s:k_version = 361
 " Created:      19th Jul 2010
-" Last Update:  08th Jan 2016
+" Last Update:  16th Jul 2019
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to environment (variables)
@@ -46,25 +46,32 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-function! lh#env#expand_all(string)
-  let res = ''
-  let tail = a:string
-  while !empty(tail)
-    let [ all, head, var, tail; dummy ] = matchlist(tail, '\(.\{-}\)\%(${\(.\{-}\)}\)\=\(.*\)')
-    if empty(var)
-      let res .= tail
-      break
-    else
-      let res .= head
-      let val = eval('$'.var)
-      let res .= val
-    endif
-  endwhile
-  return res
+let s:expand_all_hooks = {}
+function! s:expand_all_hooks.cmake(var) dict abort
+  if empty(globpath(&rtp, 'autoload/lh/cmake.vim'))
+    " Ask lh-cmake, if installed
+    return ''
+  endif
+  let var = lh#cmake#get_variables(a:var)
+  if has_key(var, a:var)
+    return var[a:var].value
+  else
+    return ''
+  endif
 endfunction
 
-"------------------------------------------------------------------------
-" ## Internal functions {{{1
+function! s:do_expand(var) abort
+  let val = eval('$'.a:var)
+  if empty(val) && has_key(s:expand_all_hooks, &ft)
+    let val = s:expand_all_hooks[&ft](a:var)
+  endif
+  return val
+endfunction
+
+function! lh#env#expand_all(string) abort
+  let res = substitute(a:string, '\v\$\{(.{-})\}', '\=s:do_expand(submatch(1))', 'g')
+  return res
+endfunction
 
 " }}}1
 "------------------------------------------------------------------------

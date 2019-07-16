@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.0)
-                        For Vim version 7+      Last change: 12th Jul 2019
+                        For Vim version 7+      Last change: 16th Jul 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -48,6 +48,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#encoding#previous_character()|
 - |lh#encoding#strlen()|
 - |lh#encoding#strpart()|
+- |lh#env#expand_all()|
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
 - |lh#exception#callstack_as_qf()|
@@ -1008,6 +1009,14 @@ lh#encoding#current_character()~
 lh#encoding#previous_character()~
 Returns The character under/before the current.
 Works even with multi-byte characters
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#env#expand_all()*             {{{3
+lh#env#expand_all({string})~
+Parses and replaces environment variable occurrences by the values found.
+Some hooks are defined for specific filetypes
+- `cmake` : if |lh-cmake| is installed, uses |lh#cmake#get_variables()| to
+          convert `${varname}` expression.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                  *lh#event#RegisterForOneExecutionAt()*           {{{3
