@@ -735,6 +735,9 @@ endfunction
 " Function: lh#list#rotate(list, rot) {{{3
 " {rot} must belong to [-len(list)n +len(list)]
 function! lh#list#rotate(list, rot) abort
+  if a:rot == 0
+    return a:list
+  endif
   let res = a:list[a:rot :] + a:list[: (a:rot-1)]
   return res
 endfunction
