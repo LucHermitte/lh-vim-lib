@@ -4,7 +4,8 @@ Luc Hermitte, maintainer, 2002(?)-2018
 Adelar da Silva Queiróz, typo in doc, 2015 PR#1
 Troy Curtis Jr, for portability functions, tests/issues, 2015-2016, PR#2, 3
 Kento TSUJI MaxMEllon, typo in doc, 2018, PR#12
+Sergey Vlasov, bug fix in `lh#list#rotate(,0)`, PR#15
 
 
-Discl. I'm likely to have forgottent old contributors, drop me an email if
-you're one of them.
+Discl. I'm likely to have forgotten old contributors, drop me an email
+if you're one of them.
