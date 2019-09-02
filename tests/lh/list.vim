@@ -4,9 +4,9 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.6.4
+" Version:      4.7.0
 " Created:	19th Nov 2008
-" Last Update:  26th Oct 2018
+" Last Update:  02nd Sep 2019
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -568,6 +568,25 @@ function! s:Test_flatten() abort
   let l = [ [[[0]]], 1, 2, [3,4], [5, [6]]]
 
   AssertEquals(lh#list#flatten(l), range(7))
+endfunction
+
+" lh#list#rotate {{{2
+function! s:Test_rotate()
+    :let l0 = [1, 25, 7, 48, 26, 5]
+    AssertEquals (l0,  lh#list#rotate(l0, 0))
+    AssertEquals ([25, 7, 48, 26, 5, 1],  lh#list#rotate(l0, 1))
+    AssertEquals ([7, 48, 26, 5, 1, 25],  lh#list#rotate(l0, 2))
+    AssertEquals ([48, 26, 5, 1, 25, 7],  lh#list#rotate(l0, 3))
+    AssertEquals ([26, 5, 1, 25, 7, 48],  lh#list#rotate(l0, 4))
+    AssertEquals ([5, 1, 25, 7, 48, 26],  lh#list#rotate(l0, 5))
+    AssertEquals ([1, 25, 7, 48, 26, 5],  lh#list#rotate(l0, 6))
+
+    AssertEquals ([25, 7, 48, 26, 5, 1],  lh#list#rotate(l0, -5))
+    AssertEquals ([7, 48, 26, 5, 1, 25],  lh#list#rotate(l0, -4))
+    AssertEquals ([48, 26, 5, 1, 25, 7],  lh#list#rotate(l0, -3))
+    AssertEquals ([26, 5, 1, 25, 7, 48],  lh#list#rotate(l0, -2))
+    AssertEquals ([5, 1, 25, 7, 48, 26],  lh#list#rotate(l0, -1))
+    AssertEquals ([1, 25, 7, 48, 26, 5],  lh#list#rotate(l0, -6))
 endfunction
 
 " Zip {{{2
