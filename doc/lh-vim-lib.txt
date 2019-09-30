@@ -403,11 +403,13 @@ used, or as a standard vim error message through |:echoerr| otherwise.
                                                  *lh#common#WarningMsg()*          {{{3
 lh#common#WarningMsg({text}) (*deprecated*)~
                                               *lh#common#warning_msg()*
-lh#common#warning_msg({text})~
+lh#common#warning_msg({text}, [{highlight}])~
 @param  {text}      Error message to display
+@param  {hl}        Highlight group name, default: `"WarningMsg"`
 @return             Nothing
 
-This function displays a warning message highlighted with |WarningMsg| syntax.
+This function displays a warning message highlighted with |WarningMsg| syntax,
+or in any other highlight group specified.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#common#CheckDeps()*           {{{3

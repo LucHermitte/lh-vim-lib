@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.5.0
-let s:k_version = 450
+" Version:	4.7.0
+let s:k_version = 470
 " Created:	07th Oct 2006
-" Last Update:	14th Jun 2018
+" Last Update:	30th Sep 2019
 "------------------------------------------------------------------------
 " Description:
 " 	Some common functions for:
@@ -18,6 +18,8 @@ let s:k_version = 450
 " Requirements:
 " 	ruby, or python enabled for lh#common#rand()
 " History:
+"       v4.7.0:
+"       - ENH: Add optional ColorHL to lh#common#warning_msg
 "       v4.5.0:
 "       - REFACT: Try to use the the best python flavour available
 "       v4.0.0:
@@ -72,8 +74,9 @@ function! lh#common#ErrorMsg(text)
 endfunction
 
 " Function: lh#common#warning_msg {{{2
-function! lh#common#warning_msg(text)
-  echohl WarningMsg
+function! lh#common#warning_msg(text, ...)
+  let hl = get(a:, 1, 'WarningMsg')
+  exe 'echohl '.hl
   " echomsg a:text
   call lh#common#echomsg_multilines(a:text)
   echohl None
