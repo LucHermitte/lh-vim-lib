@@ -7,7 +7,7 @@
 " Version:      4.6.4
 let s:k_version = 40604
 " Created:      23rd Jan 2007
-" Last Update:  26th Sep 2018
+" Last Update:  15th Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -434,25 +434,25 @@ function! lh#path#relative_to(from, to) abort
   return res
 endfunction
 
-" Function: lh#path#glob_as_list({pathslist}, {expr} [, mustSort=1]) {{{3
+" Function: lh#path#glob_as_list({pathlist}, {expr} [, mustSort=1]) {{{3
 if has("patch-7.4.279") || (v:version == 704 && has('patch279'))
   " Either version >= 7.4.237 and `has('patch-7.4.279')` detects correctly, or
   " we can fall back to old detection, assuming that we still need to test v 7.4,
-  function! s:DoGlobPath(pathslist, expr) abort
-    let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
-    return globpath(pathslist, a:expr, 1, 1)
+  function! s:DoGlobPath(pathlist, expr) abort
+    let pathlist = type(a:pathlist) == type([]) ? join(a:pathlist, ',') : a:pathlist
+    return globpath(pathlist, a:expr, 1, 1)
   endfunction
 else
-  function! s:DoGlobPath(pathslist, expr) abort
-    let pathslist = type(a:pathslist) == type([]) ? join(a:pathslist, ',') : a:pathslist
-    let sResult = globpath(pathslist, a:expr, 1)
+  function! s:DoGlobPath(pathlist, expr) abort
+    let pathlist = type(a:pathlist) == type([]) ? join(a:pathlist, ',') : a:pathlist
+    let sResult = globpath(pathlist, a:expr, 1)
     let lResult = split(sResult, '\n')
     return lResult
   endfunction
 endif
 
-function! s:GlobAsList(pathslist, expr,  mustSort) abort
-  let lResult = s:DoGlobPath(a:pathslist, a:expr)
+function! s:GlobAsList(pathlist, expr,  mustSort) abort
+  let lResult = s:DoGlobPath(a:pathlist, a:expr)
   " workaround a non feature of wildignore: it does not ignore directories
   let ignored_directories = filter(split(&wildignore, ','), 'stridx(v:val, "/")!=-1')
   if !empty(ignored_directories)
@@ -462,76 +462,76 @@ function! s:GlobAsList(pathslist, expr,  mustSort) abort
   return a:mustSort ? lh#list#unique_sort(lResult) : lResult
 endfunction
 
-function! lh#path#glob_as_list(pathslist, expr, ...) abort
+function! lh#path#glob_as_list(pathlist, expr, ...) abort
   let mustSort = (a:0 > 0) ? (a:1) : 0
   if type(a:expr) == type('string')
-    return s:GlobAsList(a:pathslist, a:expr, mustSort)
+    return s:GlobAsList(a:pathlist, a:expr, mustSort)
   elseif type(a:expr) == type([])
     let res = []
-    call map(copy(a:expr), 'extend(res, s:GlobAsList(a:pathslist, v:val, mustSort))')
+    call map(copy(a:expr), 'extend(res, s:GlobAsList(a:pathlist, v:val, mustSort))')
     " for expr in a:expr
-      " call extend(res, s:GlobAsList(a:pathslist, expr, mustSort))
+      " call extend(res, s:GlobAsList(a:pathlist, expr, mustSort))
     " endfor
     return res
   else
     throw "Unexpected type for a:expression"
   endif
 endfunction
-function! lh#path#GlobAsList(pathslist, expr)
-  return lh#path#glob_as_list(a:pathslist, a:expr)
+function! lh#path#GlobAsList(pathlist, expr)
+  return lh#path#glob_as_list(a:pathlist, a:expr)
 endfunction
 
-" Function: lh#path#strip_start({pathname}, {pathslist}) {{{3 abort
-" Strip occurrence of paths from {pathslist} in {pathname}
+" Function: lh#path#strip_start({pathname}, {pathlist}) {{{3 abort
+" Strip occurrence of paths from {pathlist} in {pathname}
 " @param[in] {pathname} name to simplify
-" @param[in] {pathslist} list of pathname (can be a |string| of pathnames
+" @param[in] {pathlist} list of pathname (can be a |string| of pathnames
 " separated by ",", of a |List|).
 " @note Unfortunatelly, this function is quite slow
-function! s:prepare_pathlist_for_strip_start(pathslist)
-  if type(a:pathslist) == type('string')
-    " let strip_re = escape(a:pathslist, '\\.')
+function! s:prepare_pathlist_for_strip_start(pathlist)
+  if type(a:pathlist) == type('string')
+    " let strip_re = escape(a:pathlist, '\\.')
     " let strip_re = '^' . substitute(strip_re, ',', '\\|^', 'g')
-    let pathslist = split(a:pathslist, ',')
-  elseif type(a:pathslist) == type([])
-    let pathslist = deepcopy(a:pathslist)
+    let pathlist = split(a:pathlist, ',')
+  elseif type(a:pathlist) == type([])
+    let pathlist = deepcopy(a:pathlist)
   else
     throw "Unexpected type for a:pathname"
   endif
 
   " apply a realpath like operation
-  let pathslist_abs=filter(copy(pathslist), 'v:val =~ "^\\.\\%(/\\|$\\)"')
-  let pathslist += pathslist_abs
+  let pathlist_abs=filter(copy(pathlist), 'v:val =~ "^\\.\\%(/\\|$\\)"')
+  let pathlist += pathlist_abs
   " replace path separators by a regex that can match them
-  call map(pathslist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")."[\\/]\\="')
-  " echomsg string(pathslist)
+  call map(pathlist, 'substitute(v:val, "[\\\\/]", "[\\\\/]", "g")."[\\/]\\="')
+  " echomsg string(pathlist)
   " escape . and ~
-  call map(pathslist, '"^".escape(v:val, ".~")')
+  call map(pathlist, '"^".escape(v:val, ".~")')
   " handle "**" as anything
-  call map(pathslist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
+  call map(pathlist, 'substitute(v:val, "\\*\\*", "\\\\%([^\\\\/]*[\\\\/]\\\\)*", "g")')
   " reverse the list to use the real best match, which is "after"
-  call reverse(pathslist)
+  call reverse(pathlist)
 
-  return pathslist
+  return pathlist
 endfunction
 
-function! s:find_best_match(pathname, pathslist) abort
-  let matches = map(copy(a:pathslist), 'substitute(a:pathname, v:val, "", "")')
+function! s:find_best_match(pathname, pathlist) abort
+  let matches = map(copy(a:pathlist), 'substitute(a:pathname, v:val, "", "")')
   let best_match_idx = lh#list#arg_min(matches, function('len'))
   return matches[best_match_idx]
 endfunction
 
-function! lh#path#strip_start(pathname, pathslist) abort
-  let pathslist = s:prepare_pathlist_for_strip_start(a:pathslist)
-  if !empty(pathslist)
+function! lh#path#strip_start(pathname, pathlist) abort
+  let pathlist = s:prepare_pathlist_for_strip_start(a:pathlist)
+  if !empty(pathlist)
     let pathnames = type(a:pathname) == type([]) ? copy(a:pathname) : [a:pathname]
-    let res = map(pathnames, 's:find_best_match(v:val, pathslist)')
+    let res = map(pathnames, 's:find_best_match(v:val, pathlist)')
   else
     let res = a:pathname
   endif
   return type(a:pathname) == type([]) ? res : res[0]
 endfunction
-function! lh#path#StripStart(pathname, pathslist)
-  return lh#path#strip_start(a:pathname, a:pathslist)
+function! lh#path#StripStart(pathname, pathlist)
+  return lh#path#strip_start(a:pathname, a:pathlist)
 endfunction
 
 " Function: lh#path#to_regex({pathname}) {{{3
@@ -575,7 +575,7 @@ endfunction
 function! lh#path#vimfiles() abort
   let re_HOME = lh#path#to_regex($HOME.'/')
   let re_LUCHOME = exists('$LUCHOME') ? '\|'.lh#path#to_regex($LUCHOME.'/'): ''
-  let what = '\%('.re_HOME.re_LUCHOME.'\)'.'\(vimfiles\|.vim\|.config[/\\]nvim\)'
+  let what = '\%('.re_HOME.re_LUCHOME.'\)'.'\(vimfiles\|\.vim\|\.config[/\\]nvim\)'
   " Comment what
   let z = lh#path#find(&rtp,what)
   return z
@@ -828,8 +828,9 @@ endfunction
 " - handle_file() {{{4
 function! s:lists_handle_file(file, permission) dict abort
   if !has_key(self, '_do_handle')
-    throw "Invalid use of `lh#path#new_filtered_list().handle_file()`
+    throw "Invalid use of `lh#path#new_filtered_list().handle_file()`"
   endif
+  let filepat = escape(a:file, '\.')
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
     return
@@ -837,11 +838,11 @@ function! s:lists_handle_file(file, permission) dict abort
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
     sandbox call self._do_handle(a:file)
     return
-  elseif match(self.rejected_paths, a:file) >= 0
+  elseif match(self.rejected_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been rejected for this session.', a:file)
     return
     " TODO: add a way to remove pathnames from validated list
-  elseif match(self.valided_paths, a:file) >= 0
+  elseif match(self.valided_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been validated for this session.', a:file)
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
@@ -879,17 +880,18 @@ endfunction
 
 " - is_file_accepted() {{{4
 function! s:lists_is_file_accepted(file, permission) dict abort
+  let filepat = escape(a:file, '\.')
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
     return 0
   elseif a:permission == 'sandboxlist'
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
     return 'sandbox'
-  elseif match(self.rejected_paths, a:file) >= 0
+  elseif match(self.rejected_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been rejected.')
     return 0
     " TODO: add a way to remove pathnames from validated list
-  elseif match(self.valided_paths, a:file) >= 0
+  elseif match(self.valided_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been validated.')
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
