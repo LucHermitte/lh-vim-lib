@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 361
+" Version:      4.7.0
+let s:k_version = 470
 " Created:      19th Jul 2010
-" Last Update:  16th Jul 2019
+" Last Update:  15th Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to environment (variables)

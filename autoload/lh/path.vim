@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = 40604
+" Version:      4.7.0
+let s:k_version = 40700
 " Created:      23rd Jan 2007
 " Last Update:  15th Nov 2019
 "------------------------------------------------------------------------
@@ -116,6 +116,8 @@ let s:k_version = 40604
 "       (*) PORT: Use `lh#ui#confirm()`
 "       v4.6.4
 "       (*) BUG: Apply `readlink()` to `munge()`
+"       v4.7.0
+"       (*) BUG: Fix local_vimrc issue with mswin pathnames
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1

@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      4.5.0.
-let s:k_version = '450'
+" Version:      4.7.0.
+let s:k_version = '470'
 " Created:      26th Jun 2018
-" Last Update:  12th Jul 2019
+" Last Update:  15th Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
