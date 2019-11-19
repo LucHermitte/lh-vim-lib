@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.7.0)
-                        For Vim version 7+      Last change: 16th Jul 2019
+*lh-vim-lib.txt*        Vim common libraries (v4.7.1)
+                        For Vim version 7+      Last change: 19th Nov 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -2769,11 +2769,14 @@ Prepares a permission lists object.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#readlink()*               {{{3
 lh#path#readlink({pathname})~
-Resolves any symbolic links in pathnames.
-Where the *nix command readlink is available, it returns >
-    readlink -f {pathname}
-elsewhere it returns {pathname}.
-@param[in] pathslist to resolve
+Resolves any symbolic links in {pathname}.
+@param[in] pathname to resolve
+
+Depending on the available external commands, it tries to return:
+- `greadlink` exists: ` greadlink -f {pathname}`
+- `readlink`  exists: ` readlink  -f {pathname}` -- except on osx
+- `realpath`  exists: ` realpath     {pathname}`
+- otherwise          `resolve({pathname})`, see |resolve()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#path#relative_to()*            {{{3

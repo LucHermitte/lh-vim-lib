@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.7.0
-let s:k_version = 40700
+" Version:      4.7.1
+let s:k_version = 40701
 " Created:      23rd Jan 2007
-" Last Update:  15th Nov 2019
+" Last Update:  19th Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -594,13 +594,20 @@ function! lh#path#is_in(file, path) abort
 endfunction
 
 " Function: lh#path#readlink(pathname) {{{3
-let s:has_readlink = 0
+if executable('greadlink')
+  let s:k_readlink = 'greadlink -f '
+elseif !has('osx') && executable('readlink')
+  " TODO: a better test for the availability of `readlink -f`  shall be
+  " implemented.
+  let s:k_readlink = 'readlink -f '
+elseif executable('realpath')
+  let s:k_readlink = 'realpath '
+endif
 function! lh#path#readlink(pathname) abort
-  if s:has_readlink || executable('readlink')
-    let s:has_readlink = 1
-    return lh#os#system('readlink -f '.shellescape(a:pathname))
+  if exists('s:k_readlink')
+    return lh#os#system(s:k_readlink.shellescape(a:pathname))
   else
-    return a:pathname
+    return resolve(a:pathname)
   endif
 endfunction
 
@@ -707,7 +714,7 @@ endfunction
 
 " Function: lh#path#munge(pathlist, path [, sep]) {{{3
 function! lh#path#munge(pathlist, path, ...) abort
-  let path = lh#path#readlink(a:path)
+  let path = resolve(a:path)
   if type(a:pathlist) == type('str')
     let sep = get(a:, 1, ',')
     let pathlist = split(a:pathlist, sep)
