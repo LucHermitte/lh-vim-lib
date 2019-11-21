@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.5.0.
-let s:k_version = '450'
+" Version:      4.7.1.
+let s:k_version = '471'
 " Created:      13th Jun 2018
-" Last Update:  15th Jun 2018
+" Last Update:  21st Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Utility function to use python from vim
@@ -51,6 +51,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
 " Function: lh#python#best_still_avail() {{{3
+" @post 'pyxversion' will be updated accordingly
 function! lh#python#best_still_avail(...) abort
   if has('python_compiled') && has('python3_compiled')
     " On the first succesful has('python'), or has('python3'), the other one
@@ -59,10 +60,17 @@ function! lh#python#best_still_avail(...) abort
     let order = get(a:, 1, ['python3', 'python'])
     let tests = map(copy(order), 'has(v:val) ? v:val : ""')
     let tests = filter(tests, '!empty(v:val)') + ['']
+    if tests[0] == 'python3'
+      set pyxversion=3
+    elseif tests[0] == 'python'
+      set pyxversion=2
+    endif
     return tests[0]
   elseif has('python3')
+    set pyxversion=3
     return 'python3'
   elseif has('python')
+    set pyxversion=2
     return 'python'
   else
     return ''
