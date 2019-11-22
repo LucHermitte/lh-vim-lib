@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/cmd.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.0.
-let s:k_version = '460'
+" Version:      4.7.1.
+let s:k_version = '471'
 " Created:      07th Mar 2017
-" Last Update:  28th Aug 2018
+" Last Update:  22nd Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Define support functions for :Project
@@ -371,7 +371,7 @@ endfunction
 " ## Internal functions {{{1
 
 " # :Project command definition {{{2
-function! s:dispatch_cmd_on_project(prj, lead, args) " {{{3
+function! s:dispatch_cmd_on_project(prj, lead, args) abort " {{{3
   let nb_args = len(a:args)
   call lh#assert#value(nb_args).is_gt(0)
   let cmd     = a:args[0]
@@ -417,12 +417,12 @@ endfunction
 
 "------------------------------------------------------------------------
 " # :Project command completion {{{2
-function! s:token_matches(tokens, pos, what) " {{{3
+function! s:token_matches(tokens, pos, what) abort " {{{3
   return     (2 == a:pos && a:tokens[a:pos-1] =~ '\v^:'.a:what.'$')
         \ || (3 == a:pos && a:tokens[a:pos-1] =~ '\v^:='.a:what.'$')
 endfunction
 
-function! s:list_var_for_complete(prj, ArgLead) " {{{3
+function! s:list_var_for_complete(prj, ArgLead) abort " {{{3
   let prj = a:prj
   if !empty(a:ArgLead) && a:ArgLead[0] == '$'
     let vars = map(keys(prj.env), '"$".v:val')
