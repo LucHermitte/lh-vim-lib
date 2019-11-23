@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = '40604'
+" Version:      4.7.4
+let s:k_version = '40701'
 " Created:      26th Nov 2015
-" Last Update:  26th Oct 2018
+" Last Update:  23rd Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       |Dict| helper functions
@@ -143,6 +143,23 @@ function! lh#dict#get_composed(dst, key, ...) abort
   endtry
 endfunction
 
+" Function: lh#dict#print_as_tree(dict, [, indent]) {{{3
+" @since version 4.7.1
+function! lh#dict#print_as_tree(dict, ...) abort
+  let res = []
+  let indent = get(a:, 1, 0)
+  let lead = repeat(' ', indent) . '+- '
+  for [k,v] in items(a:dict)
+    if type(v) == type({})
+      let res += [lead . string(k). ' = {']
+            \ +  lh#dict#print_as_tree(v, indent + 4)
+            \ +  [repeat(' ', indent+4) . '}']
+    else
+      let res += [ lead . string(k). ' = '.string(v)]
+    endif
+  endfor
+  return indent == 0 ? join(res, "\n") : res
+endfunction
 " ## Internal functions {{{1
 
 "------------------------------------------------------------------------
