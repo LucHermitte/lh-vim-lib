@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.1)
-                        For Vim version 7+      Last change: 19th Nov 2019
+                        For Vim version 7+      Last change: 24th Nov 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -159,6 +159,7 @@ Dict related functions:                                 |lhvl#dict|       {{{2
 - |lh#dict#get_composed()|
 - |lh#dict#key()|
 - |lh#dict#let()|
+- |lh#dict#print_as_tree()|
 - |lh#dict#need_ref_on()|
 - |lh#dict#subset()|
 Stack related functions:                                |lhvl#stack|      {{{2
@@ -2438,6 +2439,37 @@ Important: it may change the type of an already existing value associatiated
 to an intermediairy subkey to |dictionary|, i.e. the following works >
     let d = {'a': {'b': 1}}
     call lh#dict#let(d, 'a.b.c.d.e', 42)
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#dict#print_as_tree()*          {{{3
+lh#dict#print_as_tree(dict)~
+@since Version 4.7.1
+
+Pretty printer for |dictionaries|. Present them as trees
+e.g. >
+    echo lh#dict#print_as_tree({'a': 12, 'b': 15, 'c':[['{', 'toto'], 1], 'd':
+    \ { 'foo': 'bar', 1: 'too', 5: 'titi', 6: {42: 'last'}}})
+
+will display: >
+    {
+    +- 'a' = 12
+    +- 'b' = 15
+    +- 'c' = [
+            +- 0 -> [
+                    +- 0 -> '{'
+                    +- 1 -> 'toto'
+                    ]
+            +- 1 -> 1
+            ]
+    +- 'd' = {
+            +- 'foo' = 'bar'
+            +- '1'   = 'too'
+            +- '5'   = 'titi'
+            +- '6'   = {
+                    +- '42' = 'last'
+                    }
+            }
+    }
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *lh#dict#need_ref_on()*            {{{3
