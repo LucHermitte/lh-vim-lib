@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.1)
-                        For Vim version 7+      Last change: 24th Nov 2019
+                        For Vim version 7+      Last change: 25th Nov 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -30,6 +30,7 @@ FUNCTIONS                                    *lhvl-functions*     {{{1
                                                                         {{{2Functions list~
 Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#askvim#exe()|
+- |lh#askvim#execute()|
 - |lh#askvim#execute()|
 - |lh#askvim#scriptid()|
 - |lh#askvim#scriptnames()|
@@ -65,6 +66,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - *lh#has#partials()* returns whether |Partial|s are implemented
 - *lh#has#vkey()* returns whether |v:key| can be used in |map()| and |filter()|.
 - |lh#has#patch()|
+- |lh#has#plugin()|
 - |lh#lang#set_message_temporarily()|
 - |lh#leader#get()|
 - |lh#leader#get_local()|
@@ -1125,12 +1127,18 @@ python, ruby, perl).
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                 *lh#has#patch()*                                  {{{3
-lh#ft#has_patch('patch-{ver}.{patch})~
+lh#has#patch('patch-{ver}.{patch})~
 @since Version 4.0.0
 Provides a portable layer over |has-patch| improved detection added in patch
 7.4-236 and 7.4-237.
 In other, `has('patch-7.4.001')` won't work, while `lh#has#patch('patch-7.4.001')` will.
 Note however, that this function isn't required since Version 7.4-237.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                *lh#has#plugin()*                                 {{{3
+lh#has#plugin(name)~
+@since Version 4.7.1
+Tells whether a file is present in 'runtimepath'.
 
 ------------------------------------------------------------------------------
 OPTION RELATED FUNCTIONS                              *lhvl#option*     {{{2

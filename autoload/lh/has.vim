@@ -2,10 +2,10 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.5.0
-let s:k_version = '400500'
+" Version:      4.7.1
+let s:k_version = '40701'
 " Created:      02nd Sep 2016
-" Last Update:  17th Aug 2018
+" Last Update:  25th Nov 2019
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -104,6 +104,13 @@ endfunction
 " @since v 4.6.0
 function! lh#has#writefile_append() abort
   return has('patch-7.4.503')
+endfunction
+
+" # Vim installation {{{2
+" Function: lh#has#plugin(name) {{{3
+" @since Version 4.7.1
+function! lh#has#plugin(name) abort
+  return !empty(globpath(&rtp, a:name))
 endfunction
 
 "------------------------------------------------------------------------
