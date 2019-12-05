@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.1)
-                        For Vim version 7+      Last change: 25th Nov 2019
+                        For Vim version 7+      Last change: 05th Dec 2019
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -92,6 +92,9 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#position#is_before()|
 - |lh#position#move()|
 - |lh#position#move_n()|
+- |lh#switch#new()|
+  - |lh#switch-add_case()|
+  - |lh#switch-evaluate()|
 - |lh#tags#stack#push()|
 - |lh#tags#stack#jump()|
 - |lh#time#bench()|
@@ -860,7 +863,55 @@ lh#position#move_n({direction}, {count})~
 @since              Version 4.4.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#tags#stack#jump()*            {{{3
+                                             *lh#switch#new()*                 {{{3
+lh#switch#new([{cases}...])~
+@param {cases}  passed to |lh#switch-add_case()|
+@return a switch |lhvl#object| with two services: |lh#switch-add_case()| and
+|lh#switch-evaluate()|.
+@since              Version 4.7.1
+
+                                             *lh#switch-add_case()*                 {{{4
+lh#switch-add_case({case})~
+@param {case}  |Dictionary| made of the two keys
+- `'cond'`:     predicate taking N parameters
+- `'function'`: |function| reference, or |string| that can be |eval()|uated,
+              taking N parameters.
+@return |v:true|/1 or |v:false|/0
+@pre The number of parameters N shall match the number of parameters that will
+be passed to |lh#switch-evaluate()| method.
+
+If |lambas| are not supported in your version of vim, you can still define
+string that'll get evaluated. The parameters can be accessed through |a:000|
+... manipulated as a |string.| e.g. >
+
+    let switch = lh#switch#new()
+    call switch.add_case({'cond': {d -> d.conv}, 'func': '"converting constructor from ".a:1.params[0].spelling'})
+    call switch.add_case({'cond': 'a:1.dtr'    ,  'func': '"a destructor"'})
+    call switch.add_case({'cond': 1            ,  'func': '"0"'}) " default case...
+
+    let ctr = {'name': 'MyClass', 'params': [{'spelling': 'double'}], 'ctr': 1, 'dtr': 0}
+    AssertEqual (switch.evaluate(extend(copy(ctr), {'conv': 1})), 'converting constructor from double')
+    AssertEqual (switch.evaluate(extend(copy(ctr), {'conv': 0})), 'a constructor')
+    AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 1}), 'a destructor')
+    AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 0}), '0')
+
+Never forget to make sure all possible cases are coverred. A "default" case
+may be reduired.
+
+                                             *lh#switch-evaluate()*                 {{{4
+lh#switch-evaluate({args}...)~
+@param {args}  N parameters that'll be passed to the `'cond'` predicate and
+`'function'` registered previously with |lh#switch-add_case()|.
+@pre The number of parameters N shall match the number of parameters that will
+be passed to the predicates and the functions registered.
+
+This method will first check the first case registered (in order), with a
+predicate that evaluates to 1/|v:true|.
+
+Then, it will evaluate its associated `'function'` and return its value.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                              *lh#tags#stack#jump()*            {{{3
 lh#tags#stack#jump(tagentry [, cmd = 'tag'])~
 Forge a new tag entry in the tag stack and jump to it with the specified
 command.
