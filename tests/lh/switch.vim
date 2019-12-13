@@ -7,7 +7,7 @@
 " Version:      4.7.0.
 let s:k_version = '470'
 " Created:      05th Dec 2019
-" Last Update:  05th Dec 2019
+" Last Update:  13th Dec 2019
 "------------------------------------------------------------------------
 " Description:
 "       Unit tests for lh#switch
@@ -40,8 +40,8 @@ function! s:Test_string_string()
   AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 0}), '0')
 endfunction
 
-if lh#has#lambda()
-  function! s:Test_func_string()
+function! s:Test_func_string()
+  if lh#has#lambda()
     let switch = lh#switch#new()
     call switch.add_case({'cond': {d -> d.conv}, 'func': '"converting constructor from ".a:1.params[0].spelling'})
     call switch.add_case({'cond': {d -> d.ctr},  'func': '"a constructor"'})
@@ -53,9 +53,11 @@ if lh#has#lambda()
     AssertEqual (switch.evaluate(extend(copy(ctr), {'conv': 0})), 'a constructor')
     AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 1}), 'a destructor')
     AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 0}), '0')
-  endfunction
+  endif
+endfunction
 
-  function! s:Test_func_func()
+function! s:Test_func_func()
+  if lh#has#lambda()
     let switch = lh#switch#new()
     call switch.add_case({'cond': {d -> d.conv}, 'func': {d -> 'converting constructor from '.d.params[0].spelling}})
     call switch.add_case({'cond': {d -> d.ctr},  'func': {d -> 'a constructor'}})
@@ -67,8 +69,8 @@ if lh#has#lambda()
     AssertEqual (switch.evaluate(extend(copy(ctr), {'conv': 0})), 'a constructor')
     AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 1}), 'a destructor')
     AssertEqual (switch.evaluate({'conv': 0, 'ctr':0, 'dtr': 0}), '0')
-  endfunction
-endif
+  endif
+endfunction
 
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
