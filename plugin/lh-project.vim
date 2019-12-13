@@ -5,7 +5,7 @@
 " Version:      4.6.4
 let s:k_version = '40604'
 " Created:      29th Sep 2016
-" Last Update:  16th Jan 2019
+" Last Update:  13th Dec 2019
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands
@@ -59,17 +59,6 @@ call lh#menu#def_toggle_item(s:toggle_auto_chdir)
 command! -nargs=* -complete=customlist,lh#project#cmd#_complete
       \ Project
       \ call lh#project#cmd#execute(<f-args>)
-
-" ## Auto commands {{{1
-augroup LH_PROJECT
-  au!
-  au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<abuf>'))
-
-  " Needs to be executed after local_vimrc
-  au BufReadPost * call lh#project#_post_local_vimrc()
-
-  au BufWinEnter,VimEnter * call lh#project#_CheckUpdateCWD()
-augroup END
 
 " ## Register to editorconfig if found {{{1
 if !empty(globpath(&rtp, 'autoload/editorconfig.vim'))

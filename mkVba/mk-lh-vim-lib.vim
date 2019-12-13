@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	4.7.0
-let s:version = '4.7.0'
+" Version:	4.7.1
+let s:version = '4.7.1'
 " Created:	06th Nov 2007
-" Last Update:  05th Jul 2019
+" Last Update:  13th Dec 2019
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
@@ -23,6 +23,7 @@ finish
 README.md
 License.md
 addon-info.json
+after/plugin/lh-project-delayed-events.vim
 autoload/airline/extensions/async.vim
 autoload/lh/askvim.vim
 autoload/lh/assert.vim
@@ -42,7 +43,6 @@ autoload/lh/fmt.vim
 autoload/lh/ft.vim
 autoload/lh/ft/option.vim
 autoload/lh/function.vim
-autoload/lh/partial.vim
 autoload/lh/graph/tsort.vim
 autoload/lh/has.vim
 autoload/lh/icomplete.vim
@@ -57,6 +57,7 @@ autoload/lh/menu.vim
 autoload/lh/notify.vim
 autoload/lh/on.vim
 autoload/lh/option.vim
+autoload/lh/partial.vim
 autoload/lh/path.vim
 autoload/lh/po.vim
 autoload/lh/position.vim
