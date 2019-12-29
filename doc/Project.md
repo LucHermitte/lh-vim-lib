@@ -56,7 +56,7 @@ The objective is to avoid duplicating a lot of `b:variables` in many buffers.
 Instead, all those buffers will point to a same global variable associated to
 the current project.
 
-This variable will hold a single instance of each pair _variable_:_value_.
+This variable will hold a single instance for each pair _variable_:_value_.
 
 This means that modifying a `p:variable` in a buffer will also modify its state
 in all the buffers belonging to the same project.
@@ -69,7 +69,7 @@ where I test the behaviour of the compiler. I call those: _monofile projects_.
 On the opposite, the files from a directory hierarchy can be part of a same and
 very big project. We may even imagine subprojects within a hierarchy.
 
-In the end, what really defines a programming project is a (leaf) "makefile" --
+In the end, what really defines a programming project is a (root) "makefile" --
 and BTW, why restrict ourselves to makefiles, what about scons, autotools, ant,
 (b)jam, Rakefile? Also, Sun-Makefiles or GNU-Makefiles?
 Other projects will be recognized by the `.git/` directory at their root, and
@@ -79,7 +79,8 @@ It's important to notice that what distinguishes two projects is not the type
 of their files. Having a configuration for C++ projects and another for Java
 projects is not enough. For instance, I'm often working simultaneously on
 several C++ projects with very different sets of options, starting with the
-compilation options.
+compilation options. And more and more I have multi-languages projects (like
+C++ and Python).
 
 ## 1.2. What's a project aware-plugin?
 So, what' the point? What can we do with those _projects_?
@@ -137,14 +138,14 @@ setting we have to change it in every opened buffer belonging to the project.
 This is tedious to do correctly: we must have a way to find all buffers that
 share the same variable. Should we maintain a list of buffers, or jump in every
 buffer (and trigger too many unrequired autocommands if done incorrectly), or
-should we echeck buffer pathnames against a pattern...?
+should we check buffer pathnames against a pattern...?
 
 How often does this need arise? Much to often IMO. In
 [BuildToolsWrapper](https://github.com/LucHermitte/vim-build-tools-wrapper/),
 I've experimented the issue when I wanted to change the current compilation
 directory (from _Debug_ to _Release_ for instance). This is just one option,
 but it impacts CMake configuration directory, included directory list (for
-`.h.in` files), build directory, etc.
+`.h.in` files), build directory, compilation database, etc.
 
 Being able to toggle an option between several values, when this is a buffer
 local option, quickly becomes a nightmare. This is because we don't have
@@ -175,7 +176,7 @@ belong to a project.
 Most project detections may be done implicitly. The conditions to detect all
 the files from a directory hierarchy as part of a same project are:
 
- * At the root, there is a drectory typical of a versionning system, i.e. a
+ * At the root, there is a directory typical of a versioning system, i.e. a
    `.svn/`, `.git/`, `.hg/`, `_darcs/`, or `.bzr/` directory (See `:h
    g:lh#project.root_patterns`);
  * You have to set in your `.vimrc`:
@@ -264,6 +265,8 @@ See also:
   `p!$FOO = 42` won't assign 42 to `p:$FOO` but to `p:$foo`. I've used another
   trick to say: this is uppercase stuff: double the dollars as in `p:$$FoO` to
   design the environment variable `p:FOO`. At, there is no way to use `$FoO`.
+- this is the same with other variables, there is no way to support mixed
+  capitalization like CamelCase.
 - we have no control over the evaluation order of the variables. IOW, don't try
 
     ```dosini
@@ -272,7 +275,7 @@ See also:
     ```
 
     EditorConfig cannot hold computations as complex as the ones we can realize
-    in local vimrcs.
+    in local vimrcs. You may have to use both approaches in your projects.
 
 ### 3.1.2. Auto-detect the project root path
 On a project definition, we can automatically deduce the current project root
@@ -296,7 +299,7 @@ The detection policy will depend on the value of
  - `'in_doubt_improvise`: Uses the file current path a project root.
 
 By default, we reuse `p:paths.sources`. Then, we check whether a parent
-directory contains a [directory related to a versionning system](#3111-automagically)
+directory contains a [directory related to a versioning system](#3111-automagically)
 (i.e.  `.git/`, `.svn/`...) to use it as root directory. Then we check among
 the current list of dirnames used as project root directories to see whether there
 is one that matches the pathname of the current file. Then, in doubt, we may
@@ -453,9 +456,9 @@ Project ProjectName :doonce echo bufname('%')
 Project :doonce echo bufname('%')
 ```
 
-The best way to execute `:make` on a project is with this subcommand. This way,
-it makes sure all variables related to the project are correctly set when
-compiling.
+The best way to execute `:make` on a project (different from the current) is
+with this subcommand. This way, it makes sure all variables related to the
+project are correctly set when compiling.
 
 ```vim
 Project ProjectName :doonce make %<
@@ -510,7 +513,7 @@ We can use:
 :call lh#project#define(s:, {'some': 'default values', 'name' :'ProjectName'})
 
 " or simply:
-:call lh#project#define(s:, {'some': 'default values')
+:call lh#project#define(s:, {'some': 'default values'})
 " and let a default name be generated.
 ```
 
@@ -717,7 +720,7 @@ a `.vimrc` and it contains by default: `{'name': '&Project.', 'priority': '50.'}
 # 4. Design choices
 
 ## Regarding project file inventory
-I don't see any point in explicitly listing every files that belongs to a
+I don't see any point in explicitly listing every file that belongs to a
 project in order to have vim know them. IMO, they are best globed.  The
 venerable known project.vim plugin already does the job. Personally I use a
 [local_vimrc](http://github.com/LucHermitte/local_vimrc) plugin.
@@ -729,7 +732,6 @@ big project having a dozen of subcomponents, each component live in its own
 directory, has its own makefile (not even named Makefile, nor with a name of
 the directory)
 
-
 ## Regarding tabs
 We could have said that every thing that is loaded in a tab belongs to a same
 project. Alas, this is not always true. Often I open, in the current tab, files
@@ -737,11 +739,11 @@ that belong to different projects. My typical use case is when I split-open a
 C++ header file (or even sometimes an implementation file) from a third party
 library in order to see how it's meant to be used. When I do that, I want the
 third-party code side by side with the code I'm working on. With tabs, this
-isn't possible.
+isn't "possible".
 
 ## Regarding environment variables
 
-At this point, [we cannot unset environment variables](https://github.com/vim/vim/issues/1116).
+Until Vim 8.0.1832, [we could not unset environment variables](https://github.com/vim/vim/issues/1116).
 As a consequence, I've preferred setting them on-the-fly and locally only when
 we need to use them.
 
@@ -775,10 +777,10 @@ the firsts I've in mind).
       * [X] BTW asynchronous (via lh#async)
       * [ ] BTW -> QFImport b:crt_project
       * [ ] lh-dev
-      * [ ] µTemplate
+      * [X] µTemplate
       * [ ] Test on windows!
-   * [ ] Have let-modeline support p:var, p:&opt, and p:$env
- * Setlocally vim options on new files
+   * [ ] Have let-modeline support `p:var`, `p:&opt`, and `p:$env`
+ * Set locally vim options on new files
  * Simplify dictionaries
    * -> no 'parents' when there are none!
    * -> merge 'variables', 'env', 'options' in `variables`
