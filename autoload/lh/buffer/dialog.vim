@@ -7,12 +7,14 @@
 " Version:      4.7.0
 let s:k_version = 40700
 " Created:      21st Sep 2007
-" Last Update:  05th Jul 2019
+" Last Update:  12th Jan 2020
 "------------------------------------------------------------------------
 " Description:  «description»
 "
 "------------------------------------------------------------------------
 " History:
+"       v4.7.1
+"       (*) Simplify gui/dialog API to define more mappings
 "       v4.7.0
 "       (*) ENH: Use the exact width available to display rulers
 "       (*) BUG: Fix improper offset when selecting lines
@@ -83,12 +85,17 @@ endfunction
 " ## Functions {{{1
 " # Dialog functions {{{2
 "------------------------------------------------------------------------
-function! s:Mappings(abuffer) abort " {{{3
-  " map <enter> to edit a file, also dbl-click
-  " exe "nnoremap <silent> <buffer> <esc>         :silent call ".a:abuffer.action."(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> <esc>         :call lh#buffer#dialog#select(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> q             :call lh#buffer#dialog#select(-1, ".a:abuffer.id.")<cr>"
-  exe "nnoremap <silent> <buffer> <cr>          :call lh#buffer#dialog#select(line('.'), ".a:abuffer.id.")<cr>"
+function! s:Mappings(abuffer, action) abort " {{{3
+  nnoremap <silent> <buffer> <esc>         :<c-u>call lh#buffer#dialog#quit()<cr>
+  nnoremap <silent> <buffer> q             :<c-u>call lh#buffer#dialog#quit()<cr>
+  if type(a:action) == type('')
+    nnoremap <silent> <buffer> <cr>        :<c-u>call lh#buffer#dialog#select(line('.'))<cr>
+  else
+    for k in keys(a:action)
+      let trigger = substitute(k, '^\\<\(.*\)\\>', '<\1>', '')
+      exe "nnoremap <silent> <buffer> ".trigger." :<c-u>call lh#buffer#dialog#selectV2(".string(k).", line('.'))<cr>"
+    endfor
+  endif
   " nnoremap <silent> <buffer> <2-LeftMouse> :silent call <sid>GrepEditFileLine(line("."))<cr>
   " nnoremap <silent> <buffer> Q          :call <sid>Reformat()<cr>
   " nnoremap <silent> <buffer> <Left>     :set tabstop-=1<cr>
@@ -240,7 +247,7 @@ function! lh#buffer#dialog#new(bname, title, where, support_tagging, action, cho
         \ . helpstr
   call s:Display(res, title)
 
-  call s:Mappings(res)
+  call s:Mappings(res, a:action)
   return res
 endfunction
 
@@ -287,8 +294,8 @@ function! s:selection() dict abort " {{{3
   endif
 endfunction
 
-" Function: lh#buffer#dialog#select(line, bufferId [,overriden-action]) " {{{3
-function! lh#buffer#dialog#select(line, bufferId, ...) abort
+" Function: lh#buffer#dialog#selectV2(key, line) " {{{3
+function! lh#buffer#dialog#selectV2(key, line) abort
   if a:line == -1
     call lh#buffer#dialog#quit()
     return
@@ -297,10 +304,35 @@ function! lh#buffer#dialog#select(line, bufferId, ...) abort
     echoerr "Unselectable item"
     return
   else
-    let dialog = s:LHdialog[a:bufferId]
-    if ! has_key(dialog, 'action')
-      return
+    let dialog = b:dialog
+    call lh#assert#value(dialog).has_key('action')
+    let l:Action = dialog.action[a:key]
+    let results = { 'dialog' : dialog, 'selection' : []  }
+
+    if b:dialog.NbTags == 0
+      " -1 because first index is 0
+      " let results = [ dialog.choices[a:line - s:Help_NbL() - 1] ]
+      let results.selection = [ a:line - s:Help_NbL() - 1 ]
+    else
+      silent g/^* /call add(results.selection, line('.')-s:Help_NbL()-1)
     endif
+  endif
+
+  call call(l:Action, [results])
+endfunction
+
+" Function: lh#buffer#dialog#select(line [,overriden-action]) " {{{3
+function! lh#buffer#dialog#select(line, ...) abort
+  if a:line == -1
+    call lh#buffer#dialog#quit()
+    return
+  " elseif a:line <= s:Help_NbL() + 1
+  elseif a:line <= s:Help_NbL()
+    echoerr "Unselectable item"
+    return
+  else
+    let dialog = b:dialog
+    call lh#assert#value(dialog).has_key('action')
     let results = { 'dialog' : dialog, 'selection' : []  }
 
     if b:dialog.NbTags == 0
@@ -319,7 +351,7 @@ function! lh#buffer#dialog#select(line, bufferId, ...) abort
   endif
 endfunction
 function! lh#buffer#dialog#Select(...) abort
-  echomsg "lh#buffer#dialog#Select() is deprecated, use lh#buffer#dialog#select() instead"
+  call lh#notify#deprecated('lh#buffer#dialog#Select()', 'lh#buffer#dialog#select()')
   return call ('lh#buffer#dialog#select', a:000)
 endfunction
 

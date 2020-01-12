@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v4.7.1)
-                        For Vim version 7+      Last change: 05th Dec 2019
+                        For Vim version 7+      Last change: 12th Jan 2020
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -3515,12 +3515,11 @@ with:
 - {where} are |:split| options (like "bot below") used to open the scratch
   buffer.
 - {support-tagging} is a boolean (0/1) option to enable the multi-selection.
-- {action} is the name of the callback function (more
-  advanced calling mechanisms latter may be supported later with
-  |lhvl-functions|).
+- {action} is the name of the callback function or a |dictionary| of
+  map-trigger <-> actions.
 - {choices} is the |List| of exact strings to display.
 
-The #new function builds and returns a |Dictionary|, it also opens and fills
+The `#new` function builds and returns a |Dictionary|, it also opens and fills
 the scratch buffer, and put us within its context -- i.e. any |:map-<buffer>|
 or other buffer-related definitions will done in the new scratch buffer.
 
@@ -3557,6 +3556,22 @@ Regarding the callback function: *lhvl-dialog-select-callback*
   to anyone, but instead applies transformations in other places.
   This aspect is very important. I don't see how this kind of feature can work
   if not asynchronously in vim.
+
+- Since v4.7.1, there are two ways to fill the {action} parameters. It can be
+  either a function name that'll be bound to `<CR>` or a series of mapping
+  triggers <-> function names/references ;
+  e.g. from lh-cpp |:Override| command: >
+      let b_id = lh#buffer#dialog#new(
+            \ 'override://'.substitute(a:className, '[^A-Za-z0-9_.]', '_', 'g' ),
+            \ 'Overrideable functions for '.a:className,
+            \ 'bot below',
+            \ 1,
+            \ { '\<CR\>': 'lh#cpp#override#select',
+            \   'd': {l -> lh#cpp#override#select(l, 1)}
+            \ },
+            \ choices
+            \)
+<  Note: Special keys need to be escaped, see |lh#mapping#reinterpret_escaped_char()|.
 
 How to customize it:
 - *lh#buffer#dialog#quit()* can be explicitly called, from a registered select
@@ -5018,7 +5033,7 @@ lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type(
 
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2019 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2020 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
