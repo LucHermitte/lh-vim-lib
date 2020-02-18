@@ -7,7 +7,7 @@
 " Version:	4.6.4
 let s:k_version = 40604
 " Created:	27th Apr 2010
-" Last Update:	24th May 2019
+" Last Update:	18th Feb 2020
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -48,8 +48,12 @@ command! -nargs=0 CleanEmptyBuffers call lh#buffer#_clean_empty_buffers()
 command! -nargs=+ -complete=customlist,lh#log#_set_logger_complete LHLog
       \ call lh#log#_log(<f-args>)
 
-command! -nargs=0 Jobs       call lh#async#_jobs_console()
-command! -nargs=0 JobUnpause call lh#async#_unpause_jobs()
+command! -nargs=1
+      \ -complete=customlist,lh#async#_job_queue_names
+      \ Jobs       call lh#async#_jobs_console(<q-args>)
+command! -nargs=1
+      \ -complete=customlist,lh#async#_paused_job_queue_names
+      \ JobUnpause call lh#async#_unpause_jobs(<q-args>)
 command! -nargs=1
       \ -complete=customlist,lh#async#_complete_job_names
       \ StopBGExecution call lh#async#stop(<q-args>)

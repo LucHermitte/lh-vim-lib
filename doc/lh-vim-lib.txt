@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v4.7.1)
-                        For Vim version 7+      Last change: 12th Jan 2020
+*lh-vim-lib.txt*        Vim common libraries (v5.0.0)
+                        For Vim version 7+      Last change: 18th Feb 2020
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -284,7 +284,7 @@ Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#list_raw()|
 - |lh#syntax#list()|
 OS/System related functions:                            |lhvl#os|         {{{2
-- |lh#async#queue()|
+- |lh#async#get_queue()|
 - |:Jobs|
 - |:JobUnpause|
 - |:StopBGExecution|
@@ -718,8 +718,18 @@ Vim.
 The format of the result being ?to be stabilized?
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *lh#async#queue()*                {{{3
-lh#async#queue(job)~
+                                                *lh#async#get_queue()*            {{{3
+                                                *lh#async#queue()*
+lh#async#get_queue(name, policy)~
+@since 5.0.0
+@warning API changes in v5.0.0
+
+This first function returns a job queue object that implements a few services
+like `push_or_start(job)`, `stop()`... End-users are only expected ot use
+|lh#async#queue/push_or_start()|.
+
+                                               *lh#async#queue/push_or_start()*
+queue.push_or_start(job)~
 This function is a wrapper around recent |job_start()| function. As such it
 requires a recent version of Vim without any bugs in the |+job| related part.
 I've chosen to require v7.4-1980 at least.
@@ -745,15 +755,14 @@ Otherwise, it's ran with `&shell .' '. &shellcmdflag .' '. command`
     callback helps to delay operations written in vim-script language.
   - `'start_fail_cb'`: optional callback executed when starting the job fails.
 @todo Support for |job_stop()|
-@todo Support multiple queues -> `lh#async#new_queue()`
 
 Active queues and background job will be presented in |airline-section|`_b`.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *:Jobs*                           {{{3
-:Jobs~
+:Jobs {queue-name}~
 Opens a dialog scratch window displaying all jobs being executed in background
-and programmed to be through |lh#async#queue()|.
+and programmed to be executed through |lh#async#queue| feature.
 
 For the moment this window will:
 - keep the queue displayed up to date
@@ -764,7 +773,7 @@ Eventually, it'll permit to reorganize pending jobs.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                *:JobUnpause*                     {{{3
-:JobUnpause~
+:JobUnpause {queue-name}~
 When a process execution fails, if there are pending jobs, the job queue will
 be paused if you confirm it.
 The only ways to un-pause the queue are through `:JobUnpause` command or
