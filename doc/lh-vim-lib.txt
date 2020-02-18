@@ -723,6 +723,14 @@ The format of the result being ?to be stabilized?
 lh#async#get_queue(name, policy)~
 @since 5.0.0
 @warning API changes in v5.0.0
+@param[in] {name}   Unique identifier the global queue to obtain
+@param[in] {policy} Tells what shall be done when a new job is pushed into a
+                    non empty queue. Valid values are:
+                    - `'stack'`: push the new job for later
+                    - `'replace'`: stop the current job, and start the new one
+                    - `'dump'`: ignore the new job
+                    - any else will result in the end user being asked what to
+                      do.
 
 This first function returns a job queue object that implements a few services
 like `push_or_start(job)`, `stop()`... End-users are only expected ot use

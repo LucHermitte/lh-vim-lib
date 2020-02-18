@@ -324,6 +324,7 @@ function! s:is_empty() dict abort                  " {{{3
 endfunction
 
 function! s:push_or_start(job) dict abort          " {{{3
+  let s:k_policies = {'stack': 1, 'replace': 2, 'dump': 3}
   let job_args = lh#dict#subset(a:job, s:k_job_methods)
   try
     let self.interrupted = 0
@@ -334,11 +335,14 @@ function! s:push_or_start(job) dict abort          " {{{3
     call s:Verbose('Found another task in job queue at index %1', idx)
     if idx >= 0
       let txt = get(a:job, 'txt', a:job.cmd)
-      let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ",
-            \ ["&Queue the new (redundant task)",
-            \  "&Cancel the previous job and queue this one instead?",
-            \  "&Keep the previous job and dump the new one?"])
-      redraw
+      let choice = get(s:k_policies, self.default_behaviour, -1)
+      if choice < 0
+        let choice = lh#ui#confirm("A another `".txt."` background task is under way. Do you want to\n-> ",
+              \ ["&Queue the new (redundant task)",
+              \  "&Cancel the previous job and queue this one instead?",
+              \  "&Keep the previous job and dump the new one?"])
+        redraw
+      endif
       if choice == 3
         call s:Verbose('Ignore the new job')
         return
