@@ -5,7 +5,7 @@
 " Version:      5.0.0
 let s:k_version = '050000'
 " Created:      01st Sep 2016
-" Last Update:  18th Feb 2020
+" Last Update:  19th Feb 2020
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -200,9 +200,9 @@ endfunction
 function! lh#async#_jobs_console(name) abort
   let job_queue = s:_get_existing_queue(a:name)
 
-  if exists('s:job_ui')
+  if has_key(job_queue, 'job_ui')
     " make the window visible, and jump to it
-    let b = lh#buffer#jump(s:job_ui.id, 'sp')
+    let b = lh#buffer#jump(job_queue.job_ui.id, 'sp')
     if b > 0
       if line('$') == 1
         bw
@@ -218,8 +218,8 @@ function! lh#async#_jobs_console(name) abort
   if job_queue.is_paused()
     let title .= '    --> PAUSED <--'
   endif
-  silent let s:job_ui = lh#buffer#dialog#new('jobs://list', title, '', 1, '', job_queue._build_ui_lines())
-  let s:job_ui._job_queue = job_queue
+  silent let job_queue.job_ui = lh#buffer#dialog#new('jobs://list{'.(job_queue.name).'}', title, '', 1, '', job_queue._build_ui_lines())
+  let job_queue.job_ui._job_queue = job_queue
   " Cancellation mappings
   nnoremap <silent> <buffer> x     :call b:dialog._job_queue._cancel_jobs_ui()<cr>
   nnoremap <silent> <buffer> <del> :call b:dialog._job_queue._cancel_jobs_ui()<cr>
@@ -261,17 +261,17 @@ function! lh#async#_jobs_console(name) abort
 endfunction
 
 function! s:_update_ui() dict abort " {{{3
-  if exists('s:job_ui')
+  if has_key(self, 'job_ui')
     let w = lh#window#getid()
     try
-      let b = lh#buffer#find(s:job_ui.id)
+      let b = lh#buffer#find(self.job_ui.id)
       if b >= 0
         " TODO: try to feed updated tags as well!
         " For now tags are reset
-        call s:job_ui.reset_choices(self._build_ui_lines())
+        call self.job_ui.reset_choices(self._build_ui_lines())
         let state = self.is_paused() ? '> PAUSED <' : '> ACTIVE <'
-        let s:job_ui.help_ruler[0] = substitute(s:job_ui.help_ruler[0], '\v.{12}\zs.{10}', state, '')
-        call lh#buffer#dialog#update_all(s:job_ui)
+        let self.job_ui.help_ruler[0] = substitute(self.job_ui.help_ruler[0], '\v.{12}\zs.{10}', state, '')
+        call lh#buffer#dialog#update_all(self.job_ui)
         " Otherwise, it means there is nothing to update
         " (-> window hidden, or destroyed)
       endif
@@ -286,10 +286,10 @@ function! s:_cancel_jobs_ui() dict abort " {{{3
   let l = len(self.list)
 
   try
-    let selected = s:job_ui.selection()
+    let selected = self.job_ui.selection()
     if (len(selected) == 1 && selected[0] >= 0) || (len(selected) >= 2)
-      " call lh#common#echomsg_multilines(map(copy(selected), 's:job_ui.choices[v:val]'))
-      " call s:Verbose("Cancelling: %1", map(copy(selected), 'get(self.list[v:val], "txt", s:job_ui.list[v:val].cmd'))
+      " call lh#common#echomsg_multilines(map(copy(selected), 'self.job_ui.choices[v:val]'))
+      " call s:Verbose("Cancelling: %1", map(copy(selected), 'get(self.list[v:val], "txt", self.job_ui.list[v:val].cmd'))
       let shall_update_ui = 0
       for j in reverse(selected)
         let shall_update_ui += self._unsafe_stop_job(j, l)
