@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = '40604'
+" Version:      5.0.1
+let s:k_version = '50001'
 " Created:      18th Nov 2015
-" Last Update:  23rd Nov 2018
+" Last Update:  03rd Mar 2020
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -135,6 +135,7 @@ function! lh#exception#callstack(throwpoint) abort
         endif
         let function_stack += [data]
       endif
+      if exists('fstart') | unlet fstart | endif
     endfor
     " let g:stacks += [a:throwpoint]
   finally
