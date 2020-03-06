@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/object.vim                    {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.
-let s:k_version = '400'
+" Version:      5.1.0.
+let s:k_version = '510'
 " Created:      08th Mar 2017
-" Last Update:  24th Oct 2018
+" Last Update:  06th Mar 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -77,6 +77,7 @@ function! lh#project#object#_new(params) abort
         \ , 'variables': {}
         \ , 'options':   {}
         \ , 'env':       {}
+        \ , '_menus':    []
         \ , 'parents':   []
         \ })
   " If no name is provided, generate one on the fly
@@ -90,6 +91,8 @@ function! lh#project#object#_new(params) abort
         \, '_remove_buffer'
         \, '_update_option'
         \, '_use_options'
+        \, '_register_local_menus'
+        \, '_register_local_menus_for_crt_prj'
         \, 'apply'
         \, 'children'
         \, 'depth'
@@ -287,6 +290,20 @@ function! s:_use_options(bid) dict abort " {{{2
   endfor
   for opt in keys(self.options)
     call self._update_option(opt, a:bid)
+  endfor
+endfunction
+
+function! s:_register_local_menus_for_crt_prj(bid) dict abort " {{{2
+  call s:Verbose('%1._register_local_menus_for_crt_prj(%2)', self.name, a:bid)
+  for opt in keys(self.options)
+    call self._register_local_menus_for_crt_prj(opt, a:bid)
+  endfor
+endfunction
+
+function! s:_register_local_menus(bid) dict abort " {{{2
+  call s:Verbose('%1._register_local_menus(%2)', self.name, a:bid)
+  for menu in self._menus
+    call call('lh#menu#make', menu)
   endfor
 endfunction
 

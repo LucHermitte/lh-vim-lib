@@ -2,10 +2,10 @@
 " File:         autoload/lh/project.vim                           {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.0
-let s:k_version = '460'
+" Version:      5.1.0
+let s:k_version = '510'
 " Created:      08th Sep 2016
-" Last Update:  27th Jul 2018
+" Last Update:  06th Mar 2020
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -507,7 +507,9 @@ function! lh#project#_UseProjectOptions() " {{{3
   " # New buffer => update options
   let prj = lh#project#crt()
   if lh#option#is_set(prj)
-    call prj._use_options(bufnr('%'))
+    let bid = bufnr('%')
+    call prj._use_options(bid)
+    call prj._register_local_menus(bid)
   endif
 endfunction
 

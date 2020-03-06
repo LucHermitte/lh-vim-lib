@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/menu.vim                      {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.4.
-let s:k_version = '40604'
+" Version:      5.1.0.
+let s:k_version = '50100'
 " Created:      21st Feb 2017
-" Last Update:  31st Oct 2018
+" Last Update:  06th Mar 2020
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions to create project related menu items
@@ -54,12 +54,17 @@ call lh#let#if_undef('g:lh#project.menu', {'name': '&Project.', 'priority': '50.
 " ## Exported functions {{{1
 " Function: lh#project#menu#make(mode, priority, name, binding, ...) {{{3
 function! lh#project#menu#make(modes, priority, name, binding, ...) abort
-  call call('lh#menu#make',
-        \ [ a:modes
-        \ , g:lh#project.menu.priority . a:priority
-        \ , g:lh#project.menu.name . a:name
-        \ , a:binding
-        \ ] + a:000)
+  let priority = g:lh#project.menu.priority . a:priority
+  let name = g:lh#project.menu.name . a:name
+  let args = [ a:modes, priority, name, a:binding ] + a:000
+  call call('lh#menu#make', args)
+  if index(a:000, '<buffer>') >= 0
+    call s:Verbose("Registering local menu: %1", args)
+    let prj = lh#project#crt()
+    if lh#option#is_set(prj)
+      call add(prj._menus, args)
+    endif
+  endif
 endfunction
 
 " Function: lh#project#menu#def_toggle_item(Data) {{{3
