@@ -5,7 +5,7 @@
 " Version:      5.0.0
 let s:k_version = '050000'
 " Created:      01st Sep 2016
-" Last Update:  19th Feb 2020
+" Last Update:  22nd Mar 2020
 "------------------------------------------------------------------------
 " Description:
 "       Various functions to run async jobs
@@ -578,7 +578,7 @@ function! s:_unpause_jobs() dict abort " {{{3
   endif
 endfunction
 
-function! s:_do_clear_queue() abort " {{{3
+function! s:_do_clear_queue() dict abort " {{{3
 " Debugging purpose, avoid using this function!!!
 " If a job is really running, errors are to be expected
   call s:Verbose('Clearing job queue. It had %1 element%2 (%3)'
