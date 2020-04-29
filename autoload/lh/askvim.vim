@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = 40604
+" Version:      5.1.0
+let s:k_version = 50100
 " Created:      17th Apr 2007
-" Last Update:  23rd Nov 2018
+" Last Update:  29th Apr 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -94,7 +94,7 @@ endfunction
 function! lh#askvim#scriptname(id) abort
   if !exists('s:scripts') || len(s:scripts) <= eval(a:id)
     call lh#askvim#scriptnames()
-    if len(s:scripts) <= eval(a:id)
+    if len(s:scripts) < eval(a:id)
       return lh#option#unset()
     endif
   endif
