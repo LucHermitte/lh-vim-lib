@@ -327,6 +327,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#qf#get_winnr()`        | Returns window number of the qf window -- ignore location list windows                                                       |
 | `lh#qf#is_displayed()`     | Tells whether the qf window is visible -- ignore location list windows                                                       |
 | `lh#qf#make_context_map()` | Returns a non intrusive alternative to [`quickfix-context`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dcontext) |
+| `lh#qf#set_title()`        | Sets the title of the qf window                                                                                              |
 
 ### Syntax related functions
 | Function                                                         | Purpose                                                                                                                                |

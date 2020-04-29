@@ -269,6 +269,7 @@ Quickfix related functions:                             |lhvl#quickfix|   {{{2
 - |lh#qf#get_winnr()|
 - |lh#qf#is_displayed()|
 - |lh#qf#make_context_map()|
+- |lh#qf#set_title()|
 Syntax related functions:                               |lhvl#syntax|     {{{2
 - |lh#syntax#is_a_comment()|
 - |lh#syntax#is_a_comment_at()|
@@ -3759,6 +3760,14 @@ current) |quickfix-ID|.
 Associates a {value} to the {key} for the specified (or current) |quickfix-ID|.
 The plugin has been developped with the idea the {value} would be a
 |dictionary| or a |list|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#qf#set_title()*               {{{3
+lh#qf#set_title({title})~
+@since version 5.1.0
+Sets the title of the |quickfix-window|, even on versions of Vim where >
+    setqflist([], 'a', {'title': title})
+isn't supported.
 
 ------------------------------------------------------------------------------
 SYNTAX RELATED FUNCTIONS                              *lhvl#syntax*     {{{2

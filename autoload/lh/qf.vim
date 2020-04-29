@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      4.7.0.
-let s:k_version = '470'
+" Version:      5.1.0.
+let s:k_version = '510'
 " Created:      26th Jun 2018
-" Last Update:  15th Nov 2019
+" Last Update:  29th Apr 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -132,6 +132,19 @@ else
   function! lh#qf#get_title() abort
     let winnr = lh#qf#get_winnr()
     return winnr == 0 ? '' : getwinvar(winnr, 'quickfix_title')
+  endfunction
+endif
+
+" Function: lh#qf#set_title()        {{{3
+" @since V5.1.0
+if lh#has#properties_in_qf()
+  function! lh#qf#set_title(title) abort
+    call setqflist([], 'a', {'title': a:title})
+  endfunction
+else
+  function! lh#qf#set_title(title) abort
+    let winnr = lh#qf#get_winnr()
+    return winnr == 0 ? '' : setwinvar(winnr, 'quickfix_title')
   endfunction
 endif
 
