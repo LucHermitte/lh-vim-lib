@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.0.0)
-                        For Vim version 7+      Last change: 18th Feb 2020
+*lh-vim-lib.txt*        Vim common libraries (v5.1.0)
+                        For Vim version 7+      Last change: 06th May 2020
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -41,6 +41,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#common#error_msg()|
 - |lh#common#rand()|
 - |lh#common#warning_msg()|
+- |lh#diff#compute()|
 - |lh#encoding#at()|
 - |lh#encoding#current_character()|
 - |lh#encoding#does_support()|
@@ -455,6 +456,25 @@ lh#common#rand({max})~
 @return a random number in `[0..max[`.
 @requires vim to be compiled with |+python| feature.
 
+                                                *lh#diff#compute()*               {{{3
+lh#diff#compute({f1}, {f2})~
+Computes the difference between two "files", either with `diff` command-line
+tool, or with Python difflib
+@param[in] {f1} first file, or set of lines, or dictionary
+@param[in] {f2} first file, or set of lines, or dictionary
+@return a |list| of lines that differ
+@since version 5.1.0
+
+The dictionary format is:
+- "`file`": filename
+- "`lines`": list of lines
+- "`name`": test to display when using Python
+At least "`file`" or "`lines`" shall be set.
+
+At this time the exact output format is unspecified, and |'diffopt| is
+ignored.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#fmt#printf()*                 {{{3
 lh#fmt#printf({format}, {args}...)~
 @return a formatted string
