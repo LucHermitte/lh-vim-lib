@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      5.1.0.
-let s:k_version = '510'
+" Version:      5.1.2.
+let s:k_version = '512'
 " Created:      29th Apr 2020
-" Last Update:  13th May 2020
+" Last Update:  03rd Jun 2020
 "------------------------------------------------------------------------
 " Description:
 "       Portable API to return diff between two files/set of lines
@@ -71,9 +71,9 @@ function! lh#diff#compute(f1, f2) abort
   let f1 = s:enrich_options(a:f1)
   let f2 = s:enrich_options(a:f2)
 
-  if lh#python#can_import('difflib')
+  if exists(':pyx') && lh#python#can_import('difflib')
     return lh#diff#_compute_pydiff(f1, f2)
-  elseif executable('diff') && has('unix') && lh#has#lambda()
+  elseif executable('diff') && has('unix') " && lh#has#lambda()
     " TODO: remove the dependance to lambdas!
     return lh#diff#_compute_nixdiff(f1, f2)
   else
@@ -105,13 +105,15 @@ function! lh#diff#_compute_nixdiff(f1, f2) abort
   try
     if !has_key(a:f1, 'file') || !filereadable(a:f1.file)
       let f1 = s:tmpfile(a:f1.lines)
-      call cleanup.register({-> delete(f1)})
+      " call cleanup.register({-> delete(f1)})
+      call cleanup.register({'object': f1, 'method': 'delete'})
     else
       let f1 = a:f1.file
     endif
     if !has_key(a:f2, 'file') || !filereadable(a:f2.file)
       let f2 = s:tmpfile(a:f2.lines)
-      call cleanup.register({-> delete(f2)})
+      " call cleanup.register({-> delete(f2)})
+      call cleanup.register({'object': f2, 'method': 'delete'})
     else
       let f2 = a:f2.file
     endif

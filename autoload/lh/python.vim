@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.7.1.
-let s:k_version = '471'
+" Version:      5.1.2.
+let s:k_version = '512'
 " Created:      13th Jun 2018
-" Last Update:  21st Nov 2019
+" Last Update:  03rd Jun 2020
 "------------------------------------------------------------------------
 " Description:
 "       Utility function to use python from vim
@@ -67,10 +67,14 @@ function! lh#python#best_still_avail(...) abort
     endif
     return tests[0]
   elseif has('python3')
-    set pyxversion=3
+    if exists(':pyx')
+      set pyxversion=3
+    endif
     return 'python3'
   elseif has('python')
-    set pyxversion=2
+    if exists(':pyx')
+      set pyxversion=2
+    endif
     return 'python'
   else
     return ''
