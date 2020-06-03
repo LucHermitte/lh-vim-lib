@@ -106,14 +106,16 @@ function! lh#diff#_compute_nixdiff(f1, f2) abort
     if !has_key(a:f1, 'file') || !filereadable(a:f1.file)
       let f1 = s:tmpfile(a:f1.lines)
       " call cleanup.register({-> delete(f1)})
-      call cleanup.register({'object': f1, 'method': 'delete'})
+      " call cleanup.register({'object': f1, 'method': 'delete'})
+      call cleanup.register(printf('call delete("%s")', f1))
     else
       let f1 = a:f1.file
     endif
     if !has_key(a:f2, 'file') || !filereadable(a:f2.file)
       let f2 = s:tmpfile(a:f2.lines)
       " call cleanup.register({-> delete(f2)})
-      call cleanup.register({'object': f2, 'method': 'delete'})
+      " call cleanup.register({'object': f2, 'method': 'delete'})
+      call cleanup.register(printf('call delete("%s")', f2))
     else
       let f2 = a:f2.file
     endif
