@@ -2,10 +2,10 @@
 " File:         autoload/lh/project.vim                           {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.1.0
-let s:k_version = '510'
+" Version:      5.2.0
+let s:k_version = '520'
 " Created:      08th Sep 2016
-" Last Update:  06th Mar 2020
+" Last Update:  01st Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -490,8 +490,13 @@ function! lh#project#_auto_detect_project() abort
     if !empty(root) && s:permission_lists.check_paths([root]) == 1
       " TODO: recognize patterns such as src|source to search the project in
       " the upper directory
-      let name = fnamemodify(root, ':h:t')
-      let name = substitute(name, '[^A-Za-z0-9_]', '_', 'g')
+      let repo_path = lh#vcs#decode_github_url(lh#vcs#get_url(root))
+      if !empty(repo_path)
+        let name = repo_path[-1]
+      else
+        let name = fnamemodify(root, ':h:t')
+        let name = substitute(name, '[^A-Za-z0-9_]', '_', 'g')
+      endif
       let opt = {'name': name}
       let opt.auto_discover_root = {'value':  root}
       call lh#project#define(s:, opt, name)
