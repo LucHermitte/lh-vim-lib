@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = '4.00.0'
+" Version:      5.2.0
+let s:k_version = '5.02.0'
 " Created:      11th Mar 2015
-" Last Update:  20th Oct 2016
+" Last Update:  01st Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -107,6 +107,7 @@ endfunction
 function! lh#vcs#decode_github_url(url) abort
   let domain_pattern = 'github\.com'
   let domains = exists('g:fugitive_github_domains') ? g:fugitive_github_domains : []
+  let domains += ['[^/]\+'] " Let's decode any domain!
   for domain in domains
     let domain_pattern .= '\|' . escape(split(domain, '://')[-1], '.')
   endfor
