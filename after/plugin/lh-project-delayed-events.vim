@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPL v3 w/ exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      4.7.0.
-let s:k_version = '470'
+" Version:      5.2.0.
+let s:k_version = '520'
 " Created:      13th Dec 2019
-" Last Update:  13th Dec 2019
+" Last Update:  02nd Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       Events thats needs to be registered after other events
@@ -37,7 +37,7 @@ augroup LH_PROJECT
   au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<abuf>'))
 
   " Needs to be executed after local_vimrc, hence the after/ directory
-  au BufReadPost * call lh#project#_post_local_vimrc()
+  au BufReadPost,BufNewFile * call lh#project#_post_local_vimrc()
 
   au BufWinEnter,VimEnter * call lh#project#_CheckUpdateCWD()
 augroup END
