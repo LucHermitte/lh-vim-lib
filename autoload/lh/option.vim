@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.0.0
-let s:k_version = 4000
+" Version:      5.2.0
+let s:k_version = 50200
 " Created:      24th Jul 2004
-" Last Update:  29th Oct 2018
+" Last Update:  15th Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -270,8 +270,18 @@ endfunction
 " Function: lh#option#is_set_locally(option_name, [bufid='%']) {{{3
 " @return whether a vim option is already set locally, which requires to use
 " `let &l:`  or `setlocal`
+" TODO: Complete the list of equivalence
 let s:k_option_fullname = {
-      \ 'isk': 'iskeyword'
+      \ 'ai': 'autoindent',
+      \ 'bs': 'backspace',
+      \ 'efm': 'errorformat',
+      \ 'et': 'expandtab',
+      \ 'ft': 'filetype',
+      \ 'isk': 'iskeyword',
+      \ 'rtp': 'runtimepath',
+      \ 'sw': 'shiftwidth',
+      \ 'ts': 'tabstop',
+      \ 'tw': 'textwidth'
       \ }
 function! lh#option#is_set_locally(option_name, ...) abort
   let bufid = get(a:, 1, '%')
@@ -282,8 +292,15 @@ function! lh#option#is_set_locally(option_name, ...) abort
     " empty dict when nothing is found
     " Also, older version of vim don't return local options with
     " getbufvar(bid, '&')
-    if !empty(options) && has_key(options, get(s:k_option_fullname, a:option_name[1:], a:option_name[1:]))
-      return 1
+    " In global-local options case, an empty local option is an option that
+    " hasn't been overriden
+    let option_name = get(s:k_option_fullname, a:option_name[1:], a:option_name[1:])
+    if !empty(options) && has_key(options, option_name)
+      if type(options[option_name]) == type('')
+        return !empty(getbufvar(bufid, '&l:'.option_name))
+      else
+        return getbufvar(bufid, '&l:'.a:option_name[1:]) != getbufvar(bufid, '&g:'.option_name)
+      endif
     endif
   endif
   return 0
