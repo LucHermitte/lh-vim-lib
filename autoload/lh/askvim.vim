@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.1.0
-let s:k_version = 50100
+" Version:      5.2.0
+let s:k_version = 50200
 " Created:      17th Apr 2007
-" Last Update:  29th Apr 2020
+" Last Update:  18th Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -126,7 +126,9 @@ endfunction
 function! lh#askvim#where_is_function_defined(funcname) abort
   if has('*execute') || ! s:beware_running_through_client_server
     let cleanup = lh#lang#set_message_temporarily('C')
+          \.restore('&isfname')
     try
+      setlocal isfname+=@-@
       " Makes sure the language is C in order to be able to extract the file
       " name.
       " We cannot simply extract the last part as since Vim 8.1.??? the new
