@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4.
-let s:k_version = '40604'
+" Version:      5.2.0
+let s:k_version = '50200'
 " Created:      08th Dec 2015
-" Last Update:  24th May 2019
+" Last Update:  18th Jul 2020
 "------------------------------------------------------------------------
 " Description:
 "       String related function
@@ -149,9 +149,18 @@ function! lh#string#substitute_unless(string, pat, char) abort
 endfunction
 
 " # Miscellaneous {{{2
+
+" Function: lh#string#join(sep, ...) {{{3
+" Work as |join()|, but with strings instead of lists
+" @since Version 5.2.0
+function! lh#string#join(sep, ...) abort
+  let strs = filter(copy(a:000), '!empty(v:val)')
+  return join(strs, a:sep)
+endfunction
+
+" Function: lh#string#or(...) {{{3
 " @return the first not empty string
 " @version 4.6.4
-" Function: lh#string#or(...) {{{3
 function! lh#string#or(...) abort
   let r = filter(copy(a:000), '!empty(v:val)')
   return get(r, 0, '')

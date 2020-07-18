@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.1.0)
-                        For Vim version 7+      Last change: 06th May 2020
+*lh-vim-lib.txt*        Vim common libraries (v5.2.0)
+                        For Vim version 7+      Last change: 18th Jul 2020
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -181,6 +181,7 @@ Stack related functions:                                |lhvl#stack|      {{{2
 String related functions:                               |lhvl#string|     {{{2
 - |lh#string#as()|
 - |lh#string#count()|
+- |lh#string#join()|
 - |lh#string#matches()|
 - |lh#string#matchstrpos()|
 - |lh#string#or()|
@@ -1582,6 +1583,13 @@ add quotes around strings.
 
 @note if {val} is a |Dict| that has a field named `"_to_string"`, this field
 will be used and called a member function whose result will be returned.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#string#join()*                {{{3
+lh#string#join(sep, strings...)~
+@return the non-empty {strings} separated by {sep}
+@since Version 5.2.0
+Works as |join()| but on |string|s instead of a |List| of |string|s.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#string#matches()*             {{{3
