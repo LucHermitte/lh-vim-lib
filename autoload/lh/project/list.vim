@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/list.vim                      {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.
-let s:k_version = '400'
+" Version:      5.2.1
+let s:k_version = '521'
 " Created:      08th Mar 2017
-" Last Update:  08th Mar 2017
+" Last Update:  12th Aug 2020
 "------------------------------------------------------------------------
 " Description:
 "       Support function for project list management
@@ -93,6 +93,11 @@ function! lh#project#list#_get(prjname) abort
   return s:project_list.get(a:prjname)
 endfunction
 
+" Function: lh#project#list#_find_best(path) {{{2
+function! lh#project#list#_find_best(path) abort
+  return s:project_list.find_best(a:path)
+endfunction
+
 " Function: lh#project#list#_new_name() {{{2
 function! lh#project#list#_new_name() abort
   return s:project_list.new_name()
@@ -116,12 +121,21 @@ function! lh#project#list#_new() abort
         \ , 'projects': {}
         \ , '_next_id': 1
         \ })
-  let method_names = ['new_name', 'add_project', 'get', 'clear', 'clear_empty_projects', 'unload', 'wipeout', '_remove']
+  let method_names = ['find_best', 'new_name', 'add_project', 'get', 'clear', 'clear_empty_projects', 'unload', 'wipeout', '_remove']
   call lh#object#inject_methods(res, s:k_script_name, method_names)
   return res
 endfunction
 
 " - Methods {{{2
+function! s:find_best(path) dict abort " {{{3
+  let prjs = filter(values(self.projects), 'v:val.get("paths.sources") == a:path')
+  if empty(prjs)
+    return lh#option#unset('No project matching '.a:path)
+  endif
+  call lh#assert#value(len(prjs)).eq(1)
+  return prjs[0]
+endfunction
+
 function! s:new_name() dict abort " {{{3
   let name = 'project'. self._next_id
   let self._next_id += 1

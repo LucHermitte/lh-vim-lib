@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.7.1
-let s:k_version = 40701
+" Version:      5.2.1
+let s:k_version = 50201
 " Created:      23rd Jan 2007
-" Last Update:  19th Nov 2019
+" Last Update:  12th Aug 2020
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -118,6 +118,8 @@ let s:k_version = 40701
 "       (*) BUG: Apply `readlink()` to `munge()`
 "       v4.7.0
 "       (*) BUG: Fix local_vimrc issue with mswin pathnames
+"       v5.2.1
+"       (*) BUG: Fix permission lists behaviour
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -889,7 +891,7 @@ endfunction
 
 " - is_file_accepted() {{{4
 function! s:lists_is_file_accepted(file, permission) dict abort
-  let filepat = escape(a:file, '\.')
+  let filepat = escape(resolve(a:file), '\.')
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
     return 0
@@ -897,19 +899,22 @@ function! s:lists_is_file_accepted(file, permission) dict abort
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
     return 'sandbox'
   elseif match(self.rejected_paths, filepat) >= 0
-    call s:Verbose('Path %1 has already been rejected.')
+    call s:Verbose('Path %1 has already been rejected.', a:file)
     return 0
     " TODO: add a way to remove pathnames from validated list
   elseif match(self.valided_paths, filepat) >= 0
-    call s:Verbose('Path %1 has already been validated.')
+    call s:Verbose('Path %1 has already been validated.', a:file)
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
-    if lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No", 1) != 1
+    let choice = lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Always\n&Yes\n&No\nNe&ver", 1)
+    if     choice == 1 " Always
+      call lh#path#munge(self.valided_paths, a:file)
+    " elseif choice == 2 " Yes
+    " elseif choice == 3 " No
+    elseif choice == 4 " Never
       call lh#path#munge(self.rejected_paths, a:file)
-      return 0
     endif
-    " And remember previous choices!
-    call lh#path#munge(self.valided_paths, a:file)
+    return choice <= 2
   endif
   call s:Verbose('('.a:permission.') '. self._action_name. ' ' . a:file)
   return 1
