@@ -5,7 +5,7 @@
 " Version:      5.2.1
 let s:k_version = '521'
 " Created:      08th Sep 2016
-" Last Update:  12th Aug 2020
+" Last Update:  20th Aug 2020
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -406,6 +406,7 @@ endfunction
 let s:k_unset_no_VCS_dir = lh#option#unset('No VCS directory detected')
 function! lh#project#_check_VCS_roots() abort
   let possible_prj_dirnames = map(copy(g:lh#project.root_patterns), '[v:val, lh#path#find_upward(v:val)]')
+  call filter(possible_prj_dirnames, '!empty(v:val[1])')
   " TODO: permit to sort result by depth instead of patterns order
   if !empty(possible_prj_dirnames)
     call s:Verbose("s:FetchPrjDirname() -> %1 found in %2", possible_prj_dirnames[0][0], possible_prj_dirnames[0][1])
