@@ -7,7 +7,7 @@
 " Version:      5.2.1
 let s:k_version = 50201
 " Created:      23rd Jan 2007
-" Last Update:  12th Aug 2020
+" Last Update:  07th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -344,7 +344,7 @@ endfunction
 " Function: lh#path#is_distant_or_scratch(path) {{{3
 function! lh#path#is_distant_or_scratch(path) abort
   return a:path =~ '\v://|^//|^\\\\|^$'
-        \ || getbufvar(bufnr(a:path), '&buftype') =~ 'nofile\|quickfix'
+        \ || getbufvar(bufnr(a:path), '&buftype') =~ 'nowrite\|nofile\|quickfix'
 endfunction
 
 " Function: lh#path#select_one({pathnames},{prompt}) {{{3
