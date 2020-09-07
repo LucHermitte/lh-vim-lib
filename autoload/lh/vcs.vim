@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.0
-let s:k_version = '5.02.0'
+" Version:      5.2.1
+let s:k_version = '5.02.1'
 " Created:      11th Mar 2015
-" Last Update:  01st Jul 2020
+" Last Update:  07th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       API VCS detection
@@ -105,6 +105,9 @@ endfunction
 " Function: lh#vcs#decode_github_url(url) {{{3
 " Regex stolen and adapted from fugitive
 function! lh#vcs#decode_github_url(url) abort
+  if lh#option#is_unset(a:url)
+    return []
+  endif
   let domain_pattern = 'github\.com'
   let domains = exists('g:fugitive_github_domains') ? g:fugitive_github_domains : []
   let domains += ['[^/]\+'] " Let's decode any domain!
