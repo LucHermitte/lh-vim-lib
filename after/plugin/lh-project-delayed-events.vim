@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPL v3 w/ exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      5.2.0.
-let s:k_version = '520'
+" Version:      5.2.1.
+let s:k_version = '521'
 " Created:      13th Dec 2019
-" Last Update:  02nd Jul 2020
+" Last Update:  09th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Events thats needs to be registered after other events
@@ -34,7 +34,7 @@ let g:loaded_lh_project_delayed_events = s:k_version
 " ## Auto commands {{{1
 augroup LH_PROJECT
   au!
-  au BufUnload   * call lh#project#_RemoveBufferFromProjectConfig(expand('<abuf>'))
+  au BufDelete   * call lh#project#_RemoveBufferFromProjectConfig(expand('<abuf>'))
 
   " Needs to be executed after local_vimrc, hence the after/ directory
   au BufReadPost,BufNewFile * call lh#project#_post_local_vimrc()
