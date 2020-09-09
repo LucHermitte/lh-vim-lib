@@ -5,7 +5,7 @@
 " Version:      5.2.1
 let s:k_version = '521'
 " Created:      08th Mar 2017
-" Last Update:  12th Aug 2020
+" Last Update:  07th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Support function for project list management
@@ -95,6 +95,7 @@ endfunction
 
 " Function: lh#project#list#_find_best(path) {{{2
 function! lh#project#list#_find_best(path) abort
+  call s:Verbose('Finding best path @ %1', a:path)
   return s:project_list.find_best(a:path)
 endfunction
 
