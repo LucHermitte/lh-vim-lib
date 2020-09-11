@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.2.0)
-                        For Vim version 7+      Last change: 18th Jul 2020
+*lh-vim-lib.txt*        Vim common libraries (v5.2.1)
+                        For Vim version 7+      Last change: 12th Sep 2020
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4821,6 +4821,22 @@ Executes {cmd} in all buffers associated to the specified (or current)
 project. A temporary window is opened for the occasion (contrary to
 |:bufdo| which uses the current window) .
 @pre the project shall have listed buffers.
+
+                                                    *:Project-:bnext*
+:Project [{prj-name}] :bnext[!] [--hidden]~
+|:bnext| like command restricted to buffer from the current project.
+Go to the next buffer in the buffer list of the specified (or current)
+project.
+See |:buffer-!| for [!]
+`--hidden` option will restrict the iteration to |hidden-buffer|s.
+
+                                                    *:Project-:bprevious*
+:Project [{prj-name}] :bprevious[!] [--hidden]~
+|:bprevious| like command restricted to buffer from the current project.
+Go to the previous buffer in the buffer list of the specified (or current)
+project.
+See |:buffer-!| for [!]
+`--hidden` option will restrict the iteration to |hidden-buffer|s.
 
                                                     *:Project-:bdelete*
                                                     *:Project-:bwipeout*

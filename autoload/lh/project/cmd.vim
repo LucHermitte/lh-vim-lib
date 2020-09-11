@@ -5,7 +5,7 @@
 " Version:      4.7.1.
 let s:k_version = '471'
 " Created:      07th Mar 2017
-" Last Update:  22nd Nov 2019
+" Last Update:  12th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Define support functions for :Project
@@ -227,6 +227,26 @@ function! s:bufdo_project(prj, cmd) abort " {{{2
   endtry
 endfunction
 
+function! s:cycle_buffer_project(prj, direction, cmd, args) abort " {{{2
+  if lh#option#is_unset(a:prj)
+    throw "Cannot apply :bufdo on non existant projects"
+  endif
+  let bang = a:cmd[-1] == '!' ? '!' : ''
+  let filt = ''
+  if match(a:args, '\v-h|--hidden') >= 0
+    let filt = ' && bufwinnr(v:val) == -1'
+  endif
+  let buffers = filter(copy(a:prj.buffers), 'buflisted(v:val)'.filt)
+  if a:direction == 'next'
+    let after = filter(copy(buffers), 'v:val > bufnr("%")')
+    let buf = empty(after) ? buffers[0] : after[0]
+  else
+    let before = filter(copy(buffers), 'v:val < bufnr("%")')
+    let buf = empty(before) ? buffers[-1] : before[-1]
+  endif
+  silent! exe printf('b%s %s', bang, buf)
+endfunction
+
 function! s:define_project(prjname) abort " {{{2
   " 1- if there is already a project with that name
   " => only register the buffer
@@ -279,18 +299,20 @@ endfunction
 " Function: lh#project#cmd#execute([prjname]) abort {{{2
 let s:k_usage =
       \ [ ':Project USAGE:'
-      \ , '  :Project --list              " list existing projects'
-      \ , '  :Project --define <name>     " define a new project/register current buffer'
-      \ , '  :Project --which             " list projects to which the current buffer belongs'
-      \ , '  :Project [<name>] :ls        " list buffers belonging to the project'
-      \ , '  :Project [<name>] :cd <path> " change directory to <path> -- "!" -> reset to project directory'
-      \ , '  :Project [<name>] :echo      " echo state of a project variable'
-      \ , '  :Project [<name>] :let       " set state of a project variable'
-      \ , '  :Project [<name>] :bufdo[!]  " execute a command on all buffers belonging to the project'
-      \ , '  :Project [<name>] :windo[!]  " execute a command on all opened windows belonging to the project'
-      \ , '  :Project [<name>] :doonce    " execute a command on the first opened window found which belongs to the project'
-      \ , '  :Project <name>   :bdelete   " unload all buffers related to a project, and remove the project'
-      \ , '  :Project <name>   :bwipeout  " wipeout all buffers related to a project, and remove the project'
+      \ , '  :Project --list                 " list existing projects'
+      \ , '  :Project --define <name>        " define a new project/register current buffer'
+      \ , '  :Project --which                " list projects to which the current buffer belongs'
+      \ , '  :Project [<name>] :ls           " list buffers belonging to the project'
+      \ , '  :Project [<name>] :cd <path>    " change directory to <path> -- "!" -> reset to project directory'
+      \ , '  :Project [<name>] :echo         " echo state of a project variable'
+      \ , '  :Project [<name>] :let          " set state of a project variable'
+      \ , '  :Project [<name>] :bufdo[!]     " execute a command on all buffers belonging to the project'
+      \ , '  :Project [<name>] :windo[!]     " execute a command on all opened windows belonging to the project'
+      \ , '  :Project [<name>] :doonce       " execute a command on the first opened window found which belongs to the project'
+      \ , '  :Project [<name>] :bnext[!]     " Goes to the next buffer in project buffer list'
+      \ , '  :Project [<name>] :bprevious[!] " Goes to the previous buffer in project buffer list'
+      \ , '  :Project <name>   :bdelete      " unload all buffers related to a project, and remove the project'
+      \ , '  :Project <name>   :bwipeout     " wipeout all buffers related to a project, and remove the project'
       \ ]
 function! lh#project#cmd#execute(...) abort
   if     a:1 =~ '-\+u\%[sage]'  " {{{3
@@ -344,10 +366,12 @@ function! lh#project#cmd#_complete(ArgLead, CmdLine, CursorPos) abort
   let [pos, tokens; dummy] = lh#command#analyse_args(a:ArgLead, a:CmdLine, a:CursorPos)
 
   if     1 == pos
-    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo'] + map(copy(keys(lh#project#list#_get_all_prjs())), 'escape(v:val, " ")')
+    let res = ['--list', '--define', '--which', '--help', '--usage', ':ls', ':echo', ':let', ':cd', ':doonce', ':bufdo', ':windo', ':bnext', ':bprevious'] + map(copy(keys(lh#project#list#_get_all_prjs())), 'escape(v:val, " ")')
   elseif s:token_matches(tokens, pos, '(echo|let)')
     let prj = lh#project#list#_get(pos == 3 ? tokens[pos-2] : s:k_unset)
     let res = s:list_var_for_complete(prj, a:ArgLead)
+  elseif s:token_matches(tokens, pos, '(bn%[ext]|bp%[previous])')
+    let res = ['-h', '--hidden']
   elseif s:token_matches(tokens, pos, 'cd')
     let res = lh#path#glob_as_list(getcwd(), a:ArgLead.'*')
     call filter(res, 'isdirectory(v:val)')
@@ -360,7 +384,7 @@ function! lh#project#cmd#_complete(ArgLead, CmdLine, CursorPos) abort
     let lead = matchstr(a:CmdLine[: a:CursorPos-1], '\v^.{-}:=(doonce|bufdo|windo)\s*\zs.*')
     let res = lh#command#matching_for_command(lead)
   elseif 2 == pos
-    let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', ':windo', ':bdelete', ':bwipeout']
+    let res = [':ls', ':echo', ':cd', ':let', ':doonce', ':bufdo', ':windo', ':bnext', ':bprevious', ':bdelete', ':bwipeout']
   else
     let res = []
   endif
@@ -376,39 +400,49 @@ function! s:dispatch_cmd_on_project(prj, lead, args) abort " {{{3
   call lh#assert#value(nb_args).is_gt(0)
   let cmd     = a:args[0]
 
-  if     cmd =~ '\v^:=l%[s]$'      " {{{4
+  if     cmd =~ '\v^:=l%[s]$'       " {{{4
     call s:ls_project(a:prj)
-  elseif cmd =~ '\v^:=echo$'       " {{{4
+  elseif cmd =~ '\v^:=echo$'        " {{{4
     if nb_args != 2
       throw "Not enough arguments to `:Project ".a:lead.":echo`"
     endif
     call s:echo_project(a:prj, a:args[1])
-  elseif cmd =~ '\v^:=let$'        " {{{4
+  elseif cmd =~ '\v^:=let$'         " {{{4
     if nb_args < 3
       throw "Not enough arguments to `:Project ".a:lead.":let`"
     endif
     call s:let_project(a:prj, a:args[1], a:args[2:])
-  elseif cmd =~ '\v^:=cd$'         " {{{4
+  elseif cmd =~ '\v^:=cd$'          " {{{4
     if nb_args != 2
       throw "Not enough arguments to `:Project ".a:lead.":cd`"
     endif
     call s:cd_project(a:prj, a:args[1])
-  elseif cmd =~ '\v^:=doonce'      " {{{4
+  elseif cmd =~ '\v^:=doonce'       " {{{4
     if nb_args < 2
       throw "Not enough arguments to `:Project ".a:lead.":doonce`"
     endif
     call s:doonce_project(a:prj, a:args[1:])
-  elseif cmd =~ '\v^:=bufdo'       " {{{4
+  elseif cmd =~ '\v^:=bufdo'        " {{{4
     if nb_args < 2
       throw "Not enough arguments to `:Project ".a:lead.":bufdo`"
     endif
     call s:bufdo_project(a:prj, a:args[1:])
-  elseif cmd =~ '\v^:=windo'       " {{{4
+  elseif cmd =~ '\v^:=windo'        " {{{4
     if nb_args < 2
       throw "Not enough arguments to `:Project ".a:lead.":windo`"
     endif
     call s:windo_project(a:prj, a:args[1:])
-  elseif cmd =~ '\v^--define$'    " {{{4
+  elseif cmd =~ '\v^:=bn%[ext]'     " {{{4
+    if nb_args < 1
+      throw "Not enough arguments to `:Project ".a:lead.":bnext`"
+    endif
+    call s:cycle_buffer_project(a:prj, 'next', cmd, a:args[1:])
+  elseif cmd =~ '\v^:=bp%[revious]' " {{{4
+    if nb_args < 1
+      throw "Not enough arguments to `:Project ".a:lead.":bprevous`"
+    endif
+    call s:cycle_buffer_project(a:prj, 'prev', cmd, a:args[1:])
+  elseif cmd =~ '\v^--define$'      " {{{4
     call s:define_project(a:args[1])
   else                            " -- unknown command {{{4
     throw "Unexpected `:Project ".a:lead.cmd."` subcommand"
