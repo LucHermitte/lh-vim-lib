@@ -5,18 +5,26 @@ applications relate to plugin maintenance: debugging,
 [unit testing](https://github.com/LucHermitte/vim-UT), [DbC](DbC.md),
 [logging](Log.md) ...
 
-While Vim knows internally its current call stack, this information isn't
-directly available to us ([at this time](https://github.com/vim/vim/issues/1125)).
+While Vim knows internally its current call stack, this information wasn't
+directly available to us up until Vim 8.2.1297 which introduces
+[`expand(<stack>)`](http://vimhelp.appspot.com/cmdline.txt.html#%3cstack%3e).
+Unfortunatelly the result is in text format and it still needs parsing, but at
+least this string isn't localized.
+[In a ideal world we would have been able to obtain real callstack object...](https://github.com/vim/vim/issues/1125)
 
-Still we can trick vim into giving us the information. The idea is to throw an
-exception and to decode
+Up until Vim 8.2.1297, we had to trick vim into giving us the information.
+The idea was to throw an exception and to decode
 [`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint). Note
 however that this must not be abused as it could cripple down your plugin
-performances.
+performances. Fortunatelly `v:throwpoint` and `expand(<stack>)` are almost in
+the same format.
 
 ## API
 ### `lh#exception#callstack(throwpoint)`
 Parses `throwpoint`, in the current locale, to extract the function call stack.
+This function is compatible with
+[`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint) and
+[`expand(<stack>)`](http://vimhelp.appspot.com/cmdline.txt.html#%3cstack%3e).
 
 Returns a list of:
 - `"script"`: filename of the vim script where the function is defined
@@ -32,12 +40,20 @@ In case the script file could not be obtained, `"script"` will value `"???"`,
 Example:
 
 ```vim
-try
-    throw "dummy"
-catch /.*/
-    let callstack = lh#exception#callstack(v:throwpoint)
-endtry
-do_something_with(callstack)
+function! s:some_func() abort
+    try
+        throw "dummy"
+    catch /.*/
+        let callstack = lh#exception#callstack(v:throwpoint)
+    endtry
+    do_something_with(callstack)
+endfunction
+
+" or
+function! s:some_func() abort
+    let callstack = lh#exception#callstack(expand('<stack>'))
+    do_something_with(callstack)
+endfunction
 ```
 
 Note: In a _*nix_ world, or precisely when `bash` is detected, the call stack
@@ -46,8 +62,8 @@ you'd need to stay in a C locale to make sure `v:throwpoint` could be correctly
 decoded.
 
 ### `lh#exception#decode([throwpoint=v:throwpoint])`
-Given a _throwpoint_, creates an [object](OO.md) containing call stack
-information.
+Given a _throwpoint_ (or `expand(<stack>)`), creates an [object](OO.md)
+containing call stack information.
 
 The object is made of:
 - `"callstack"`: [list](http://vimhelp.appspot.com/eval.txt.html#List)
@@ -56,9 +72,9 @@ The object is made of:
   by [`setqflist()`](http://vimhelp.appspot.com/eval.txt.html#setqflist%28%29).
 
 ### `lh#exception#get_callstack()`
-Helper function to obtain the call stack at the current call-site. It takes care
-of throwing the dummy exception. You can see this function as the first main
-entry point.
+Helper function to obtain the call stack at the current call-site. It takes
+care of returning `expand('<stack>')` if possible, or of throwing the dummy
+exception otherwise. You can see this function as the first main entry point.
 
 It returns the object returned by [`lh#exception#decode()`](#lhexceptiondecodethrowpointvthrowpoint).
 
