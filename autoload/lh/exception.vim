@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.0.1
-let s:k_version = '50001'
+" Version:      5.2.1
+let s:k_version = '50201'
 " Created:      18th Nov 2015
-" Last Update:  03rd Mar 2020
+" Last Update:  11th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -80,25 +80,37 @@ function! lh#exception#callstack(throwpoint) abort
     let function_stack = []
     let dScripts = {}
     for sFunc in stack
-      " next line requires '#' in &isk for autoload function names
-      let func_data = matchlist(sFunc, '\(\k\+\)\[\(\d\+\)\]')
-      if empty(func_data)
-        " could it be a file?
+      " echomsg "DEBUG: ".sFunc
+      " With Vim 8.2.1297, expand(<stack>) may prefix the first function w/
+      " "function "
+      let sFunc = substitute(sFunc, '^function ', '', '')
+
+      " 1- Test files
+      " With Vim 8.2.1297, expand(<stack>) may return filenames: "{filename}[{lineno}]"
+      let file_data = matchlist(sFunc, '\v(\f+)\[(\d+)\]')
+      if empty(file_data)
+        " Should support internationalized Vim PO/gettext messages w/ bash
+        " syntax:  "{filename}, line {lineno}"
         let file_data = matchlist(sFunc, rx_file)
-        if !empty(file_data)
-          let script = file_data[1]
-          let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
-          if filereadable(script)
-            let offset = !empty(file_data[2]) ? file_data[2] : 0
-            let data = {'script': script, 'fname': '(none)', 'fstart': offset, 'offset': offset }
-            let data.pos = data.offset
-            let function_stack += [data]
-            continue
-          endif
+      endif
+      if !empty(file_data)
+        let script = file_data[1]
+        let script = substitute(script, '^\~', substitute($HOME, '\\', '/', 'g'), '')
+        if filereadable(script)
+          let offset = !empty(file_data[2]) ? file_data[2] : 0
+          let data = {'script': script, 'fname': '(:source)', 'fstart': offset, 'offset': offset }
+          let data.pos = offset
+          let function_stack += [data]
+          continue " <<<-------------- CONTINUE to break switch...
         endif
       endif
+
+      " 2- Test functions
+      " next line requires '#' in &isk for autoload function names
+      let func_data = matchlist(sFunc, '\v(\k+)\[(\d+)\]')
       if empty(func_data)
         " Should support internationalized Vim PO/gettext messages w/ bash
+        " syntax:  "{function}, line {lineno}"
         let func_data = matchlist(sFunc, rx_line)
       endif
       if !empty(func_data)
@@ -134,8 +146,8 @@ function! lh#exception#callstack(throwpoint) abort
           let data = {'script': '???', 'fname': fname, 'fstart':0, 'offset': offset, 'pos': offset  }
         endif
         let function_stack += [data]
-      endif
-      if exists('fstart') | unlet fstart | endif
+        if exists('fstart') | unlet fstart | endif
+      endif " <<<-------------- functions
     endfor
     " let g:stacks += [a:throwpoint]
   finally
@@ -145,18 +157,28 @@ function! lh#exception#callstack(throwpoint) abort
 endfunction
 
 " Function: lh#exception#get_callstack() {{{3
-"Note:  As of vim 8.0-314, the callstack size is always of 1 when called from a
-"script. See Vim issue#1480
-function! lh#exception#get_callstack() abort
-  try
-    throw "dummy"
-  catch /.*/
-    let stack = lh#exception#decode()
+if has('patch-8.2.1297')
+  function! lh#exception#get_callstack() abort
+    let raw_stack = expand('<stack>')
+    let stack = lh#exception#decode(raw_stack)
     " ignore current level => [1:]
     call stack.__pop()
     return stack
-  endtry
-endfunction
+  endfunction
+else
+  "Note:  As of vim 8.0-314, the callstack size is always of 1 when called from a
+  "script. See Vim issue#1480
+  function! lh#exception#get_callstack() abort
+    try
+      throw "dummy"
+    catch /.*/
+      let stack = lh#exception#decode()
+      " ignore current level => [1:]
+      call stack.__pop()
+      return stack
+    endtry
+  endfunction
+endif
 
 " Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
 function! lh#exception#callstack_as_qf(filter, ...) abort
