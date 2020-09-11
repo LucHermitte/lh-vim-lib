@@ -4824,7 +4824,8 @@ project. A temporary window is opened for the occasion (contrary to
 
                                                     *:Project-:bnext*
 :Project [{prj-name}] :bnext[!] [--hidden]~
-|:bnext| like command restricted to buffer from the current project.
+|:bnext|-like command restricted to buffers from the specified/current
+project.
 Go to the next buffer in the buffer list of the specified (or current)
 project.
 See |:buffer-!| for [!]
@@ -4832,7 +4833,8 @@ See |:buffer-!| for [!]
 
                                                     *:Project-:bprevious*
 :Project [{prj-name}] :bprevious[!] [--hidden]~
-|:bprevious| like command restricted to buffer from the current project.
+|:bprevious|-like command restricted to buffers from the specified/current
+project.
 Go to the previous buffer in the buffer list of the specified (or current)
 project.
 See |:buffer-!| for [!]
