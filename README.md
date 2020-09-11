@@ -22,6 +22,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
   * [Installation](#installation)
   * [Credits](#credits)
   * [Some other Vim Scripting libraries](#some-other-vim-scripting-libraries)
+  * [Design Notes](doc/design_notes.md)
 
 ## Functions
 
