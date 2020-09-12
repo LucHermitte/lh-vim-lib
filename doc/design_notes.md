@@ -1,12 +1,220 @@
 # Design Notes
 
+* [Scope](#scope)
+* [Regarding debugging and maintenance](#regarding-debugging-and-maintenance)
+    * [Debugging](#debugging)
+        * [Debugging loops](#debugging-loops)
+    * [Code instrumentation (Logs and global variables)](#code-instrumentation-logs-and-global-variables)
+        * [Variables](#variables)
+        * [Logs](#logs)
+    * [Design by Contract](#design-by-contract)
+    * [Unit Testing](#unit-testing)
+    * [`:WTF`](#wtf)
+* [Regarding OO](#regarding-oo)
+* [Regarding dependencies](#regarding-dependencies)
+    * [1. Standalone plugins](#1-standalone-plugins)
+    * [2. Plugins that depend on other plugins](#2-plugins-that-depend-on-other-plugins)
+    * [3. Submodules](#3-submodules)
+    * [My choice on the subject](#my-choice-on-the-subject)
+
+----
+## Scope
+TBC
+<!---
+
+common stuff used elsewhere but not programming related (lh-dev: analysing
+source code), nor tool related (lh-tag, vim-clang, build-tools-wrappers).
+
+I avoid intrusive features (commands, mappings, global functions) (->local_vimrc, lh-brackets, mu-template...), yet there is :Project and a few others
+
+But, given the old: project-specific, `p:` were a natural extension for
+`lh#option#get()` - - finding the exact limit is sometimes complex; for instance Copen, Make...
+
+-->
+
 ----
 ## Regarding debugging and maintenance
-- loops (speed, debug)
-- Dbc
-- UT
-- `:WTF`
-- Logs
+Softwares have bugs, and neither lh-vim-lib nor my other plugins are exempted.
+
+Various techniques exists, and I'm using them in my plugins. These techniques
+have consequences on the code of my plugins, and on features I've ended up
+defining in lh-vim-lib.
+
+Let's have a quick tour.
+
+###  Debugging
+Vim provides a debugger for its Vim script language. It is started with
+[`:h :debug`](http://vimhelp.appspot.com/repeat.txt.html#%3adebug). And from
+here we can display expressions with `:echo`,
+[`>step`](http://vimhelp.appspot.com/repeat.txt.html#%3estep) into a command,
+execute the [`>next`](http://vimhelp.appspot.com/repeat.txt.html#%3enext)
+command and do a few more things.
+
+This debugger has the merit to exist, but it's definitively not ergonomic.
+Indeed once a debugging session has started we can no longer operate Vim as a
+text editor and browse the buffers it would display the rest of the time.
+To add a breakpoint, we will have to remember where (or to open the relevant
+files in another process).
+Vim kernel would need to be rewritten in order to have a non blocking/modal
+debug mode.
+
+I'm aware of
+[Alberto Fanjul's `vim-breakpts` project](https://github.com/albfan/vim-breakpts)
+that tries to work around this limitation (by running two instances of Vim,
+IIRC)
+
+#### Debugging loops
+Debugging loops is one of the things that annoys me the most when debugging vim
+scripts. We have to do `>next` several times, check manually the thing that
+changes (_variant_/index/element) at each iteration (as there is no possible
+`>watch` because of the design of Vim kernel), and there is no
+`>finish-the-loop`, only a `>finish`-the-function.
+
+Of course we could have breakpoints but... I don't want to open the file in
+another window to see where it must go. By the way, there are no _conditional
+breakpoints_.
+
+As a workaround I avoid loops and instead I try to use
+[`map()`](http://vimhelp.appspot.com/eval.txt.html#map%28%29) and
+[`filter()`](http://vimhelp.appspot.com/eval.txt.html#filter%28%29) as much as
+possible. Even when I'm looking for the first element that matches a predicate
+I filter the whole list and... it's not even slower but much faster that
+manual loops -- because loops are interpreted while list functions are coded in
+C.
+
+BTW, there are also many list-related functions that I miss and thus I emulate
+them in lh-vim-lib. Sometimes they are added later in Vim like the recent (as
+far as I'm concerned)
+[`reduce()`](http://vimhelp.appspot.com/eval.txt.html#reduce%28%29).
+
+### Code instrumentation (Logs and global variables)
+One of the oldest alternative approach to debug consist in instrumenting our
+source code to observe what happens -- I guess this is even much older than
+debuggers.
+
+Two approaches mainly.
+
+#### Variables
+We can store
+[local-variables](http://vimhelp.appspot.com/eval.txt.html#local%2dvariable)
+into [global-variables](http://vimhelp.appspot.com/eval.txt.html#global%2dvariable)
+
+```vim
+let g:foobar = foobar
+```
+
+This is quite efficient to store complex things like
+[lists](http://vimhelp.appspot.com/eval.txt.html#list) or
+[dictionaries](http://vimhelp.appspot.com/eval.txt.html#Dictionaries) just
+before a crash. It's more complex to follow the code flow with them.
+
+#### Logs
+Logs can start with a single
+[`:echomsg`](http://vimhelp.appspot.com/eval.txt.html#%3aechomsg). In the past
+I was even playing with
+[`confirm()`](http://vimhelp.appspot.com/eval.txt.html#confirm%28%29) dialog
+box to have the time to read the message.
+
+That does the job. Dr Charles Campbell even a `Decho` command to display logs.
+
+But I needed more.
+
+- I needed first to not spend my time commenting and uncommenting log
+  instructions depending on whether I needed them or not. In particular I did
+  not want such changes to parasite my commits.
+- And I also needed to see where the log was happening and why not in the
+  [`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
+  that already have everything here to navigate between its entries.
+
+Thanks to a (slow) hack I found, I was able to retrieve the current callstack
+and to thus display logs in the quickfix window with the exact reference of the
+calling line (and even the calling functions!).
+
+The result is my [logging framework](Log.md). Given my needs, the fact that I
+don't really need logging levels but just errors that stops, warning that are
+notified, debug logs, and information notifications messages, the framework
+ended up minimalist. Logs are always logged (in qf-window or loclist-windows,
+or a `:messages`), and it's up to each vim files to control whether it logs or
+not. As such all my autoload plugin files have the same first lines that help
+control their verbosity level. I can activate logs in one file and not the
+other.
+
+### Design by Contract
+There is a lot to say about Designing by Contract, and I've already said a lot,
+but [in French, and for C++](https://luchermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/).
+
+To make it short, it's about specifying contracts on functions, classes, points
+in the program... And when a contract is not respected this means we have a
+design error or a programming error.
+
+Often I write functions and consider they are not meant to be called with
+a certain context (parameter state, buffer state...). Because I don't care for
+this extra situation, and think it should absolutely never happen. Because it
+would be too complex to handle. And so on.
+
+I put a contract on a function, on a line in the program: I assert a given
+state and I know that if that state isn't verified, there is, or there will be,
+an error. Continuing makes absolutely no sense. At best we can abort. We can
+_fail fast_.
+
+My take on the subject is that recovering from errors is hardly possible.
+Sometimes this means some internal state is completely corrupted. Sometimes the
+only solution we have is to get rid of a buffer (with `:bw`) or even restart
+Vim.
+
+So, I prefer to be aggressive with my assertions. I like to fail fast with as
+much as context as possible in order to be able to investigate and fix the error.
+
+That's how I ended up defining my [DbC framework](Dbc.md). And thus I use
+assertions in my vim scripts in critical places in case I need investigating in
+the future.
+
+Or course I could instead throw an exception and investigate its stack with
+[`:WTF`](#WTF). But, with exceptions I won't have any access to the full program
+state (like local variables). With my assertion framework I have the choice
+between ignore-and-continue, abort, and start-the-debugger when an error is
+detected.
+
+I reserve exceptions for exceptional but plausible situations. Not for aborting
+when a plugin is in a corrupted or unexpected state.
+
+
+Last thing, DbC assertions are perfect for preconditions but definitively not
+the best tools for post-conditions. Unit tests are much better for
+post-conditions.
+
+### Unit Testing
+I also have my
+[own solution for unit-testing](https://github.com/LucHermitte/vim-UT). An old one.
+
+Its primary design goal was to see the assertion failures appear in the
+[`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow),
+and also to be able to see the callstack of uncaught exceptions.
+
+A few version back Vim introduced
+[assertion functions](http://vimhelp.appspot.com/testing.txt.html#assert%2dfunctions%2ddetails).
+Since Vim 8.2.1297 we can also access directly to the callstack.
+
+I'll continue with my framework as it works well, and it answers my first need:
+filling the quickfix-window.
+
+
+### `:WTF`
+Thanks to [`:WTF`](Callstack.md#lhexceptionsay_what) I have a nice tool to
+analyse error messages and fill the
+[`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
+with the error call stack.
+
+In fair honesty, this feature is directly inspired by
+https://github.com/tweekmonster/exception.vim
+I've ported it to lh-vim-lib has I had already the required tools to analyse
+the error messages (as they are in the same format as
+[`v:throwpoint`](http://vimhelp.appspot.com/eval.txt.html#v%3athrowpoint)).
+Beside, I handle i18n issues which the original plugin did not.
+
+Also, as I try to avoid defining too many commands, mappings... in lh-vim-lib,
+`:WTF` isn't not defined. It's up to us to bind `lh#exception#say_what()` to
+whatever we want in our `.vimrc.`
 
 ----
 ## Regarding OO
@@ -18,7 +226,7 @@ I delved into the subject in another document: [Object Oriented Programming in v
 
 This is an edited copy of an answer I wrote on [vi.SE](https://vi.stackexchange.com/questions/12666/including-utility-libraries-in-a-vim-plugin).
 
-As you likely have noted my plugins have dependencies and lh-vim-lib is the
+As you likely have noticed my plugins have dependencies, and lh-vim-lib is the
 central one they all depend upon.
 
 When we want to reuse a function between unrelated plugins, we have a few
