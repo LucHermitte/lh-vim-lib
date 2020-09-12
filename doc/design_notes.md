@@ -115,29 +115,32 @@ I was even playing with
 [`confirm()`](http://vimhelp.appspot.com/eval.txt.html#confirm%28%29) dialog
 box to have the time to read the message.
 
-That does the job. Dr Charles Campbell even a `Decho` command to display logs.
+That does the job. Dr Charles Campbell even defines a `Decho` command to
+display logs.
 
 But I needed more.
 
 - I needed first to not spend my time commenting and uncommenting log
   instructions depending on whether I needed them or not. In particular I did
   not want such changes to parasite my commits.
-- And I also needed to see where the log was happening and why not in the
+- And I also needed to see where the log was happening, and why not display the
+  log in the
   [`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
-  that already have everything here to navigate between its entries.
+  it already has everything to navigate between its entries.
 
 Thanks to a (slow) hack I found, I was able to retrieve the current callstack
-and to thus display logs in the quickfix window with the exact reference of the
+and thus to display logs in the quickfix window with the exact reference of the
 calling line (and even the calling functions!).
 
 The result is my [logging framework](Log.md). Given my needs, the fact that I
-don't really need logging levels but just errors that stops, warning that are
-notified, debug logs, and information notifications messages, the framework
+don't really need logging levels but just errors that stops, warnings that are
+notified, debug logs, and information notification messages, the framework
 ended up minimalist. Logs are always logged (in qf-window or loclist-windows,
-or a `:messages`), and it's up to each vim files to control whether it logs or
+or as `:messages`), and it's up to each vim files to control whether it logs or
 not. As such all my autoload plugin files have the same first lines that help
 control their verbosity level. I can activate logs in one file and not the
-other.
+other. e.g. `:call lh#path#verbose(1)` (or `:Verbose pa<tab>` thanks to a small
+miscellaneous plugin I have)
 
 ### Design by Contract
 There is a lot to say about Designing by Contract, and I've already said a lot,
@@ -205,7 +208,7 @@ analyse error messages and fill the
 [`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
 with the error call stack.
 
-In fair honesty, this feature is directly inspired by
+In fair honesty, this feature is directly inspired from
 https://github.com/tweekmonster/exception.vim
 I've ported it to lh-vim-lib has I had already the required tools to analyse
 the error messages (as they are in the same format as
@@ -215,6 +218,14 @@ Beside, I handle i18n issues which the original plugin did not.
 Also, as I try to avoid defining too many commands, mappings... in lh-vim-lib,
 `:WTF` isn't not defined. It's up to us to bind `lh#exception#say_what()` to
 whatever we want in our `.vimrc.`
+
+### Plugin reloading
+TBC
+<!--
+`:Reload`
+
+guards
+-->
 
 ----
 ## Regarding OO
