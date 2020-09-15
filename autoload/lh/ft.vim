@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      3.6.1
-let s:k_version = 3601
+" Version:      5.2.1
+let s:k_version = 50201
 " Created:      28th Jan 2014
-" Last Update:  08th Jan 2016
+" Last Update:  15th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       library functions related to filetype manipulations
@@ -52,7 +52,7 @@ endfunction
 " Function: lh#ft#is_text(...) {{{3
 function! lh#ft#is_text(...)
   let ft = a:0 == 0 ? &ft : (a:1)
-  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown\|gitcommit'
+  return ft =~ '^$\|text\|latex\|tex\|html\|docbk\|help\|mail\|man\|xhtml\|markdown\|rst\|gitcommit'
 endfunction
 
 " Function: lh#ft#is_script(...) {{{3
@@ -64,6 +64,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
