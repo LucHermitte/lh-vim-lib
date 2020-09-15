@@ -129,7 +129,7 @@ endfunction
 
 " - Methods {{{2
 function! s:find_best(path) dict abort " {{{3
-  let prjs = filter(values(self.projects), 'v:val.get("paths.sources") == a:path')
+  let prjs = filter(values(self.projects), 'v:val.get("paths.sources", "") == a:path')
   if empty(prjs)
     return lh#option#unset('No project matching '.a:path)
   endif
