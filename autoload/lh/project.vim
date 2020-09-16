@@ -2,10 +2,10 @@
 " File:         autoload/lh/project.vim                           {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.2.1
-let s:k_version = '521'
+" Version:      5.2.2
+let s:k_version = '522'
 " Created:      08th Sep 2016
-" Last Update:  20th Aug 2020
+" Last Update:  16th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Define new kind of variables: `p:` variables.
@@ -500,8 +500,8 @@ function! lh#project#_auto_detect_project() abort
           let name = repo_path[-1]
         else
           let name = fnamemodify(root, ':h:t')
-          let name = substitute(name, '[^A-Za-z0-9_]', '_', 'g')
         endif
+        let name = substitute(name, '[^A-Za-z0-9_]', '_', 'g')
         let opt = {'name': name}
         let opt.auto_discover_root = {'value':  root}
         call lh#project#define(s:, opt, name)

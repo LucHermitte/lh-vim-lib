@@ -5,7 +5,7 @@
 " Version:      5.1.0.
 let s:k_version = '510'
 " Created:      08th Mar 2017
-" Last Update:  06th Mar 2020
+" Last Update:  16th Sep 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -144,6 +144,7 @@ function! lh#project#object#_define(s, params, ...) abort
   if !lh#project#is_eligible() | return s:k_unset  | endif
   call lh#assert#not_equal(&ft, 'qf', "Don't run lh#project#define() from qf window!")
   let name = get(a:, 1, 'project')
+  call lh#assert#value(name).match('^[a-zA-Z0-9_]\+$', 'Project name shall be a valid variable name unlike "'.name.'"')
   if !has_key(a:s, name)
     let a:s[name] = lh#project#object#_new(a:params)
   else
