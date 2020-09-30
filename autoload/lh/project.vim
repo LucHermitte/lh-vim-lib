@@ -355,7 +355,7 @@ function! s:GetPlausibleRoot() abort " {{{3
   let auto_discover_root = lh#project#_auto_discover_root()
   call s:Verbose('s:GetPlausibleRoot() -- auto discover root: %1', auto_discover_root)
   if auto_discover_root == 'in_doubt_ask'
-    if s:permission_lists.check_paths([ expand('%:p:h')])
+    if s:permission_lists.check_paths([ expand('%:p')])
       let prj_dirname = lh#ui#input("prj needs to know the current project root directory.\n-> ", expand('%:p:h'))
     else
       let prj_dirname = ''
