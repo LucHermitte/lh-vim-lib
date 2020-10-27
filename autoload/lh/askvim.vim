@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.0
-let s:k_version = 50200
+" Version:      5.2.2
+let s:k_version = 50202
 " Created:      17th Apr 2007
-" Last Update:  18th Jul 2020
+" Last Update:  27th Oct 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -137,20 +137,20 @@ function! lh#askvim#where_is_function_defined(funcname) abort
       " "\n\tLast set from " which is quite difficult to inject into bash...
       " Beside this is not portable to Windows...
       let definition = lh#askvim#execute('verbose function '.a:funcname)
+      if empty(definition)
+        throw "Cannot find a definition for ".a:funcname
+      endif
+      let script = matchstr(definition[1], '\v.{-}Last set from \zs\f+')
+      let res = {'script': script}
+      let line = matchstr(definition[1], '\v line \zs\d+\ze')
+      if !empty(line)
+        " Information available starting w/ Vim 8.1.0362+
+        let res.line = line
+      endif
+      return res
     finally
       call cleanup.finalize()
     endtry
-    if empty(definition)
-      throw "Cannot find a definition for ".a:funcname
-    endif
-    let script = matchstr(definition[1], '\v.{-}Last set from \zs\f+')
-    let res = {'script': script}
-    let line = matchstr(definition[1], '\v line \zs\d+\ze')
-    if !empty(line)
-      " Information available starting w/ Vim 8.1.0362+
-      let res.line = line
-    endif
-    return res
   elseif a:funcname =~ '#'
     " autoloaded function
     let script = substitute(a:funcname, '#', '/', 'g')
