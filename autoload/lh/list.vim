@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.7.0
-let s:k_version = 40700
+" Version:      5.2.2
+let s:k_version = 50202
 " Created:      17th Apr 2007
-" Last Update:  02nd Sep 2019
+" Last Update:  10th Nov 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -617,6 +617,13 @@ function! lh#list#intersect(list1, list2) abort
   let result = copy(a:list1)
   call filter(result, 'index(a:list2, v:val) >= 0')
   return result
+endfunction
+
+" Function: lh#list#is_contained_in(sublist, list) {{{3
+" @since Version 5.2.2
+function! lh#list#is_contained_in(sublist, list) abort
+  let i = lh#list#intersect(a:sublist, a:list)
+  return i == a:sublist
 endfunction
 
 " Function: lh#list#flat_extend(list, rhs) {{{3

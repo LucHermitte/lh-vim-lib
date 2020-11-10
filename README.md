@@ -183,6 +183,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#for_each_call()`        | Calls a function of all elements from a list                                                                      |
 | `lh#list#get()`                  | Returns a list with the elements of index/key in a list of lists/dictionaries (<=> map get(key/idx) list)         |
 | `lh#list#intersect()`            | Intersection of two lists                                                                                         |
+| `lh#list#is_contained_in()`      | Returns whether all elements from the sublist are present in the second list                                      |
 | `lh#list#lower_bound()`          | See C++ [`std::lower_bound`](http://en.cppreference.com/w/cpp/algorithm/lower_bound)                              |
 | `lh#list#map_on()`               | Transforms a list of lists/dictionaries at key/index with specified action.                                       |
 | `lh#list#mask()`                 | Builds a subset of the input list ; elements are kept according to a mask list.                                   |

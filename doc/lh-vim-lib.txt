@@ -140,6 +140,7 @@ List related functions:                                 |lhvl#list|       {{{2
 - |lh#list#for_each_call()|
 - |lh#list#get()|
 - |lh#list#intersect()|
+- |lh#list#is_contained_in()|
 - |lh#list#lower_bound()| and |lh#list#upper_bound()|
 - |lh#list#map_on()|
 - |lh#list#mask()|
@@ -2324,6 +2325,17 @@ Example: >
     :let l2 = [ 3, 8, 7, 25, 6 ]
     :echo lh#list#intersect(l1, l2)
     [ 25, 7, 6 ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                               *lh#list#is_contained_in()*        {{{3
+lh#list#is_contained_in({sublist},{list})~
+Returns whether all elements from {sublist} are present in {list}
+
+@param[in] {sublist} |List|
+@param[in] {list}    |List|
+kepts in the same order as in {list1}
+@see also |lh#list#intersect()| upon which this function is built.
+@since Version 5.2.2
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#list#concurrent_for()*         {{{3
