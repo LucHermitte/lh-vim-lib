@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = 464
+" Version:      5.2.2
+let s:k_version = 5.2.2
 " Created:      08th Jan 2007
-" Last Update:  13th Sep 2018
+" Last Update:  10th Nov 2020
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -174,36 +174,70 @@ endfunction
 " Function: lh#command#matching_bash_completion(command, lead [, dir]) {{{3
 " Requires bash
 function! lh#command#matching_bash_completion(command, lead, ...) abort
-  if lh#command#can_use_bash_completion()
+  if !lh#command#can_use_bash_completion()
     return a:lead
   endif
 
+  " COMP_WORDS=('module' 'load' 'c')
+  " COMP_CWORD=2 _module module load module  && echo ${COMPREPLY[@]}
+  " ===> load
+  " COMP_CWORD=3 _module module co load && echo ${COMPREPLY[@]}
+  " ===> conda/coz...
+
+  " Two cases:
+  " 1- completion of the current word
+  " 2- completion of the next word, last part in a:lead matches ^\s*$
   let lead = [a:command]
-  if !empty(a:lead) | let lead += [ a:lead ] | endif
+  let cur = ''
+  let prev = ''
+  if !empty(a:lead)
+    if  type(a:lead) == type([])
+      let lead += a:lead
+    else
+      " [[deprecated]]
+      let lead += [ a:lead ]
+    endif
+    let last_idx = -1
+    " if empty(lead[last_idx]) | let last_idx -= 1 | endif
+    let cur = string(lead[last_idx])
+    if len(a:lead) >= -(last_idx-1)
+      let prev = string(a:lead[last_idx-1])
+    endif
+  endif
+  call map(lead, 'string(v:val)')
   let sLead = join(lead, ' ')
+
   let env = {}
   let env.__shebang  = '/bin/env bash'
   let env.COMP_LINE  = sLead
-  let env.COMP_POINT = lh#encoding#strlen(sLead) + 1
+  let env.COMP_POINT = lh#encoding#strlen(sLead)
   let env.COMP_WORDS = lead
-  let env.COMP_CWORD = 1
+  let env.COMP_CWORD = len(lead) -1
+
+  call s:Verbose('current %1', cur)
+  call s:Verbose('previous %1', prev)
+  call s:Verbose('COMP_WORDS: %1',  env.COMP_WORDS)
+  call s:Verbose('COMP_CWORDS: %1', env.COMP_CWORD)
+  call s:Verbose('COMP_LINE "%1"', env.COMP_LINE)
+  call s:Verbose('COMP_POINT %1', env.COMP_POINT)
 
   let commands = []
   let commands += [ '__print_completions() { printf ''%s\n'' "${COMPREPLY[@]}"; }']
   let commands += [ 'source /etc/bash_completion']
-  let commands += [ '_completion_loader '.a:command ]
+  let commands += [ 'complete -p '.a:command.' >/dev/null 2>&1 ||_completion_loader '.a:command ]
   let commands += [ 'compl_def=$(complete -p '.a:command.')' ]
   let commands += [ 'policy="${compl_def/complete -F /}"' ]
   let commands += [ 'pol_tokens=(${policy})' ]
-  let commands += [ '${pol_tokens[0]}' ]
+  let commands += [ printf('${pol_tokens[0]} %s %s %s', a:command, cur, prev) ]
   if a:0 > 0
     let commands[-1] = 'cd '.shellescape(a:1). ' && ' . commands[-1] .' || echo "Invalid directory!"'
   endif
   let commands += [ '__print_completions' ]
   let commands += [ '']
+  call s:Verbose('Command %1', commands)
 
   let script = lh#os#new_runner_script(commands, env)
-  return script.run()
+  return split(script.run(), "\n")
 endfunction
 
 " Function: lh#command#can_use_bash_completion() {{{3
