@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      5.1.1.
-let s:k_version = '511'
+" Version:      5.2.2.
+let s:k_version = '522'
 " Created:      26th Jun 2018
-" Last Update:  18th May 2020
+" Last Update:  18th Nov 2020
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -109,6 +109,7 @@ function! s:set(key, value, ...) dict abort
   let id = a:0 > 0 ? a:1 : self.get_id()
   let ctx = self._context(id)
   let ctx[a:key] = a:value
+  return ctx[a:key]
 endfunction
 
 " # Misc functions {{{2
