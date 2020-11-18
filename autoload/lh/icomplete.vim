@@ -7,7 +7,7 @@
 " Version:      4.5.0
 let s:version = '4.5.0'
 " Created:      03rd Jan 2011
-" Last Update:  26th Jun 2018
+" Last Update:  02nd Nov 2020
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -87,7 +87,7 @@ endfunction
 
 " Function: lh#icomplete#_restore_key_bindings() {{{2
 function! lh#icomplete#_restore_key_bindings(previous_mappings)
-  call s:Verbose('Restore keybindings after completion')
+  call s:Verbose('Restore keybindings after completion -> %1', a:previous_mappings)
   if has_key(a:previous_mappings, 'cr') && has_key(a:previous_mappings.cr, 'buffer') && a:previous_mappings.cr.buffer
     let cmd = lh#mapping#define(a:previous_mappings.cr)
   else
