@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.6.4
-let s:version = '4.6.4'
+" Version:	5.3.0
+let s:version = '5.3.0'
 " Created:      01st Mar 2013
-" Last Update:  04th Mar 2019
+" Last Update:  06th Jan 2021
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -18,6 +18,8 @@ let s:cpo_save=&cpo
 set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
+let s:k_script_name      = expand('<sfile>:p')
+
 " # Version {{{2
 function! lh#mapping#version()
   return s:k_version
@@ -100,12 +102,9 @@ function! lh#mapping#define(md) abort
   " In case LaTeX-Suite/IMAP is installed
   if exists('*IMAP') && a:md.mode=='i' && (a:md.lhs !~? '<bs>\|<cr>\|<up>\|<down>\|<left>\|<right>\|<M-\|<C-\|<PageDown>\|<PageUp>\|<end>\|<home>')
     let rhs = get(a:md, 'expr', 0) ? "\<c-r>=".(a:md.rhs)."\<cr>" : a:md.rhs
-    call s:Verbose("Using IMAP() to define the mapping %1 -> %2", strtrans(a:md.lhs), strtrans(lhs))
-    if get(a:md, 'buffer', 0)
-      call IMAP(a:md.lhs, rhs, &ft)
-    else
-      call IMAP(a:md.lhs, rhs)
-    endif
+    call s:Verbose("Using IMAP() to define the mapping %1 -> %2", strtrans(a:md.lhs), strtrans(rhs))
+    let ft = get(a:md, 'buffer', 0) ? &ft : ''
+    call IMAP(a:md.lhs, rhs, ft)
   else
     let cmd = lh#mapping#_build_command(a:md)
     call s:Verbose("%1", strtrans(cmd))
@@ -218,10 +217,227 @@ function! lh#mapping#reinterpret_escaped_char(seq) abort
         \   substitute( seq, '\\\\<\(.\{-}\)\\\\>', '"."\\<\1>"."', 'g' ) .  '"'
 endfunction
 
+" Object: ToggableMappings {{{2
+" @Since Version 5.3.0, moved from lh-bracket lh#brackets#*
+
+" Sub-object: activation_state {{{3
+function! s:make_activation_state() abort " {{{4
+  let state = {
+        \ 'is_active': 1,
+        \ 'is_active_in_buffer': {},
+        \}
+  let res = lh#object#make_top_type(state)
+  call lh#object#inject_methods(res, s:k_script_name, 'toggle', 'must_activate', 'must_deactivate')
+  return res
+endfunction
+
+function! s:toggle() dict abort " {{{4
+  let self.is_active = 1 - self.is_active
+  let bid = bufnr('%')
+  let self.is_active_in_buffer[bid] = self.is_active
+endfunction
+
+function! s:must_activate() dict abort " {{{4
+  let bid = bufnr('%')
+  if has_key(self.is_active_in_buffer, bid)
+    let must = !self.is_active_in_buffer[bid]
+    let why = must." <= has key, global=". (self.is_active) . ", local=".self.is_active_in_buffer[bid]
+  else " first time in the buffer
+    " throw "lh#mappings#must_activate() assertion failed: unknown local activation state"
+    let must = 0
+    let why = must." <= has not key, global=". (self.is_active)
+  endif
+  let self.is_active_in_buffer[bid] = self.is_active
+  " echomsg "must_activate[".bid."]: ".why
+  return must
+endfunction
+
+function! s:must_deactivate() dict abort " {{{4
+  let bid = bufnr('%')
+  if has_key(self.is_active_in_buffer, bid)
+    let must = self.is_active_in_buffer[bid]
+    let why = must." <= has key, global=". (self.is_active) . ", local=".self.is_active_in_buffer[bid]
+  else " first time in the buffer
+    " throw "lh#mappings#must_deactivate() assertion failed: unknown local activation state"
+    let must = 0
+    let why = must." <= has not key, global=". (self.is_active)
+  endif
+  let self.is_active_in_buffer[bid] = self.is_active
+  " echomsg "must_deactivate[".bid."]: ".why
+  return must
+endfunction
+
+" Function: lh#mapping#create_toggable_group(kind) {{{3
+let s:toggable_mapping_groups = get(s:, 'toggable_mapping_groups', [])
+" let s:toggable_mapping_groups = []
+
+function! lh#mapping#create_toggable_group(kind) abort
+  let grp = lh#object#make_top_type({})
+  let grp.definitions = {}
+  let grp._state      = s:make_activation_state()
+  let grp.kind        = a:kind
+  call lh#object#inject_methods(grp, s:k_script_name,
+        \  'define_map', 'define_imap'
+        \, 'list_mappings', 'clear_mappings', 'toggle_mappings'
+        \, '_ev_buffer_enter', '_ev_buffer_leave', '_ev_buffer_delete'
+        \, '_get_definitions')
+  call add(s:toggable_mapping_groups, grp)
+  return grp
+endfunction
+
+function! s:_get_definitions(isLocal) dict abort " {{{3
+  " Fetch the brackets defined for the current buffer.
+  let bid = a:isLocal ? bufnr('%') : -1
+  if !has_key(self.definitions, bid)
+    let self.definitions[bid] = []
+  endif
+  let crt_definitions = self.definitions[bid]
+  return crt_definitions
+endfunction
+
+function! s:define_map(mode, lhs, rhs, isLocal, isExpr) dict abort " {{{3
+  let crt_definitions = self._get_definitions(a:isLocal)
+  let crt_mapping = {}
+  let crt_mapping.lhs    = escape(a:lhs, '|') " need to escape bar
+  let crt_mapping.mode   = a:mode
+  let crt_mapping.rhs    = a:rhs
+  let crt_mapping.buffer = a:isLocal ? '<buffer> ' : ''
+  let crt_mapping.expr   = a:isExpr  ? '<expr> '   : ''
+  if self._state.is_active
+    call s:Map(crt_mapping)
+  endif
+  let p = lh#list#Find_if(crt_definitions,
+        \ 'v:val.mode==v:1_.mode && v:val.lhs==v:1_.lhs',
+        \ [crt_mapping])
+  if p == -1
+    call add(crt_definitions, crt_mapping)
+  else
+    if crt_mapping.rhs != a:rhs
+      call lh#common#warning_msg("Overrriding ".a:mode."map ".a:lhs." ".crt_definitions[p].rhs."  with ".a:rhs)
+    elseif &verbose >= 2
+      call s:Log("(almost) Overrriding ".a:mode."map ".a:lhs." ".crt_definitions[p].rhs." with ".a:rhs)
+    endif
+    let crt_definitions[p] = crt_mapping
+  endif
+endfunction
+
+function! s:define_imap(lhs, rhs, isLocal, ...) dict abort " {{{3
+  " TODO: fatorize w/ lh#mapping#define()
+  if exists('*IMAP') && a:lhs !~? '<bs>\|<cr>\|<up>\|<down>\|<left>\|<right>\|<M-\|<C-\|<PageDown>\|<PageUp>\|<end>\|<home>'
+    let rhs = "\<c-r>=".a:rhs."\<cr>"
+    let ft = a:isLocal ? 'ft' : ''
+    call s:Verbose("Using IMAP() to define the mapping %1 -> %2", strtrans(a:lhs), strtrans(rhs))
+    call IMAP(a:lhs, rhs, ft)
+  else
+    let nore = get(a:, '1', 1) ? 'nore' : ''
+    " call s:DefineMap('inore', a:lhs, " \<c-r>=".(a:rhs)."\<cr>", a:isLocal)
+    call self.define_map('i' . nore, a:lhs, a:rhs, a:isLocal, 1)
+  endif
+endfunction
+
+function! s:list_mappings(isLocal) dict abort " {{{3
+  let crt_definitions = self._get_definitions(a:isLocal)
+  for m in crt_definitions
+    let cmd = m.mode.'map <silent> ' . m.buffer . m.lhs .' '.m.rhs
+    echomsg cmd
+  endfor
+endfunction
+
+function! s:clear_mappings(isLocal) dict abort " {{{3
+  let crt_definitions = self._get_definitions(a:isLocal)
+  if self._state.is_active
+    for m in crt_definitions
+      call s:UnMap(m)
+    endfor
+  endif
+  if !empty(crt_definitions)
+    unlet crt_definitions[:]
+  endif
+endfunction
+
+function! s:toggle_mappings() dict abort " {{{3
+  " TODO: when entering a buffer, update the mappings depending on whether it
+  " has been toggled
+  if exists('*IMAP')
+    let g:Imap_FreezeImap = 1 - self._state.is_active
+  else
+    let crt_definitions = self._get_definitions(0) + self._get_definitions(1)
+    if self._state.is_active " active -> inactive
+      for m in crt_definitions
+        call s:UnMap(m)
+      endfor
+      call lh#common#warning_msg(self.kind . "mappings deactivated")
+    else " inactive -> active
+      for m in crt_definitions
+        call s:Map(m)
+      endfor
+      call lh#common#warning_msg(self.kind . "mappings (re)activated")
+    endif
+  endif " No imaps.vim
+  call self._state.toggle()
+endfunction
+
+function! s:_ev_buffer_enter() dict abort " {{{3
+  " Activate or deactivate the mappings in the current buffer
+  if self._state.is_active
+    if self._state.must_activate()
+      let crt_definitions = self._get_definitions(1)
+      for m in crt_definitions
+        call s:Map(m)
+      endfor
+    endif " active && must activate
+  else " not active
+    let crt_definitions = self._get_definitions(1)
+    if self._state.must_deactivate()
+    for m in crt_definitions
+        call s:UnMap(m)
+      endfor
+    endif
+  endif
+endfunction
+
+function! s:_ev_buffer_leave() dict abort " {{{3
+  let bid = bufnr('%')
+  let self._state.is_active_in_buffer[bid] = self._state.is_active
+endfunction
+
+function! s:_ev_buffer_delete() dict abort " {{{3
+  let bid = bufnr('<abuf>')
+  if has_key(self._state.is_active_in_buffer, bid)
+    unlet self._state.is_active_in_buffer[bid]
+  endif
+endfunction
+
+"# Autocommands                                                                                              {{{3
+augroup LHToggableMappings
+  au!
+  au BufEnter  * call s:UpdateMappingsActivationE()
+  au BufLeave  * call s:UpdateMappingsActivationL()
+  au BufDelete * call s:UpdateMappingsActivationD()
+augroup END
+
+function! s:UpdateMappingsActivationE() abort
+  for obj in s:toggable_mapping_groups
+    call obj._ev_buffer_enter()
+  endfor
+endfunction
+
+function! s:UpdateMappingsActivationL() abort
+  for obj in s:toggable_mapping_groups
+    call obj._ev_buffer_leave()
+  endfor
+endfunction
+
+function! s:UpdateMappingsActivationD() abort
+  for obj in s:toggable_mapping_groups
+    call obj._ev_buffer_delete()
+  endfor
+endfunction
+
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
-"
-function! s:callsite()
+
+function! s:callsite() " {{{2
   let stack = lh#exception#get_callstack()
   call stack.__pop() " remove this call site from the callstack
   if len(stack.callstack) <= 1
@@ -233,6 +449,24 @@ function! s:callsite()
     let current = lh#fmt#printf(' in %{1.fname}:%{1.lnum}', stack.callstack[1])
   endif
   return current
+endfunction
+
+" Function: s:UnMap(m)                                                                                       {{{2
+function! s:UnMap(m) abort
+  try
+    let cmd = a:m.mode[0].'unmap '. a:m.buffer . a:m.lhs
+    call s:Verbose(cmd)
+    exe cmd
+  catch /E31/
+    call s:Verbose("%1: %2", v:exception, cmd)
+  endtry
+endfunction
+
+" Function: s:Map(m)                                                                                         {{{2
+function! s:Map(m) abort
+  let cmd = a:m.mode.'map <silent> ' . a:m.expr . a:m.buffer . a:m.lhs .' '.a:m.rhs
+  call s:Verbose(cmd)
+  exe cmd
 endfunction
 
 "------------------------------------------------------------------------

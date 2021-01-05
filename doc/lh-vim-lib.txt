@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.2.1)
-                        For Vim version 7+      Last change: 12th Sep 2020
+*lh-vim-lib.txt*        Vim common libraries (v5.3.0)
+                        For Vim version 7+      Last change: 05th Jan 2021
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -75,6 +75,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#mark#find_first_unused()|
 - |lh#mark#is_unused()|
 - |lh#math#abs()|
+- |lh#mapping#create_toggable_group()|
 - |lh#mapping#define()|
 - |lh#mapping#plug()|
 - |lh#mapping#reinterpret_escaped_char()|
@@ -511,6 +512,30 @@ lh#math#abs(val)~
 
 The purpose of the function is to emulate |abs()| on vim version where it
 isn't defined.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                             *lh#mapping#create_toggable_group()* {{{3
+lh#mapping#create_toggable_group(group_name)~
+@returns a |lhvl#object| that permits to define mappings that can be
+deactivated.
+@version 5.3.0
+
+It's subservices are:
+- *define_map()*  -- `(mode, lhs, rhs, isLocal, isExpr)`
+                Defines a new mapping
+- *define_imap()* -- `(lhs, rhs, isLocal, isExpr [, isNore])`
+                Defines a new insert-mode mapping. In the particular case
+                *IMAP* is installed, it'll be used to define the mapping.
+- *list_mappings()* -- `(isLocal)`
+                Displays the list of mappings defined through this object
+- *clear_mappings()* -- `(isLocal)`
+                Removes all mappings defined through this object
+- *toggle_mappings()*
+                Toggle the activation state of the mappings defined through
+                this object.
+                The activation state is global (multi-buffers), and it'll be
+                propagated even to mappings local in buffer other than the
+                current one.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#mapping#define()*             {{{3
