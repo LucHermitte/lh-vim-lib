@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.1
-let s:k_version = 50201
+" Version:      5.3.1
+let s:k_version = 50301
 " Created:      23rd Jan 2007
-" Last Update:  16th Sep 2020
+" Last Update:  23rd Feb 2021
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -121,6 +121,8 @@ let s:k_version = 50201
 "       v5.2.1
 "       (*) BUG: Fix permission lists behaviour
 "       (*) ENH: Returns the number of handled files in permission list
+"       v5.3.1
+"       (*) BUG: Fix `lh#path#select()` when cancelling through escape
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -362,7 +364,7 @@ function! lh#path#select_one(pathnames, prompt) abort
     finally
       let &guioptions = guioptions_save
     endtry
-    let file = (selection == 1) ? '' : a:pathnames[selection-2]
+    let file = (selection <= 1) ? '' : a:pathnames[selection-2]
     return file
   elseif len(a:pathnames) == 0
     return ''
