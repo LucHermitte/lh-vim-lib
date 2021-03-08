@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.0
-let s:k_version = 50200
+" Version:      5.3.1
+let s:k_version = 50301
 " Created:      24th Jul 2004
-" Last Update:  15th Jul 2020
+" Last Update:  08th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 "
 " History: {{{2
+"       v5.3.1
+"       (*) ENH: Add lh#option#update()
 "       v4.0.0
 "       (*) ENH: lh#option#get() functions evolve to support new `p:` project
 "           variables
@@ -369,6 +371,26 @@ function! lh#option#add(name,values)
   let new = filter(values, 'match(old, escape(v:val, "\\*.")) < 0')
   let val = join(old+new, ',')
   exe 'let &'.a:name.' = val'
+endfunction
+
+" Function: lh#option#update(bid, varname, value) {{{3
+function! lh#option#update(bid, varname, value) abort
+  if     a:value =~ '^+='
+    let lValue = split(getbufvar(a:bid, a:varname), ',')
+    call lh#list#push_if_new_elements(lValue, split(a:value[2:], ','))
+    let value = join(lValue, ',')
+  elseif a:value =~ '^-='
+    let lValue = split(getbufvar(a:bid, a:varname), ',')
+    let toRemove = split(a:value[2:], ',')
+    call filter(lValue, 'index(toRemove, v:val) >= 0')
+    let value = join(lValue, ',')
+  elseif a:value =~ '^='
+    let value = a:value[1:]
+  else
+    let value = a:value
+  endif
+  call s:Verbose('setlocal{%1} %2%3 -> %4', a:bid, a:varname, a:value, value)
+  call setbufvar(a:bid, a:varname, value)
 endfunction
 
 " Functions }}}1

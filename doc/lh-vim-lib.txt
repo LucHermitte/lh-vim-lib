@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.3.0)
-                        For Vim version 7+      Last change: 05th Jan 2021
+*lh-vim-lib.txt*        Vim common libraries (v5.3.1)
+                        For Vim version 7+      Last change: 08th Mar 2021
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -114,6 +114,7 @@ Option related functions:                               |lhvl#option|     {{{2
 - |lh#option#getbufglobvar()|
 - |lh#option#is_set()|
 - |lh#option#is_unset()|
+- |lh#option#update()|
 - |lh#ft#option#get()|
 - |lh#ft#option#get_postfixed()|
 - |lh#ft#option#get_all()|
@@ -1370,6 +1371,23 @@ This function will permit to test whether an option is set or not: >
     Assert lh#option#is_unset(lh#option#getbufvar('%', 'foobar'))
     let b:foobar = 1
     Assert lh#option#is_set(lh#option#getbufvar('%', 'foobar'))
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#option#update()*              {{{3
+lh#option#update({bid}, {varname}, {value})~
+@param {bid} buffer id
+@param {varname} Name of the option to update
+@param {value}   Assignment to apply to the option
+@since version 5.3.1
+
+Examples: >
+   call lh#option#update(bufnr('%'), '&tags',    '+=~/tags,/opt/some/project/tags')
+   call lh#option#update(bufnr('%'), '&isfname', '+={,}')
+   call lh#option#update(bufnr('%'), '&isfname', '-==')
+   call lh#option#update(bufnr('%'), '&cindent', '=1') " or:
+   call lh#option#update(bufnr('%'), '&cindent', '1')  " without the "="
+   call lh#option#update(bufnr('%'), 'foo',      '=somevalue')      " b:foo
+   call lh#option#update(bufnr('%'), 'bar',      '=someothervalue') " b:bar
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#ft#option#get()*              {{{3

@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/object.vim                    {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.2.2.
-let s:k_version = '522'
+" Version:      5.3.1.
+let s:k_version = '531'
 " Created:      08th Mar 2017
-" Last Update:  26th Sep 2020
+" Last Update:  08th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -253,34 +253,15 @@ function! s:update(varname, value, ...) dict abort " {{{2
   return 0
 endfunction
 
-function! s:do_update_option(bid, varname, value) abort " {{{2
-  if     a:value =~ '^+='
-    let lValue = split(getbufvar(a:bid, a:varname), ',')
-    call lh#list#push_if_new_elements(lValue, split(a:value[2:], ','))
-    let value = join(lValue, ',')
-  elseif a:value =~ '^-='
-    let lValue = split(getbufvar(a:bid, a:varname), ',')
-    let toRemove = split(a:value[2:], ',')
-    call filter(lValue, 'index(toRemove, v:val) >= 0')
-    let value = join(lValue, ',')
-  elseif a:value =~ '^='
-    let value = a:value[1:]
-  else
-    let value = a:value
-  endif
-  call s:Verbose('setlocal{%1} %2%3 -> %4', a:bid, a:varname, a:value, value)
-  call setbufvar(a:bid, a:varname, value)
-endfunction
-
 function! s:_update_option(varname, ...) dict abort " {{{2
   call lh#assert#value(a:varname[0]).differ('&')
   let value = self.options[a:varname]
   call s:Verbose('%1._update_option(%2 <- %3)', self.name, a:varname, value)
   if a:0 == 0
     " Apply to all buffers
-    cal map(copy(self.buffers), 's:do_update_option(v:val, "&".a:varname, value)')
+    cal map(copy(self.buffers), 'lh#option#update(v:val, "&".a:varname, value)')
   else
-    call s:do_update_option(a:1, '&'.a:varname, value)
+    call lh#option#update(a:1, '&'.a:varname, value)
   endif
 endfunction
 
