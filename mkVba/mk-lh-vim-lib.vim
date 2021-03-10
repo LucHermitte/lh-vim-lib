@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	5.3.1
-let s:version = '5.3.1'
+" Version:	5.3.2
+let s:version = '5.3.2'
 " Created:	06th Nov 2007
-" Last Update:  23rd Feb 2021
+" Last Update:  10th Mar 2021
 "------------------------------------------------------------------------
 cd <sfile>:p:h
 try
