@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	4.0.0
-let s:k_version = 400
+" Version:	5.3.2
+let s:k_version = 5.3.2
 " Created:	05th Sep 2007
-" Last Update:	17th Oct 2018
+" Last Update:	10th Mar 2021
 "------------------------------------------------------------------------
 " Description:	«description»
 "
@@ -75,6 +75,11 @@ function! lh#syntax#debug(expr) abort
   return eval(a:expr)
 endfunction
 
+" # Misc {{{2
+function! s:getSID() abort
+  return eval(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_getSID$'))
+endfunction
+let s:k_script_name      = s:getSID()
 
 "=============================================================================
 " ## Functions {{{1
@@ -310,7 +315,6 @@ function! s:getline_not_matching(linenr) dict abort " {{{4
   return res
 endfunction
 
-let s:k_script_name = expand('<sfile>:p')
 function! lh#syntax#line_filter(syn_pattern) abort " {{{4
   let obj = lh#object#make_top_type({})
   let obj.pattern = a:syn_pattern
