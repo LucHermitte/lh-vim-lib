@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.5.0
-let s:k_version = 450
+" Version:      5.3.3
+let s:k_version = 533
 " Created:      21st Feb 2008
-" Last Update:  18th Jun 2018
+" Last Update:  20th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that help managing various encodings
 "
 "------------------------------------------------------------------------
 " History:
+"       v5.3.3
+"       (*) ENH: Make length optional in `lh#encoding#strpart()`
 "       v4.5.0
 "       (*) ENH: Add functions to detect available glyphs
 "       v3.6.1
@@ -93,14 +95,18 @@ endfunction
 " @param p 0-indexed position
 " @param l length of the string to extract
 if exists('*strcharpart')
-  function! lh#encoding#strpart(mb_string, p, l)
+  function! lh#encoding#strpart(...)
     " call lh#assert#value(lh#encoding#strlen(a:mb_string)).is_ge(a:p+a:l)
-    return strcharpart(a:mb_string, a:p, a:l)
+    return call('strcharpart', a:000)
   endfunction
 else
-  function! lh#encoding#strpart(mb_string, p, l)
+  function! lh#encoding#strpart(mb_string, p, ...)
     " call lh#assert#value(lh#encoding#strlen(a:mb_string)).is_ge(a:p+a:l)
-    return matchstr(a:mb_string, '.\{,'.a:l.'}', 0, a:p+1)
+    if a:0 > 0
+      return matchstr(a:mb_string, '.\{,'.a:1.'}', 0, a:p+1)
+    else
+      return matchstr(a:mb_string, '.*', 0, a:p+1)
+    endif
   endfunction
 endif
 
