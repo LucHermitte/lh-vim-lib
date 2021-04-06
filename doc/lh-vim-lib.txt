@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.3.1)
-                        For Vim version 7+      Last change: 08th Mar 2021
+*lh-vim-lib.txt*        Vim common libraries (v5.3.3)
+                        For Vim version 7+      Last change: 07th Apr 2021
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -555,8 +555,10 @@ Defines a |mapping| from:
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#mapping#plug()*               {{{3
-lh#mapping#plug(keybinding, name, modes)~
+lh#mapping#plug(keybinding, name, modes [, extra_map_dict])~
 lh#mapping#plug(map_dict, modes)~
+@param {map-dict} dictionary with the same keys as |maparg()| result.
+
 Helper function to define in one go several default and unique mappings for a
 plug mapping.
 
@@ -564,6 +566,13 @@ For all the mode specified, it's equivalent to: >
     if !hasmapto(name, mode) && (mapcheck(keybinding, mode) == "")
         exe mode.'map <silent> <unique> '.keybinding.' '.name
     endif
+
+Example: >
+    " 1st overload
+    call lh#mapping#plug('<C-F3>',   '<Plug>(search-word)',             'nx')
+    call lh#mapping#plug('<C-S-F3>', '<Plug>(search-word-interactive)', 'nx', {'silent': 0})
+    " 2nd overload
+    call lh#mapping#plug({'lhs': '<C-F3>',  'rhs': '<Plug>(search-word)'}, 'nx')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#mapping#reinterpret_escaped_char()* {{{3

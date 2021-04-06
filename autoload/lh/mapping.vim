@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	5.3.0
-let s:version = '5.3.0'
+" Version:	5.3.3
+let s:version = '5.3.3'
 " Created:      01st Mar 2013
-" Last Update:  06th Jan 2021
+" Last Update:  07th Apr 2021
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -151,11 +151,15 @@ endfunction
 " Function: lh#mapping#plug(map_definition, modes)
 call lh#mapping#clear()
 function! lh#mapping#plug(...) abort
+  let mapping = {'silent': 1, 'unique': 1}
   if type(a:1) == type({})
-    let mapping = extend(a:1, {'silent': 1, 'unique': 1})
+    let mapping = extend(mapping, a:1, "force")
     let modes = split(a:2, '\zs')
   else
-    let mapping = {'silent': 1, 'unique': 1, 'lhs': a:1, 'rhs': a:2}
+    if a:0 >= 4 && type(a:4) == type({})
+      let mapping = extend(mapping, a:4, "force")
+    endif
+    let mapping = extend(mapping, {'lhs': a:1, 'rhs': a:2})
     let modes = split(a:3, '\zs')
   endif
 
