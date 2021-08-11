@@ -2,10 +2,10 @@
 " File:         autoload/lh/ui.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.4
-let s:k_version = '40604'
+" Version:      5.3.3
+let s:k_version = '50303'
 " Created:      03rd Jan 2017
-" Last Update:  11th Aug 2021
+" Last Update:  12th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
