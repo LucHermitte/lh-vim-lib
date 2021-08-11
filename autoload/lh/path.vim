@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.3.1
-let s:k_version = 50301
+" Version:      5.3.3
+let s:k_version = 50303
 " Created:      23rd Jan 2007
-" Last Update:  23rd Feb 2021
+" Last Update:  12th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -123,6 +123,9 @@ let s:k_version = 50301
 "       (*) ENH: Returns the number of handled files in permission list
 "       v5.3.1
 "       (*) BUG: Fix `lh#path#select()` when cancelling through escape
+"       v5.3.3
+"       (*) ENH: Change `lh#path#new_permission_lists().handle_file()` default
+"           to "Always"
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -862,7 +865,7 @@ function! s:lists_handle_file(file, permission) dict abort
     call s:Verbose('Path %1 has already been validated for this session.', a:file)
     " TODO: add a way to remove pathnames from validated list
   elseif a:permission == 'asklist'
-    let choice = lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Yes\n&No\n&Always\nNe&ver", 1)
+    let choice = lh#ui#confirm('Do you want to '. self._action_name. ' "'.a:file.'"?', "&Once\n&No\n&Always\nNe&ver", 3)
     if choice == 3 " Always
       call s:Verbose("Add %1 to current session whitelist", a:file)
       call lh#path#munge(self.valided_paths, a:file)
