@@ -5,7 +5,7 @@
 " Version:      4.6.4
 let s:k_version = '40604'
 " Created:      03rd Jan 2017
-" Last Update:  25th Mar 2019
+" Last Update:  11th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -176,7 +176,7 @@ endfunction
 
 " Function: lh#ui#confirm(text [, choices [, default [, type]]]) {{{3
 function! lh#ui#confirm(text, ...) abort
-  if a:0 > 4 " {{{5
+  if a:0 > 4
     throw "lh#ui#confirm(): too many parameters"
     return 0
   endif
@@ -417,10 +417,10 @@ function! s:confirm_impl(box, text, ...) abort " {{{2
   endif
 endfunction
 
-" Function: s:status_line(current, hl [, choices] ) {{{2
+" Function: s:status_line(prompt, current, hl [, choices] ) {{{2
 "     a:current: current item
 "     a:hl     : Generic, Warning, Error
-function! s:status_line(current, hl, ...) abort
+function! s:status_line(prompt, current, hl, ...) abort
   " Highlightning {{{3
   if     a:hl == "Generic"  | let hl = '%1*'
   elseif a:hl == "Warning"  | let hl = '%2*'
@@ -443,7 +443,11 @@ function! s:status_line(current, hl, ...) abort
     let i +=  1
   endwhile
   " }}}3
-  return sl_choices
+
+  " Display the prompt only if it fits
+  let maw_width = winwidth('%')
+  let raw_msg = a:prompt . join(a:000, ' ')
+  return lh#encoding#strlen(raw_msg) >= maw_width ? sl_choices : a:prompt.sl_choices
 endfunction
 
 " Function: s:confirm_text(box, text [, choices [, default [, type]]]) {{{2
@@ -540,7 +544,7 @@ function! s:confirm_text(box, text, ...) abort
       " Note: unfortunately the 'statusline' is a global option, {{{
       " not a local one. I the hope that may change, as it does not provokes any
       " error, I use '&l:statusline'. }}}
-      exe 'let &l:statusline=s:status_line(i, type,'. list_choices .')'
+      exe 'let &l:statusline=s:status_line('.string(a:text).', i, type,'. list_choices .')'
       if has(':redrawstatus')
         redrawstatus!
       else
