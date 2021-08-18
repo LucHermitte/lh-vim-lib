@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/object.vim                    {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.3.1.
-let s:k_version = '531'
+" Version:      5.3.13
+let s:k_version = '533'
 " Created:      08th Mar 2017
-" Last Update:  08th Mar 2021
+" Last Update:  18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -324,13 +324,11 @@ endfunction
 function! s:exists(varname) dict abort " {{{2
   let r0 = lh#dict#get_composed(self.variables, a:varname)
   if lh#option#is_set(r0)
-    " may need to interpret a reference lh#ref('g:variable')
     return 1
   else
     for p in self.parents
-      let r = p.get(a:varname)
-      if lh#option#is_set(r) | return 1 | endif
-      unlet! r
+      let r = p.exists(a:varname)
+      if r | return 1 | endif
     endfor
   endif
   return 0
