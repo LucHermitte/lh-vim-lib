@@ -5,7 +5,7 @@
 " Version:      4.0.0.
 let s:k_version = '400'
 " Created:      10th Sep 2016
-" Last Update:  08th Mar 2017
+" Last Update:  18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Tests for lh#project
@@ -22,10 +22,10 @@ let s:cpo_save=&cpo
 set cpo&vim
 
 " ## Dependencies {{{1
-runtime autoload/lh/project.vim
 runtime autoload/lh/let.vim
 runtime autoload/lh/option.vim
 runtime autoload/lh/os.vim
+runtime autoload/lh/project.vim
 
 let cleanup = lh#on#exit()
       \.restore('g:force_reload_lh_project')
@@ -46,7 +46,7 @@ function! s:Setup() " {{{2
         \.restore('s:prj_varname')
         \.restore('g:lh#project.auto_discover_root')
         " \.register({-> lh#project#list#_restore(s:prj_list)})
-  let g:lh#project = { 'auto_discover_root': 'no' }
+  LetTo g:lh#project.auto_discover_root = 'no'
   if exists('b:'.s:prj_varname)
     exe 'unlet b:'.s:prj_varname
   endif
