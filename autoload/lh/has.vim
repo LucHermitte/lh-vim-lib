@@ -2,10 +2,10 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.2.2
-let s:k_version = '50202'
+" Version:      5.3.3
+let s:k_version = '50303'
 " Created:      02nd Sep 2016
-" Last Update:  19th Nov 2020
+" Last Update:  18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -78,12 +78,18 @@ function! lh#has#lambda() abort
   return has("lambda")
 endfunction
 
+" Function: lh#has#methods()              {{{3
+" @since version 5.3.3
+function! lh#has#methods() abort
+  return lh#has#patch("patch-8.1.1987")
+endfunction
+
 " Function: lh#has#partials()             {{{3
 function! lh#has#partials() abort
   return lh#has#patch("patch-7.4.1558")
 endfunction
 
-" Function: lh#has#properties_in_qf() {{{3
+" Function: lh#has#properties_in_qf()     {{{3
 " @since v 4.5.0
 function! lh#has#properties_in_qf() abort
   return lh#has#patch("patch-7.4.2200")
@@ -95,7 +101,7 @@ function! lh#has#redo() abort
   return has('patch-7.4.849')
 endfunction
 
-" Function: lh#has#setqflist_lines() {{{3
+" Function: lh#has#setqflist_lines()      {{{3
 function! lh#has#setqflist_lines() abort
   return has('patch-8.0.1031')
 endfunction
@@ -105,7 +111,7 @@ function! lh#has#vkey() abort
   return lh#has#patch('patch-7.2-295')
 endfunction
 
-" Function: lh#has#writefile_append() {{{3
+" Function: lh#has#writefile_append()     {{{3
 " @since v 4.6.0
 function! lh#has#writefile_append() abort
   return has('patch-7.4.503')
