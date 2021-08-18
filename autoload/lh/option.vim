@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.3.1
-let s:k_version = 50301
+" Version:      5.3.3
+let s:k_version = 50303
 " Created:      24th Jul 2004
-" Last Update:  08th Mar 2021
+" Last Update:  18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 "
 " History: {{{2
+"       v5.3.3
+"       (*) REFACT: Small improvments in `lh#option#get()`
 "       v5.3.1
 "       (*) ENH: Add lh#option#update()
 "       v4.0.0
@@ -131,30 +133,38 @@ endfunction
 " The order of the variables checked can be specified through the optional
 " argument {scope}
 function! lh#option#get(names,...) abort
-  let sScopes = (a:0 == 2) ? a:2 : 'bpg'
+  let names   = type(a:names) == type([]) ? a:names : [a:names]
+  let sScopes = get(a:, 2, 'bpg')
   let lScopes = split(sScopes, '\zs')
-  let names = type(a:names) == type([]) ? a:names : [a:names]
+
   for scope in lScopes
-    for name in names
-      if scope == 'p'
-            \ && exists('*lh#project#_get') " the contrary means: no option associated to any project
-        let r = lh#project#_get(name)
-        if lh#option#is_set(r)
-          call s:Verbose('p:%1 found -> %2', name, r)
-          return lh#ref#is_bound(r) ? r.resolve() : r
-        endif
-      elseif exists(scope.':'.name)
-        " \ && (0 != strlen({scope}:{name}))
-        " "return" syntax doesn't work with dictionaries -> "!exe"
-        " return {scope}:{name}
+    if scope == 'p'
+      if exists('*lh#project#_get')
+            \ && lh#project#is_in_a_project() " no _get means: no option associated to any project
+        for name in names
+          let r = lh#project#_get(name)
+          if lh#option#is_set(r)
+            call s:Verbose('p:%1 found -> %2', name, r)
+            return lh#ref#is_bound(r) ? r.resolve() : r
+          endif
+        endfor
+        " else: continue: do not try to check p: dictionary as it doesn't exist
+      endif
+    else
+      let names_in_scope = filter(copy(names), 'exists(scope.":".v:val)')
+      if !empty(names_in_scope)
+        let name = names_in_scope[0]
         exe 'let l:Value='.scope.':'.name
         call s:Verbose('%1:%2 found -> %3', scope, name, l:Value)
         return lh#ref#is_bound(l:Value) ? l:Value.resolve() : l:Value
       endif
-    endfor
+    endif
   endfor
-  return a:0 > 0 ? (a:1) : lh#option#unset('unknown option: ('.sScopes.'):'.(len(names)==1 ? names[0] : string(names)))
+  return a:0 > 0
+        \ ? (a:1)
+        \ : lh#option#unset('unknown option: ('.sScopes.'):'.(len(names)==1 ? names[0] : string(names)))
 endfunction
+
 function! lh#option#Get(names,default,...)
   let scope = (a:0 == 1) ? a:1 : 'bg'
   return lh#option#get(a:names, a:default, scope)
