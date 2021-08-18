@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/master/tree/License.md>
-" Version:      4.0.0
-let s:k_version = 400
+" Version:      5.3.3.
+let s:k_version = 533
 " Created:      05th Oct 2009
-" Last Update:  08th Dec 2017
+" Last Update:  18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 " Notes:
@@ -103,13 +103,13 @@ function! lh#ft#option#get_all(varname, ...) abort
   let ft = get(a:, '1', &ft)
   let fts = map(lh#ft#option#inherited_filetypes(ft), 'v:val."_"') + ['']
   call map(fts, 'v:val.a:varname')
-  let scopes = ['b:', 'p:', 'g:']
+  let scopes = ['b', 'p', 'g']
   let res = {}
   let rs = []
   for s in scopes
     let scope_res = map(copy(fts), 'lh#option#get(v:val, s:k_unset, s)')
     call filter(scope_res, 'lh#option#is_set(v:val)')
-    call s:Verbose('%1%2 -> %3', s, fts, scope_res)
+    call s:Verbose('%1:%2 -> %3', s, fts, scope_res)
     let rs += scope_res
   endfor
   " The specialized results are sorted from most specialized to more generic

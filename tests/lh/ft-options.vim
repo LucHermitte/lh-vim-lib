@@ -1,13 +1,13 @@
 "=============================================================================
-" File:		tests/lh/dev-option.vim                           {{{1
-" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+" File:		tests/lh/ft-options.vim                           {{{1
+" Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/master/tree/License.md>
-" Version:      4.0.0
-let s:k_version = 400
+" Version:      5.3.3.
+let s:k_version = 533
 " Created:	05th Oct 2009
-" Last Update:	08th Mar 2017
+" Last Update:	18th Aug 2021
 "------------------------------------------------------------------------
 " Description:
 "       Test lh#ft#options#*() functions
