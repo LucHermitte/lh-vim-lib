@@ -2,10 +2,10 @@
 " File:         autoload/lh/ui.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.3.3
-let s:k_version = '50303'
+" Version:      5.4.0
+let s:k_version = '50400'
 " Created:      03rd Jan 2017
-" Last Update:  12th Aug 2021
+" Last Update:  13th Jun 2022
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -222,26 +222,14 @@ endfunction
 
 " Function: lh#ui#which(function, prompt, choice [, ... ]) {{{3
 function! lh#ui#which(fn, prompt, ...) abort
-  " 1- Check parameters {{{4
-  " build the parameters string {{{5
-  let i = 1
-  while i <= a:0
-    if i == 1
-      if type(a:1) == type([])
-        let choices = a:1
-      else
-        let choices = split(a:1, "\n")
-      endif
-      let params = 'a:{1}'
-    else      | let params .=  ',a:{'.i.'}'
-    endif
-    let i +=  1
-  endwhile
-  " 2- Execute the function {{{4
-  exe 'let which = '.a:fn.'(a:prompt,'.params.')'
+  let params = copy(a:000)
+  if type(params[0]) != type([])
+    let params[0] = split(params[0], "\n")
+  endif
+  let which = call(a:fn, [a:prompt] + params)
   if     0 >= which | return ''
   else
-    return substitute(choices[which-1], '&', '', '')
+    return substitute(params[0][which-1], '&', '', '')
   endif
 endfunction
 
@@ -387,33 +375,25 @@ function! s:confirm_impl(box, text, ...) abort " {{{2
   " 1- Check parameters {{{3
   call lh#assert#value(a:0).is_le(4)
   " build the parameters string {{{4
-  let i = 1
-  while i <= a:0
-    if i == 1
-      if type(a:1) == type([])
-        let params = string(join(a:1, "\n"))
-      else
-        let params = 'a:{1}'
-      endif
-    else      | let params .= ',a:{'.i.'}'
-    endif
-    let i +=  1
-  endwhile
+  let params = copy(a:000)
+  if type(params[0]) == type([])
+    let params[0] = join(params[0], "\n")
+  endif
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
   if o !~ '\v^(g%[ui]|t%[ext]|v%[te])$'
     call lh#notify#once("lh#ui#confirm(): Unkonwn user-interface style (".o.")")
   endif
   if     o =~ '\vf%[te]'                                                                                        " {{{4
-    exe 'return s:confirm_fte(a:text,'.params.')'
+    return call('s:confirm_fte', [a:text]+params)
   elseif o =~ '\vg%[ui]' && has('gui_running')                                                                  " {{{4
-    exe 'return confirm(a:text,'.params.')'
+    return call('confirm', [a:text]+params)
   elseif o =~ '\v(t%[ext]|g%[ui])' && has('dialog_con') && s:Opt_confirm_type() == 'std' && !has('gui_running') " {{{4
     " confirm() in plain Vim doesn't work that well => permit to override it
     " with a version that works well
-    exe 'return confirm(a:text,'.params.')'
+    return call('confirm', [a:text]+params)
   else                                                                                                          " {{{4
-    exe 'return s:confirm_text(a:box, a:text,'.params.')'
+    return call('s:confirm_text', [a:box, a:text]+params)
   endif
 endfunction
 
@@ -467,11 +447,7 @@ function! s:confirm_text(box, text, ...) abort
 
   " 2- Retrieve the proposed choices {{{3
   " Prepare the hot keys
-  let i = 0
-  while i != 26
-    let hotkey_{nr2char(i+65)} = 0
-    let i += 1
-  endwhile
+  let hotkeys_ = lh#list#zip_as_dict(map(range(26), {_,v -> nr2char(v+65)}), repeat([0], 26))
   let hotkeys = '' | let help_k = '/'
   " Parse the choices
   let i = 0
@@ -495,7 +471,7 @@ function! s:confirm_text(box, text, ...) abort
     " Update the hotkey.
     if choice_{i} =~ '&[A-Za-z]'
       let key = toupper(matchstr(choice_{i}, '&\zs.\ze'))
-      let hotkey_{key} = i
+      let hotkeys_[key] = i
       let hotkeys .=  tolower(key) . toupper(key)
       let help_k .=  tolower(key)
     endif
@@ -583,7 +559,7 @@ function! s:confirm_text(box, text, ...) abort
           let direction = -1
         elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
           if '' == complType  | continue | endif
-          let direction = hotkey_{toupper(complType)} - i
+          let direction = hotkey_[toupper(complType)] - i
           let toggle = 1
           " else
         endif
