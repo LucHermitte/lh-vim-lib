@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:      4.5.0
-let s:version = '4.5.0'
+" Version:      5.4.0
+let s:version = '5.4.0'
 " Created:      03rd Jan 2011
-" Last Update:  02nd Nov 2020
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Helpers functions to build |ins-completion-menu|
@@ -166,14 +166,18 @@ function! lh#icomplete#new(startcol, matches, hook) abort
         \.restore('&l:completefunc')
         \.restore('&l:complete')
         \.restore('&l:omnifunc')
-        \.restore('&completeopt')
         \.register('au! '.augroup)
         \.register('call s:Verbose("finalized! (".getline(".").")")')
   setlocal complete=
   " TODO: actually, remove most options but preview
-  set completeopt-=menu
-  set completeopt-=longest
-  set completeopt+=menuone
+  " Let's try to trigger any event on 'completeopt' that could be detected by COC
+  let completeopt0 = split(&completeopt, ',')
+  let completeopt = filter(copy(completeopt0), 'v:val != "menu" && v:val != "longest"')
+  call lh#list#push_if_new(completeopt, 'menuone')
+  if completeopt != completeopt0
+    call b:complete_data.restore('&completeopt')
+    let &completeopt = completeopt
+  endif
   let b:complete_data.startcol        = a:startcol
   let b:complete_data.all_matches     = map(copy(a:matches), 'type(v:val)==type({}) ? v:val : {"word": v:val}')
   let b:complete_data.matches         = {'words': [], 'refresh': 'always'}
@@ -183,7 +187,7 @@ function! lh#icomplete#new(startcol, matches, hook) abort
   let b:complete_data.no_more_matches = 0
   call lh#log#clear()
 
-  if has('patch-7.4-314')
+  if has('patch-7.4.314')
     " Neutralize messages like "Match 1 of 7"/"Back at original"
     call b:complete_data
         \.restore('&shortmess')

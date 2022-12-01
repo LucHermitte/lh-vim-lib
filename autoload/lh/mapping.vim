@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:	5.3.3
-let s:version = '5.3.3'
+" Version:	5.4.0
+let s:version = '5.4.0'
 " Created:      01st Mar 2013
-" Last Update:  07th Apr 2021
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -142,7 +142,7 @@ function! lh#mapping#clear() abort
   let s:issues_notified.x = {}
   let s:issues_notified.l = {}
   let s:issues_notified.t = {}
-  if has("patch-7.4-1707")
+  if has("patch-7.4.1707")
     let s:issues_notified[''] = {}
   endif
 endfunction

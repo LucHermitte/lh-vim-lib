@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.2
-let s:k_version = 50202
+" Version:      5.4.0
+let s:k_version = 50400
 " Created:      17th Apr 2007
-" Last Update:  10th Nov 2020
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to |Lists|
@@ -481,8 +481,8 @@ endfunction
 " - default: string cmp
 " - 'n' -> number comp
 " - 'N' -> number comp, but on strings
-let s:k_has_num_cmp = has("patch-7.4-341")
-let s:k_has_fixed_str_cmp = has("patch-7.4-411")
+let s:k_has_num_cmp = has("patch-7.4.341")
+let s:k_has_fixed_str_cmp = has("patch-7.4.411")
 let s:k_has_list_num_cmp = 0
 " For testing purposes...
 " let s:k_has_num_cmp = 0

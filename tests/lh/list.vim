@@ -6,7 +6,7 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
 " Version:      4.7.0
 " Created:	19th Nov 2008
-" Last Update:  02nd Sep 2019
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/list.vim
@@ -382,7 +382,7 @@ function! s:Test_possible_values_list_list()
   AssertEquals (lh#list#possible_values(list, 0), range(8))
   AssertEquals (lh#list#possible_values(list, 1), ['a', 'b', 'c', 15, 42, 8])
   " OK, this line is odd, but it works!
-  if has("patch-7.4-411")
+  if has("patch-7.4.411")
     " It'll fail with vim 7.3, but I don't care
     AssertEquals (lh#list#possible_values(list, 3), [ 12, [], lh#option#unset()])
   endif

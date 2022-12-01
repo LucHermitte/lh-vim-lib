@@ -2,11 +2,11 @@
 " File:         autoload/lh/log.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.00.0.
-" let s:k_version = '4000'
-let s:k_version = '4000'
+" Version:      5.4.0.
+" let s:k_version = '5040'
+let s:k_version = '5040'
 " Created:      23rd Dec 2015
-" Last Update:  25th May 2018
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Logging facilities
@@ -95,7 +95,7 @@ function! lh#log#new(where, kind) abort
   function! s:add_qf(msg) abort dict
     call setqflist([a:msg], 'a')
   endfunction
-  if has('patch-7.4-503')
+  if has('patch-7.4.503')
     function! s:add_file(msg) abort dict
       call writefile([lh#fmt#printf("%1:%2: %3", get(a:msg,'filename', ''), get(a:msg,'lnum', ''), a:msg.text)], self.where, 'a')
     endfunction
