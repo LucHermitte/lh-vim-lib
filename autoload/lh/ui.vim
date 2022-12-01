@@ -5,7 +5,7 @@
 " Version:      5.4.0
 let s:k_version = '50400'
 " Created:      03rd Jan 2017
-" Last Update:  13th Jun 2022
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -223,7 +223,7 @@ endfunction
 " Function: lh#ui#which(function, prompt, choice [, ... ]) {{{3
 function! lh#ui#which(fn, prompt, ...) abort
   let params = copy(a:000)
-  if type(params[0]) != type([])
+  if type(params[0]) != type([]) && a:fn != 'confirm'
     let params[0] = split(params[0], "\n")
   endif
   let which = call(a:fn, [a:prompt] + params)
@@ -559,7 +559,7 @@ function! s:confirm_text(box, text, ...) abort
           let direction = -1
         elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
           if '' == complType  | continue | endif
-          let direction = hotkey_[toupper(complType)] - i
+          let direction = hotkeys[toupper(complType)] - i
           let toggle = 1
           " else
         endif
