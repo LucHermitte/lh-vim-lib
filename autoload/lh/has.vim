@@ -2,10 +2,10 @@
 " File:         autoload/lh/has.vim                               {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.3.3
-let s:k_version = '50303'
+" Version:      5.4.0
+let s:k_version = '50400'
 " Created:      02nd Sep 2016
-" Last Update:  18th Aug 2021
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Synthetize compatibility options.
@@ -108,7 +108,7 @@ endfunction
 
 " Function: lh#has#vkey()                 {{{3
 function! lh#has#vkey() abort
-  return lh#has#patch('patch-7.2-295')
+  return lh#has#patch('patch-7.2.295')
 endfunction
 
 " Function: lh#has#writefile_append()     {{{3
