@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.3.3
-let s:k_version = 50303
+" Version:      5.4.0
+let s:k_version = 50400
 " Created:      24th Jul 2004
-" Last Update:  18th Aug 2021
+" Last Update:  07th Feb 2023
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -400,7 +400,14 @@ function! lh#option#update(bid, varname, value) abort
     let value = a:value
   endif
   call s:Verbose('setlocal{%1} %2%3 -> %4', a:bid, a:varname, a:value, value)
-  call setbufvar(a:bid, a:varname, value)
+  try
+    call setbufvar(a:bid, a:varname, value)
+  catch /E21.*/
+    " trap and ignore exceptions about "set ff=xxx" when the buffer is
+    " non-modiable
+    " pass
+    call s:Verbose('IGNORE E21 on non-modifiable buffer: setlocal{%1} %2%3 -> %4', a:bid, a:varname, a:value, value)
+  endtry
 endfunction
 
 " Functions }}}1
