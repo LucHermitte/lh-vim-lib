@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:      5.2.2.
-let s:k_version = '522'
+" Version:      5.4.0.
+let s:k_version = '540'
 " Created:      26th Jun 2018
-" Last Update:  18th Nov 2020
+" Last Update:  01st Dec 2022
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions related to quickfix feature
@@ -153,7 +153,7 @@ endif
 
 " Function: lh#qf#get_winnr()        {{{3
 " @since V4.5.0
-if lh#has#patch('patch-7.4-2215') " && exists('*getwininfo')
+if lh#has#patch('patch-7.4.2215') " && exists('*getwininfo')
   function! lh#qf#get_winnr() abort
     let wins = filter(getwininfo(), 'v:val.quickfix && !v:val.loclist')
     " assert(len(wins) <= 1)
