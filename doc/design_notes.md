@@ -1,15 +1,26 @@
 # Design Notes
 
 * [Scope](#scope)
+* [Good practices](#good-practices)
+   * [Function definitions](#function-definitions)
+        * [Where shall we define functions?](#where-shall-we-define-functions)
+            * [Script-local functions](#script-local-functions)
+            * [Library functions](#library-functions)
+            * [Functions that don't need to be defined when Vim starts](#functions-that-dont-need-to-be-defined-when-vim-starts)
+        * [Signature](#signature)
+            * [bang -> `:function!`](#bang---function)
+            * [`abort`](#abort)
 * [Regarding debugging and maintenance](#regarding-debugging-and-maintenance)
     * [Debugging](#debugging)
         * [Debugging loops](#debugging-loops)
     * [Code instrumentation (Logs and global variables)](#code-instrumentation-logs-and-global-variables)
         * [Variables](#variables)
         * [Logs](#logs)
+        * [Warnings](#warnings)
     * [Design by Contract](#design-by-contract)
     * [Unit Testing](#unit-testing)
     * [`:WTF`](#wtf)
+    * [Plugin reloading](#plugin-reloading)
 * [Regarding OO](#regarding-oo)
 * [Regarding dependencies](#regarding-dependencies)
     * [1. Standalone plugins](#1-standalone-plugins)
@@ -19,7 +30,12 @@
 
 ----
 ## Scope
-TBC
+
+I will only cover the writting and maintenance of portable code across multiple
+versions of Vim, and even neovim. I won't cover
+[`Vim9-script`](http://vimhelp.appspot.com/vim9.txt.html#Vim9%2dscript) nor
+Lua.
+
 <!---
 
 common stuff used elsewhere but not programming related (lh-dev: analysing
@@ -30,14 +46,102 @@ I avoid intrusive features (commands, mappings, global functions) (->local_vimrc
 But, given the old: project-specific, `p:` were a natural extension for
 `lh#option#get()` - - finding the exact limit is sometimes complex; for instance Copen, Make...
 
-
-### Misc
-
-func abort
-
-autoload -> library
-
 -->
+
+## Good practices
+
+Here are a few good practices that I regularly share when reviewing Vim codes.
+
+### Function definitions
+
+#### Where shall we define functions?
+
+While _global-functions_ are probably the oldest, they are best avoided. The
+reason? Unless you find a convoluted naming scheme, you have no guarantee that
+other plugins won't use the same name.
+
+Most examples you'll find also use global-functions as they as the default and
+thus they don't require extra explanations about
+[local-functions](http://vimhelp.appspot.com/userfunc.txt.html#local%2dfunction)
+(the new default for Vim9!) nor
+[autoload-functions](http://vimhelp.appspot.com/userfunc.txt.html#autoload%2dfunctions)
+
+See also [Object Oriented Programming in vim scripts](OO.md) regarding
+dictionary-function.
+
+##### Script-local functions
+
+If your function is internal (it's only used to define other functions, or
+to define mappings/commands/menus/... in the same file), we can make them
+[_local_](http://vimhelp.appspot.com/userfunc.txt.html#local%2dfunction). The
+name will start with `s:`, and then, use any naming convention you fancy (the
+first letter of the function name no longer needs to be capitalized).
+
+The only drawbacks are:
+
+- The name will start with
+  [`<SID>`](http://vimhelp.appspot.com/map.txt.html#%3cSID%3e) when used from a
+  mapping.
+- They cannot be tested from other files, like for instance from
+  [Unit Testing](#unit-testing) frameworks. But as we all know, private
+  functions shall not be tested...
+
+##### Library functions
+
+Since vim7, library functions are best defined as
+[autoload-functions](http://vimhelp.appspot.com/userfunc.txt.html#autoload%2dfunctions).
+
+**Pro:**
+
+- Nice naming scheme. We can use _snake-case_ in lowercase.
+  I usually go for `{my-initials}#{plugin-name}#{function-name}`.
+- They are loaded lazily/on-demand.
+
+Note: 20ish years ago with Vim6, we either defined such functions as global
+functions in `plugin/` files (always loaded), or in `macros/` files (needed to
+be loaded explicitly), or in `ftplugin/` files (which required convoluted
+workarounds to avoid defining them multiple times).
+
+##### Functions that don't need to be defined when Vim starts
+
+Lazy function loading is the _reason d'être_ behind
+[autoload-functions](http://vimhelp.appspot.com/userfunc.txt.html#autoload%2dfunctions).
+
+They are loaded on-demand (they may never be loaded). And as long as we avoid
+crazy circular dependencies, they are perfect most of the time.
+
+Unlike script-local functions, they can be called from anywhere, and thus
+tested in Unit Testing. It's up to us to have a naming policy that says:
+_«This is a private function»_. I use Python conventions here.
+
+Nowadays, I define support functions for mappings, commands... as _protected_
+functions from autoload plugins. They as thus lazily loaded when the
+mapping/command... is executed (=> no impact on vim startup time), and
+[reloading](http://vimhelp.appspot.com/repeat.txt.html#%3asource) the vim
+script file, will permit to update the function definition.
+
+I will seldom define functions in my `.vimrc`, in `plugin/` files, `ftplugin/`
+files... It may still happen when I'm testing small things.
+
+#### Function signature
+
+##### bang -> `:function!`
+
+When I'm maintening vimscripts, I
+[reload](http://vimhelp.appspot.com/repeat.txt.html#%3asource) my files a lot.
+Really. As a consequence, my functions are always defined
+[_banged_](http://vimhelp.appspot.com/userfunc.txt.html#E127). Even if they may
+be overriden from other plugins...
+
+##### `abort`
+
+A long time ago, functions were continuing their execution even if a error has
+been detected. On the contrary, what we want 99% of the time, is for the
+execution to stop as soon an an error is encountered.
+As introducing changes in behaviour is always source of regression. It's been
+made up to us to be explicit about what we really want:
+
+**we need to append `abort` at the end of function definitions**.
 
 ----
 
