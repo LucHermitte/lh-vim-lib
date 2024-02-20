@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.3.3)
-                        For Vim version 7+      Last change: 07th Apr 2021
+*lh-vim-lib.txt*        Vim common libraries (v5.4.0)
+                        For Vim version 7+      Last change: 20th Feb 2024
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -54,6 +54,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#event#register_for_one_execution_at()|
 - |lh#exception#callstack()|
 - |lh#exception#callstack_as_qf()|
+- |lh#exception#callstack_as_qf_from()|
 - |lh#exception#decode()|
 - |lh#exception#get_callstack()|
 - |lh#file#new_cache()|
@@ -1178,7 +1179,9 @@ Returns an |lh#oo| object storing a decoded callstack (with
 This objects provides the following methods:
 - `__pop()` (internal): remove the first callsite in the callstack (useful to
   clean noise from intermediary functions)
-- `as_qf()`: return the callstack as a list compatible with |setqflist()|.
+- `as_qf()`: return the callstack as a list compatible with |setqflist()| --
+  current behaviour meant to be deprecated.
+- `as_qf_from()`: return the callstack as a list compatible with |setqflist()|.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#exception#callstack()*        {{{3
@@ -1189,7 +1192,7 @@ Decodes the {throwpoint} and returns a list of dictionaries made of:
 - "`fname`" : name of the function where the exception has been issued
 - "`offset`": Relative line number from the function first line where the
   exception....
-@see also |lh#exception#callstack_as_qf()|
+@see also |lh#exception#callstack_as_qf_from()|
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#exception#callstack_as_qf()*  {{{3
@@ -1200,6 +1203,17 @@ Entries with a `fname` field  matching `'\vlh#exception#'.{filter}` will be
 filtered out. If you plan to use this field, don't forget to prepend with
 a `/\|`, (magic mode).
 @see also |lh#exception#callstack()|
+@warning Meant to be deprecated in favour of |lh#exception#callstack_as_qf()|.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                            *lh#exception#callstack_as_qf_from()* {{{3
+lh#exception#callstack_as_qf_from({start_point} [{msg}])~
+Decodes the current callstack and returns a list of dictionaries compatible
+with |setqflist()| and |setloclist()|.
+Entries up to the one with a `fname` matching `{start_point}` will be ignored.
+Typically, pass the name of the function calling `lh#exception#callstack_as_qf_from()`.
+@see also |lh#exception#callstack()|
+@since Version 5.4.0
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                *lh#file#new_cache()*             {{{3
@@ -5169,7 +5183,7 @@ lh#assert#type({actual}).belongs_to({expected}...)              *lh#assert#type(
 
                                                                      }}}1
 ==============================================================================
- (c) Luc Hermitte, 2001-2020 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
+ (c) Luc Hermitte, 2001-2024 <http://github.com/LucHermitte/lh-vim-lib>, CC by SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:

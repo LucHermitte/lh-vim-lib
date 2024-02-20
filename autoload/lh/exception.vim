@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.1
-let s:k_version = '50201'
+" Version:      5.4.0
+let s:k_version = '50400'
 " Created:      18th Nov 2015
-" Last Update:  11th Sep 2020
+" Last Update:  20th Feb 2024
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to VimL Exceptions
@@ -180,6 +180,12 @@ else
   endfunction
 endif
 
+" Function: lh#exception#callstack_as_qf_from(start_point, [msg]) {{{3
+function! lh#exception#callstack_as_qf_from(start_point, ...) abort
+  let stack = lh#exception#get_callstack()
+  return call(stack.as_qf_from, [a:start_point]+a:000, stack)
+endfunction
+
 " Function: lh#exception#callstack_as_qf(filter, [msg]) {{{3
 function! lh#exception#callstack_as_qf(filter, ...) abort
   let stack = lh#exception#get_callstack()
@@ -187,7 +193,36 @@ function! lh#exception#callstack_as_qf(filter, ...) abort
 endfunction
 
 " Function: lh#exception#decode([throwpoint]) {{{3
+function! s:as_qf_from(start_point, ...) dict abort
+  " Search for first item after the start_point
+  let start_point = empty(a:start_point) ? 'lh#exception#' : a:start_point
+  let data = []
+  let idx = lh#list#find_if(self.callstack, 'v:val.fname =~? '.string(start_point))
+  if idx >= 0
+    let idx = min([idx+1, len(self.callstack)])
+    let data = map(copy(self.callstack)[idx : ], '{"type": "I", "filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+    " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[idx], get(a:, 1, '...'))
+    " let data[0].text = lh#fmt#printf('function %{1.fname} line %{1.offset}: %2', self.callstack[0], get(a:, 1, '...'))
+  elseif !empty(self.callstack)
+    let idx = 0
+    let data = map(copy(self.callstack), '{"type": "I", "filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
+  endif
+  if !empty(data)
+    let message =  get(a:, 1, "... (".get(self.callstack[idx],"fname", "n/a").":".get(self.callstack[idx],"offset", "?").")")
+    if type(message) == type([])
+      let data[0].text = message[0]
+      let data[0].type = message[1]
+    else
+      let data[0].text = message
+      let data[0].type = 'E'
+    endif
+  endif
+  return data
+endfunction
+
 function! s:as_qf(filter, ...) dict abort
+  " Search for for item that doesn't match lh#exception|{filter}
+  " TODO: merge/factorize w/ as_qf_from
   let data = []
   let idx = lh#list#find_if(self.callstack, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"')
   " let idx = lh#list#find_if(self.callstack, 'v:val.fname !~? "\\vlh#exception#'.a:filter.'"', 1)
@@ -199,10 +234,14 @@ function! s:as_qf(filter, ...) dict abort
     let idx = 0
     let data = map(copy(self.callstack), '{"type": "I", "filename": v:val.script, "text": "called from here (".get(v:val,"fname", "n/a").":".get(v:val,"offset", "?").")", "lnum": v:val.pos}')
   endif
-  if !empty(data)
-    let data[0].text =  get(a:, 1, "... (".get(self.callstack[idx],"fname", "n/a").":".get(self.callstack[idx],"offset", "?").")")
-    let data[0].type = 'E'
-  endif
+    let message =  get(a:, 1, "... (".get(self.callstack[idx],"fname", "n/a").":".get(self.callstack[idx],"offset", "?").")")
+    if type(message) == type([])
+      let data[0].text = message[0]
+      let data[0].type = message[1]
+    else
+      let data[0].text = message
+      let data[0].type = 'E'
+    endif
   return data
 endfunction
 
@@ -215,8 +254,9 @@ function! lh#exception#decode(...) abort
   let throwpoint = get(a:, 1, v:throwpoint)
   let callstack = lh#exception#callstack(throwpoint)
   let res = lh#object#make_top_type({'callstack': callstack})
-  let res.as_qf = function(s:getSNR('as_qf'))
-  let res.__pop = function(s:getSNR('__pop'))
+  let res.as_qf      = function(s:getSNR('as_qf'))
+  let res.as_qf_from = function(s:getSNR('as_qf_from'))
+  let res.__pop      = function(s:getSNR('__pop'))
   return res
 endfunction
 
