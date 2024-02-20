@@ -142,7 +142,7 @@ As introducing changes in behaviour is always source of regression. It's been
 made up to us to be explicit about what we really want:
 
 **we need to append
-[`:func-abort`](http://vimhelp.appspot.com/userfunc.txt.html#%3afunc%2dabort)
+[`abort`](http://vimhelp.appspot.com/userfunc.txt.html#%3afunc%2dabort)
 at the end of function definitions**.
 
 ----
