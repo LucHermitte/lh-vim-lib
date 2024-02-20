@@ -2,10 +2,10 @@
 " File:         autoload/lh/po.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.5.0.
-let s:k_version = '40500'
+" Version:      5.4.0.
+let s:k_version = '50400'
 " Created:      03rd Feb 2017
-" Last Update:  27th Jun 2018
+" Last Update:  27th Dec 2023
 "------------------------------------------------------------------------
 " Description:
 "       Utility functions to handle Portable Object messages
@@ -60,12 +60,13 @@ endfunction
 " Function: s:translate(id) {{{3
 let s:k_cached_translations = {}
 function! s:translate(id) dict abort
+  " TODO: Skip translation if LANG is English/C
   let cache = lh#dict#let(s:k_cached_translations, self._env.LANG .'.'. self._env.TEXTDOMAIN, {})
   if !has_key(cache, a:id)
     if executable('bash')
       let cache[a:id] = lh#os#system('bash -c '.shellescape('echo $"'.a:id.'"'), self._env)
     else
-      " TODO: support windows
+      " TODO: support pure windows w/o bash
       let cache[a:id] = a:id
     endif
   endif
@@ -79,7 +80,7 @@ function! lh#po#context(...) abort
   let res._env.TEXTDOMAIN    = get(a:, 1, 'vim')
   let res._env.TEXTDOMAINDIR = get(a:, 1, $VIMRUNTIME.'/lang')
   let res._env.LANG          = exists('$LC_MESSAGES') ? $LC_MESSAGES : v:lang
-  let res.translate = function(s:getSNR('translate'))
+  let res.translate          = function(s:getSNR('translate'))
   return res
 endfunction
 

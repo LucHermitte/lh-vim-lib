@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = 40604
+" Version:      5.4.0
+let s:k_version = 50400
 " Created:      10th Apr 2012
-" Last Update:  29th Oct 2018
+" Last Update:  27th Dec 2023
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -200,7 +200,10 @@ endfunction
 
 " Function: lh#os#new_runner_script(command, env) {{{3
 function! lh#os#new_runner_script(command, env) abort
-  let tmpname = tempname()
+  " Force .cmd extension as Windows's cmd.exe will only accept command
+  " files with this extension. Even with an explicit "cmd /c
+  " foobar.tmp.cmd", the .cmd extension is required.
+  let tmpname = tempname() . ".cmd"
   let result = lh#on#exit()
         \.register(':call delete('.string(tmpname).')')
   let result._script_name = tmpname
@@ -214,9 +217,19 @@ function! lh#os#new_runner_script(command, env) abort
       let result._lines += ['#!'.(env.__shebang)]
       unlet env.__shebang
     endif
-    if lh#os#OnDOSWindows() && ! lh#os#system_detected() == 'unix'
-      let result._lines += map(items(env), 'set v:val[0]."=".v:val[1]')
-    else
+    if &shell =~? '\vcmd(.exe)?$'
+      " TODO: Support powershell!
+      let result._cmd = result._script_name
+      let result._lines += ["@echo off"]
+      let result._lines += map(items(env), '"set ".v:val[0]."=".v:val[1]')
+    elseif &shell =~? 'powershell'
+      let result._cmd = result._script_name
+      let result._lines += map(items(env), '"$Env:".v:val[0]."=".s:as_string(v:val[1])')
+      " Warning, the exact command needs to be compatible with powershell!
+    else " Expecting unix like shells
+      " It seems we still need to say bash will interpret the script, and no
+      " other option (even "-c") shall be used.
+      let result._cmd = &shell . ' ' . result._script_name
       let result._lines += map(items(env), '"export ".v:val[0]."=".s:as_string(v:val[1])')
     endif
     let result._lines += type(a:command) == type([]) ? a:command : [ a:command ]
@@ -232,8 +245,8 @@ function! lh#os#new_runner_script(command, env) abort
 endfunction
 
 function! s:run_script() dict abort
-  call s:Verbose("%1", self._lines)
-  let r = system(&shell . ' ' . self._script_name)
+  call s:Verbose("execute -> %1 which contains: %2", self._cmd, self._lines)
+  let r = system(self._cmd)
   return r
 endfunction
 
