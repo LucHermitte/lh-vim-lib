@@ -320,6 +320,9 @@ Log related functions                                   |lhvl#log|        {{{2
 - |lh#log#callstack()||
 - |lh#log#exception()||
 - |lh#log#this()||
+- |Warnings|
+- |lh#warning#emit()|
+- |lh#warning#clear()|
 Version Control System functions                        |lhvl#vcs|        {{{2
 - |lh#vcs#get_svn_root()|
 - |lh#vcs#get_git_root()|
@@ -4273,6 +4276,7 @@ Sets the global logger.
                 @since v4.0.0
 
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *:LHLog*                          {{{3
 :LHLog {kind} [{where}]~
 Sets the global logger.
@@ -4364,6 +4368,33 @@ It's isn't meant to be used directly. See |lhvl-global-logger|.
 
 Typical use, see |lh#log#set_logger()|: >
     call lh#log#set_logger('none')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *:Warnings*                       {{{3
+:Warnings [clear]~
+Display the cached warnings in the |quickfix-window|. This feature has been
+inspired by |:message| but dedicated to warnings for which we could need more
+information.
+
+This offer an information level between messages, errors and failed
+assertions. Its meant to provide a better user experience while leaving room
+for investigation on plugin author side.
+
+The warning cache is:
+- filled with calls to |lh#warning#emit()|
+- and cleared on `:Warnings clear` or *lh#warning#clear()*
+
+@since Version 5.4.0
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#warning#emit()*               {{{3
+lh#warning#emit(message)~
+Emits a new warning as a coloured message.
+Also the |callstack|| is automatically recorded when calling the function.
+It's cached with the message for future display in the |quickfix-window| with
+|:Warnings|.
+
+@since Version 5.4.0
 
 ------------------------------------------------------------------------------
 VERSION CONTROL SYSTEM RELATED FUNCTIONS              *lhvl#vcs*        {{{2

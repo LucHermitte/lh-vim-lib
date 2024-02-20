@@ -30,10 +30,19 @@ I avoid intrusive features (commands, mappings, global functions) (->local_vimrc
 But, given the old: project-specific, `p:` were a natural extension for
 `lh#option#get()` - - finding the exact limit is sometimes complex; for instance Copen, Make...
 
+
+### Misc
+
+func abort
+
+autoload -> library
+
 -->
 
 ----
+
 ## Regarding debugging and maintenance
+
 Softwares have bugs, and neither lh-vim-lib nor my other plugins are exempted.
 
 Various techniques exists, and I'm using them in my plugins. These techniques
@@ -42,7 +51,8 @@ defining in lh-vim-lib.
 
 Let's have a quick tour.
 
-###  Debugging
+### Debugging
+
 Vim provides a debugger for its Vim script language. It is started with
 [`:h :debug`](http://vimhelp.appspot.com/repeat.txt.html#%3adebug). And from
 here we can display expressions with `:echo`,
@@ -64,6 +74,7 @@ that tries to work around this limitation (by running two instances of Vim,
 IIRC)
 
 #### Debugging loops
+
 Debugging loops is one of the things that annoys me the most when debugging vim
 scripts. We have to do `>next` several times, check manually the thing that
 changes (_variant_/index/element) at each iteration (as there is no possible
@@ -88,6 +99,7 @@ far as I'm concerned)
 [`reduce()`](http://vimhelp.appspot.com/eval.txt.html#reduce%28%29).
 
 ### Code instrumentation (Logs and global variables)
+
 One of the oldest alternative approach to debug consist in instrumenting our
 source code to observe what happens -- I guess this is even much older than
 debuggers.
@@ -95,6 +107,7 @@ debuggers.
 Two approaches mainly.
 
 #### Variables
+
 We can store
 [local-variables](http://vimhelp.appspot.com/eval.txt.html#local%2dvariable)
 into [global-variables](http://vimhelp.appspot.com/eval.txt.html#global%2dvariable)
@@ -109,6 +122,7 @@ This is quite efficient to store complex things like
 before a crash. It's more complex to follow the code flow with them.
 
 #### Logs
+
 Logs can start with a single
 [`:echomsg`](http://vimhelp.appspot.com/eval.txt.html#%3aechomsg). In the past
 I was even playing with
@@ -142,7 +156,26 @@ control their verbosity level. I can activate logs in one file and not the
 other. e.g. `:call lh#path#verbose(1)` (or `:Verbose pa<tab>` thanks to a small
 miscellaneous plugin I have)
 
+#### Warnings
+
+There is some room for something in between silent debug logs, and errors that
+stop the execution. _Warnings_. They make sense when we don't intend to stop
+violently the execution, but yet report that something is fishy, if not plain
+wrong.
+
+Most of the time printing in a different colour what happened is a good start.
+`lh#common#warning_msg()` does that.
+
+Sometimes, we still smell that some investigation is required and yet this
+isn't a full programming error (see next section on _design by contract_).
+That's why I've introduced `lh#warning#emit(message)`, to emit a new warning,
+and `:Warnings` to display the last warnings in their context. In other words,
+`lh#warning#emit()` records the [callstack](Callstack.md) at the point of
+emission, and `:Warning` displays the messages and the full callstack in the
+[`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow).
+
 ### Design by Contract
+
 There is a lot to say about Designing by Contract, and I've already said a lot,
 but [in French, and for C++](https://luchermitte.github.io/blog/2014/05/24/programmation-par-contrat-un-peu-de-theorie/).
 
@@ -187,6 +220,7 @@ the best tools for post-conditions. Unit tests are much better for
 post-conditions.
 
 ### Unit Testing
+
 I also have my
 [own solution for unit-testing](https://github.com/LucHermitte/vim-UT). An old one.
 
@@ -203,6 +237,7 @@ filling the quickfix-window.
 
 
 ### `:WTF`
+
 Thanks to [`:WTF`](Callstack.md#lhexceptionsay_what) I have a nice tool to
 analyse error messages and fill the
 [`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)
@@ -220,6 +255,7 @@ Also, as I try to avoid defining too many commands, mappings... in lh-vim-lib,
 whatever we want in our `.vimrc.`
 
 ### Plugin reloading
+
 TBC
 <!--
 `:Reload`
@@ -229,6 +265,7 @@ guards
 
 ----
 ## Regarding OO
+
 I delved into the subject in another document: [Object Oriented Programming in vim scripts](OO.md).
 
 
@@ -244,6 +281,7 @@ When we want to reuse a function between unrelated plugins, we have a few
 different approaches available.
 
 ### 1. Standalone plugins
+
 This is the dominant approach. Code from other plugins is copied.
 
 **pro**:
@@ -260,6 +298,7 @@ This is the dominant approach. Code from other plugins is copied.
   with different licences in the same file.
 
 ### 2. Plugins that depend on other plugins
+
 Very few plugins follow this approach. End-users have to install the plugins we
 depend upon. Dare I say this is the most professional one.
 
@@ -286,6 +325,7 @@ depend upon. Dare I say this is the most professional one.
   here.
 
 ### 3. Submodules
+
 We could also introduce our dependencies as submodules.
 
 **pro**
@@ -319,6 +359,7 @@ We could also introduce our dependencies as submodules.
     plugin depends on the same version...
 
 ### My choice on the subject
+
 I'm maintaining something like almost 20 different plugins. A long time ago
 after playing with duplicated functions, I've eventually chosen to define this
 plugin library that other plugins depend upon.
@@ -346,7 +387,6 @@ maintain our plugins.
 I've chosen to not repeat myself and to build more complex solutions by
 stacking layers of thematic and independent features -- which is far from
 being an easy feat.
-
 
   [1]: https://github.com/LucHermitte/lh-cpp#installation
   [2]: https://github.com/LucHermitte/lh-vim-lib

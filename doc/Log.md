@@ -74,28 +74,27 @@ execute
 
 ![lh-vim-lib logging framework demo](screencast-log.gif "lh-vim-lib logging framework demo")
 
-## Functions:
+## Functions
 
-| Function                           | Purpose                                                                        |
-|------------------------------------|--------------------------------------------------------------------------------|
-| `lh#log#echomsg()`                 | Returns a new logger object, that logs with `:echomsg` (internal use)          |
-| `lh#log#new()`                     | Returns a new logger object (internal use)                                     |
-| `lh#log#none()`                    | Returns a new, inactive, logger object (internal use)                          |
-| `lh#log#set_logger(kind, opts)`    | Sets the global logging policy (quickfix/loclist window, none, `echomsg`)      |
-| `lh#log#this({format}, {args...})` | Logs a formatted message with the global logger                                |
-| `lh#log#exception(...)`            | Logs the exception, and possibly its call stack, with the global logger.       |
-
+| Function                        | Purpose                                                                 |
+|---------------------------------|-------------------------------------------------------------------------|
+| `lh#log#echomsg()`              | Returns a new logger object, that logs with `:echomsg` (internal use)   |
+| `lh#log#new()`                  | Returns a new logger object (internal use)                              |
+| `lh#log#none()`                 | Returns a new, inactive, logger object (internal use)                   |
+| `lh#log#set_logger(kind, opts)` | Sets the global logging policy (quickfix/loclist window, none, echomsg) |
+| `lh#log#this(format, args...)`  | Logs a formatted message with the global logger                         |
+| `lh#log#exception(...)`         | Logs the exception, and possibly its call stack, with the global logger |
 
 ## Design considerations
 
 ### Logging context, i18n...
+
 This framework has a feature that isn't that trivial to implement: it locates
 the lines (file + line number) from where every log message is issued.
 
 It isn't used by all logging policies, it's used only by those that fill the
 quickfix window (or location list windows) in order to permit to navigate the
 context of the logged messages, as you can see in the screencast.
-
 
 It's ain't trivial because:
 
@@ -111,12 +110,14 @@ Also, please note that decoding the callstack is really slow and that this
 shall be avoided in loops.
 
 ### Logging levels
+
 Usually logging frameworks provide logging levels. This logging framework does
 not, and it's not really an issue.
 
-
 #### TL;DR
+
 The choices I've made in lh-vim-lib and my other plugins are the following:
+
 - Information messages are meant to be always displayed.
 - Error messages are meant to be always displayed, and to stop the current
   process. If they don't need to stop the current process, it means they are
@@ -128,8 +129,13 @@ The choices I've made in lh-vim-lib and my other plugins are the following:
 - When debugging I need the logging context of a debug message.
 - We need to be able to trace back the context of an error, whether it's a
   runtime error or a logic error.
+- When things that should not really happen... happen. I usually really on my
+  [DbC framework](DbC.md) for programming errors, and since v5.4.0 I have a new
+  [warning](#warnings) sub-framework for errors that relate to an incorrect
+  usage/configuration of various features.
 
 #### Rationale/motivations
+
 End users only really need comprehensible error and information messages. They
 don't care about the context. They don't care about debug messages.
 
@@ -165,3 +171,23 @@ instead to duplicate 30ish lines in all my autoload plugins.
 
 Note BTW that we mustn't and don't need to comment and uncomment debugging
 lines depending on whether we are working on a feature, or releasing a plugin.
+
+## Warnings
+
+In version 5.4.0, I introduce a new way to emit warnings. I've had
+`lh#common#warning_msg()` for ages to reports problems, in a coloured way,
+without interrupting function execution nor messing with the
+[`messages`](http://vimhelp.appspot.com/message.txt.html#message%2dhistory)
+displayed.
+
+I provide a new `lh#warning#emit(message)` function that, eventually calls
+`lh#common#warning_msg()`, but also records the current
+[callstack](Callstack.md). That information is cached, and it will be displayed
+(in the
+[`quickfix-window`](http://vimhelp.appspot.com/quickfix.txt.html#quickfix%2dwindow)),
+when executing `:Warnings`.
+
+The main use case is to emit warnings while leaving room for investigation
+regarding what went wrong in case the issue is in the plugins code. Unlike
+`:echoerr`+`:WTF`  or my [DbC framework](DbC.md) that also permit to fill-in
+the quickfix-window, this feature doesn't interrupt function execution.

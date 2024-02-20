@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/blob/master/License.md>
-" Version:	4.6.4
-let s:k_version = 40604
+" Version:	5.4.0
+let s:k_version = 50400
 " Created:	27th Apr 2010
-" Last Update:	18th Feb 2020
+" Last Update:	20th Feb 2024
 "------------------------------------------------------------------------
 " Description:
 "       Non-function resources from lh-vim-lib
@@ -16,6 +16,7 @@ let s:k_version = 40604
 " Installation:
 "       Drop the file into {rtp}/plugin
 " History:
+"       v5.4.0   New command: Warnings
 "       v4.0.0   New commands: :StopBGExecution :Jobs, :JobUnpause, ConfirmGlobal
 "       v3.8.2,3 New command: :LHLog
 "       v3.1.12  New command: :CleanEmptyBuffers
@@ -63,6 +64,10 @@ command! -nargs=1 ConfirmGlobal call lh#ui#_confirm_global('<args>')
 command! -nargs=+ -complete=file
       \ SplitIfNotOpen4COC
       \ call lh#coc#_split_open(<f-args>)
+
+command! -nargs=? -complete=customlist,lh#warning#_command_complete
+      \ Warnings
+      \ call lh#warning#_command(<f-args>)
 
 "------------------------------------------------------------------------
 " ## Options {{{1
