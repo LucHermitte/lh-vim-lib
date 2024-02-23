@@ -7,7 +7,7 @@
 " Version:	5.4.0
 let s:version = '5.4.0'
 " Created:      01st Mar 2013
-" Last Update:  01st Dec 2022
+" Last Update:  23rd Feb 2024
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -177,7 +177,7 @@ function! lh#mapping#plug(...) abort
         let current = s:callsite()
         let origin = has_key(previous_map, 'sid') ?  'in '.lh#askvim#scriptname(previous_map.sid) : 'manually'
         let glob_loc = get(previous_map, 'buffer') ? 'local' : 'global'
-        call lh#common#warning_msg(lh#fmt#printf('Warning: Cannot define %{2.mode}map `%1` to `%{2.rhs}`%3: a previous %5 mapping on `%1` was defined %4.',
+        call lh#warning#emit(lh#fmt#printf('Warning: Cannot define %{2.mode}map `%1` to `%{2.rhs}`%3: a previous %5 mapping on `%1` was defined %4.',
               \ strtrans(mapping.lhs), mapping, current, origin, glob_loc))
       endif
     else
@@ -185,7 +185,7 @@ function! lh#mapping#plug(...) abort
       if !empty(m_check)
         let current = s:callsite()
         " TODO: ask vim which mapping has the same start
-        call lh#common#warning_msg(lh#fmt#printf('Warning: While defining %{2.mode}map `%1` to `%{2.rhs}`%3: there already exists another mapping starting as `%1` to `%4`.',
+        call lh#warning#emit(lh#fmt#printf('Warning: While defining %{2.mode}map `%1` to `%{2.rhs}`%3: there already exists another mapping starting as `%1` to `%4`.',
               \ strtrans(mapping.lhs), mapping, current, strtrans(m_check)))
       endif
       call lh#mapping#define(mapping)
@@ -317,7 +317,7 @@ function! s:define_map(mode, lhs, rhs, isLocal, isExpr) dict abort " {{{3
     call add(crt_definitions, crt_mapping)
   else
     if crt_mapping.rhs != a:rhs
-      call lh#common#warning_msg("Overrriding ".a:mode."map ".a:lhs." ".crt_definitions[p].rhs."  with ".a:rhs)
+      call lh#warning#emit("Overrriding ".a:mode."map ".a:lhs." ".crt_definitions[p].rhs."  with ".a:rhs)
     elseif &verbose >= 2
       call s:Log("(almost) Overrriding ".a:mode."map ".a:lhs." ".crt_definitions[p].rhs." with ".a:rhs)
     endif
@@ -370,12 +370,12 @@ function! s:toggle_mappings() dict abort " {{{3
       for m in crt_definitions
         call s:UnMap(m)
       endfor
-      call lh#common#warning_msg(self.kind . "mappings deactivated")
+      call lh#warning#emit(self.kind . "mappings deactivated")
     else " inactive -> active
       for m in crt_definitions
         call s:Map(m)
       endfor
-      call lh#common#warning_msg(self.kind . "mappings (re)activated")
+      call lh#warning#emit(self.kind . "mappings (re)activated")
     endif
   endif " No imaps.vim
   call self._state.toggle()

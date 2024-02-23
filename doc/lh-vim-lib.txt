@@ -578,6 +578,14 @@ Example: >
     " 2nd overload
     call lh#mapping#plug({'lhs': '<C-F3>',  'rhs': '<Plug>(search-word)'}, 'nx')
 
+In case of conflict, |lhvl-warnings| will be emitted. Plugin authors who want
+to provide default mappings may not want to see theirs plugins print anything.
+In order to do that you can |:call| `lh#mapping#plug()` with |:silent|: >
+    silent call lh#mapping#plug('if', '<plug>(lhdev-select-function)', 'ox')
+
+The warning will still be recorded to be displayed later (with its stacktrace)
+with |:Warnings|.
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#mapping#reinterpret_escaped_char()* {{{3
 lh#mapping#reinterpret_escaped_char(seq)~
@@ -4370,7 +4378,7 @@ Typical use, see |lh#log#set_logger()|: >
     call lh#log#set_logger('none')
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                                *:Warnings*                       {{{3
+                                                  *:Warnings*  *lhvl-warnings*      {{{3
 :Warnings [clear]~
 Display the cached warnings in the |quickfix-window|. This feature has been
 inspired by |:message| but dedicated to warnings for which we could need more
