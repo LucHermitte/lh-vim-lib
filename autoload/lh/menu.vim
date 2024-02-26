@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      4.6.4
-let s:k_version = 40604
+" Version:      5.4.0
+let s:k_version = 50400
 " Created:      13th Oct 2006
-" Last Update:  23rd May 2019
+" Last Update:  26th Feb 2024
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -570,6 +570,7 @@ endfunction
 
 "------------------------------------------------------------------------
 " # IVN Menus          {{{2
+let s:k_map_prefixes = '[aincvxsolt]*'
 " Function: s:CTRL_O({cmd})                                {{{3
 " Build the command (sequence of ':ex commands') to be executed from
 " INSERT-mode.
@@ -619,8 +620,8 @@ endfunction
 " Function: lh#menu#map_all({map_type}, [{map args}...)   {{{3
 " map the command to all the modes required
 function! lh#menu#map_all(map_type,...) abort
-  let nore   = (match(a:map_type, '[aincv]*noremap') != -1) ? "nore" : ""
-  let prefix = matchstr(substitute(a:map_type, nore, '', ''), '[aincv]*')
+  let nore   = (match(a:map_type, s:k_map_prefixes.'noremap') != -1) ? "nore" : ""
+  let prefix = matchstr(substitute(a:map_type, nore, '', ''), s:k_map_prefixes)
   if a:1 == "<buffer>" | let i = 3 | let binding = a:1 . ' ' . a:2
   else                 | let i = 2 | let binding = a:1
   endif
@@ -649,8 +650,8 @@ endfunction
 " Function: lh#menu#make({prefix},{code},{text},{binding},...) {{{3
 " Build the menu and map its associated binding to all the modes required
 function! lh#menu#make(prefix, code, text, binding, ...) abort
-  let nore    = (match(a:prefix, '[aincvsx]*nore') != -1) ? "nore" : ""
-  let prefix  = matchstr(substitute(a:prefix, nore, '', ''), '[aincvsx]*')
+  let nore    = (match(a:prefix, s:k_map_prefixes.'nore') != -1) ? "nore" : ""
+  let prefix  = matchstr(substitute(a:prefix, nore, '', ''), s:k_map_prefixes)
   let b       = (a:1 == '<buffer>') ? 1 : 0
   let cmd = join(a:000[b : ], ' ')
   if type(a:binding) == type({})
