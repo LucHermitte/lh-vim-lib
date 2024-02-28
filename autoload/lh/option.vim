@@ -113,7 +113,6 @@ function! lh#option#unset(...) abort
   return a:0 > 0
         \ ? extend(copy(g:lh#option#unset), {'__msg': a:1})
         \ : g:lh#option#unset
-  endif
 endfunction
 
 
