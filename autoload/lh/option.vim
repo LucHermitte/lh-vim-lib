@@ -7,7 +7,7 @@
 " Version:      5.4.0
 let s:k_version = 50400
 " Created:      24th Jul 2004
-" Last Update:  07th Feb 2023
+" Last Update:  28th Feb 2024
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -361,7 +361,7 @@ endif
 " Function: lh#option#getbufglobvar(expr, name [, default]) {{{3
 if s:has_default_in_getbufvar
   function! lh#option#getbufglobvar(expr, name, ...) abort
-    return getbufvar(a:expr, a:name, get(g:, a:name, lh#option#unset('unknow option ['.a:buf.']:'.a:name)))
+    return getbufvar(a:expr, a:name, get(g:, a:name, lh#option#unset('unknow option ['.a:expr.']:'.a:name)))
   endfunction
 else
   function! lh#option#getbufglobvar(expr, name, ...) abort
