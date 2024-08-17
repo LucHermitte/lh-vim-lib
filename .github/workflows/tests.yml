@@ -35,11 +35,12 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Setup Vim
-      # uses: rhysd/action-setup-vim@v1
-      uses: thinca/action-setup-vim@v2
+      uses: rhysd/action-setup-vim@v1
+      # uses: thinca/action-setup-vim@v2
       id: vim
-      # with:
-      #   gui: yes
+      with:
+        configure-args: |
+          --with-features=huge
 
     # - name: Set up Git
     #   run: |
