@@ -4,9 +4,9 @@
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/License.md>
-" Version:	4.0.0
+" Version:	5.4.0
 " Created:	03rd Nov 2008
-" Last Update:	26th Jul 2018
+" Last Update:	17th Aug 2024
 "------------------------------------------------------------------------
 " Description:
 " 	Tests for autoload/lh/function.vim
@@ -299,11 +299,11 @@ endfunction
 
 " Function: s:Test_partial() {{{3
 function! s:Test_partial() abort
-  let l:Cb = lh#partial#make('has', ['gui_running'])
+  let l:Cb = lh#partial#make('has', ['eval'])
   AssertEquals(1, lh#partial#execute(l:Cb))
   let l:Cb = lh#partial#make('has', [])
-  AssertEquals(1, lh#partial#execute(l:Cb, 'gui_running'))
-  AssertEquals(0, lh#partial#execute(l:Cb, 'g*i_running'))
+  AssertEquals(1, lh#partial#execute(l:Cb, 'eval'))
+  AssertEquals(0, lh#partial#execute(l:Cb, 'e*val'))
 endfunction
 
 " }}}1
