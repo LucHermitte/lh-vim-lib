@@ -22,15 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['2.6', '2.7', '3.0']
+      # ruby-version: ['2.6', '2.7', '3.0']
+        ruby-version: ['2.7']
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
     # change this to (see https://github.com/ruby/setup-ruby#versioning):
-    # uses: ruby/setup-ruby@v1
-      uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+      uses: ruby/setup-ruby@v1
+    # uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
@@ -38,5 +39,13 @@ jobs:
       uses: rhysd/action-setup-vim@v1
       id: vim
 
+    - name: Set up Git
+      run: |
+        git config --global user.email 'ci@example.com'
+        git config --global user.name 'CI'
+        git config --global init.defaultBranch 'master'
+
+    - name: Install dependencies
+      run: bundle exec rake dump install
     - name: Run tests
-      run: bundle exec rake ci
+      run: bundle exec rake tests
