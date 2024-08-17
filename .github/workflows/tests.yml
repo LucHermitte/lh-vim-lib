@@ -38,8 +38,8 @@ jobs:
       # uses: rhysd/action-setup-vim@v1
       uses: thinca/action-setup-vim@v2
       id: vim
-      with:
-        gui: yes
+      # with:
+      #   gui: yes
 
     # - name: Set up Git
     #   run: |
@@ -51,5 +51,5 @@ jobs:
     #   run: bundle exec rake dump install
     - name: Install vim plugin dependencies & Run tests
       run: |
-        gvim --version
+        vim --version
         bundle exec rake ci
