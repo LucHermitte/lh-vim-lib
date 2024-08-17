@@ -7,7 +7,7 @@
 " Version:      5.3.3.
 let s:k_version = '533'
 " Created:      18th Aug 2021
-" Last Update:  18th Aug 2021
+" Last Update:  17th Aug 2024
 "------------------------------------------------------------------------
 " Description:
 "       Test lh#option#get() function
@@ -78,11 +78,15 @@ function! s:Test_global() " {{{2
     let b:foo = 43
     AssertEquals(lh#option#get('foo', 12) , 43)
 
-    LetTo p:foo = 44
-    AssertEquals(lh#option#get('foo', 12) , 43)
+    if lh#project#is_in_a_project()
+      " Cannot be tested if not in a project.
+      " -> tests/lh/project.vim will tests this scenario
+      LetTo p:foo = 44
+      AssertEquals(lh#option#get('foo', 12) , 43)
 
-    Unlet b:foo
-    AssertEquals(lh#option#get('foo', 12) , 44)
+      Unlet b:foo
+      AssertEquals(lh#option#get('foo', 12) , 44)
+    endif
   finally
     call cleanup.finalize()
   endtry
