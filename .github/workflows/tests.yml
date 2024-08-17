@@ -34,6 +34,9 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+    - name: Run headless test
+      uses: coactions/setup-xvfb@v1
+      # => vim +clientserver seems to expect X11
     - name: Setup Vim
       uses: rhysd/action-setup-vim@v1
       # uses: thinca/action-setup-vim@v2
