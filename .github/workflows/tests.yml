@@ -46,7 +46,6 @@ jobs:
 
     - name: Install Vim plugin dependencies
       run: |
-        gem update --system
         bundle install
         bundle exec rake dump install
     - name: Run tests
