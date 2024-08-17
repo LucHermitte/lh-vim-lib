@@ -45,6 +45,9 @@ jobs:
     #     git config --global init.defaultBranch 'master'
 
     - name: Install Vim plugin dependencies
-      run: bundle exec rake dump install
+      run: |
+        gem update --system
+        bundle install
+        bundle exec rake dump install
     - name: Run tests
       run: bundle exec rake test
