@@ -40,7 +40,6 @@ jobs:
       id: vim
       with:
         gui: yes
-      run: gvim --version
 
     # - name: Set up Git
     #   run: |
@@ -51,4 +50,6 @@ jobs:
     # - name: Install Vim plugin dependencies
     #   run: bundle exec rake dump install
     - name: Install vim plugin dependencies & Run tests
-      run: bundle exec rake ci
+      run: |
+        gvim --version
+        bundle exec rake ci
