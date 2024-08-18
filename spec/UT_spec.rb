@@ -26,7 +26,7 @@ RSpec.describe "unit tests" do
     u_vimrc = "-u #{vimrc} -N --cmd 'set rtp+=#{vim_plugin_path},#{vim_plugin_path}/after' --cmd 'filetype plugin on'"
   end
 
-  cmd = %(vim #{u_vimrc} -X -V1 -e -s -c "echo 'RTP: '..&rtp" -c "q")
+  cmd = %(vim #{u_vimrc} -X -V1 -e -s -c "echo 'RTP: '..&rtp" -c "scriptnames" -c "q")
   pp system(cmd)
 
   # The tests
