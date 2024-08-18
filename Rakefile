@@ -14,11 +14,9 @@ end
 
 task :test    => :spec
 
-task :spec do
-  # sh "bundle exec rspec ~/.vim-flavor/repos/LucHermitte_vim-UT/spec/UT_spec_v2.rb"
-  sh "bundle exec rspec spec/UT_spec.rb"
-  # sh "bundle exec rspec ~/.vim-flavor/repos/LucHermitte_vim-UT/spec"
-end
+# task :spec do
+#   sh "bundle exec rspec spec/UT_spec.rb"
+# end
 
 task :install do
   sh 'cd tests && bundle exec vim-flavor install'

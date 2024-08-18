@@ -42,16 +42,12 @@ jobs:
         configure-args: |
           --with-features=huge
 
-    # - name: Set up Git
-    #   run: |
-    #     git config --global user.email 'ci@example.com'
-    #     git config --global user.name 'CI'
-    #     git config --global init.defaultBranch 'master'
-
-    # - name: Install Vim plugin dependencies
-    #   run: bundle exec rake dump install
-    - name: Install vim plugin dependencies & Run tests
+    - name: Install vim plugin dependencies
+      # manually install UT -- without vim-flavor which will install
+      # lh-vim-lib another time...
       run: |
         mkdir -p ~/.vim/pack/flavors/start
         git clone  https://github.com/LucHermitte/vim-UT ~/.vim/pack/flavors/start/UT
+    - name: Run tests
+      run: |
         xvfb-run bundle exec rake test

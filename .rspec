@@ -1,4 +1,3 @@
 --color
 --require spec_helper
 --format documentation
--I ~/.vim-flavor/repos/LucHermitte_vim-UT/spec
