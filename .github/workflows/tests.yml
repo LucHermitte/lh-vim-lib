@@ -18,20 +18,23 @@ permissions:
 
 jobs:
   test:
+    name: "test on ${{ matrix.os }} ; neovim: ${{ neovim }}"
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # Testing doesn't seem to work on Windows: output log file
+        # cannot be read...
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         neovim: [false, true]
+        # TODO: Test different flavours of Vim...
+
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Ruby
-    # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-    # change this to (see https://github.com/ruby/setup-ruby#versioning):
       uses: ruby/setup-ruby@v1
-    # uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
       with:
         ruby-version: 3.0
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
@@ -39,20 +42,19 @@ jobs:
       uses: rhysd/action-setup-vim@v1
       # uses: thinca/action-setup-vim@v2
       id: vim
-      # TODO: Vim matrix: neovim, vim 8 & 9; macosx, windows...
       with:
         neovim: ${{matrix.neovim }}
         configure-args: |
           --with-features=huge
 
     - name: Install vim plugin dependencies
-      # manually install UT -- without vim-flavor which will install
-      # lh-vim-lib another time...
+      # Manually install UT -- without vim-flavor which will install
+      # lh-vim-lib a second time and create conflicts...
       run: |
         mkdir -p ~/.vim/pack/flavors/start
         git clone  https://github.com/LucHermitte/vim-UT ~/.vim/pack/flavors/start/UT
     - name: Run tests on Linux
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' # headless execution is required on Linux
       run: |
         xvfb-run bundle exec rake test
     - name: Run tests on ${{ matrix.os }}
