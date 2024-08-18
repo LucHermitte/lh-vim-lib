@@ -52,5 +52,6 @@ jobs:
     #   run: bundle exec rake dump install
     - name: Install vim plugin dependencies & Run tests
       run: |
-        vim --version
-        xvfb-run bundle exec rake ci
+        mkdir -p ~/.vim/pack/flavors/start
+        git clone  https://github.com/LucHermitte/vim-UT ~/.vim/pack/flavors/start/UT
+        xvfb-run bundle exec rake test

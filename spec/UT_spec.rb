@@ -17,7 +17,8 @@ RSpec.describe "unit tests" do
   vimrc = vimrc_candidates.find{ |candidate| File.file?(candidate)}
   if vimrc.nil?
     print "no bootstrapping vimrc found...\n"
-    u_vimrc = ""
+    vim_plugin_path = File.expand_path('.')
+    u_vimrc = "--cmd 'set rtp+=#{vim_plugin_path},#{vim_plugin_path}/after' --cmd 'filetype plugin on'"
   else
     print "bootstrapping vimrc found: #{vimrc}\n"
     vim_plugin_path = File.expand_path('.')
@@ -41,7 +42,7 @@ RSpec.describe "unit tests" do
         # pp "abs: #{abs_file}"
         # pp "log: #{log_file}"
         # TODO: collect verbose mode messages
-        cmd = %(vim #{u_vimrc} -V1 -e -s -c "UTBatch #{log_file} #{abs_file}")
+        cmd = %(vim #{u_vimrc} -X -V1 -e -s -c "UTBatch #{log_file} #{abs_file}")
         pp cmd
         ok = system(cmd)
         # print "Check log file '#{log_file}' exists\n"
