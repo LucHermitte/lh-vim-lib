@@ -5,7 +5,7 @@
 " Version:      4.6.0.
 let s:k_version = '40600'
 " Created:      09th Sep 2016
-" Last Update:  18th Oct 2018
+" Last Update:  18th Aug 2024
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -134,12 +134,16 @@ function! s:Test_scoped() " {{{2
     AssertIs(res.resolve(), b:dummy)
 
     let g:__d = {'k': 42}
-    LetTo p:dummy  = g:__d
-    AssertIs(res.resolve(), b:dummy)
+    if lh#project#is_in_a_project()
+      LetTo p:dummy  = g:__d
+      AssertIs(res.resolve(), b:dummy)
+    endif
 
     unlet b:dummy
     Assert ! has_key(b:, 'dummy')
-    AssertIs(res.resolve(), g:__d)
+    if lh#project#is_in_a_project()
+      AssertIs(res.resolve(), g:__d)
+    endif
   finally
     Unlet g:__d
     Unlet p:dummy
