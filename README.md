@@ -1,4 +1,4 @@
-﻿# lh-vim-lib [![Last release](https://img.shields.io/github/tag/LucHermitte/lh-vim-lib.svg)](https://github.com/LucHermitte/lh-vim-lib/releases) [![Build Status](https://secure.travis-ci.org/LucHermitte/lh-vim-lib.png?branch=master)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+﻿# lh-vim-lib [![Last release](https://img.shields.io/github/tag/LucHermitte/lh-vim-lib.svg)](https://github.com/LucHermitte/lh-vim-lib/releases) [![Build Status](https://github.com/LucHermitte/lh-vim-lib/actions/workflows/tests.yml/badge.svg)](http://travis-ci.org/LucHermitte/lh-vim-lib) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
 
 ## Introduction
 
