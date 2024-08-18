@@ -19,10 +19,11 @@ permissions:
 jobs:
   test:
 
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.0']
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        neovim: [false, true]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
@@ -32,13 +33,15 @@ jobs:
       uses: ruby/setup-ruby@v1
     # uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
       with:
-        ruby-version: ${{ matrix.ruby-version }}
+        ruby-version: 3.0
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Setup Vim
       uses: rhysd/action-setup-vim@v1
       # uses: thinca/action-setup-vim@v2
       id: vim
+      # TODO: Vim matrix: neovim, vim 8 & 9; macosx, windows...
       with:
+        neovim: ${{matrix.neovim }}
         configure-args: |
           --with-features=huge
 
