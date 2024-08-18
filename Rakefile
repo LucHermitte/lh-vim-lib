@@ -15,7 +15,7 @@ end
 task :test    => :spec
 
 task :spec do
-    sh "bundle exec rspec ~/.vim-flavor/repos/LucHermitte_vim-UT/spec"
+  sh "find ~/.vim -type f && bundle exec rspec ~/.vim-flavor/repos/LucHermitte_vim-UT/spec"
 end
 
 task :install do
