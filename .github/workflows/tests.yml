@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   test:
-    name: "test on ${{ matrix.os }} ; neovim: ${{ matrix.neovim }}"
+    name: "test on ${{ matrix.os }} ; ${{ matrix.neovim && 'neovim' || 'vim' }}"
 
     strategy:
       matrix:
