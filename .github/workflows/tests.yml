@@ -51,6 +51,11 @@ jobs:
       run: |
         mkdir -p ~/.vim/pack/flavors/start
         git clone  https://github.com/LucHermitte/vim-UT ~/.vim/pack/flavors/start/UT
-    - name: Run tests
+    - name: Run tests on Linux
+      if: runner.os == 'Linux'
       run: |
         xvfb-run bundle exec rake test
+    - name: Run tests on ${{ matrix.os }}
+      if: runner.os != 'Linux'
+      run: |
+        bundle exec rake test
