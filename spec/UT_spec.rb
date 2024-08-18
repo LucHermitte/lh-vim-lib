@@ -42,7 +42,7 @@ RSpec.describe "unit tests" do
         # pp "abs: #{abs_file}"
         # pp "log: #{log_file}"
         # TODO: collect verbose mode messages
-        cmd = %(vim #{u_vimrc} -X -V1 -e -s -c "UTBatch #{log_file} #{abs_file}")
+        cmd = %(vim #{u_vimrc} -N -X -V1 -e -s -c "UTBatch #{log_file} #{abs_file}")
         pp cmd
         ok = system(cmd)
         # print "Check log file '#{log_file}' exists\n"
