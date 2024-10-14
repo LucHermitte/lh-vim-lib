@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v5.4.0)
-                        For Vim version 7+      Last change: 20th Feb 2024
+                        For Vim version 7+      Last change: 14th Oct 2024
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -3605,11 +3605,14 @@ does not open the buffer may be used in the {cmd} parameter.
                                                 *lh#buffer#Scratch()*             {{{3
 lh#buffer#Scratch({bname},{where})  (*deprecated*)~
                                       *scratch* *lh#buffer#scratch()*
-lh#buffer#scratch({bname},{where})~
+lh#buffer#scratch({bname},{where} [, {content}])~
 Split-opens a new scratch buffer.
 
 @param {bname} Name for the new scratch buffer
-@param {where} Where the new scratch buffer will be opened ('', or 'v')
+@param {where} Where the new scratch buffer will be opened
+               ('', '|vert|', '|vnew|', '|vsp|', or '|tabnew|')
+@param {content} |String| or |List| to insert. Or |function| to call that'll
+                 set the content itself.
 @return The buffer number of the new scratch buffer.
 @post          The buffer has the following properties set:
                    'bt'=nofile, 'bh'=wipe, 'nobl', 'noswf', 'ro'

@@ -5,10 +5,10 @@
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
 " Licence:      GPLv3
-" Version:	4.6.3
-let s:k_version = '40603'
+" Version:	5.4.0
+let s:k_version = '50400'
 " Created:	23rd Jan 2007
-" Last Update:	10th Sep 2018
+" Last Update:	14th Oct 2024
 "------------------------------------------------------------------------
 " Description:
 " 	Defines functions that help finding windows and handling buffers.
@@ -45,6 +45,8 @@ let s:k_version = '40603'
 "       (*) BUG: Work around a vim bug with winbufnr() within event context
 "       v4.0.0
 "       (*) BUG: Fix `lh#buffer#find()` when using relative pathnames.
+"       v5.4.0
+"       (*) ENH: Improve `lh#buffer#scratch()`
 " }}}1
 "=============================================================================
 
@@ -124,14 +126,28 @@ function! lh#buffer#Jump(filename, cmd) abort
   return lh#buffer#jump(a:filename, a:cmd)
 endfunction
 
-" Function: lh#buffer#scratch({bname},{where}) {{{2
-function! lh#buffer#scratch(bname, where) abort
+" Function: lh#buffer#scratch({bname},{where} [, {content}) {{{2
+function! lh#buffer#scratch(bname, where, ...) abort
   try
     set modifiable
-    call lh#window#create_window_with(a:where.' sp '.fnameescape(substitute(a:bname, '\*', '...', 'g')))
+    if a:where =~ 'new$'
+      " we avoid to trigger templating engines this way
+      call lh#window#create_window_with(a:where)
+      exe 'file ' . fnameescape(substitute(a:bname, '\*', '...', 'g'))
+    else
+      let cmd = a:where =~ 'sp$' ? a:where : a:where.' sp'
+      call lh#window#create_window_with(cmd.' '.fnameescape(substitute(a:bname, '\*', '...', 'g')))
+    endif
   catch /.*/
     throw "Can't open a buffer named '".a:bname."'!"
   endtry
+  if a:0 > 0
+    if type(a:1) == v:t_func
+      call a:1()
+    else
+      call setline(1, a:1)
+    endif
+  endif
   setlocal bt=nofile bh=wipe nobl noswf ro
   return bufnr('%')
 endfunction
