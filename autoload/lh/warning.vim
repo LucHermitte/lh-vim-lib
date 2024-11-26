@@ -7,7 +7,7 @@
 " Version:      5.4.0.
 let s:k_version = '540'
 " Created:      20th Feb 2024
-" Last Update:  20th Feb 2024
+" Last Update:  26th Nov 2024
 "------------------------------------------------------------------------
 " Description:
 "       Support functions for emitting warnings that remember their context
@@ -63,9 +63,15 @@ function! lh#warning#clear() abort
   let s:warnings = []
 endfunction
 
-" Function: lh#warning#emit(message) {{{2
-function! lh#warning#emit(message) abort
-  let context = lh#exception#callstack_as_qf_from('lh#warning', [a:message, 'W'])
+" Function: lh#warning#emit(message [, context]) {{{2
+function! lh#warning#emit(message, ...) abort
+  if a:0 == 0
+    let context = lh#exception#callstack_as_qf_from('lh#warning', [a:message, 'W'])
+  elseif type(a:1) == type({}) " let's suppose it's already a context object
+    let context = a:1
+  else " Let's suppose it's a throwpoint
+    let context = lh#exception#decode(a:1).as_qf_from('lh#warning', [a:message, 'W'])
+  endif
   call add(s:warnings, [a:message, context])
   call lh#common#warning_msg(a:message)
 endfunction

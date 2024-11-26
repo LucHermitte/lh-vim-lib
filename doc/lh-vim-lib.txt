@@ -1,5 +1,5 @@
 *lh-vim-lib.txt*        Vim common libraries (v5.4.0)
-                        For Vim version 7+      Last change: 14th Oct 2024
+                        For Vim version 7+      Last change: 26th Nov 2024
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4399,11 +4399,16 @@ The warning cache is:
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#warning#emit()*               {{{3
-lh#warning#emit(message)~
+lh#warning#emit(message [, context])~
 Emits a new warning as a coloured message.
 Also the |callstack|| is automatically recorded when calling the function.
 It's cached with the message for future display in the |quickfix-window| with
 |:Warnings|.
+
+@param {message} Message printed and registered
+@param {context} Optional context. Can be |v:throwpoint|, or a |setqflist()|
+                 compatible |Dictionary| that could be returned by
+                 `lh#exception#decode().as_qf()`.
 
 @since Version 5.4.0
 
