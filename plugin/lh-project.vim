@@ -2,10 +2,10 @@
 " File:         plugin/lh-project.vim                             {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.4
-let s:k_version = '40604'
+" Version:      5.4.1
+let s:k_version = '50401'
 " Created:      29th Sep 2016
-" Last Update:  13th Dec 2019
+" Last Update:  13th Dec 2024
 "------------------------------------------------------------------------
 " Description:
 "       :Project related commands

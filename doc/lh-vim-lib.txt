@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.4.0)
-                        For Vim version 7+      Last change: 26th Nov 2024
+*lh-vim-lib.txt*        Vim common libraries (v5.4.1)
+                        For Vim version 7+      Last change: 13th Dec 2024
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -4911,6 +4911,12 @@ where current paths are changed behing our back.
 :Project [{prj-name}] :echo {varname}~
 Echoes the value of the |p:|variable {varname} associated to specified
 project, or to the current project otherwise.
+
+                                                    *:Project-:prettyprint*
+:Project [{prj-name}] :prettyprint {varname}~
+Pretty-prints the value of the |p:|variable {varname} associated to specified
+project, or to the current project otherwise.
+Internally it relies on |lh#dict#print_as_tree()|.
 
                                                     *:Project-:let*
 :Project [{prj-name}] :let {varname} = {value}~
