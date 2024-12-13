@@ -4,16 +4,18 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.4.0
-let s:k_version = 50400
+" Version:      5.4.1
+let s:k_version = 50401
 " Created:      24th Jul 2004
-" Last Update:  28th Feb 2024
+" Last Update:  13th Dec 2024
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
 "       Aimed at (ft)plugin writers.
 "
 " History: {{{2
+"       v5.4.1
+"       (*) ENH: Extend lh#option#is_set() to v:none
 "       v5.3.3
 "       (*) REFACT: Small improvments in `lh#option#get()`
 "       v5.3.1
@@ -118,12 +120,12 @@ endfunction
 
 " Function: lh#option#is_unset(expr) {{{3
 function! lh#option#is_unset(expr) abort
-  return (type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type')
+  return (a:expr is v:none) || ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
 endfunction
 
 " Function: lh#option#is_set(expr) {{{3
 function! lh#option#is_set(expr) abort
-  return ! ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
+  return (a:expr isnot v:none) && ! ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
 endfunction
 
 " Function: lh#option#get(names [, default [, scope]])            {{{3
