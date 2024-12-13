@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/menu.vim                      {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.1.0.
-let s:k_version = '50100'
+" Version:      5.4.1.
+let s:k_version = '50401'
 " Created:      21st Feb 2017
-" Last Update:  06th Mar 2020
+" Last Update:  13th Dec 2024
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions to create project related menu items
@@ -89,7 +89,7 @@ function! lh#project#menu#reserve_id(...) abort
     return id
   else
     let s:last_id += 10
-    let prj.set('menu.priority', s:last_id)
+    call prj.set('menu.priority', s:last_id)
     return s:last_id
   endif
 endfunction
