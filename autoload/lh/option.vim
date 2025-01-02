@@ -7,7 +7,7 @@
 " Version:      5.4.1
 let s:k_version = 50401
 " Created:      24th Jul 2004
-" Last Update:  13th Dec 2024
+" Last Update:  02nd Jan 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#option#get().
@@ -15,7 +15,7 @@ let s:k_version = 50401
 "
 " History: {{{2
 "       v5.4.1
-"       (*) ENH: Extend lh#option#is_set() to v:none
+"       (*) ENH: Extend lh#option#is_set() to v:none/v:null
 "       v5.3.3
 "       (*) REFACT: Small improvments in `lh#option#get()`
 "       v5.3.1
@@ -119,13 +119,16 @@ endfunction
 
 
 " Function: lh#option#is_unset(expr) {{{3
+" type(v:none) == type(v:null) == 7
+let s:t_none = get(v:, 't_none', 7)
+let s:t_dict = get(v:, 't_dict', 4)
 function! lh#option#is_unset(expr) abort
-  return (a:expr is v:none) || ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
+  return (type(a:expr) == s:t_none) || ((type(a:expr) == s:t_dict) && has_key(a:expr, '__lhvl_unset_type'))
 endfunction
 
 " Function: lh#option#is_set(expr) {{{3
 function! lh#option#is_set(expr) abort
-  return (a:expr isnot v:none) && ! ((type(a:expr) == type ({})) && has_key(a:expr, '__lhvl_unset_type'))
+  return (type(a:expr) != s:t_none) && ! ((type(a:expr) == s:t_dict) && has_key(a:expr, '__lhvl_unset_type'))
 endfunction
 
 " Function: lh#option#get(names [, default [, scope]])            {{{3

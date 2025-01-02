@@ -2,10 +2,10 @@
 " File:         autoload/lh/type.vim                              {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.0.0.0.
-let s:k_version = '4000'
+" Version:      5.4.1
+let s:k_version = '050401'
 " Created:      20th Feb 2017
-" Last Update:  10th Apr 2017
+" Last Update:  02nd Jan 2025
 "------------------------------------------------------------------------
 " Description:
 "       Helper functions around |type()|
@@ -61,12 +61,23 @@ let s:names =
       \, 9                    : 'channel'
       \ }
 if exists('v:true')
-  let s:names[v:true] = 'bool'
-  let s:names[v:false] = 'bool'
+  let s:names[type(v:true)] = 'bool'
+  " let s:names[v:false] = 'bool'
+endif
+if exists('v:null')
+  let s:names[type(v:null)] = 'none'
 endif
 if exists('v:none')
-  let s:names[v:none] = 'None'
+  let s:names[type(v:none)] = 'none'
 endif
+if exists('v:t_blob')      | let s:names[v:t_bool] = 'blob'      | endif
+if exists('v:t_class')     | let s:names[v:t_bool] = 'class'     | endif
+if exists('v:t_object')    | let s:names[v:t_bool] = 'object'    | endif
+if exists('v:t_typealias') | let s:names[v:t_bool] = 'typealias' | endif
+if exists('v:t_enum')      | let s:names[v:t_bool] = 'enum'      | endif
+if exists('v:t_enumvalue') | let s:names[v:t_bool] = 'enumvalue' | endif
+
+
 function! lh#type#name(type) abort
   return get(s:names, a:type, 'unknown')
 endfunction
