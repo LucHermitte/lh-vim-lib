@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.2
-let s:k_version = 50202
+" Version:      5.4.0
+let s:k_version = 50400
 " Created:      17th Apr 2007
-" Last Update:  27th Oct 2020
+" Last Update:  11th Feb 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -83,42 +83,73 @@ else
 endif
 
 " Function: lh#askvim#scriptnames() {{{3
-function! lh#askvim#scriptnames() abort
-  let scripts = lh#askvim#execute('scriptnames')
-  let s:scripts = map(copy(scripts), 'split(v:val, "\\v:=\\s+")')
-  call lh#list#map_on(s:scripts, 1, 'fnamemodify(v:val, ":p")')
-  return s:scripts
-endfunction
+if exists('*getscriptinfo')
+  function! lh#askvim#scriptnames() abort
+    let s:scripts = map(getscriptinfo(), '[string(v:val.sid), fnamemodify(v:val.name, ":p")]')
+    return s:scripts
+  endfunction
+else
+  function! lh#askvim#scriptnames() abort
+    let scripts = lh#askvim#execute('scriptnames')
+    let s:scripts = map(copy(scripts), 'split(v:val, "\\v:=\\s+")')
+    call lh#list#map_on(s:scripts, 1, 'fnamemodify(v:val, ":p")')
+    return s:scripts
+  endfunction
+endif
 
 " Function: lh#askvim#scriptname(id) {{{3
-function! lh#askvim#scriptname(id) abort
-  if !exists('s:scripts') || len(s:scripts) <= eval(a:id)
-    call lh#askvim#scriptnames()
-    if len(s:scripts) < eval(a:id)
+if exists('*getscriptinfo')
+  function! lh#askvim#scriptname(id) abort
+    let script = getscriptinfo({'sid': a:id})
+    if empty(script)
       return lh#option#unset()
+    else
+      return fnamemodify(script[0].name, ':p')
     endif
-  endif
-  return s:scripts[a:id - 1][1]
-endfunction
+  endfunction
+else
+  function! lh#askvim#scriptname(id) abort
+    if !exists('s:scripts') || len(s:scripts) <= eval(a:id)
+      call lh#askvim#scriptnames()
+      if len(s:scripts) < eval(a:id)
+        return lh#option#unset()
+      endif
+    endif
+    return s:scripts[a:id - 1][1]
+  endfunction
+endif
 
 " Function: lh#askvim#scriptid(name) {{{3
-function! lh#askvim#scriptid(name, ...) abort
-  let last_change = get(a:, 1, 0)
-  if last_change || !exists('s:scripts')
-    call lh#askvim#scriptnames()
-  endif
-  let matches = filter(copy(s:scripts), 'v:val[1] =~ a:name')
-  if len(matches) > 1
-    throw "Too many scripts match `".a:name."`: ".string(matches)
-  elseif empty(matches)
-    if last_change
+if exists('*getscriptinfo')
+  function! lh#askvim#scriptid(name, ...) abort
+    let scripts = getscriptinfo({'name': a:name})
+    if len(scripts) > 1
+      throw "Too many scripts match `".a:name."`: ".string(scripts)
+    elseif empty(scripts)
       throw "No script match `".a:name."`"
     else
-      return lh#askvim#scriptid(a:name, 1)
+      return scripts[0].sid
     endif
-  endif
-  return matches[0][0]
-endfunction
+  endfunction
+else
+  function! lh#askvim#scriptid(name, ...) abort
+    let last_change = get(a:, 1, 0)
+    if last_change || !exists('s:scripts')
+      call lh#askvim#scriptnames()
+    endif
+    let matches = filter(copy(s:scripts), 'v:val[1] =~ a:name')
+    if len(matches) > 1
+      throw "Too many scripts match `".a:name."`: ".string(matches)
+    elseif empty(matches)
+      if last_change
+        throw "No script match `".a:name."`"
+      else
+        return lh#askvim#scriptid(a:name, 1)
+      endif
+    endif
+    return matches[0][0]
+  endfunction
+endif
 
 " Function: lh#askvim#where_is_function_defined(funcname) {{{3
 " @since Version 4.0.0
