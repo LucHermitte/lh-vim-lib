@@ -7,7 +7,7 @@
 " Version:      5.4.0
 let s:k_version = 50400
 " Created:      13th Oct 2006
-" Last Update:  26th Feb 2024
+" Last Update:  13th Feb 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines the global function lh#menu#def_menu
@@ -636,9 +636,12 @@ function! lh#menu#map_all(map_type,...) abort
     if prefix[0] == "a" | let prefix = "incv"
     else
       let map_cmd = prefix[0] . build_cmd . s:Build_CMD(prefix[0],cmd)
-      if hasmapto(binding, prefix)
-        call lh#common#warning_msg("Warning: There is already a ".prefix. "-mode mapping starting with ".binding. " when mapping\n  -> ".map_cmd)
-        exe 'verbose '.prefix.'map '.binding
+      if 0 && hasmapto(cmd, prefix[0])
+        call lh#warning#emit("Warning: There is already a ".prefix[0]. "-mode mapping to ".cmd)
+      endif
+      if !empty(maparg(binding, prefix[0]))
+        call lh#warning#emit("Warning: There is already a ".prefix[0]. "-mode mapping starting with ".binding. " when mapping\n  -> ".map_cmd)
+        exe 'verbose '.prefix[0].'map '.binding
       endif
       call s:Verbose("%1", map_cmd)
       execute map_cmd

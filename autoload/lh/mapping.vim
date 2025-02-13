@@ -7,7 +7,7 @@
 " Version:	5.4.0
 let s:version = '5.4.0'
 " Created:      01st Mar 2013
-" Last Update:  23rd Feb 2024
+" Last Update:  02nd Oct 2024
 "------------------------------------------------------------------------
 " Description:
 "       Functions to handle mappings
@@ -151,7 +151,7 @@ endfunction
 " Function: lh#mapping#plug(map_definition, modes)
 call lh#mapping#clear()
 function! lh#mapping#plug(...) abort
-  let mapping = {'silent': 1, 'unique': 1}
+  let mapping = {'silent': 1, 'unique': 1, 'buffer': 0}
   if type(a:1) == type({})
     let mapping = extend(mapping, a:1, "force")
     let modes = split(a:2, '\zs')
@@ -172,24 +172,29 @@ function! lh#mapping#plug(...) abort
     let previous_map = maparg(mapping.lhs, mode, 0, 1)
     if !empty(previous_map)
       call lh#assert#value(s:issues_notified).has_key(mode)
+      let was_buffer_local = get(previous_map, 'buffer')
+      let is_buffer_local  = get(mapping, 'buffer', 0)
       if !has_key(s:issues_notified[mode], mapping.lhs) || s:verbose
         let s:issues_notified[mode][mapping.lhs] = 1
         let current = s:callsite()
-        let origin = has_key(previous_map, 'sid') ?  'in '.lh#askvim#scriptname(previous_map.sid) : 'manually'
-        let glob_loc = get(previous_map, 'buffer') ? 'local' : 'global'
-        call lh#warning#emit(lh#fmt#printf('Warning: Cannot define %{2.mode}map `%1` to `%{2.rhs}`%3: a previous %5 mapping on `%1` was defined %4.',
-              \ strtrans(mapping.lhs), mapping, current, origin, glob_loc))
+        let origin = has_key(previous_map, 'sid') ?  'in '.lh#askvim#scriptname(previous_map.sid).':'.get(previous_map, 'lnum', -1) : 'manually'
+        let was_glob_loc = was_buffer_local ? 'local' : 'global'
+        let is_glob_loc  = is_buffer_local  ? 'local' : 'global'
+        call lh#warning#emit(lh#fmt#printf('Warning: Cannot define %6 %{2.mode}map `%1` to `%{2.rhs}`%3: a previous %5 mapping on `%1` was defined %4.',
+              \ strtrans(mapping.lhs), mapping, current, origin, was_glob_loc, is_glob_loc))
       endif
-    else
-      let m_check = mapcheck(mapping.lhs, mode)
-      if !empty(m_check)
-        let current = s:callsite()
-        " TODO: ask vim which mapping has the same start
-        call lh#warning#emit(lh#fmt#printf('Warning: While defining %{2.mode}map `%1` to `%{2.rhs}`%3: there already exists another mapping starting as `%1` to `%4`.',
-              \ strtrans(mapping.lhs), mapping, current, strtrans(m_check)))
+      if was_buffer_local == is_buffer_local
+        continue
       endif
-      call lh#mapping#define(mapping)
     endif
+    let m_check = mapcheck(mapping.lhs, mode)
+    if !empty(m_check)
+      let current = s:callsite()
+      " TODO: ask vim which mapping has the same start
+      call lh#warning#emit(lh#fmt#printf('Warning: While defining %{2.mode}map `%1` to `%{2.rhs}`%3: there already exists another mapping starting as `%1` to `%4`.',
+            \ strtrans(mapping.lhs), mapping, current, strtrans(m_check)))
+    endif
+    call lh#mapping#define(mapping)
   endfor
 endfunction
 
