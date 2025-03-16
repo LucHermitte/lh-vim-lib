@@ -7,7 +7,7 @@
 " Version:      5.4.0
 let s:k_version = 50400
 " Created:      17th Apr 2007
-" Last Update:  11th Feb 2025
+" Last Update:  16th Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines functions that asks vim what it is relinquish to tell us
@@ -97,10 +97,29 @@ else
   endfunction
 endif
 
+" Function: lh#askvim#_scriptinfo(...) {{{3
+" Work around difference in interface in getscriptinfo between nvim and
+" vim
+if exists('*getscriptinfo') && has('nvim')
+  function! lh#askvim#_getscriptinfo(opts) abort
+    let info = getscriptinfo()
+    if has_key(a:opts, 'sid')
+      return filter(info, {_,e -> e.sid == a:opts.sid})
+    elseif has_key(a:opts, 'name')
+      return filter(info, {_,e -> e.name =~ a:opts.name})
+    endif
+  endfunction
+elseif exists('*getscriptinfo')
+  function! lh#askvim#_getscriptinfo(opts) abort
+    return getscriptinfo(a:opts)
+  endfunction
+endif
+
+
 " Function: lh#askvim#scriptname(id) {{{3
 if exists('*getscriptinfo')
   function! lh#askvim#scriptname(id) abort
-    let script = getscriptinfo({'sid': a:id})
+    let script = lh#askvim#_getscriptinfo({'sid': a:id})
     if empty(script)
       return lh#option#unset()
     else
@@ -122,7 +141,7 @@ endif
 " Function: lh#askvim#scriptid(name) {{{3
 if exists('*getscriptinfo')
   function! lh#askvim#scriptid(name, ...) abort
-    let scripts = getscriptinfo({'name': a:name})
+    let scripts = lh#askvim#_getscriptinfo({'name': a:name})
     if len(scripts) > 1
       throw "Too many scripts match `".a:name."`: ".string(scripts)
     elseif empty(scripts)
