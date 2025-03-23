@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/object.vim                    {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.3.13
-let s:k_version = '533'
+" Version:      5.5.0
+let s:k_version = '550'
 " Created:      08th Mar 2017
-" Last Update:  18th Aug 2021
+" Last Update:  23rd Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines project object
@@ -70,6 +70,7 @@ endfunction
 " - "options"   <- where altered vim options will be stored
 " - "env"       <- where $ENV variables will be stored
 function! lh#project#object#_new(params) abort
+  call s:Verbose("lh#project#object#_new(%1)", a:params)
   " Inherits OO.to_string()
   let project = lh#object#make_top_type(a:params)
   call lh#dict#add_new(project,
