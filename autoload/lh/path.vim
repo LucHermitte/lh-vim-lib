@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.3.3
-let s:k_version = 50303
+" Version:      5.5.0
+let s:k_version = 50500
 " Created:      23rd Jan 2007
-" Last Update:  12th Aug 2021
+" Last Update:  23rd Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -126,6 +126,9 @@ let s:k_version = 50303
 "       v5.3.3
 "       (*) ENH: Change `lh#path#new_permission_lists().handle_file()` default
 "           to "Always"
+"       v5.5.0
+"       (*) REFACT: Change `lh#path#new_permission_lists.handle_file()`
+"           and `.handle_paths()` return types to a |List|.
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -826,8 +829,9 @@ function! s:lists_prepare() dict abort
 endfunction
 
 " - handle_paths() {{{4
+"   @return list
 function! s:lists_handle_paths(paths) dict abort
-  let n = 0
+  let n = []
   if !empty(a:paths)
     let indent_str = repeat('  ', s:indent)
     let filtered_pathnames = self.prepare()
@@ -838,13 +842,14 @@ function! s:lists_handle_paths(paths) dict abort
             \ ? filtered_pathnames[idx][1]
             \ : "default"
       call s:Verbose('%5%1 =~ fp_keys[%2]=%3 -- %4', fnamemodify(path, ':h'), idx, (idx != -1 ? fp_keys[idx] : 'default'), permission, indent_str)
-      let n += self.handle_file(path, permission)
+      call extend(n, self.handle_file(path, permission))
     endfor
   endif
   return n
 endfunction
 
 " - handle_file() {{{4
+"   @return list
 function! s:lists_handle_file(file, permission) dict abort
   if !has_key(self, '_do_handle')
     throw "Invalid use of `lh#path#new_filtered_list().handle_file()`"
@@ -852,14 +857,13 @@ function! s:lists_handle_file(file, permission) dict abort
   let filepat = escape(a:file, '\.')
   if a:permission == 'blacklist'
     call s:Verbose( '(blacklist) Ignoring ' . a:file)
-    return 0
+    return []
   elseif a:permission == 'sandboxlist'
     call s:Verbose( '(sandbox) '. self._action_name . ' '. a:file)
-    sandbox call self._do_handle(a:file)
-    return 1
+    sandbox return [[a:file, self._do_handle(a:file)]]
   elseif match(self.rejected_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been rejected for this session.', a:file)
-    return 0
+    return []
     " TODO: add a way to remove pathnames from validated list
   elseif match(self.valided_paths, filepat) >= 0
     call s:Verbose('Path %1 has already been validated for this session.', a:file)
@@ -872,14 +876,14 @@ function! s:lists_handle_file(file, permission) dict abort
     elseif choice == 4 " Never
       call s:Verbose("Add %1 to current session blacklist", a:file)
       call lh#path#munge(self.rejected_paths, a:file)
-      return 0
+      return []
     elseif choice != 1 " not Yes
-      return 0
+      return []
     endif
   endif
   call s:Verbose('('.a:permission.') '. self._action_name. ' ' . a:file)
   call self._do_handle(a:file)
-  return 1
+  return [[a:file, self._do_handle(a:file)]]
 endfunction
 
 " - check_paths() {{{4

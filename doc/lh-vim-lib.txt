@@ -1,5 +1,5 @@
-*lh-vim-lib.txt*        Vim common libraries (v5.4.1)
-                        For Vim version 7+      Last change: 13th Dec 2024
+*lh-vim-lib.txt*        Vim common libraries (v5.5.0)
+                        For Vim version 7+      Last change: 23rd Mar 2025
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -2985,7 +2985,8 @@ Prepares a permission lists object.
   - `"_action_name"`: Name of the action to display in messages.
 @return An object completed with the methods:
   - *prepare()*          -- internal
-  - *handle_paths()*     -- applies `"_do_handle()"` to files compatibles with permissions
+  - *handle_paths()*     -- applies `"_do_handle()"` to files compatible with permissions
+                          @return a |List| of `[valided_path, _do_handle() result]`
   - *handle_file()*      -- internal
   - *check_paths()*      -- tells whether a file is compatible with current permissions
   - *is_file_accepted()* -- internal
