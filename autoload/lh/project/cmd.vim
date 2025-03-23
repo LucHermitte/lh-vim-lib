@@ -2,10 +2,10 @@
 " File:         autoload/lh/project/cmd.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.4.1
-let s:k_version = '541'
+" Version:      5.5.0
+let s:k_version = '550'
 " Created:      07th Mar 2017
-" Last Update:  13th Dec 2024
+" Last Update:  23rd Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Define support functions for :Project
@@ -82,7 +82,11 @@ function! s:cd_project(prj, path) abort                           " {{{2
   let path = expand(a:path)
   if a:path == '!'
     " Reset directory to project directory in current window.
-    call lh#os#lcd(lh#option#get('paths.sources'))
+    let path_sources = lh#option#get('paths.sources')
+    if lh#option#is_unset(path_sources)
+      throw "Cannot apply ':cd !' as 'paths.sources' isn't set"
+    endif
+    call lh#os#lcd(path_sources)
     return
   elseif !isdirectory(path)
     throw "Invalid directory `".path."`!"
