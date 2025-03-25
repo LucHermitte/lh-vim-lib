@@ -2,10 +2,10 @@
 " File:         autoload/lh/notify.vim                            {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      4.6.3.
-let s:k_version = '463'
+" Version:      5.5.0
+let s:k_version = '550'
 " Created:      24th Jul 2017
-" Last Update:  10th Sep 2018
+" Last Update:  25th Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       API to notify things once
@@ -72,6 +72,34 @@ endfunction
 function! lh#notify#deprecated(old, new) abort
   " TODO: add feature to know where the call has been made
   call lh#notify#once(a:old, 'Warning %1 is deprecated, use %2 now.', a:old, a:new)
+endfunction
+
+" Function: lh#notify#error(message, exception, throwpoint) {{{3
+function! s:callback(choice) abort
+  if a:choice == 'q' || a:choice == 2
+    let s:bt_qf = lh#exception#decode(s:last_error.throwpoint).as_qf('')
+    let s:bt_qf[0].text = substitute(s:bt_qf[0].text, '\.\.\.', s:last_error.exception, '')
+    call setqflist(s:bt_qf)
+    if exists(':Copen')
+      Copen
+    else
+      copen
+    endif
+  elseif a:choice == 'q' || a:choice == 3
+    let error = printf("%s: %s\n%s", s:last_error.message, s:last_error.exception, s:last_error.throwpoint)
+    call lh#common#warning_msg(error)
+  endif
+endfunction
+
+function! lh#notify#error(message, exception, throwpoint) abort
+  let s:last_error = {'exception': a:exception, 'throwpoint': a:throwpoint, 'message': a:message}
+
+  call lh#ui#confirm_callback(
+        \ a:message,
+        \ ['&Ignore', 'Send to &quickfix', '&Trace'], #{
+        \   callback: { choice -> s:callback(choice) },
+        \   ui_type: exists('*popup_menu') ? 'popup' : 'text',
+        \ })
 endfunction
 
 "------------------------------------------------------------------------

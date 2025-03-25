@@ -83,6 +83,7 @@ Miscellanous functions:                                 |lhvl#misc|       {{{2
 - |lh#mapping#who_maps()|
 - |lh#notify#clear_notifications()|
 - |lh#notify#deprecated()|
+- |lh#notify#error()|
 - |lh#notify#once()|
 - |lh#on#exit()|
 - |lh#po#context()|
@@ -622,6 +623,22 @@ Notifies once that {old} is deprecated and that we should use {new} instead.
   call lh#notify#deprecated(
        \ 'lh#dev#reinterpret_escaped_char',
        \ 'lh#mapping#reinterpret_escaped_char')
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                                                *lh#notify#error()*               {{{3
+lh#notify#error(message, exception, throwpoint)~
+Notifies an error has happened and asks whether it shall be: ignored, sent to
+|quickfix| window, or traced (with |lh#common#warning_msg()|)
+@param {message}    Message to contextualize the error detected
+@param {exception}  Error description: a typical value is |v:exception|
+@param {throwpoint} Error callstack a typical value is |v:throwpoint|
+@return nothing
+@version 5.5.0
+>
+  call lh#notify#error
+       \ printf('Cannot open file %s'),
+       \ v:exception,
+       \ v:throwpoint)
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *lh#notify#once()*                {{{3
