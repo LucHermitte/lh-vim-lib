@@ -512,7 +512,7 @@ function! s:confirm_text(box, text, ...) abort
   let hotkeys = '' | let help_k = '/'
   " Parse the choices
   let i = 0
-  while choices != ""
+  while !empty(choices)
     let i +=  1
     let item    = matchstr(choices, "^.\\{-}\\ze\\(\n\\|$\\)")
     let choices = matchstr(choices, "\n\\zs.*$")
@@ -537,6 +537,9 @@ function! s:confirm_text(box, text, ...) abort
       let help_k .=  tolower(key)
     endif
   endwhile
+  " let g:hotkeys = hotkeys
+  " let g:hotkeys_ = hotkeys_
+
   let nb_choices = i
   if default > nb_choices | let default = nb_choices | endif
 
@@ -618,9 +621,10 @@ function! s:confirm_text(box, text, ...) abort
           let direction = 1
         elseif key =~ "\<left>\\|\<s-tab>"                " Previous  {{{5
           let direction = -1
-        elseif -1 != stridx(hotkeys, complType )          " Hotkeys   {{{5
+        elseif -1 != stridx(hotkeys, complType)           " Hotkeys   {{{5
           if '' == complType  | continue | endif
-          let direction = hotkeys[toupper(complType)] - i
+          let direction = hotkeys_[toupper(complType)] - i
+          " call s:Verbose("from %1 to %2(%4) -> dir=%3", i, hotkeys_[toupper(complType)], direction, complType)
           let toggle = 1
           " else
         endif
