@@ -110,7 +110,7 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#mapping#reinterpret_escaped_char()`        | Transforms sequences into interpreted sequences for mappings                                                                                                             |
 | `lh#mapping#who_map(rhs, mode)`                | Returns a list of mappings that are bound to {rhs} in the specified {mode}                                                                                               |
 | `lh#notify#once()`                             | Notifies something once                                                                                                                                                  |
-| `lh#notify#deprecated()`                       | Notifies somthing is deprecated once                                                                                                                                     |
+| `lh#notify#deprecated()`                       | Notifies something is deprecated once                                                                                                                                    |
 | `lh#notify#clear_notifications()`              | Clear previous notification so that could be notified again                                                                                                              |
 | `lh#on#exit()`                                 | Prepares a finalizer object to be executed in a `:finally` clause in order to restore variables and execute functions                                                    |
 | `lh#ref#bind(varname)`                         | Returns a reference to another variable. To be evaluated with [`lh#option#get()`](doc/Options.md#lhoptiongetname-default--scope)                                         |
@@ -123,8 +123,8 @@ The [complete documentation](http://github.com/LucHermitte/lh-vim-lib/blob/maste
 | `lh#position#extract(pos1,pos2)`               | Obtains the text between two positions                                                                                                                                   |
 | `lh#position#getcur()`                         | Return [`getcurpos()`](http://vimhelp.appspot.com/eval.txt.html#getcurpos%28%29) when it exists, [`getpos('.')`](http://vimhelp.appspot.com/eval.txt.html#getpos%28%29)  otherwise |
 | `lh#position#is_before()`                      | Tells if a position in a buffer is before another one -- boolean result                                                                                                  |
-| `lh#position#move(dir)`                        | Returns a the string to use to move the cursor in the given direction -- this can be redoable w/ vim > 7.4.849                                                           |
-| `lh#position#move_n(dir, count)`               | Returns a the string to use to move the cursor count times in the given direction -- this can be redoable w/ vim > 7.4.849                                               |
+| `lh#position#move(dir)`                        | Returns the string to use to move the cursor in the given direction -- this can be redoable w/ vim > 7.4.849                                                             |
+| `lh#position#move_n(dir, count)`               | Returns the string to use to move the cursor count times in the given direction -- this can be redoable w/ vim > 7.4.849                                                 |
 | `lh#string#count_char()`                       | Counts how many times a character is present in a string                                                                                                                 |
 | `lh#string#join()`                             | Work as [`join()`](http://vimhelp.appspot.com/eval.txt.html#join%28%29) but on strings directly                                                                          |
 | `lh#string#matches()`                          | Extracts a list of all matches in a string                                                                                                                               |
@@ -168,7 +168,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | Function                         | Purpose                                                                                                           |
 |:---------------------------------|:------------------------------------------------------------------------------------------------------------------|
 | `lh#dict#add_new()`              | Adds elements from the second dictionary if they are not set yet in the first                                     |
-| `lh#dict#get_composed()`         | Function symetric to `lh#let#*()` functions                                                                       |
+| `lh#dict#get_composed()`         | Function symmetric to `lh#let#*()` functions                                                                      |
 | `lh#dict#key()`                  | Expects the dictionary to have only one element (throw otherwise) and returns it                                  |
 | `lh#dict#let()`                  | Emulates `:let dict.key.key.key = value`                                                                          |
 | `lh#dict#print_as_tree()`        | Pretty printer for dictionaries: present them as tree                                                             |
@@ -179,7 +179,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#accumulate2()`          | Accumulates the elements from a list -- version closer to C++ std::accumulate()                                   |
 | `lh#list#arg_min()` & `max`      | Returns the index of the lesser/greater elements                                                                  |
 | `lh#list#chain_transform()`      | Applies a series of transformation on each element from a list ; unlike `map()`, the input list is left unchanged |
-| `lh#list#concurrent_for()`       | Concurrently searches for symettric differences and intersection of two sorted sets                               |
+| `lh#list#concurrent_for()`       | Concurrently searches for symmetric differences and intersection of two sorted sets                               |
 | `lh#list#contain_entity()`       | Tells whether a Dict or List entity is present within a list                                                      |
 | `lh#list#copy_if()`              | Copies the elements from a list that match a predicate                                                            |
 | `lh#list#cross()`                | Cross elements from two lists and produce a new list                                                              |
@@ -187,7 +187,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#find_entity()`          | Return the index where an entity is within a list, -1 if not found                                                |
 | `lh#list#find_if()`              | Searches the first element in a list that verifies a predicate                                                    |
 | `lh#list#find_if_fast()`         | Searches the first element in a list that verifies a simple predicate only relying on `v:val` or `v:key`          |
-| `lh#list#flat_extend()`          | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter             |
+| `lh#list#flat_extend()`          | Extends a list with another, or add elements into a list depending on the _right-hand-side_ parameter               |
 | `lh#list#flatten()`              | Flattens a list                                                                                                   |
 | `lh#list#for_each_call()`        | Calls a function of all elements from a list                                                                      |
 | `lh#list#get()`                  | Returns a list with the elements of index/key in a list of lists/dictionaries (<=> map get(key/idx) list)         |
@@ -217,7 +217,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#list#unique_sort2()`         | Another implementation of `unique_sort`                                                                           |
 | `lh#list#upper_bound()`          | See C++ [`std::upper_bound`](http://en.cppreference.com/w/cpp/algorithm/upper_bound)                              |
 | `lh#list#zip()`                  | Zip two lists into one list.                                                                                      |
-| `lh#list#zip_as_dict()`          | Zip two lists into a dictionary                                                                                   |
+| `lh#list#zip_as_dict()`          | Zip two lists into a dictionary.                                                                                  |
 
 
 ### Stacks related functions
@@ -226,7 +226,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
 | Function                      | Purpose                                                                                      |
 |:------------------------------|:---------------------------------------------------------------------------------------------|
-| `lh#stack#push(stack, value)` | Pushes a variable at the end of a list that will be interpreted as a _stack_                 |
+| `lh#stack#push(stack, value)` | Pushes a variable at the end of a list that will be interpreted as a _stack_                   |
 | `lh#stack#top(stack)`         | Fetches the top of the stack                                                                 |
 | `lh#stack#pop(stack)`         | Pops the top of the stack                                                                    |
 
@@ -234,7 +234,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 
 | Function                      | Purpose                                                                                      |
 |:------------------------------|:---------------------------------------------------------------------------------------------|
-| `lh#stack#new(...)`           | Creates a new _stack_ object that proposes `push`, `top` and `pop` methods.                  |
+| `lh#stack#new(...)`           | Creates a new _stack_ object that proposes `push`, `top` and `pop` methods.                    |
 | `lh#stack#new_list(nb)`       | Builds what `repeat([lh#stack#new()], 42)` cannot build                                      |
 
 ### Graphs related functions
@@ -305,7 +305,7 @@ See also [system-tools](http://github.com/LucHermitte/vim-system-tools)
 | `lh#menu#is_in_visual_mode()` | Tells whether the action triggered by a menu/map was initiated while in visual mode.                                                                     |
 | `lh#menu#make()`              | Helper function to associate menus and mappings to actions in different modes.                                                                           |
 | `lh#menu#map_all()`           | Helper function to define several mappings at once as `:amenu` would do                                                                                  |
-| `lh#menu#emove()`             | Helper function to remove a menus from as many modes as required                                                                                         |
+| `lh#menu#emove()`             | Helper function to remove a menu from as many modes as required                                                                                          |
 | `lh#menu#text()`              | Transforms a regular text into a text that can be directly used with [|`:menu`|](http://vimhelp.appspot.com/gui.txt.html#:menu) commands.                |
 
 See also the documentation of the old functions at http://hermitte.free.fr/vim/general.php#expl_menu_map
@@ -365,7 +365,7 @@ See also the documentation of the old functions at http://hermitte.free.fr/vim/g
 | `lh#function#execute()`   | Executes a functor object.                                  |
 | `lh#function#prepare()`   | Prepares a functor object to be `eval`uated.                |
 | `lh#partial#make()`       | Prepares a partial (or an emulated partial) to be executed. |
-| `lh#partial#execute()`    | Executes a partial (or an emulated partial) .               |
+| `lh#partial#execute()`    | Executes a partial (or an emulated partial).                |
 
 
 ### UI functions
@@ -386,9 +386,10 @@ propositions with the cursor or `tab`  keys to choose one.
 | Function                         | Purpose                                                                                                                                                 |
 |:---------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `lh#ui#ask()`                    | Ask a question under the status line                                                                                                                    |
-| `lh#ui#check()`                  | Emulates a checbox UI function                                                                                                                          |
+| `lh#ui#check()`                  | Emulates a checkbox UI function                                                                                                                         |
 | `lh#ui#combo()`                  | Emulates a combobox UI function                                                                                                                         |
 | `lh#ui#confirm()`                | Similar to `confirm()`                                                                                                                                  |
+| `lh#ui#confirm_callback()`       | Calls [`:h popup_menu()`](http://vimhelp.appspot.com/popup.txt.html#popup_menu%28%29), or fallback to `confirm()` (nvim)                                |
 | `lh#ui#global_confirm_command()` | Extends `:substitute` `confirm`  flag to `:global`. Wrapped in `:ConfirnGlobal`                                                                         |
 | `lh#ui#if()`                     | Acts as the ternary operator                                                                                                                            |
 | `lh#ui#input()`                  | Calls `inputdialog()` or `input()`                                                                                                                      |

@@ -2,10 +2,10 @@
 " File:         autoload/lh/ui.vim                                {{{1
 " Author:       Luc Hermitte <EMAIL:luc {dot} hermitte {at} gmail {dot} com>
 "		<URL:http://github.com/LucHermitte/lh-vim-lib>
-" Version:      5.4.0
-let s:k_version = '50400'
+" Version:      5.5.0
+let s:k_version = '50500'
 " Created:      03rd Jan 2017
-" Last Update:  01st Dec 2022
+" Last Update:  25th Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -181,6 +181,21 @@ function! lh#ui#confirm(text, ...) abort
     return 0
   endif
   return call('s:confirm_impl', ['none', a:text] + a:000)
+endfunction
+
+" Function: lh#ui#confirm_callback(text, choices, {options}) {{{3
+" @since Version 5.5.0
+function! lh#ui#confirm_callback(text, choices, options) abort
+  call lh#assert#value(a:options).has_key('callback')
+  let ui_type = get(a:options, 'ui_type', s:Opt_type())
+  if ui_type =~? '\vp%[opup]'
+    call s:confirm_popup(a:text, a:choices, a:options)
+  else
+    let choice = lh#ui#confirm(a:text, join(a:choices, "\n"))
+    if choice > 0
+      call a:options.callback(choice)
+    endif
+  endif
 endfunction
 
 " Function: lh#ui#input(prompt [, default ]) {{{3
@@ -381,7 +396,7 @@ function! s:confirm_impl(box, text, ...) abort " {{{2
   endif
   " 2- Choose the correct way to execute according to the option {{{3
   let o = s:Opt_type()
-  if o !~ '\v^(g%[ui]|t%[ext]|v%[te])$'
+  if o !~ '\v^(g%[ui]|t%[ext]|v%[te]|p%[opup])$'
     call lh#notify#once("lh#ui#confirm(): Unkonwn user-interface style (".o.")")
   endif
   if     o =~ '\vf%[te]'                                                                                        " {{{4
@@ -431,6 +446,53 @@ function! s:status_line(prompt, current, hl, ...) abort
 endfunction
 
 " Function: s:confirm_text(box, text [, choices [, default [, type]]]) {{{2
+hi def LHHotKey term=bold cterm=bold ctermfg=LightRed guifg=Red guibg=#e0e0e0
+if hlexists('CocFloating')
+  hi def link LHFloating CocFloating
+else
+  hi def LHFloating ctermbg=253 guibg=#e0e0e0
+endif
+
+function! s:popup_callback(id, choice, hotkeys, actual_callback) abort
+  let choice = type(a:choice) == type(0) ? a:choice : a:hotkeys[a:choice]
+  call a:actual_callback(choice)
+endfunction
+
+function! s:popup_filter(id, key, hotkey_re) abort
+  if !empty(a:hotkey_re) && (a:key =~? a:hotkey_re)
+    call popup_close(a:id, tolower(a:key))
+    return v:true  " <=> key has been handled => necessary
+  else
+    return popup_filter_menu(a:id, a:key)
+  endif
+endfunction
+
+function! s:confirm_popup(text, choices, options) abort
+  " Analyse the hotkeys. Each hot key -> an index
+  let hotkey_list = map(copy(a:choices), { _, s -> matchstr(s, '&\zs.\ze')})
+  if !empty(hotkey_list)
+    let hotkey_re = printf('^[%s]$', hotkey_list->join(''))
+    let hotkeys = {}
+    call map(copy(hotkey_list), {idx, key -> empty(key) ? 0 : extend(l:hotkeys, {tolower(key): (idx+1)})})
+    let s:popup_info = {'choices' :  hotkeys}
+  else
+    let hotkeys = ''
+    let hotkey_re = ''
+  endif
+
+  " Create the popup_menu
+  let id = popup_menu(a:choices, #{
+        \ title : a:text,
+        \ filter: {id, key -> s:popup_filter(id, key, l:hotkey_re)},
+        \ callback: { id,choice -> s:popup_callback(id , choice, l:hotkeys, a:options.callback) },
+        \ highlight: 'LHFloating'
+        \ })
+  call matchadd('LHHotKey', '&.', 10, -1, {'window': id})
+  call matchadd('Conceal', '&', 10, -1, {'window': id, 'conceal': ''})
+  call setwinvar(id, '&conceallevel', 3)
+endfunction
+
+" Function: s:confirm_text(box, text [, choices [, default [, type]]]) {{{2
 function! s:confirm_text(box, text, ...) abort
   let help = "/<esc>/<s-tab>/<tab>/<left>/<right>/<cr>/<F1>"
   " 1- Retrieve the parameters       {{{3
@@ -443,7 +505,6 @@ function! s:confirm_text(box, text, ...) abort
     let help = '/ '.help
   else                    | let prefix = ''
   endif
-
 
   " 2- Retrieve the proposed choices {{{3
   " Prepare the hot keys
@@ -491,19 +552,19 @@ function! s:confirm_text(box, text, ...) abort
         \.restore('&l:statusline')
   try
     " Color schemes for selected item {{{5
-    :hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow
+    hi User1 term=inverse,bold cterm=inverse,bold ctermfg=Yellow
           \ guifg=Black guibg=Yellow
-    :hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
+    hi User2 term=inverse,bold cterm=inverse,bold ctermfg=LightRed
           \ guifg=Black guibg=LightRed
-    :hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red
+    hi User3 term=inverse,bold cterm=inverse,bold ctermfg=Red
           \ guifg=Black guibg=Red
-    :hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
+    hi User4 term=inverse,bold cterm=inverse,bold ctermfg=Cyan
           \ guifg=Black guibg=Cyan
-    :hi User5 term=inverse,bold cterm=inverse,bold ctermfg=LightYellow
+    hi User5 term=inverse,bold cterm=inverse,bold ctermfg=LightYellow
           \ guifg=Black guibg=LightYellow
-    :hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
+    hi User6 term=inverse,bold cterm=inverse,bold ctermfg=LightGray
           \ guifg=DarkRed guibg=LightGray
-    :hi User7 term=inverse,bold cterm=inverse,bold ctermfg=LightCyan
+    hi User7 term=inverse,bold cterm=inverse,bold ctermfg=LightCyan
           \ guifg=Black guibg=LightCyan
     " }}}5
 
