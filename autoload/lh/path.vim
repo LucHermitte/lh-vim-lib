@@ -7,7 +7,7 @@
 " Version:      5.5.0
 let s:k_version = 50500
 " Created:      23rd Jan 2007
-" Last Update:  23rd Mar 2025
+" Last Update:  25th Mar 2025
 "------------------------------------------------------------------------
 " Description:
 "       Functions related to the handling of pathnames
@@ -129,6 +129,7 @@ let s:k_version = 50500
 "       v5.5.0
 "       (*) REFACT: Change `lh#path#new_permission_lists.handle_file()`
 "           and `.handle_paths()` return types to a |List|.
+"       (*) REFACT: Handle errors in `lh#path#new_permission_lists.handle_*()`
 " TODO:
 "       (*) Fix #simplify('../../bar')
 " }}}1
@@ -729,7 +730,8 @@ function! lh#path#munge(pathlist, path, ...) abort
   if type(a:pathlist) == type('str')
     let sep = get(a:, 1, ',')
     let pathlist = split(a:pathlist, sep)
-    return join(lh#path#munge(pathlist, path), sep)
+    " return join(lh#path#munge(pathlist, path), sep)
+    return lh#path#munge(pathlist, path)->join(sep)  " To fix highlighting...
   else
     " if filereadable(path) || isdirectory(path)
     if ! empty(glob(path))
@@ -882,8 +884,14 @@ function! s:lists_handle_file(file, permission) dict abort
     endif
   endif
   call s:Verbose('('.a:permission.') '. self._action_name. ' ' . a:file)
-  call self._do_handle(a:file)
-  return [[a:file, self._do_handle(a:file)]]
+  try
+    let res = self._do_handle(a:file)
+  catch /.*/
+    let error = printf("Error detected while handling %s: %s\n%s", a:file, v:exception, v:throwpoint)
+    let res = error
+    call lh#notify#error(printf('Error while handling %s', a:file), v:exception, v:throwpoint)
+  endtry
+    return [[a:file, res]]
 endfunction
 
 " - check_paths() {{{4
