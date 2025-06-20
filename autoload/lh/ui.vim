@@ -5,7 +5,7 @@
 " Version:      5.5.0
 let s:k_version = '50500'
 " Created:      03rd Jan 2017
-" Last Update:  25th Mar 2025
+" Last Update:  20th Jun 2025
 "------------------------------------------------------------------------
 " Description:
 "       Defines helper functions to interact with end user.
@@ -238,13 +238,18 @@ endfunction
 " Function: lh#ui#which(function, prompt, choice [, ... ]) {{{3
 function! lh#ui#which(fn, prompt, ...) abort
   let params = copy(a:000)
-  if type(params[0]) != type([]) && a:fn != 'confirm'
-    let params[0] = split(params[0], "\n")
+  if type(params[0]) != type([])
+    let choices = split(params[0], "\n")
+    if a:fn != 'confirm'
+      let params[0] = choices
+    endif
+  else
+    let choices = params[0]
   endif
   let which = call(a:fn, [a:prompt] + params)
   if     0 >= which | return ''
   else
-    return substitute(params[0][which-1], '&', '', '')
+    return substitute(choices[which-1], '&', '', '')
   endif
 endfunction
 
