@@ -4,10 +4,10 @@
 "               <URL:http://github.com/LucHermitte/lh-vim-lib>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/lh-vim-lib/tree/master/License.md>
-" Version:      5.2.2
-let s:k_version = 5.2.2
+" Version:      5.4.0
+let s:k_version = '5.4.0'
 " Created:      08th Jan 2007
-" Last Update:  10th Nov 2020
+" Last Update:  10th Sep 2025
 "------------------------------------------------------------------------
 " Description:
 "       Helpers to define commands that:
@@ -61,6 +61,45 @@ endfunction
 " ## Functions {{{1
 
 " Tool functions {{{2
+
+" Function: lh#command#split_quote_wise(text) {{{3
+" Split a:text into tokens at spaces, while quotes delimate unsplitable tokens
+" Let's ignore \ for now...
+let s:k_any_quote       = '["'."']"
+let s:k_any_quote_space = '[ \t"'."']"
+function! lh#command#split_quote_wise(text) abort
+  let res = []
+  let in_string = ''
+  let in_space = 0
+
+  let positions = matchstrlist([a:text], s:k_any_quote_space)
+  let b = 0
+  for p in positions
+    let c = p.text
+    if in_string != ''
+      if in_string == c " end of quote
+        let in_string = ''
+      endif
+      " and analyse next token
+    elseif c =~ '\s' " space outside substring
+      if in_space && b == p.byteidx " still in space => advance
+      else " new of token
+        call add(res, a:text[b : p.byteidx-1])
+      endif
+      let b = p.byteidx + 1
+      let in_space = 1
+    else " start of substring
+      let in_string = c
+      let in_space = 0
+    endif
+  endfor
+  if b < strlen(a:text)
+    call add(res, a:text[b : -1])
+  endif
+  return res
+endfunction
+
+
 " Function: lh#command#Fargs2String(aList) {{{3
 " @param[in,out] aList list of params from <f-args>
 " @see tests/lh/test-Fargs2String.vim
